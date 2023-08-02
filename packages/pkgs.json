@@ -1,0 +1,17 @@
+[
+ {
+  "path": "/packages/tools/CmBacktrace", 
+  "ver": "v1.4.1", 
+  "name": "CMBACKTRACE"
+ }, 
+ {
+  "path": "/packages/peripherals/nrf5x_sdk", 
+  "ver": "latest", 
+  "name": "NRF5X_SDK"
+ }, 
+ {
+  "path": "/packages/peripherals/nrfx", 
+  "ver": "latest", 
+  "name": "NRFX"
+ }
+]
