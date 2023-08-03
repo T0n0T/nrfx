@@ -273,18 +273,13 @@ static void date(int argc, char **argv)
         struct timeval tv  = {0};
         struct timezone tz = {0};
 
-        get_timestamp(&now); /* get new timestamp */
-        rt_kprintf("now: %.*s", 25, ctime(&now));
-        int result = gettimeofday(&tv, &tz);
-        // if (result != 0) {
-        //     rt_kprintf("date go wrong");
-        // }
+        gettimeofday(&tv, &tz);
 
-        // now = tv.tv_sec;
-        // /* output current time */
-        // rt_kprintf("local time: %.*s", 25, ctime(&now));
-        // rt_kprintf("timestamps: %ld\n", (long)tv.tv_sec);
-        // rt_kprintf("timezone: UTC%c%d\n", -tz.tz_minuteswest > 0 ? '+' : '-', -tz.tz_minuteswest / 60);
+        now = tv.tv_sec;
+        /* output current time */
+        rt_kprintf("local time: %.*s", 25, ctime(&now));
+        rt_kprintf("timestamps: %ld\n", (long)now);
+        rt_kprintf("timezone: UTC%c%d\n", -tz.tz_minuteswest > 0 ? '+' : '-', -tz.tz_minuteswest / 60);
     } else if (argc >= 7) {
         /* set time and date */
         struct tm tm_new = {0};

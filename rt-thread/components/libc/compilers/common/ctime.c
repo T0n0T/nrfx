@@ -409,7 +409,7 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
         tv->tv_sec  = 0;
         tv->tv_usec = 0;
 
-        if (_control_rtc(RT_DEVICE_CTRL_RTC_GET_TIMEVAL, tv) == RT_EOK)
+        if (_control_rtc(RT_DEVICE_CTRL_RTC_GET_TIME, tv) == RT_EOK)
             return 0;
     }
 
