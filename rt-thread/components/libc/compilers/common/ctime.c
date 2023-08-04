@@ -41,7 +41,7 @@
 #endif
 
 #define DBG_TAG "time"
-#define DBG_LVL DBG_LOG
+#define DBG_LVL DBG_INFO
 #include <rtdbg.h>
 
 #define _WARNING_NO_RTC "Cannot find a RTC device!"
