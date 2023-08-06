@@ -5,7 +5,7 @@
 /* RT-Thread Configuration */
 
 /* RT-Thread Kernel */
-#define __STDC_NO_ATOMICS__
+
 #define RT_NAME_MAX   8
 #define RT_ALIGN_SIZE 8
 #define RT_THREAD_PRIORITY_32
@@ -27,7 +27,7 @@
 #define RT_DEBUGING_COLOR
 #define RT_DEBUGING_CONTEXT
 #define RT_DEBUGING_INIT
-// #define RT_I2C_DEBUG
+
 /* Inter-Thread communication */
 
 #define RT_USING_SEMAPHORE
@@ -80,6 +80,9 @@
 
 #define RT_USING_DEVICE_IPC
 #define RT_UNAMED_PIPE_NUMBER 64
+#define RT_USING_SYSTEM_WORKQUEUE
+#define RT_SYSTEM_WORKQUEUE_STACKSIZE 2048
+#define RT_SYSTEM_WORKQUEUE_PRIORITY  23
 #define RT_USING_SERIAL
 #define RT_USING_SERIAL_V1
 #define RT_SERIAL_RB_BUFSZ 64
@@ -105,6 +108,28 @@
 
 /* Network */
 
+#define RT_USING_SAL
+#define SAL_INTERNET_CHECK
+
+/* Docking with protocol stacks */
+
+#define SAL_USING_AT
+#define SAL_SOCKETS_NUM 16
+#define RT_USING_NETDEV
+#define NETDEV_USING_IFCONFIG
+#define NETDEV_USING_PING
+#define NETDEV_USING_NETSTAT
+#define NETDEV_USING_AUTO_DEFAULT
+#define NETDEV_IPV4 1
+#define NETDEV_IPV6 0
+#define RT_USING_AT
+#define AT_USING_CLIENT
+#define AT_CLIENT_NUM_MAX 1
+#define AT_USING_SOCKET
+#define AT_USING_CLI
+#define AT_CMD_MAX_LEN    128
+#define AT_SW_VERSION_NUM 0x10301
+
 /* Utilities */
 
 /* RT-Thread online packages */
@@ -116,6 +141,18 @@
 /* Marvell WiFi */
 
 /* Wiced WiFi */
+
+#define PKG_USING_AT_DEVICE
+#define AT_DEVICE_USING_EC200X
+#define AT_DEVICE_EC200X_SOCKET
+#define AT_DEVICE_EC200X_SAMPLE
+#define EC200X_SAMPLE_POWER_PIN     -1
+#define EC200X_SAMPLE_STATUS_PIN    -1
+#define EC200X_SAMPLE_WAKEUP_PIN    -1
+#define EC200X_SAMPLE_CLIENT_NAME   "uart2"
+#define EC200X_SAMPLE_RECV_BUFF_LEN 512
+#define PKG_USING_AT_DEVICE_LATEST_VERSION
+#define PKG_AT_DEVICE_VER_NUM 0x99999
 
 /* IoT Cloud */
 
@@ -155,13 +192,6 @@
 /* peripheral libraries and drivers */
 
 /* sensors drivers */
-
-#define PKG_USING_MAX30102
-#define PKG_USING_MAX30102_LATEST_VERSION
-#define MAX30102_STACK_SIZE 1024
-#define MAX30102_PRIORITY   20
-#define MAX30102_TICKS      10
-#define MAX30102_USING_EXAMPLE
 
 /* touch drivers */
 

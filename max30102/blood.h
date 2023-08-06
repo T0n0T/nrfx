@@ -5,15 +5,14 @@
 #include "math.h"
 
 typedef enum {
-    BLD_NORMAL, // Õı³£
-    BLD_ERROR,  // Õì²â´íÎó
-
-} BloodState; // ÑªÒº×´Ì¬
+    HRM_SPO2 = 1,
+    PROX,
+} HRM_Mode; // è¡€æ¶²çŠ¶æ€
 
 typedef struct
 {
-    int heart;  // ĞÄÂÊÊı¾İ
-    float SpO2; // ÑªÑõÊı¾İ
+    int heart;  // å¿ƒç‡æ•°æ®
+    float SpO2; // è¡€æ°§æ•°æ®
 } BloodData;
 
 void blood_data_translate(void);

@@ -1,41 +1,41 @@
 #ifndef __ALGORITHM_H
 #define __ALGORITHM_H
 
-#define FFT_N       512 // ¶¨Òå¸µÀïÒ¶±ä»»µÄµãÊı
-#define START_INDEX 4   // µÍÆµ¹ıÂËãĞÖµ
+#define FFT_N       512 // å®šä¹‰å‚…é‡Œå¶å˜æ¢çš„ç‚¹æ•°
+#define START_INDEX 4   // ä½é¢‘è¿‡æ»¤é˜ˆå€¼
 
-struct compx // ¶¨ÒåÒ»¸ö¸´Êı½á¹¹
+struct compx // å®šä¹‰ä¸€ä¸ªå¤æ•°ç»“æ„
 {
     float real;
     float imag;
 };
 
-// ÏòÏÂÈ¡Õû
+// å‘ä¸‹å–æ•´
 double my_floor(double x);
-// ÇóÓàÔËËã
+// æ±‚ä½™è¿ç®—
 double my_fmod(double x, double y);
-// ÕıÏÒº¯Êı
+// æ­£å¼¦å‡½æ•°
 double XSin(double x);
-// ÓàÏÒº¯Êı
+// ä½™å¼¦å‡½æ•°
 double XCos(double x);
-// ¿ªÆ½·½
+// å¼€å¹³æ–¹
 int qsqrt(int a);
 
 /*******************************************************************
-º¯ÊıÔ­ĞÍ£ºstruct compx EE(struct compx b1,struct compx b2)
-º¯Êı¹¦ÄÜ£º¶ÔÁ½¸ö¸´Êı½øĞĞ³Ë·¨ÔËËã
-ÊäÈë²ÎÊı£ºÁ½¸öÒÔÁªºÏÌå¶¨ÒåµÄ¸´Êıa,b
-Êä³ö²ÎÊı£ºaºÍbµÄ³Ë»ı£¬ÒÔÁªºÏÌåµÄĞÎÊ½Êä³ö
+å‡½æ•°åŸå‹ï¼šstruct compx EE(struct compx b1,struct compx b2)
+å‡½æ•°åŠŸèƒ½ï¼šå¯¹ä¸¤ä¸ªå¤æ•°è¿›è¡Œä¹˜æ³•è¿ç®—
+è¾“å…¥å‚æ•°ï¼šä¸¤ä¸ªä»¥è”åˆä½“å®šä¹‰çš„å¤æ•°a,b
+è¾“å‡ºå‚æ•°ï¼šaå’Œbçš„ä¹˜ç§¯ï¼Œä»¥è”åˆä½“çš„å½¢å¼è¾“å‡º
 *******************************************************************/
 struct compx EE(struct compx a, struct compx b);
 /*****************************************************************
-º¯ÊıÔ­ĞÍ£ºvoid FFT(struct compx *xin,int N)
-º¯Êı¹¦ÄÜ£º¶ÔÊäÈëµÄ¸´Êı×é½øĞĞ¿ìËÙ¸µÀïÒ¶±ä»»£¨FFT£©
-ÊäÈë²ÎÊı£º*xin¸´Êı½á¹¹Ìå×éµÄÊ×µØÖ·Ö¸Õë£¬structĞÍ
+å‡½æ•°åŸå‹ï¼švoid FFT(struct compx *xin,int N)
+å‡½æ•°åŠŸèƒ½ï¼šå¯¹è¾“å…¥çš„å¤æ•°ç»„è¿›è¡Œå¿«é€Ÿå‚…é‡Œå¶å˜æ¢ï¼ˆFFTï¼‰
+è¾“å…¥å‚æ•°ï¼š*xinå¤æ•°ç»“æ„ä½“ç»„çš„é¦–åœ°å€æŒ‡é’ˆï¼Œstructå‹
 *****************************************************************/
 void FFT(struct compx *xin);
 
-// ¶ÁÈ¡·åÖµ
+// è¯»å–å³°å€¼
 int find_max_num_index(struct compx *data, int count);
 
 typedef struct
@@ -46,7 +46,7 @@ typedef struct
 
 } DC_FilterData;
 
-// Ö±Á÷ÂË²¨Æ÷
+// ç›´æµæ»¤æ³¢å™¨
 int dc_filter(int input, DC_FilterData *df);
 
 typedef struct
