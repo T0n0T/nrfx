@@ -118,8 +118,6 @@ static rt_bool_t maxim_max30102_init()
         return RT_FALSE;
     if (!maxim_max30102_write_reg(REG_LED2_PA, 0x24)) // Choose value for ~ 7mA for LED2
         return RT_FALSE;
-    // if (!maxim_max30102_write_reg(REG_PILOT_PA, 0x7f)) // Choose value for ~ 25mA for Pilot LED
-    //     return RT_FALSE;
 
     return RT_TRUE;
 }
@@ -132,7 +130,7 @@ static rt_bool_t maxim_max30102_init_proximity_mode()
         return RT_FALSE;
     if (!maxim_max30102_write_reg(REG_FIFO_RD_PTR, 0x00)) // FIFO_RD_PTR[4:0]
         return RT_FALSE;
-    if (!maxim_max30102_write_reg(REG_FIFO_CONFIG, 0x00)) // sample avg = 1, fifo rollover=RT_FALSE, fifo almost full = 32
+    if (!maxim_max30102_write_reg(REG_FIFO_CONFIG, 0x1E)) // sample avg = 1, fifo rollover=1, 16 unread samlpes,8 gourps
         return RT_FALSE;
     if (!maxim_max30102_write_reg(REG_MODE_CONFIG, 0x07)) // 0x02 for Red only, 0x03 for SpO2 mode 0x07 multimode LED
         return RT_FALSE;
@@ -144,7 +142,7 @@ static rt_bool_t maxim_max30102_init_proximity_mode()
         return RT_FALSE;                                      // SPO2_SR : 50HZ, LED_PW : 400us
     if (!maxim_max30102_write_reg(REG_MULTI_LED_CTRL1, 0x12)) // Using LED1 in IR,LED2 in RED
         return RT_FALSE;
-    if (!maxim_max30102_write_reg(REG_MULTI_LED_CTRL2, 0x00)) // Choose value for ~ 25mA for Pilot LED
+    if (!maxim_max30102_write_reg(REG_MULTI_LED_CTRL2, 0x00))
         return RT_FALSE;
     if (!maxim_max30102_write_reg(REG_INTR_ENABLE_1, 0x40)) // INTR setting: PPG int
         return RT_FALSE;
@@ -155,26 +153,30 @@ static rt_bool_t maxim_max30102_init_proximity_mode()
 
 rt_bool_t max30102_checkout_HRM_SPO2_mode()
 {
+    if (!maxim_max30102_write_reg(REG_FIFO_CONFIG, 0x0f)) // sample avg = 1, fifo rollover=1, 16 unread samlpes,8 gourps
+        return RT_FALSE;
     if (!maxim_max30102_write_reg(REG_LED1_PA, 0x24)) // LED1: 7mA
         return RT_FALSE;
     if (!maxim_max30102_write_reg(REG_LED2_PA, 0x24)) // LED2: 7mA
         return RT_FALSE;
-    if (!maxim_max30102_write_reg(REG_SPO2_CONFIG, 0x4E)) // SPO2_ADC_RGE : 8uA (this is a good starting point, try other settings in order to fine tune your design),
-        return RT_FALSE;                                  // SPO2_SR : 400HZ, LED_PW : 400us
-    if (!maxim_max30102_write_reg(REG_FIFO_CONFIG, 0x40)) // sample avg = 1, fifo rollover=RT_FALSE, fifo almost full = 32
+    if (!maxim_max30102_write_reg(REG_SPO2_CONFIG, 0x27))
+        return RT_FALSE;
+    if (!maxim_max30102_write_reg(REG_FIFO_CONFIG, 0x0f)) // sample avg = 4, fifo rollover=RT_FALSE, fifo almost full = 32
         return RT_FALSE;
     return RT_TRUE;
 }
 
 rt_bool_t max30102_checkout_proximity_mode()
 {
+    if (!maxim_max30102_write_reg(REG_MODE_CONFIG, 0x07)) // 0x02 for Red only, 0x03 for SpO2 mode 0x07 multimode LED
+        return RT_FALSE;
     if (!maxim_max30102_write_reg(REG_LED1_PA, 0x19)) // LED1: 5mA
         return RT_FALSE;
     if (!maxim_max30102_write_reg(REG_LED2_PA, 0x00)) // LED2: 0mA
         return RT_FALSE;
     if (!maxim_max30102_write_reg(REG_SPO2_CONFIG, 0x43)) // SPO2_ADC_RGE : 8uA (this is a good starting point, try other settings in order to fine tune your design),
         return RT_FALSE;                                  // SPO2_SR : 50HZ, LED_PW : 400us
-    if (!maxim_max30102_write_reg(REG_FIFO_CONFIG, 0x40)) // sample avg = 1, fifo rollover=RT_FALSE, fifo almost full = 32
+    if (!maxim_max30102_write_reg(REG_FIFO_CONFIG, 0x1E)) // sample avg = 1, fifo rollover=1, 16 unread samlpes,8 gourps
         return RT_FALSE;
     if (!maxim_max30102_write_reg(REG_FIFO_WR_PTR, 0x00)) // FIFO_WR_PTR[4:0]
         return RT_FALSE;
@@ -182,7 +184,7 @@ rt_bool_t max30102_checkout_proximity_mode()
         return RT_FALSE;
     if (!maxim_max30102_write_reg(REG_FIFO_RD_PTR, 0x00)) // FIFO_RD_PTR[4:0]
         return RT_FALSE;
-    if (!maxim_max30102_write_reg(REG_FIFO_CONFIG, 0x00)) // sample avg = 1, fifo rollover=RT_FALSE, fifo almost full = 32
+    if (!maxim_max30102_write_reg(REG_FIFO_CONFIG, 0x1E)) // sample avg = 1, fifo rollover=1, 16 unread samlpes,8 gourps
         return RT_FALSE;
     return RT_TRUE;
 }
@@ -318,10 +320,11 @@ int rt_hw_max30102_init(struct rt_sensor_config *cfg)
         rt_thread_mdelay(1000);
 
         maxim_max30102_read_reg(REG_INTR_STATUS_1, &uch_dummy, sizeof(uch_dummy)); // Reads/clears the interrupt status register
-        maxim_max30102_init_proximity_mode();                                      // initialize the MAX30102
+        // maxim_max30102_init();                                                     // initialize the MAX30102
+        maxim_max30102_init_proximity_mode(); // initialize the MAX30102
 
         tid = rt_thread_create("max30102", max30102_thread_entry, sensor,
-                               MAX30102_STACK_SIZE, MAX30102_PRIORITY, MAX30102_TICKS);
+                               MAX30102_STACK_SIZE, 20, MAX30102_TICKS);
         if (tid == RT_NULL) {
             err_msg = "Create max30102 thread error.";
             break;
