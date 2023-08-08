@@ -31,7 +31,9 @@ void SysTick_Handler(void)
     rt_interrupt_leave();
 }
 
-static void clk_event_handler(nrfx_clock_evt_type_t event){}
+static void clk_event_handler(nrfx_clock_evt_type_t event)
+{
+}
 
 void SysTick_Configuration(void)
 {
@@ -44,9 +46,7 @@ void SysTick_Configuration(void)
     /* Configure SysTick to interrupt at the requested rate. */
     nrf_systick_load_set(SystemCoreClock / RT_TICK_PER_SECOND);
     nrf_systick_val_clear();
-    nrf_systick_csr_set(NRF_SYSTICK_CSR_CLKSOURCE_CPU | NRF_SYSTICK_CSR_TICKINT_ENABLE
-                        | NRF_SYSTICK_CSR_ENABLE);
-
+    nrf_systick_csr_set(NRF_SYSTICK_CSR_CLKSOURCE_CPU | NRF_SYSTICK_CSR_TICKINT_ENABLE | NRF_SYSTICK_CSR_ENABLE);
 }
 
 /**
@@ -61,23 +61,17 @@ void rt_hw_us_delay(rt_uint32_t us)
     rt_uint32_t reload = SysTick->LOAD;
 
     ticks = us * reload / (1000000 / RT_TICK_PER_SECOND);
-    told = SysTick->VAL;
-    while (1)
-    {
+    told  = SysTick->VAL;
+    while (1) {
         tnow = SysTick->VAL;
-        if (tnow != told)
-        {
-            if (tnow < told)
-            {
+        if (tnow != told) {
+            if (tnow < told) {
                 tcnt += told - tnow;
-            }
-            else
-            {
+            } else {
                 tcnt += reload - tnow + told;
             }
             told = tnow;
-            if (tcnt >= ticks)
-            {
+            if (tcnt >= ticks) {
                 break;
             }
         }
@@ -102,6 +96,7 @@ void rt_hw_board_init(void)
 #endif
 
 #if defined(RT_USING_CONSOLE) && defined(RT_USING_DEVICE)
+    // rt_hw_jlink_console_init();
     rt_console_set_device(RT_CONSOLE_DEVICE_NAME);
 #endif
 
@@ -110,18 +105,14 @@ void rt_hw_board_init(void)
 #endif
 
 #ifdef BSP_USING_SOFTDEVICE
-    extern uint32_t  Image$$RW_IRAM1$$Base;
-    uint32_t const *const m_ram_start  = &Image$$RW_IRAM1$$Base;
-    if ((uint32_t)m_ram_start == 0x20000000)
-    {
+    extern uint32_t Image$$RW_IRAM1$$Base;
+    uint32_t const *const m_ram_start = &Image$$RW_IRAM1$$Base;
+    if ((uint32_t)m_ram_start == 0x20000000) {
         rt_kprintf("\r\n using softdevice the RAM couldn't be %p,please use the templete from package\r\n", m_ram_start);
-        while (1);
-    }
-    else
-    {
+        while (1)
+            ;
+    } else {
         rt_kprintf("\r\n using softdevice the RAM at %p\r\n", m_ram_start);
     }
 #endif
-
 }
-

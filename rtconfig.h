@@ -178,6 +178,16 @@
 #define PKG_CMBACKTRACE_PRINT_ENGLISH
 #define PKG_USING_CMBACKTRACE_V10401
 #define PKG_CMBACKTRACE_VER_NUM 0x10401
+#define PKG_USING_SEGGER_RTT
+#define SEGGER_RTT_ENABLE
+#define SEGGER_RTT_MAX_NUM_UP_BUFFERS   3
+#define SEGGER_RTT_MAX_NUM_DOWN_BUFFERS 3
+#define BUFFER_SIZE_UP                  1024
+#define BUFFER_SIZE_DOWN                16
+#define SEGGER_RTT_PRINTF_BUFFER_SIZE   64
+#define RTT_DEFAULT_BUFFER_INDEX        0
+#define RTT_DEFAULT_TERMINAL_INDEX      0
+#define PKG_USING_SEGGER_RTT_LATEST_VERSION
 
 /* system packages */
 
@@ -248,17 +258,19 @@
 
 /* Onboard Peripheral Drivers */
 
+#define BSP_USING_JLINK_TO_USART
+
 /* On-chip Peripheral Drivers */
 
 #define BSP_USING_GPIO
 #define NRFX_GPIOTE_ENABLED 1
 #define BSP_USING_UART
-#define NRFX_USING_UART
-#define NRFX_UART_ENABLED 1
+#define NRFX_USING_UARTE
 #define BSP_USING_UART0
-#define NRFX_UART0_ENABLED 1
-#define BSP_UART0_RX_PIN   8
-#define BSP_UART0_TX_PIN   6
+#define BSP_UART0_RX_PIN    8
+#define BSP_UART0_TX_PIN    6
+#define NRFX_UARTE_ENABLED  1
+#define NRFX_UARTE0_ENABLED 1
 #define BSP_USING_I2C
 #define NRFX_TWIM_ENABLED 1
 #define BSP_USING_I2C0
@@ -266,19 +278,19 @@
 #define BSP_I2C0_SCL_PIN   5
 #define BSP_I2C0_SDA_PIN   7
 #define BSP_USING_SPI
-#define NRFX_SPIM_ENABLED 1
+#define NRFX_SPI_ENABLED 1
 #define BSP_USING_SPI1
-#define NRFX_SPIM1_ENABLED 1
-#define BSP_SPI1_SCK_PIN   13
-#define BSP_SPI1_MOSI_PIN  15
-#define BSP_SPI1_MISO_PIN  16
-#define BSP_SPI1_SS_PIN    14
+#define NRFX_SPI1_ENABLED 1
+#define BSP_SPI1_SCK_PIN  13
+#define BSP_SPI1_MOSI_PIN 15
+#define BSP_SPI1_MISO_PIN 16
+#define BSP_SPI1_SS_PIN   14
 #define BSP_USING_SPI2
-#define NRFX_SPIM2_ENABLED 1
-#define BSP_SPI2_SCK_PIN   26
-#define BSP_SPI2_MOSI_PIN  25
-#define BSP_SPI2_MISO_PIN  24
-#define BSP_SPI2_SS_PIN    27
+#define NRFX_SPI2_ENABLED 1
+#define BSP_SPI2_SCK_PIN  26
+#define BSP_SPI2_MOSI_PIN 25
+#define BSP_SPI2_MISO_PIN 24
+#define BSP_SPI2_SS_PIN   27
 
 /* On-chip flash config */
 

@@ -20,7 +20,7 @@
 #define LOG_TAG "drv.spi"
 
 #ifdef BSP_USING_SPI
-#if defined(SOC_NRF52832)
+#if defined(SOC_NRF52840)
 #if defined(BSP_USING_SPI0) || defined(BSP_USING_SPI1) || defined(BSP_USING_SPI2) || defined(BSP_USING_SPI3) || defined(BSP_USING_SPI4)
 static struct nrfx_drv_spi_config spi_config[] =
     {
@@ -206,10 +206,10 @@ static rt_err_t spi_configure(struct rt_spi_device *device,
     nrfx_spim_evt_handler_t handler = RT_NULL; // spi send callback handler ,default NULL
     void *context                   = RT_NULL;
     nrfx_err_t nrf_ret              = nrfx_spim_init(&spi, &config, handler, context);
-    if (NRFX_SUCCESS == nrf_ret)
-        return RT_EOK;
-
-    return -RT_ERROR;
+    if (NRFX_SUCCESS != nrf_ret)
+        return -RT_ERROR;
+    LOG_I("SPI configure success");
+    return RT_EOK;
 }
 
 static rt_uint32_t spixfer(struct rt_spi_device *device, struct rt_spi_message *message)
