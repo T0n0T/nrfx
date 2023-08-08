@@ -15,9 +15,10 @@
 extern "C" {
 #endif
 
+#define I2C_RECOVER 1
+
 #ifdef __cplusplus
 }
 #endif
 
-
-#endif  /* __DRV_I2C_H__ */
+#endif /* __DRV_I2C_H__ */

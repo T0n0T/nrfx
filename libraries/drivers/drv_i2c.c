@@ -144,11 +144,25 @@ out:
     return i;
 }
 
+rt_err_t _i2c_bus_control(struct rt_i2c_bus_device *bus, int cmd, void *args)
+{
+    drv_i2c_cfg_t *cfg = (drv_i2c_cfg_t *)bus->priv;
+
+    switch (cmd) {
+        case I2C_RECOVER:
+            nrfx_twi_twim_bus_recover(cfg->scl_pin, cfg->sda_pin);
+            break;
+
+        default:
+            break;
+    }
+}
+
 static const struct rt_i2c_bus_device_ops _i2c_ops =
     {
         _master_xfer,
         NULL,
-        NULL,
+        _i2c_bus_control,
 };
 
 int rt_hw_i2c_init(void)

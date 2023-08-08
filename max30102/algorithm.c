@@ -1,12 +1,3 @@
-/**
- ******************************************************************************
- * @file    algorithm.c
- * @author  张沛田
- * @version V1.0.0
- * @date    2013-5-16
- * @brief   基础计算算法
- ******************************************************************************
- */
 /*--Include-start-------------------------------------------------------------*/
 #include "algorithm.h"
 #include <stdint.h>
@@ -213,7 +204,12 @@ int find_max_num_index(struct compx *data, int count)
             max_num_index = i;
         }
     }
-    // printf("max_num_index=%d\r\n",max_num_index);
+
+    if (max_num_index == START_INDEX) {
+        return -1;
+    }
+
+    printf("max_num_index=%d\r\n", max_num_index);
     return max_num_index;
 }
 

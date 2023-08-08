@@ -81,6 +81,7 @@ rt_bool_t maxim_max30102_read_reg(uint8_t uch_addr, uint8_t *data, uint16_t len)
 
     if ((err = rt_i2c_transfer(i2c_bus, msg_buf, 2)) != 2) {
         LOG_E("I2c read failed (err: %d).", err);
+        rt_i2c_control(i2c_bus, 1, 0);
         return RT_FALSE;
     }
 
@@ -159,7 +160,7 @@ rt_bool_t max30102_checkout_HRM_SPO2_mode()
         return RT_FALSE;
     if (!maxim_max30102_write_reg(REG_LED2_PA, 0x24)) // LED2: 7mA
         return RT_FALSE;
-    if (!maxim_max30102_write_reg(REG_SPO2_CONFIG, 0x27))
+    if (!maxim_max30102_write_reg(REG_SPO2_CONFIG, 0x27)) // adc rang 4096; sample rate 100hz; led_width 400us = 2.5khz
         return RT_FALSE;
     if (!maxim_max30102_write_reg(REG_FIFO_CONFIG, 0x0f)) // sample avg = 4, fifo rollover=RT_FALSE, fifo almost full = 32
         return RT_FALSE;
