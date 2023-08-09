@@ -14,7 +14,9 @@
             "rtdbg.h": "c",
             "rtdevice.h": "c",
             "chrono": "c",
-            "functional": "c"
+            "functional": "c",
+            "drv_uart.h": "c",
+            "nrfx_uarte.h": "c"
         }
     },
     "extensions": {}

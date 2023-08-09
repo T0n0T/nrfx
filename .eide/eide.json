@@ -430,10 +430,10 @@
         "name": "SAL",
         "files": [
           {
-            "path": "rt-thread/components/net/netdev/src/netdev.c"
+            "path": "rt-thread/components/net/netdev/src/netdev_ipaddr.c"
           },
           {
-            "path": "rt-thread/components/net/netdev/src/netdev_ipaddr.c"
+            "path": "rt-thread/components/net/netdev/src/netdev.c"
           },
           {
             "path": "rt-thread/components/net/sal/impl/af_inet_at.c"
