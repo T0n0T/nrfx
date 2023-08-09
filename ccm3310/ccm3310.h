@@ -12,11 +12,16 @@
 #include "drv_spi.h"
 #include <stdio.h>
 
-#define CS_PIN 18
+#define CS_PIN   BSP_SPI1_SS_PIN
 
-#define POR    12
-#define GINT0  3
-#define GINT1  28
+#define POR      18
+#define GINT0    19
+#define GINT1    20
+
+#define PIN_SCK  13
+#define PIN_MOSI 16
+#define PIN_MISO 14
+#define PIN_SS   15
 
 struct ccm3310_key_data {
     uint8_t version;

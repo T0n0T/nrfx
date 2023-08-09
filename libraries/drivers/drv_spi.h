@@ -17,7 +17,7 @@
 #define __DRV_SPI_H_
 
 #ifdef BSP_USING_SPI
-#if defined(SOC_NRF52840)
+#if NRFX_SPIM_ENABLED
 #include "nrfx_spim.h"
 
 /**

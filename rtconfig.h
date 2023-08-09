@@ -278,19 +278,19 @@
 #define BSP_I2C0_SCL_PIN   5
 #define BSP_I2C0_SDA_PIN   7
 #define BSP_USING_SPI
-#define NRFX_SPI_ENABLED 1
+#define NRFX_SPIM_ENABLED 1
 #define BSP_USING_SPI1
-#define NRFX_SPI1_ENABLED 1
-#define BSP_SPI1_SCK_PIN  13
-#define BSP_SPI1_MOSI_PIN 15
-#define BSP_SPI1_MISO_PIN 16
-#define BSP_SPI1_SS_PIN   14
-#define BSP_USING_SPI2
-#define NRFX_SPI2_ENABLED 1
-#define BSP_SPI2_SCK_PIN  26
-#define BSP_SPI2_MOSI_PIN 25
-#define BSP_SPI2_MISO_PIN 24
-#define BSP_SPI2_SS_PIN   27
+#define NRFX_SPIM1_ENABLED 1
+#define BSP_SPI1_SCK_PIN   14
+#define BSP_SPI1_MOSI_PIN  17
+#define BSP_SPI1_MISO_PIN  19
+#define BSP_SPI1_SS_PIN    18
+// #define BSP_USING_SPI2
+// #define NRFX_SPI2_ENABLED 1
+// #define BSP_SPI2_SCK_PIN  26
+// #define BSP_SPI2_MOSI_PIN 25
+// #define BSP_SPI2_MISO_PIN 24
+// #define BSP_SPI2_SS_PIN   27
 
 /* On-chip flash config */
 

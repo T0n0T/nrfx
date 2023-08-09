@@ -50,10 +50,5 @@ cconfig.h
 .project
 makefile.targets
 rtconfig_preinc.h
-/apps
-.eide/eide.json
-.eide/env.ini
-.eide/rt-thread.arm.options.v5.json
-.eide/rt-thread.files.options.yml
-.clang-format
-.eide.usr.ctx.json
+
+

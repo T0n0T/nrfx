@@ -14,4 +14,4 @@ int max30102_port_init(void)
 
     return RT_EOK;
 }
-INIT_APP_EXPORT(max30102_port_init);
+// INIT_APP_EXPORT(max30102_port_init);

@@ -20,7 +20,7 @@
 #define LOG_TAG "drv.spi"
 
 #ifdef BSP_USING_SPI
-#if defined(SOC_NRF52840)
+#if NRFX_SPIM_ENABLED
 #if defined(BSP_USING_SPI0) || defined(BSP_USING_SPI1) || defined(BSP_USING_SPI2) || defined(BSP_USING_SPI3) || defined(BSP_USING_SPI4)
 static struct nrfx_drv_spi_config spi_config[] =
     {
@@ -96,34 +96,6 @@ static rt_uint8_t spi_index_find(struct rt_spi_bus *spi_bus)
     }
     return 0xFF;
 }
-
-/**
- * spi event handler function
- */
-static void spi0_handler(const nrfx_spim_evt_t *p_event, void *p_context)
-{
-    LOG_I("\nspi0_handler");
-}
-
-static void spi1_handler(const nrfx_spim_evt_t *p_event, void *p_context)
-{
-    LOG_I("\nspi1_handler");
-}
-
-static void spi2_handler(const nrfx_spim_evt_t *p_event, void *p_context)
-{
-    LOG_I("\nspi2_handler");
-}
-static void spi3_handler(const nrfx_spim_evt_t *p_event, void *p_context)
-{
-    LOG_I("\nspi3_handler");
-}
-static void spi4_handler(const nrfx_spim_evt_t *p_event, void *p_context)
-{
-    LOG_I("\nspi4_handler");
-}
-
-nrfx_spim_evt_handler_t spi_handler[] = {spi0_handler, spi1_handler, spi2_handler, spi3_handler, spi4_handler};
 
 /**
  * @brief  This function config spi bus
@@ -205,7 +177,7 @@ static rt_err_t spi_configure(struct rt_spi_device *device,
     rt_memcpy((void *)&spi_bus_obj[index].spi_config, (void *)&config, sizeof(nrfx_spim_config_t));
     nrfx_spim_evt_handler_t handler = RT_NULL; // spi send callback handler ,default NULL
     void *context                   = RT_NULL;
-    nrfx_err_t nrf_ret              = nrfx_spim_init(&spi, &config, handler, context);
+    nrfx_err_t nrf_ret              = nrfx_spim_init(&spi, &config, handler, (void *)spi.drv_inst_idx);
     if (NRFX_SUCCESS != nrf_ret)
         return -RT_ERROR;
     LOG_I("SPI configure success");
@@ -369,7 +341,7 @@ static struct nrfx_drv_spi_pin_config bsp_spi_pin[] =
         {.sck_pin  = BSP_SPI1_SCK_PIN,
          .mosi_pin = BSP_SPI1_MOSI_PIN,
          .miso_pin = BSP_SPI1_MISO_PIN,
-         .ss_pin   = BSP_SPI1_SS_PIN},
+         .ss_pin   = 0xff},
 #endif
 
 #ifdef BSP_USING_SPI2

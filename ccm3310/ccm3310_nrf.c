@@ -13,29 +13,24 @@
 #include <rtdevice.h>
 #include <board.h>
 #include <ccm3310.h>
+#include "nrfx_spim.h"
 
 struct rt_spi_device ccm;
-
+nrfx_spim_t instance = NRFX_SPIM_INSTANCE(1);
 uint8_t recv_buf[1024];
 
 void ccm3310_init(void)
 {
     rt_pin_mode(POR, PIN_MODE_OUTPUT);
     rt_pin_mode(GINT0, PIN_MODE_OUTPUT);
+    // rt_pin_mode(15, PIN_MODE_OUTPUT);
     rt_pin_mode(GINT1, PIN_MODE_INPUT);
+    nrfx_spim_config_t config_spim = NRFX_SPIM_DEFAULT_CONFIG(PIN_SCK, PIN_MOSI, PIN_MISO, PIN_SS);
+    config_spim.frequency          = NRF_SPIM_FREQ_1M;
+    config_spim.mode               = NRF_SPIM_MODE_3;
+    config_spim.miso_pull          = NRF_GPIO_PIN_PULLUP;
+    nrfx_spim_init(&instance, &config_spim, 0, (void *)instance.drv_inst_idx);
 
-    rt_err_t err = rt_spi_bus_attach_device_cspin(&ccm, "ccm", "spi1", CS_PIN, RT_NULL);
-    // rt_err_t err = rt_spi_bus_attach_device(&ccm, "ccm", "spi1", 0);
-    if (err != RT_NULL) {
-        printf("Fail to attach %s creating spi_device %s failed.\n", "spi1", "ccm");
-        return;
-    }
-
-    struct rt_spi_configuration cfg;
-    cfg.data_width = 8;
-    cfg.mode       = RT_SPI_MASTER | RT_SPI_MODE_3 | RT_SPI_MSB;
-    cfg.max_hz     = 1 * 1000 * 1000;
-    rt_spi_configure(&ccm, &cfg);
     rt_pin_write(POR, PIN_LOW);
     rt_thread_mdelay(20);
     rt_pin_write(POR, PIN_HIGH);
@@ -44,9 +39,9 @@ INIT_APP_EXPORT(ccm3310_init);
 
 int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int recv_len)
 {
-    struct rt_spi_message msg;
-    int len          = 0;
-    rt_int8_t status = PIN_HIGH;
+    int len           = 0;
+    rt_int8_t status  = PIN_HIGH;
+    nrfx_err_t result = NRFX_SUCCESS;
 
     rt_memset(recv_buf, 0xff, sizeof(recv_buf));
     rt_pin_write(GINT0, PIN_LOW);
@@ -55,13 +50,16 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
         printf("status: %d", status);
     }
 
-    msg.send_buf   = send_buf;
-    msg.recv_buf   = RT_NULL;
-    msg.length     = send_len;
-    msg.cs_take    = 1;
-    msg.cs_release = 1;
-    msg.next       = RT_NULL;
-    rt_spi_transfer_message(&ccm, &msg);
+    nrfx_spim_xfer_desc_t spim_xfer_desc =
+        {
+            .p_tx_buffer = send_buf,
+            .tx_length   = send_len,
+            .p_rx_buffer = 0,
+            .rx_length   = send_len,
+        };
+    result = nrfx_spim_xfer(&instance, &spim_xfer_desc, 0);
+    printf("\nspim transmit:[%x]\n", result);
+
     printf("\n========= print transmit ========\n");
     for (size_t i = 0; i < send_len; i++) {
         printf("0x%02x ", *(send_buf + i));
@@ -73,14 +71,13 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
         status = rt_pin_read(GINT1);
     }
 
-    msg.send_buf   = RT_NULL;
-    msg.recv_buf   = recv_buf;
-    msg.length     = recv_len;
-    msg.cs_take    = 1;
-    msg.cs_release = 1;
-    msg.next       = RT_NULL;
-    rt_spi_transfer_message(&ccm, &msg);
+    spim_xfer_desc.p_tx_buffer = 0;
+    spim_xfer_desc.tx_length   = recv_len;
+    spim_xfer_desc.p_rx_buffer = recv_buf;
+    spim_xfer_desc.rx_length   = recv_len;
 
+    result = nrfx_spim_xfer(&instance, &spim_xfer_desc, 0);
+    printf("\nspim receive:[%x]\n", result);
     printf("\n========= print receive =========\n");
     for (size_t i = 0; i < recv_len; i++) {
         printf("0x%02x ", recv_buf[i]);

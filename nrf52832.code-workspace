@@ -10,7 +10,11 @@
             "ccm3310.h": "c",
             "nrf_gpio.h": "c",
             "drv_spi.h": "c",
-            "rtthread.h": "c"
+            "rtthread.h": "c",
+            "rtdbg.h": "c",
+            "rtdevice.h": "c",
+            "chrono": "c",
+            "functional": "c"
         }
     },
     "extensions": {}
