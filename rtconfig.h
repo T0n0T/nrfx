@@ -86,6 +86,7 @@
 #define RT_USING_SERIAL
 #define RT_USING_SERIAL_V1
 #define RT_SERIAL_RB_BUFSZ 64
+#define RT_SERIAL_USING_DMA
 #define RT_USING_I2C
 #define RT_USING_I2C_BITOPS
 #define RT_USING_PIN
@@ -143,7 +144,7 @@
 /* Wiced WiFi */
 
 #define PKG_USING_AT_DEVICE
-#define AT_PRINT_RAW_CMD
+// #define AT_PRINT_RAW_CMD
 #define AT_DEVICE_USING_EC200X
 #define AT_DEVICE_EC200X_INIT_ASYN
 #define AT_DEVICE_EC200X_SOCKET
@@ -266,13 +267,23 @@
 
 #define BSP_USING_GPIO
 #define NRFX_GPIOTE_ENABLED 1
-#define BSP_USING_UART
+
+// #define BSP_USING_UART
+// #define NRFX_USING_UART
+// #define BSP_USING_UART0
+// #define BSP_UART0_RX_PIN   12
+// #define BSP_UART0_TX_PIN   3
+// #define NRFX_UART_ENABLED  1
+// #define NRFX_UART0_ENABLED 1
+
+#define BSP_USING_UARTE
 #define NRFX_USING_UARTE
 #define BSP_USING_UART0
 #define BSP_UART0_RX_PIN    12
 #define BSP_UART0_TX_PIN    3
 #define NRFX_UARTE_ENABLED  1
 #define NRFX_UARTE0_ENABLED 1
+
 #define BSP_USING_I2C
 #define NRFX_TWIM_ENABLED 1
 #define BSP_USING_I2C0

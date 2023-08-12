@@ -217,6 +217,9 @@
             "path": "libraries/drivers/drv_spi.c"
           },
           {
+            "path": "libraries/drivers/drv_uart.c"
+          },
+          {
             "path": "libraries/drivers/drv_uarte.c"
           }
         ],
@@ -226,16 +229,16 @@
         "name": "Finsh",
         "files": [
           {
-            "path": "rt-thread/components/finsh/shell.c"
-          },
-          {
-            "path": "rt-thread/components/finsh/msh.c"
+            "path": "rt-thread/components/finsh/cmd.c"
           },
           {
             "path": "rt-thread/components/finsh/msh_parse.c"
           },
           {
-            "path": "rt-thread/components/finsh/cmd.c"
+            "path": "rt-thread/components/finsh/msh.c"
+          },
+          {
+            "path": "rt-thread/components/finsh/shell.c"
           }
         ],
         "folders": []
@@ -600,7 +603,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": "ip 192.168.1.2"
+        "otherCmds": ""
       },
       "uploadConfigMap": {},
       "custom_dep": {

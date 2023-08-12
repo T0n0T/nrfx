@@ -17,7 +17,7 @@
 #include <rtdbg.h>
 #define LOG_TAG "drv.uarte"
 
-#ifdef BSP_USING_UART
+#ifdef BSP_USING_UARTE
 #if defined(BSP_USING_UART0) || defined(BSP_USING_UART1) || defined(BSP_USING_UART2) || defined(BSP_USING_UART3)
 typedef struct
 {
@@ -74,10 +74,11 @@ static void uarte_evt_handler(nrfx_uarte_event_t const *p_event,
 {
     drv_uart_cb_t *p_cb = RT_NULL;
     p_cb                = (drv_uart_cb_t *)p_context;
+    // printf("func action [%s]\n", __func__);
     switch (p_event->type) {
         case NRFX_UARTE_EVT_RX_DONE:
             p_cb->rx_length = p_event->data.rxtx.bytes;
-            if (p_cb->serial->parent.open_flag & RT_DEVICE_FLAG_INT_RX) {
+            if (p_cb->serial->parent.open_flag & RT_DEVICE_FLAG_INT_RX || p_cb->serial->parent.open_flag & RT_DEVICE_FLAG_DMA_RX) {
                 rt_hw_serial_isr(p_cb->serial, RT_SERIAL_EVENT_RX_IND);
             }
             (void)nrfx_uarte_rx(&(p_cb->uarte_instance), p_cb->rx_buffer, 1);
