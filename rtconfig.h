@@ -76,6 +76,15 @@
 
 /* DFS: device virtual file system */
 
+#define RT_USING_DFS
+#define DFS_USING_POSIX
+#define DFS_USING_WORKDIR
+#define DFS_FD_MAX 16
+#define RT_USING_DFS_V1
+#define DFS_FILESYSTEMS_MAX      4
+#define DFS_FILESYSTEM_TYPES_MAX 4
+#define RT_USING_DFS_DEVFS
+
 /* Device Drivers */
 
 #define RT_USING_DEVICE_IPC
@@ -85,8 +94,8 @@
 #define RT_SYSTEM_WORKQUEUE_PRIORITY  23
 #define RT_USING_SERIAL
 #define RT_USING_SERIAL_V1
-#define RT_SERIAL_RB_BUFSZ 64
 #define RT_SERIAL_USING_DMA
+#define RT_SERIAL_RB_BUFSZ 256
 #define RT_USING_I2C
 #define RT_USING_I2C_BITOPS
 #define RT_USING_PIN
@@ -103,7 +112,16 @@
 
 /* POSIX (Portable Operating System Interface) layer */
 
+#define RT_USING_POSIX_FS
+#define RT_USING_POSIX_DEVIO
+#define RT_USING_POSIX_POLL
+#define RT_USING_POSIX_SELECT
+#define RT_USING_POSIX_SOCKET
+
 /* Interprocess Communication (IPC) */
+
+#define RT_USING_POSIX_PIPE
+#define RT_USING_POSIX_PIPE_SIZE 512
 
 /* Socket is in the 'Network' category */
 
@@ -115,7 +133,7 @@
 /* Docking with protocol stacks */
 
 #define SAL_USING_AT
-#define SAL_SOCKETS_NUM 16
+#define SAL_USING_POSIX
 #define RT_USING_NETDEV
 #define NETDEV_USING_IFCONFIG
 #define NETDEV_USING_PING
@@ -133,9 +151,18 @@
 
 /* Utilities */
 
+#define RT_USING_RESOURCE_ID
+
 /* RT-Thread online packages */
 
 /* IoT - internet of things */
+
+#define PKG_USING_PAHOMQTT
+#define PAHOMQTT_PIPE_MODE
+#define RT_PKG_MQTT_THREAD_STACK_SIZE   4096
+#define PKG_PAHOMQTT_SUBSCRIBE_HANDLERS 1
+#define MQTT_DEBUG
+#define PKG_USING_PAHOMQTT_LATEST
 
 /* Wi-Fi */
 
@@ -144,16 +171,6 @@
 /* Wiced WiFi */
 
 #define PKG_USING_AT_DEVICE
-// #define AT_PRINT_RAW_CMD
-#define AT_DEVICE_USING_EC200X
-#define AT_DEVICE_EC200X_INIT_ASYN
-#define AT_DEVICE_EC200X_SOCKET
-#define AT_DEVICE_EC200X_SAMPLE
-#define EC200X_SAMPLE_POWER_PIN     -1
-#define EC200X_SAMPLE_STATUS_PIN    -1
-#define EC200X_SAMPLE_WAKEUP_PIN    -1
-#define EC200X_SAMPLE_CLIENT_NAME   "uart0"
-#define EC200X_SAMPLE_RECV_BUFF_LEN 512
 #define PKG_USING_AT_DEVICE_LATEST_VERSION
 #define PKG_AT_DEVICE_VER_NUM 0x99999
 
@@ -187,7 +204,7 @@
 #define SEGGER_RTT_MAX_NUM_DOWN_BUFFERS 3
 #define BUFFER_SIZE_UP                  1024
 #define BUFFER_SIZE_DOWN                16
-#define SEGGER_RTT_PRINTF_BUFFER_SIZE   256
+#define SEGGER_RTT_PRINTF_BUFFER_SIZE   64
 #define RTT_DEFAULT_BUFFER_INDEX        0
 #define RTT_DEFAULT_TERMINAL_INDEX      0
 #define PKG_USING_SEGGER_RTT_LATEST_VERSION

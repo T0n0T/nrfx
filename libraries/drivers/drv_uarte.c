@@ -80,6 +80,7 @@ static void uarte_evt_handler(nrfx_uarte_event_t const *p_event,
             p_cb->rx_length = p_event->data.rxtx.bytes;
             if (p_cb->serial->parent.open_flag & RT_DEVICE_FLAG_INT_RX || p_cb->serial->parent.open_flag & RT_DEVICE_FLAG_DMA_RX) {
                 rt_hw_serial_isr(p_cb->serial, RT_SERIAL_EVENT_RX_IND);
+                // printf("UARTE EVT_RX_DONE\n");
             }
             (void)nrfx_uarte_rx(&(p_cb->uarte_instance), p_cb->rx_buffer, 1);
             break;
@@ -91,6 +92,7 @@ static void uarte_evt_handler(nrfx_uarte_event_t const *p_event,
         case NRFX_UARTE_EVT_TX_DONE:
             if (p_cb->serial->parent.open_flag & RT_DEVICE_FLAG_INT_TX) {
                 rt_hw_serial_isr(p_cb->serial, RT_SERIAL_EVENT_TX_DONE);
+                // printf("UARTE EVT_TX_DONE\n");
             }
             break;
 

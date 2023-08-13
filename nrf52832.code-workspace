@@ -6,6 +6,10 @@
     ],
     "settings": {
         "files.associations": {
+            "*.cpp": "cpp",
+            "*.html": "html",
+            "*.env": "dotenv",
+            "*.go": "go",
             "board.h": "c",
             "ccm3310.h": "c",
             "nrf_gpio.h": "c",
@@ -24,8 +28,10 @@
             "netdb.h": "c",
             "sal_netdb.h": "c",
             "sal_socket.h": "c",
-            "at_log.h": "c"
-        }
+            "at_log.h": "c",
+            "at_device_ec800x.h": "c"
+        },
+        "EIDE.JLink.InstallDirectory": "D:\\JLink"
     },
     "extensions": {}
 }
