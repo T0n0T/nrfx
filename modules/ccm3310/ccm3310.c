@@ -13,7 +13,7 @@
 #include <rtdevice.h>
 #include <board.h>
 #include <ccm3310.h>
-
+// #include <drv_spim.h>
 struct rt_spi_device ccm;
 
 uint8_t recv_buf[1024];
@@ -24,9 +24,7 @@ void ccm3310_init(void)
     rt_pin_mode(GINT0, PIN_MODE_OUTPUT);
     rt_pin_mode(GINT1, PIN_MODE_INPUT);
 
-    rt_err_t err = rt_spi_bus_attach_device_cspin(&ccm, "ccm", "spi1", CS_PIN, RT_NULL);
-    // rt_err_t err = rt_spi_bus_attach_device(&ccm, "ccm", "spi1", 0);
-    if (err != RT_NULL) {
+    if (rt_spi_bus_attach_device(&ccm, "ccm", "spi1", (void *)CS_PIN) != RT_EOK) {
         printf("Fail to attach %s creating spi_device %s failed.\n", "spi1", "ccm");
         return;
     }

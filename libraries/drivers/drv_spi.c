@@ -177,7 +177,7 @@ static rt_err_t spi_configure(struct rt_spi_device *device,
     rt_memcpy((void *)&spi_bus_obj[index].spi_config, (void *)&config, sizeof(nrfx_spim_config_t));
     nrfx_spim_evt_handler_t handler = RT_NULL; // spi send callback handler ,default NULL
     void *context                   = RT_NULL;
-    nrfx_err_t nrf_ret              = nrfx_spim_init(&spi, &config, handler, (void *)spi.drv_inst_idx);
+    nrfx_err_t nrf_ret              = nrfx_spim_init(&spi, &config, handler, 0);
     if (NRFX_SUCCESS != nrf_ret)
         return -RT_ERROR;
     LOG_I("SPI configure success");
@@ -214,6 +214,14 @@ static rt_uint32_t spixfer(struct rt_spi_device *device, struct rt_spi_message *
     nrf_ret = nrfx_spim_xfer(p_instance, &p_xfer_desc, 0);
     if (message->cs_release == 1) {
         nrf_gpio_pin_set((uint32_t)device->parent.user_data);
+    }
+    printf("\nspim send: \n");
+    for (size_t i = 0; i < p_xfer_desc.tx_length; i++) {
+        printf("%02x ", *(p_xfer_desc.p_tx_buffer + i));
+    }
+    printf("\nspim recv: \n");
+    for (size_t i = 0; i < p_xfer_desc.rx_length; i++) {
+        printf("%02x ", *(p_xfer_desc.p_rx_buffer + i));
     }
 
     if (NRFX_SUCCESS != nrf_ret) {

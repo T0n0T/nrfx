@@ -173,6 +173,17 @@
 #define PKG_USING_AT_DEVICE
 #define PKG_USING_AT_DEVICE_LATEST_VERSION
 #define PKG_AT_DEVICE_VER_NUM 0x99999
+#define PKG_USING_WIZNET
+#define WIZ_USING_W5500
+
+/* WIZnet device configure */
+#define WIZ_DEBUG
+#define WIZ_SPI_DEVICE "w5500"
+#define WIZ_RST_PIN    3
+#define WIZ_IRQ_PIN    12
+#define WIZ_USING_DHCP
+#define WIZ_USING_PING
+#define PKG_USING_WIZNET_LATEST_VERSION
 
 /* IoT Cloud */
 
@@ -208,6 +219,8 @@
 #define RTT_DEFAULT_BUFFER_INDEX        0
 #define RTT_DEFAULT_TERMINAL_INDEX      0
 #define PKG_USING_SEGGER_RTT_LATEST_VERSION
+#define PKG_USING_GPS_RMC
+#define PKG_USING_GPS_RMC_LATEST_VERSION
 
 /* system packages */
 
@@ -296,8 +309,10 @@
 #define BSP_USING_UARTE
 #define NRFX_USING_UARTE
 #define BSP_USING_UART0
-#define BSP_UART0_RX_PIN    12
-#define BSP_UART0_TX_PIN    3
+#define BSP_UART0_RX_PIN 8
+#define BSP_UART0_TX_PIN 6
+// #define BSP_UART0_RX_PIN    12
+// #define BSP_UART0_TX_PIN    3
 #define NRFX_UARTE_ENABLED  1
 #define NRFX_UARTE0_ENABLED 1
 
@@ -309,18 +324,22 @@
 #define BSP_I2C0_SDA_PIN   7
 #define BSP_USING_SPI
 #define NRFX_SPIM_ENABLED 1
-#define BSP_USING_SPI1
+// #define BSP_USING_SPI1
 #define NRFX_SPIM1_ENABLED 1
-#define BSP_SPI1_SCK_PIN   14
-#define BSP_SPI1_MOSI_PIN  17
-#define BSP_SPI1_MISO_PIN  19
-#define BSP_SPI1_SS_PIN    18
-// #define BSP_USING_SPI2
-// #define NRFX_SPI2_ENABLED 1
-// #define BSP_SPI2_SCK_PIN  26
-// #define BSP_SPI2_MOSI_PIN 25
-// #define BSP_SPI2_MISO_PIN 24
-// #define BSP_SPI2_SS_PIN   27
+#define BSP_SPI1_SCK_PIN   13
+#define BSP_SPI1_MOSI_PIN  16
+#define BSP_SPI1_MISO_PIN  14
+#define BSP_SPI1_SS_PIN    15
+#define BSP_USING_SPI2
+#define NRFX_SPIM2_ENABLED 1
+#define BSP_SPI2_SCK_PIN   13
+#define BSP_SPI2_MOSI_PIN  15
+#define BSP_SPI2_MISO_PIN  16
+#define BSP_SPI2_SS_PIN    14
+// #define BSP_SPI2_SCK_PIN   24
+// #define BSP_SPI2_MOSI_PIN  22
+// #define BSP_SPI2_MISO_PIN  27
+// #define BSP_SPI2_SS_PIN    23
 
 /* On-chip flash config */
 

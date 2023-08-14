@@ -5,33 +5,40 @@
         }
     ],
     "settings": {
+        "files.autoGuessEncoding": true,
+        "C_Cpp.default.configurationProvider": "cl.eide",
+        "C_Cpp.errorSquiggles": "disabled",
         "files.associations": {
+            ".eideignore": "ignore",
+            "*.a51": "a51",
+            "*.h": "c",
+            "*.c": "c",
+            "*.hxx": "cpp",
+            "*.hpp": "cpp",
+            "*.c++": "cpp",
             "*.cpp": "cpp",
-            "*.html": "html",
-            "*.env": "dotenv",
-            "*.go": "go",
-            "board.h": "c",
-            "ccm3310.h": "c",
-            "nrf_gpio.h": "c",
-            "drv_spi.h": "c",
-            "rtthread.h": "c",
-            "rtdbg.h": "c",
-            "rtdevice.h": "c",
-            "chrono": "c",
-            "functional": "c",
-            "drv_uart.h": "c",
-            "nrfx_uarte.h": "c",
-            "at.h": "c",
-            "at_device_ec200x.h": "c",
-            "at_device.h": "c",
-            "at_socket.h": "c",
-            "netdb.h": "c",
-            "sal_netdb.h": "c",
-            "sal_socket.h": "c",
-            "at_log.h": "c",
-            "at_device_ec800x.h": "c"
+            "*.cxx": "cpp",
+            "*.cc": "cpp"
         },
-        "EIDE.JLink.InstallDirectory": "D:\\JLink"
+        "[yaml]": {
+            "editor.insertSpaces": true,
+            "editor.tabSize": 4,
+            "editor.autoIndent": "advanced"
+        }
     },
-    "extensions": {}
+    "extensions": {
+        "recommendations": [
+            "cl.eide",
+            "keroc.hex-fmt",
+            "xiaoyongdong.srecord",
+            "hars.cppsnippets",
+            "zixuanwang.linkerscript",
+            "redhat.vscode-yaml",
+            "IBM.output-colorizer",
+            "cschlosser.doxdocgen",
+            "ms-vscode.vscode-serial-monitor",
+            "dan-c-underwood.arm",
+            "marus25.cortex-debug"
+        ]
+    }
 }

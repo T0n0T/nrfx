@@ -18,10 +18,10 @@
 #define GINT0    19
 #define GINT1    20
 
-#define PIN_SCK  13
-#define PIN_MOSI 16
-#define PIN_MISO 14
-#define PIN_SS   15
+#define PIN_SCK  BSP_SPI1_SCK_PIN
+#define PIN_MOSI BSP_SPI1_MOSI_PIN
+#define PIN_MISO BSP_SPI1_MISO_PIN
+#define PIN_SS   BSP_SPI1_SS_PIN
 
 struct ccm3310_key_data {
     uint8_t version;

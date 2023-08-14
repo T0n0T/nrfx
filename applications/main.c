@@ -25,3 +25,11 @@ int main(void)
     }
     return RT_EOK;
 }
+
+#include <drv_spim.h>
+
+static int w5500_bing_spi(void)
+{
+    return rt_hw_spi_device_attach("spi2", WIZ_SPI_DEVICE, BSP_SPI2_SS_PIN);
+}
+INIT_DEVICE_EXPORT(w5500_bing_spi);
