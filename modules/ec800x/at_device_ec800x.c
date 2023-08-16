@@ -19,7 +19,7 @@
 
 #ifdef AT_DEVICE_USING_EC800X
 
-#define EC800X_WAIT_CONNECT_TIME 10000
+#define EC800X_WAIT_CONNECT_TIME 2000
 #define EC800X_THREAD_STACK_SIZE 2048
 #define EC800X_THREAD_PRIORITY   (RT_THREAD_PRIORITY_MAX / 2)
 
@@ -242,6 +242,33 @@ static int ec800x_check_link_status(struct at_device *device)
 }
 
 static int ec800x_read_rssi(struct at_device *device)
+{
+    int result         = -RT_ERROR;
+    at_response_t resp = at_create_resp(64, 0, rt_tick_from_millisecond(300));
+    if (resp == RT_NULL) {
+        LOG_D("no memory for resp create.");
+        return (result);
+    }
+
+    if (at_obj_exec_cmd(device->client, resp, "AT+CSQ") == RT_EOK) {
+        int rssi = 0;
+        if (at_resp_parse_line_args_by_kw(resp, "+CSQ:", "+CSQ: %d", &rssi) > 0) {
+            struct at_device_ec800x *ec800x = (struct at_device_ec800x *)device->user_data;
+            if (rssi < 99) {
+                ec800x->rssi = rssi * 2 - 113;
+            } else if (rssi >= 100 && rssi < 199) {
+                ec800x->rssi = rssi - 216;
+            }
+            result = RT_EOK;
+        }
+    }
+
+    at_delete_resp(resp);
+
+    return (result);
+}
+
+static int ec800x_read_gnss(struct at_device *device)
 {
     int result         = -RT_ERROR;
     at_response_t resp = at_create_resp(64, 0, rt_tick_from_millisecond(300));

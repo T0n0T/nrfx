@@ -223,10 +223,10 @@
             "path": "modules/ec800x/at_device_ec800x.c"
           },
           {
-            "path": "modules/ec800x/at_socket_ec800x.c"
+            "path": "modules/ec800x/at_instance_ec800x.c"
           },
           {
-            "path": "modules/ec800x/at_instance_ec800x.c"
+            "path": "modules/ec800x/at_socket_ec800x.c"
           }
         ],
         "folders": []
@@ -367,115 +367,115 @@
         "name": "nrf_Drivers",
         "files": [
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_power.c"
-          },
-          {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_qdec.c"
-          },
-          {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_nvmc.c"
-          },
-          {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_i2s.c"
-          },
-          {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_spim.c"
-          },
-          {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_usbreg.c"
-          },
-          {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_nfct.c"
-          },
-          {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_egu.c"
-          },
-          {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_rng.c"
-          },
-          {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_ppi.c"
-          },
-          {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_twi.c"
+            "path": "packages/nrfx-latest/drivers/src/nrfx_adc.c"
           },
           {
             "path": "packages/nrfx-latest/drivers/src/nrfx_clock.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_qspi.c"
-          },
-          {
-            "path": "packages/nrfx-latest/mdk/system_nrf52.c"
-          },
-          {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_temp.c"
-          },
-          {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_spi.c"
-          },
-          {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_uart.c"
-          },
-          {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_gpiote.c"
-          },
-          {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_spis.c"
-          },
-          {
-            "path": "packages/nrfx-latest/mdk/arm_startup_nrf52.s"
-          },
-          {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_twi_twim.c"
-          },
-          {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_twis.c"
-          },
-          {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_saadc.c"
-          },
-          {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_twim.c"
+            "path": "packages/nrfx-latest/drivers/src/nrfx_comp.c"
           },
           {
             "path": "packages/nrfx-latest/drivers/src/nrfx_dppi.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_systick.c"
+            "path": "packages/nrfx-latest/drivers/src/nrfx_egu.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_pwm.c"
+            "path": "packages/nrfx-latest/drivers/src/nrfx_gpiote.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_pdm.c"
+            "path": "packages/nrfx-latest/drivers/src/nrfx_i2s.c"
           },
           {
             "path": "packages/nrfx-latest/drivers/src/nrfx_ipc.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_rtc.c"
-          },
-          {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_usbd.c"
-          },
-          {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_adc.c"
-          },
-          {
             "path": "packages/nrfx-latest/drivers/src/nrfx_lpcomp.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_wdt.c"
+            "path": "packages/nrfx-latest/drivers/src/nrfx_nfct.c"
+          },
+          {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_nvmc.c"
+          },
+          {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_pdm.c"
+          },
+          {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_power.c"
+          },
+          {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_ppi.c"
+          },
+          {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_pwm.c"
+          },
+          {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_qdec.c"
+          },
+          {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_qspi.c"
+          },
+          {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_rng.c"
+          },
+          {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_rtc.c"
+          },
+          {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_saadc.c"
+          },
+          {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_spi.c"
+          },
+          {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_spim.c"
+          },
+          {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_spis.c"
+          },
+          {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_systick.c"
+          },
+          {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_temp.c"
           },
           {
             "path": "packages/nrfx-latest/drivers/src/nrfx_timer.c"
           },
           {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_twi_twim.c"
+          },
+          {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_twi.c"
+          },
+          {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_twim.c"
+          },
+          {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_twis.c"
+          },
+          {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_uart.c"
+          },
+          {
             "path": "packages/nrfx-latest/drivers/src/nrfx_uarte.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_comp.c"
+            "path": "packages/nrfx-latest/drivers/src/nrfx_usbd.c"
+          },
+          {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_usbreg.c"
+          },
+          {
+            "path": "packages/nrfx-latest/drivers/src/nrfx_wdt.c"
+          },
+          {
+            "path": "packages/nrfx-latest/mdk/arm_startup_nrf52.s"
+          },
+          {
+            "path": "packages/nrfx-latest/mdk/system_nrf52.c"
           }
         ],
         "folders": []
@@ -630,7 +630,8 @@
     "rtthread": {
       "excludeList": [
         "<virtual_root>/ccm3310/ccm3310_nrf.c",
-        "<virtual_root>/Drivers/drv_spi.c"
+        "<virtual_root>/Drivers/drv_spi.c",
+        "<virtual_root>/WIZnet"
       ],
       "toolchain": "AC5",
       "compileConfig": {
