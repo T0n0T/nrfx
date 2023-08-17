@@ -16,7 +16,7 @@ extern "C" {
 #endif
 
 #include <stdlib.h>
-
+#include "gps_rmc.h"
 #include <at_device.h>
 
 #define AT_DEVICE_CLASS_EC800X 0X17U
@@ -32,6 +32,8 @@ extern "C" {
 #define EC800X_SAMPLE_WAKEUP_PIN    -1
 #define EC800X_SAMPLE_CLIENT_NAME   "uart0"
 #define EC800X_SAMPLE_RECV_BUFF_LEN 512
+
+#define EC800X_GPS_MSG_NUM          128
 
 struct at_device_ec800x {
     char *device_name;
@@ -50,6 +52,9 @@ struct at_device_ec800x {
     rt_bool_t power_status;
     rt_bool_t sleep_status;
     int rssi;
+
+    char rmc[EC800X_GPS_MSG_NUM];
+    gps_info_t rmc_info;
 };
 
 #ifdef AT_USING_SOCKET

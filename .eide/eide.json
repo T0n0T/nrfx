@@ -337,16 +337,16 @@
         "name": "max30102",
         "files": [
           {
-            "path": "modules/max30102/blood.c"
-          },
-          {
             "path": "modules/max30102/algorithm.c"
           },
           {
-            "path": "modules/max30102/port.c"
+            "path": "modules/max30102/blood.c"
           },
           {
             "path": "modules/max30102/max30102.c"
+          },
+          {
+            "path": "modules/max30102/port.c"
           }
         ],
         "folders": []

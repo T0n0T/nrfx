@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include <string.h>
-
 #include <at_device_ec800x.h>
 
 #define LOG_TAG "at.dev.ec800x"
@@ -22,6 +21,8 @@
 #define EC800X_WAIT_CONNECT_TIME 2000
 #define EC800X_THREAD_STACK_SIZE 2048
 #define EC800X_THREAD_PRIORITY   (RT_THREAD_PRIORITY_MAX / 2)
+
+struct gps_info rmcinfo;
 
 static int ec800x_power_on(struct at_device *device)
 {
@@ -245,7 +246,8 @@ static int ec800x_read_rssi(struct at_device *device)
 {
     int result         = -RT_ERROR;
     at_response_t resp = at_create_resp(64, 0, rt_tick_from_millisecond(300));
-    if (resp == RT_NULL) {
+    at_resp_set_info() if (resp == RT_NULL)
+    {
         LOG_D("no memory for resp create.");
         return (result);
     }
@@ -277,16 +279,12 @@ static int ec800x_read_gnss(struct at_device *device)
         return (result);
     }
 
-    if (at_obj_exec_cmd(device->client, resp, "AT+CSQ") == RT_EOK) {
-        int rssi = 0;
-        if (at_resp_parse_line_args_by_kw(resp, "+CSQ:", "+CSQ: %d", &rssi) > 0) {
-            struct at_device_ec800x *ec800x = (struct at_device_ec800x *)device->user_data;
-            if (rssi < 99) {
-                ec800x->rssi = rssi * 2 - 113;
-            } else if (rssi >= 100 && rssi < 199) {
-                ec800x->rssi = rssi - 216;
-            }
-            result = RT_EOK;
+    if (at_obj_exec_cmd(device->client, resp, "AT+QGPSGNMEA=\"RMC\"") == RT_EOK) {
+        struct at_device_ec800x *ec800x = (struct at_device_ec800x *)device->user_data;
+        rt_memset(ec800x->rmc, 0, sizeof(ec800x->rmc));
+        rt_memset(&rmcinfo, 0, sizeof(struct gps_info));
+        if (at_resp_parse_line_args_by_kw(resp, "+QGPSGNMEA:", "+QGPSGNMEA:%s", ec800x->rmc) > 0) {
+            result = gps_rmc_parse(&rmcinfo, ec800x->rmc);
         }
     }
 
@@ -437,6 +435,7 @@ static void ec800x_check_link_status_entry(void *parameter)
 #define EC800X_LINK_DELAY_TIME (60 * RT_TICK_PER_SECOND)
 
     rt_bool_t is_link_up;
+    rt_err_t result          = RT_EOK;
     struct at_device *device = RT_NULL;
     struct netdev *netdev    = (struct netdev *)parameter;
 
@@ -447,7 +446,19 @@ static void ec800x_check_link_status_entry(void *parameter)
     }
 
     while (1) {
-        ec800x_read_rssi(device);
+        result = ec800x_read_rssi(device);
+        if (result != RT_EOK) {
+            LOG_E("ec800x read rssi failed");
+        }
+
+        result = ec800x_read_gnss(device);
+        if (result != RT_EOK) {
+            if (result = -RT_ERROR) {
+                LOG_E("ec800x read gnss failed");
+            } else if (result = RT_ERROR) {
+                LOG_E("ec800x gnss valid");
+            }
+        }
 
         rt_thread_delay(EC800X_LINK_DELAY_TIME);
 
@@ -895,6 +906,25 @@ static void ec800x_init_thread_entry(void *parameter)
         /* Activate context profile */
         resp = at_resp_set_info(resp, RESP_SIZE, 0, rt_tick_from_millisecond(150 * 1000));
         if (at_obj_exec_cmd(device->client, resp, "AT+QIACT=1") != RT_EOK) {
+            result = -RT_ERROR;
+            goto __exit;
+        }
+
+        /* configure gnss */
+        resp = at_resp_set_info(resp, RESP_SIZE, 0, rt_tick_from_millisecond(300 * 1000));
+        if (at_obj_exec_cmd(device->client, resp, "AT+QGPS=1") != RT_EOK) {
+            result = -RT_ERROR;
+            goto __exit;
+        }
+
+        /* only use rmc */
+        if (at_obj_exec_cmd(device->client, resp, "AT+QGPSCFG=\"gpsnmeatype\",2") != RT_EOK) {
+            result = -RT_ERROR;
+            goto __exit;
+        }
+
+        /* only use beidou*/
+        if (at_obj_exec_cmd(device->client, resp, "AT+QGPSCFG=\"gpssconfig\",7") != RT_EOK) {
             result = -RT_ERROR;
             goto __exit;
         }

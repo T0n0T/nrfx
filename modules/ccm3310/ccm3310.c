@@ -14,6 +14,16 @@
 #include <board.h>
 #include <ccm3310.h>
 // #include <drv_spim.h>
+
+// #define CCM3310_DEBUG
+#if defined(CCM3310_DEBUG)
+#define CCM3310_RAW_PRINTF
+
+#define DBG_TAG "ccm3310.dev"
+#define DBG_LVL DBG_INFO
+#include <rtdbg.h>
+#endif
+
 struct rt_spi_device ccm;
 
 uint8_t recv_buf[1024];
@@ -25,7 +35,7 @@ void ccm3310_init(void)
     rt_pin_mode(GINT1, PIN_MODE_INPUT);
 
     if (rt_spi_bus_attach_device(&ccm, "ccm", "spi1", (void *)CS_PIN) != RT_EOK) {
-        printf("Fail to attach %s creating spi_device %s failed.\n", "spi1", "ccm");
+        LOG_E("Fail to attach %s creating spi_device %s failed.", "spi1", "ccm");
         return;
     }
 
@@ -50,7 +60,7 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
     rt_pin_write(GINT0, PIN_LOW);
     while (status == PIN_HIGH) {
         status = rt_pin_read(GINT1);
-        printf("status: %d", status);
+        LOG_D("status: %d", status);
     }
 
     msg.send_buf   = send_buf;
@@ -60,6 +70,8 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
     msg.cs_release = 1;
     msg.next       = RT_NULL;
     rt_spi_transfer_message(&ccm, &msg);
+
+#if defined(CCM3310_RAW_PRINTF)
     printf("\n========= print transmit ========\n");
     for (size_t i = 0; i < send_len; i++) {
         printf("0x%02x ", *(send_buf + i));
@@ -70,6 +82,7 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
     while (status == PIN_HIGH) {
         status = rt_pin_read(GINT1);
     }
+#endif
 
     msg.send_buf   = RT_NULL;
     msg.recv_buf   = recv_buf;
@@ -79,6 +92,7 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
     msg.next       = RT_NULL;
     rt_spi_transfer_message(&ccm, &msg);
 
+#if defined(CCM3310_RAW_PRINTF)
     printf("\n========= print receive =========\n");
     for (size_t i = 0; i < recv_len; i++) {
         printf("0x%02x ", recv_buf[i]);
@@ -89,6 +103,8 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
             break;
         }
     }
+#endif
+
     int err = decode(recv_buf, decode_data, &len);
     if (err == 0) {
         return len;

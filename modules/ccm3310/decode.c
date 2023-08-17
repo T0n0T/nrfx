@@ -10,6 +10,10 @@
  */
 #include <ccm3310.h>
 
+#define DBG_TAG "ccm3310.tool"
+#define DBG_LVL DBG_INFO
+#include <rtdbg.h>
+
 static uint16_t decode_2bytes(uint8_t *msb)
 {
     return *msb | (*(msb + 1) << 8);
@@ -74,13 +78,13 @@ MSH_CMD_EXPORT(decode_test, decode test);
 int decode(uint8_t *raw, uint8_t **data, int *len)
 {
     if (decode_4bytes(&raw[0]) != 0x33100252) {
-        printf("decode wrong with upheader 0x%X, 0x%X\n", decode_4bytes(&raw[0]), 0x33100252);
+        LOG_E("decode wrong with upheader 0x%X, 0x%X", decode_4bytes(&raw[0]), 0x33100252);
         return -1;
     }
 
     *len = (int)decode_4bytes(&raw[4]);
     if (decode_2bytes(&raw[8]) != 0x9000) {
-        printf("decode wrong with status 0x%X\n", decode_4bytes(&raw[0]));
+        LOG_E("decode wrong with status 0x%X", decode_4bytes(&raw[0]));
         return -2;
     }
     *data = &raw[16];
