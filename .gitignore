@@ -51,4 +51,16 @@ cconfig.h
 makefile.targets
 rtconfig_preinc.h
 
+nrf_sdk/components
+nrf_sdk/config
+nrf_sdk/documentation
+nrf_sdk/examples
+nrf_sdk/external
+nrf_sdk/external_tools
+nrf_sdk/integration
+nrf_sdk/modules
+nrf_sdk/license.txt
+nrf_sdk/nRF_MDK_8_40_3_IAR_BSDLicense.msi
+
+
 

@@ -18,11 +18,13 @@
 // #define CCM3310_DEBUG
 #if defined(CCM3310_DEBUG)
 #define CCM3310_RAW_PRINTF
+#define DBG_LVL DBG_LOG
+#else
+#define DBG_LVL DBG_INFO
+#endif
 
 #define DBG_TAG "ccm3310.dev"
-#define DBG_LVL DBG_INFO
 #include <rtdbg.h>
-#endif
 
 struct rt_spi_device ccm;
 

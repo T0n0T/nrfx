@@ -6,65 +6,32 @@ config SOC_NRF52832
     select RT_USING_COMPONENTS_INIT
     select RT_USING_USER_MAIN
     default y
-    config NRFX_CLOCK_ENABLED
-    int
-    default 1
-    config NRFX_CLOCK_DEFAULT_CONFIG_IRQ_PRIORITY
-    int
-    default 7
-    config NRFX_CLOCK_CONFIG_LF_SRC
-    int
-    default 1
-
 
 config SOC_NORDIC
     bool
     config SOC_NORDIC
     default y
 
-
-menu "Onboard Peripheral Drivers"
-    config BSP_USING_JLINK_TO_USART
-        bool "Enable JLINK TO USART (uart0|RX_PIN:8|TX_PIN:6)"
-        select BSP_USING_UART
-        select BSP_USING_UART0
-        default y
-endmenu
-
 menu "On-chip Peripheral Drivers"
     config BSP_USING_GPIO
         bool "Enable GPIO"
         select RT_USING_PIN
         default y
-    if BSP_USING_GPIO
-        config NRFX_GPIOTE_ENABLED
-        int
-        default 1
-    endif
+
     config BSP_USING_SAADC
         bool "Enable SAADC"
         select RT_USING_ADC
         default n
-        if BSP_USING_SAADC
-                config NRFX_SAADC_ENABLED
-                int
-                default 1
-        endif
+
     menuconfig BSP_USING_PWM
         bool "Enable PWM"
         select RT_USING_PWM
         default n
         if BSP_USING_PWM
-                config NRFX_PWM_ENABLED
-                int
-                default 1
                 config BSP_USING_PWM0
                     bool "Enable PWM0 bus"
                     default y
                 if BSP_USING_PWM0
-                    config NRFX_PWM0_ENABLED
-                    int
-                    default 1
                     config BSP_USING_PWM0_CH0
                         int "PWM0 channel 0 pin number set"
                         range 0 47
@@ -86,9 +53,6 @@ menu "On-chip Peripheral Drivers"
                     bool "Enable PWM1 bus"
                     default n
                 if BSP_USING_PWM1
-                    config NRFX_PWM1_ENABLED
-                    int
-                    default 1
                     config BSP_USING_PWM1_CH0
                         int "PWM1 channel 0 pin number set"
                         range 0 47
@@ -110,9 +74,6 @@ menu "On-chip Peripheral Drivers"
                     bool "Enable PWM2 bus"
                     default n
                 if BSP_USING_PWM2
-                    config NRFX_PWM2_ENABLED
-                    int
-                    default 1
                     config BSP_USING_PWM2_CH0
                         int "PWM2 channel 0 pin number set"
                         range 0 47
@@ -134,9 +95,6 @@ menu "On-chip Peripheral Drivers"
                     bool "Enable PWM3 bus"
                     default n
                 if BSP_USING_PWM3
-                    config NRFX_PWM3_ENABLED
-                    int
-                    default 1
                     config BSP_USING_PWM3_CH0
                         int "PWM3 channel 0 pin number set"
                         range 0 47
@@ -161,31 +119,12 @@ menu "On-chip Peripheral Drivers"
         bool "Enable UART"
         default y
         select RT_USING_SERIAL
-        if BSP_USING_UART
-        choice
-        prompt "UART or UARTE"
-        default NRFX_USING_UART
-        help
-            Select the UART or UARTE
-        config NRFX_USING_UART
-            bool "UART"
-
-        config NRFX_USING_UARTE
-            bool "UARTE"
-        endchoice
-        endif
+		
         if BSP_USING_UART&&NRFX_USING_UART
-            config NRFX_UART_ENABLED
-            int
-            default 1
-
             config BSP_USING_UART0
                 bool "Enable UART0"
                 default y
                 if BSP_USING_UART0
-                    config NRFX_UART0_ENABLED
-                    int
-                    default 1
                     config BSP_UART0_RX_PIN
                         int "uart0 rx pin number"
                         range 0 31
@@ -196,18 +135,12 @@ menu "On-chip Peripheral Drivers"
                         default 6
                 endif
         endif
-        if BSP_USING_UART&&NRFX_USING_UARTE
-            config NRFX_UARTE_ENABLED
-            int
-            default 1
-
+        if BSP_USING_UART&&NRFX_USING_UARTE			
             config BSP_USING_UART0
                 bool "Enable UARTE0"
                 default n
+				select RT_SERIAL_USING_DMA
                 if BSP_USING_UART0
-                    config NRFX_UARTE0_ENABLED
-                    int
-                    default 1
                     config BSP_UART0_RX_PIN
                         int "uarte0 rx pin number"
                         range 0 31
@@ -224,16 +157,10 @@ menu "On-chip Peripheral Drivers"
         select RT_USING_I2C
         default n
         if BSP_USING_I2C
-            config NRFX_TWIM_ENABLED
-            int
-            default 1
             config BSP_USING_I2C0
                 bool "Enable I2C0 bus"
                 default y
             if BSP_USING_I2C0
-                config NRFX_TWIM0_ENABLED
-                int
-                default 1
                 config BSP_I2C0_SCL_PIN
                     int "i2c0 scl pin number"
                     range 0 31
@@ -247,9 +174,6 @@ menu "On-chip Peripheral Drivers"
                 bool "Enable I2C1 bus"
                 default n
             if BSP_USING_I2C1
-                config NRFX_TWIM1_ENABLED
-                int
-                default 1
                 config BSP_I2C1_SCL_PIN
                     int "i2c1 scl pin number"
                     range 0 31
@@ -267,9 +191,6 @@ menu "On-chip Peripheral Drivers"
         default y
 
         if BSP_USING_SPI
-            config NRFX_SPI_ENABLED
-            int
-            default 1
             config BSP_USING_SPI0
                 bool "Enable SPI0 bus"
                 default y
@@ -347,7 +268,6 @@ menu "On-chip Peripheral Drivers"
         default n
 
     menu "On-chip flash config"
-
         config MCU_FLASH_START_ADDRESS
             hex "MCU FLASH START ADDRESS"
             default 0x00000000
@@ -375,41 +295,12 @@ menu "On-chip Peripheral Drivers"
         bool "Enable WDT"
         select RT_USING_WDT
         default n
-    if BSP_USING_WDT
-        config NRFX_WDT_ENABLED
-        int
-        default 1
-        config NRFX_WDT0_ENABLED
-        int
-        default 1
-        config NRFX_WDT_CONFIG_NO_IRQ
-        int
-        default 1
-    endif
 
     menuconfig BSP_USING_ONCHIP_RTC
     bool "Enable RTC"
     select RT_USING_RTC
     default n
     if BSP_USING_ONCHIP_RTC
-        config NRFX_CLOCK_ENABLED
-        int
-        default 1
-        config NRFX_CLOCK_DEFAULT_CONFIG_IRQ_PRIORITY
-        int
-        default 7
-        config NRFX_RTC_ENABLED
-        int
-        default 1
-        config NRFX_RTC0_ENABLED
-        int
-        default 1
-        config NRFX_RTC1_ENABLED
-        int
-        default 1
-        config NRFX_RTC2_ENABLED
-        int
-        default 1
         config RTC_INSTANCE_ID
         int
         default 2
@@ -424,50 +315,21 @@ menu "On-chip Peripheral Drivers"
         select RT_USING_HWTIMER
         default n
         if BSP_USING_TIM
-            config NRFX_TIMER_ENABLED
-            int
-            default 1
             config BSP_USING_TIM0
                 bool "Enable TIMER0"
                 default n
-            if BSP_USING_TIM0
-                config NRFX_TIMER0_ENABLED
-                int
-                default 1
-            endif
             config BSP_USING_TIM1
                 bool "Enable TIMER1"
                 default n
-            if BSP_USING_TIM1
-                config NRFX_TIMER1_ENABLED
-                int
-                default 1
-            endif
             config BSP_USING_TIM2
                 bool "Enable TIMER2"
                 default n
-            if BSP_USING_TIM2
-                config NRFX_TIMER2_ENABLED
-                int
-                default 1
-            endif
             config BSP_USING_TIM3
                 bool "Enable TIMER3"
                 default n
-            if BSP_USING_TIM3
-                config NRFX_TIMER3_ENABLED
-                int
-                default 1
-            endif
-
             config BSP_USING_TIM4
                 bool "Enable TIMER4"
                 default n
-            if BSP_USING_TIM4
-                config NRFX_TIMER4_ENABLED
-                int
-                default 1
-            endif
         endif
 endmenu
 

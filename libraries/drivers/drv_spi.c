@@ -14,7 +14,7 @@
 #include <string.h>
 #include "board.h"
 #include "drv_spi.h"
-
+#include <nrf_gpio.h>
 #define DBG_LEVEL DBG_LOG
 #include <rtdbg.h>
 #define LOG_TAG "drv.spi"
@@ -115,8 +115,10 @@ static rt_err_t spi_configure(struct rt_spi_device *device,
     RT_ASSERT(index != 0xFF);
 
     nrfx_spim_t spi           = spi_bus_obj[index].spi;
-    nrfx_spim_config_t config = NRFX_SPIM_DEFAULT_CONFIG(bsp_spi_pin[index].sck_pin,
-                                                         bsp_spi_pin[index].mosi_pin, bsp_spi_pin[index].miso_pin, NRFX_SPIM_PIN_NOT_USED);
+    nrfx_spim_config_t config = NRFX_SPIM_DEFAULT_CONFIG;
+    config.sck_pin            = bsp_spi_pin[index].sck_pin;
+    config.mosi_pin           = bsp_spi_pin[index].mosi_pin;
+    config.miso_pin           = bsp_spi_pin[index].miso_pin;
 
     /* spi config ss pin */
     if (device->parent.user_data != RT_NULL) {

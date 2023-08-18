@@ -25,10 +25,13 @@ void ccm3310_init(void)
     rt_pin_mode(GINT0, PIN_MODE_OUTPUT);
     // rt_pin_mode(15, PIN_MODE_OUTPUT);
     rt_pin_mode(GINT1, PIN_MODE_INPUT);
-    nrfx_spim_config_t config_spim = NRFX_SPIM_DEFAULT_CONFIG(PIN_SCK, PIN_MOSI, PIN_MISO, PIN_SS);
+    nrfx_spim_config_t config_spim = NRFX_SPIM_DEFAULT_CONFIG;
+    config_spim.sck_pin            = PIN_SCK;
+    config_spim.mosi_pin           = PIN_MOSI;
+    config_spim.miso_pin           = PIN_MISO;
+    config_spim.ss_pin             = PIN_SS;
     config_spim.frequency          = NRF_SPIM_FREQ_1M;
     config_spim.mode               = NRF_SPIM_MODE_3;
-    config_spim.miso_pull          = NRF_GPIO_PIN_PULLUP;
     nrfx_spim_init(&instance, &config_spim, 0, (void *)instance.drv_inst_idx);
 
     rt_pin_write(POR, PIN_LOW);

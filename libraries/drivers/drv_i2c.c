@@ -72,7 +72,7 @@ static struct rt_i2c_bus_device i2c3_bus;
 static int twi_master_init(struct rt_i2c_bus_device *bus)
 {
     nrfx_err_t rtn;
-    nrfx_twim_config_t config     = NRFX_TWIM_DEFAULT_CONFIG(0, 0);
+    nrfx_twim_config_t config     = NRFX_TWIM_DEFAULT_CONFIG;
     drv_i2c_cfg_t *p_cfg          = bus->priv;
     nrfx_twim_t const *p_instance = &p_cfg->twi_instance;
 

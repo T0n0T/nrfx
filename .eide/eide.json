@@ -22,13 +22,13 @@
         "name": "AT",
         "files": [
           {
-            "path": "rt-thread/components/net/at/at_socket/at_socket.c"
-          },
-          {
             "path": "rt-thread/components/net/at/src/at_cli.c"
           },
           {
             "path": "rt-thread/components/net/at/src/at_client.c"
+          },
+          {
+            "path": "rt-thread/components/net/at/at_socket/at_socket.c"
           },
           {
             "path": "rt-thread/components/net/at/src/at_utils.c"
@@ -70,13 +70,13 @@
         "name": "cm_backtrace",
         "files": [
           {
-            "path": "packages/CmBacktrace-v1.4.1/cm_backtrace.c"
-          },
-          {
             "path": "packages/CmBacktrace-v1.4.1/cmb_flash_log.c"
           },
           {
             "path": "packages/CmBacktrace-v1.4.1/cmb_port.c"
+          },
+          {
+            "path": "packages/CmBacktrace-v1.4.1/cm_backtrace.c"
           }
         ],
         "folders": []
@@ -136,13 +136,13 @@
             "path": "rt-thread/components/drivers/core/device.c"
           },
           {
+            "path": "rt-thread/components/drivers/i2c/i2c-bit-ops.c"
+          },
+          {
             "path": "rt-thread/components/drivers/i2c/i2c_core.c"
           },
           {
             "path": "rt-thread/components/drivers/i2c/i2c_dev.c"
-          },
-          {
-            "path": "rt-thread/components/drivers/i2c/i2c-bit-ops.c"
           },
           {
             "path": "rt-thread/components/drivers/ipc/completion.c"
@@ -172,10 +172,10 @@
             "path": "rt-thread/components/drivers/rtc/rtc.c"
           },
           {
-            "path": "rt-thread/components/drivers/sensor/v1/sensor_cmd.c"
+            "path": "rt-thread/components/drivers/sensor/v1/sensor.c"
           },
           {
-            "path": "rt-thread/components/drivers/sensor/v1/sensor.c"
+            "path": "rt-thread/components/drivers/sensor/v1/sensor_cmd.c"
           },
           {
             "path": "rt-thread/components/drivers/serial/serial.c"
@@ -208,9 +208,6 @@
             "path": "libraries/drivers/drv_spi.c"
           },
           {
-            "path": "libraries/drivers/drv_spim.c"
-          },
-          {
             "path": "libraries/drivers/drv_uarte.c"
           }
         ],
@@ -220,13 +217,13 @@
         "name": "ec800x",
         "files": [
           {
-            "path": "modules/ec800x/at_device_ec800x.c"
-          },
-          {
             "path": "modules/ec800x/at_instance_ec800x.c"
           },
           {
             "path": "modules/ec800x/at_socket_ec800x.c"
+          },
+          {
+            "path": "modules/ec800x/at_device_ec800x.c"
           }
         ],
         "folders": []
@@ -238,6 +235,9 @@
             "path": "rt-thread/components/dfs/dfs_v1/filesystems/devfs/devfs.c"
           },
           {
+            "path": "rt-thread/components/dfs/dfs_v1/src/dfs.c"
+          },
+          {
             "path": "rt-thread/components/dfs/dfs_v1/src/dfs_file.c"
           },
           {
@@ -245,9 +245,6 @@
           },
           {
             "path": "rt-thread/components/dfs/dfs_v1/src/dfs_posix.c"
-          },
-          {
-            "path": "rt-thread/components/dfs/dfs_v1/src/dfs.c"
           }
         ],
         "folders": []
@@ -340,13 +337,13 @@
             "path": "modules/max30102/algorithm.c"
           },
           {
+            "path": "modules/max30102/port.c"
+          },
+          {
             "path": "modules/max30102/blood.c"
           },
           {
             "path": "modules/max30102/max30102.c"
-          },
-          {
-            "path": "modules/max30102/port.c"
           }
         ],
         "folders": []
@@ -364,118 +361,196 @@
         "folders": []
       },
       {
-        "name": "nrf_Drivers",
+        "name": "nrf_drivers",
         "files": [
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_adc.c"
+            "path": "nrf_sdk/integration/nrfx/legacy/nrf_drv_clock.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_clock.c"
+            "path": "nrf_sdk/integration/nrfx/legacy/nrf_drv_power.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_comp.c"
+            "path": "nrf_sdk/integration/nrfx/legacy/nrf_drv_ppi.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_dppi.c"
+            "path": "nrf_sdk/integration/nrfx/legacy/nrf_drv_rng.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_egu.c"
+            "path": "nrf_sdk/integration/nrfx/legacy/nrf_drv_spi.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_gpiote.c"
+            "path": "nrf_sdk/integration/nrfx/legacy/nrf_drv_spis.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_i2s.c"
+            "path": "nrf_sdk/integration/nrfx/legacy/nrf_drv_swi.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_ipc.c"
+            "path": "nrf_sdk/integration/nrfx/legacy/nrf_drv_twi.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_lpcomp.c"
+            "path": "nrf_sdk/integration/nrfx/legacy/nrf_drv_uart.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "nrf_hal",
+        "files": [
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_adc.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_nfct.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_clock.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_nvmc.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_comp.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_pdm.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_dppi.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_power.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_gpiote.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_ppi.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_i2s.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_pwm.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_lpcomp.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_qdec.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_nfct.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_qspi.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_nvmc.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_rng.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_pdm.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_rtc.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_power.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_saadc.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_ppi.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_spi.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_pwm.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_spim.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_qdec.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_spis.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_qspi.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_systick.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_rng.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_temp.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_rtc.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_timer.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_saadc.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_twi_twim.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_spi.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_twi.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_spim.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_twim.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_spis.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_twis.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_swi.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_uart.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_systick.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_uarte.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_temp.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_usbd.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_timer.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_usbreg.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_twi_twim.c"
           },
           {
-            "path": "packages/nrfx-latest/drivers/src/nrfx_wdt.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_twi.c"
           },
           {
-            "path": "packages/nrfx-latest/mdk/arm_startup_nrf52.s"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_twim.c"
           },
           {
-            "path": "packages/nrfx-latest/mdk/system_nrf52.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_twis.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_uart.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_uarte.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_usbd.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_wdt.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/mdk/arm_startup_nrf52.s"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/mdk/system_nrf52.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "nrf_lib",
+        "files": [
+          {
+            "path": "nrf_sdk/components/libraries/log/src/nrf_log_backend_flash.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/log/src/nrf_log_backend_rtt.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/log/src/nrf_log_backend_serial.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/log/src/nrf_log_backend_uart.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/log/src/nrf_log_default_backends.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/log/src/nrf_log_frontend.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/log/src/nrf_log_str_formatter.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/util/app_error_handler_gcc.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/util/app_error_handler_iar.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/util/app_error_handler_keil.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/util/app_error_weak.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/util/app_error.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/util/app_util_platform.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/util/nrf_assert.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/util/sdk_mapped_flags.c"
           }
         ],
         "folders": []
@@ -484,37 +559,37 @@
         "name": "paho-mqtt",
         "files": [
           {
-            "path": "packages/pahomqtt-latest/MQTTClient-RT/paho_mqtt_pipe.c"
-          },
-          {
-            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTConnectClient.c"
-          },
-          {
-            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTConnectServer.c"
-          },
-          {
-            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTDeserializePublish.c"
-          },
-          {
-            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTFormat.c"
-          },
-          {
-            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTPacket.c"
-          },
-          {
-            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTSerializePublish.c"
-          },
-          {
             "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTSubscribeClient.c"
           },
           {
             "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTSubscribeServer.c"
           },
           {
+            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTDeserializePublish.c"
+          },
+          {
+            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTSerializePublish.c"
+          },
+          {
+            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTPacket.c"
+          },
+          {
+            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTConnectServer.c"
+          },
+          {
             "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTUnsubscribeClient.c"
           },
           {
+            "path": "packages/pahomqtt-latest/MQTTClient-RT/paho_mqtt_pipe.c"
+          },
+          {
             "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTUnsubscribeServer.c"
+          },
+          {
+            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTConnectClient.c"
+          },
+          {
+            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTFormat.c"
           }
         ],
         "folders": []
@@ -565,10 +640,10 @@
             "path": "packages/SEGGER_RTT-latest/adapter/drv_rtt.c"
           },
           {
-            "path": "packages/SEGGER_RTT-latest/RTT/SEGGER_RTT_printf.c"
+            "path": "packages/SEGGER_RTT-latest/RTT/SEGGER_RTT.c"
           },
           {
-            "path": "packages/SEGGER_RTT-latest/RTT/SEGGER_RTT.c"
+            "path": "packages/SEGGER_RTT-latest/RTT/SEGGER_RTT_printf.c"
           }
         ],
         "folders": []
@@ -586,34 +661,34 @@
         "name": "WIZnet",
         "files": [
           {
-            "path": "packages/wiznet-latest/ioLibrary/Ethernet/W5500/w5500.c"
+            "path": "packages/wiznet-latest/src/wiz.c"
           },
           {
             "path": "packages/wiznet-latest/ioLibrary/Ethernet/wizchip_conf.c"
           },
           {
-            "path": "packages/wiznet-latest/ioLibrary/Ethernet/wizchip_socket.c"
+            "path": "packages/wiznet-latest/src/wiz_ping.c"
           },
           {
             "path": "packages/wiznet-latest/ioLibrary/Internet/DHCP/wizchip_dhcp.c"
           },
           {
-            "path": "packages/wiznet-latest/ioLibrary/Internet/DNS/wizchip_dns.c"
+            "path": "packages/wiznet-latest/ioLibrary/Ethernet/wizchip_socket.c"
           },
           {
-            "path": "packages/wiznet-latest/src/wiz_af_inet.c"
+            "path": "packages/wiznet-latest/ioLibrary/Ethernet/W5500/w5500.c"
+          },
+          {
+            "path": "packages/wiznet-latest/ioLibrary/Internet/DNS/wizchip_dns.c"
           },
           {
             "path": "packages/wiznet-latest/src/wiz_device.c"
           },
           {
-            "path": "packages/wiznet-latest/src/wiz_ping.c"
+            "path": "packages/wiznet-latest/src/wiz_af_inet.c"
           },
           {
             "path": "packages/wiznet-latest/src/wiz_socket.c"
-          },
-          {
-            "path": "packages/wiznet-latest/src/wiz.c"
           }
         ],
         "folders": []
@@ -624,14 +699,12 @@
   "deviceName": null,
   "packDir": null,
   "miscInfo": {
-    "uid": "ef8d7d294caf0c785637ea32f517fc69"
+    "uid": "b19a443300ed999920b7c15e4b79d32f"
   },
   "targets": {
     "rtthread": {
       "excludeList": [
-        "<virtual_root>/ccm3310/ccm3310_nrf.c",
-        "<virtual_root>/Drivers/drv_spi.c",
-        "<virtual_root>/WIZnet"
+        "<virtual_root>/ccm3310/ccm3310_nrf.c"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -749,35 +822,41 @@
       },
       "uploader": "JLink",
       "uploadConfig": {
-        "bin": "${ExecutableName}.bin",
-        "baseAddr": "0x0",
+        "bin": "",
+        "baseAddr": "",
         "cpuInfo": {
-          "vendor": "Nordic Semi",
-          "cpuName": "nRF52832_xxAA"
+          "vendor": "null",
+          "cpuName": "null"
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": "ip 192.168.1.2"
+        "otherCmds": ""
       },
       "uploadConfigMap": {},
       "custom_dep": {
         "name": "default",
         "incList": [
           "packages/wiznet-latest/ioLibrary/Ethernet",
-          "packages/nrfx-latest/drivers/src",
+          "nrf_sdk/modules/nrfx/drivers",
           "rt-thread/components/libc/posix/io/stdio",
           "rt-thread/components/net/sal/impl",
-          "packages/nrfx-latest/drivers",
+          "packages/SEGGER_RTT-latest",
           "rt-thread/components/libc/posix/io/eventfd",
+          "nrf_sdk/modules/nrfx/soc",
           "rt-thread/components/libc/compilers/common/extension",
-          "packages/nrfx-latest/drivers/include",
+          "packages/pahomqtt-latest/MQTTPacket/src",
           "packages/wiznet-latest/ioLibrary/Internet",
-          "packages/nrfx-latest/mdk",
+          "nrf_sdk/modules/nrfx/mdk",
           "rt-thread/libcpu/arm/cortex-m4",
           "rt-thread/components/dfs/dfs_v1/filesystems/devfs",
           "rt-thread/components/net/sal/include/socket",
+          "nrf_sdk/integration/nrfx",
+          "nrf_sdk/integration/nrfx/legacy",
           "rt-thread/components/drivers/include",
+          "nrf_sdk/components/libraries/util",
+          "nrf_sdk/modules/nrfx/drivers/include",
           "rt-thread/components/drivers/spi",
+          "nrf_sdk/modules/nrfx",
           "packages/CmBacktrace-v1.4.1",
           "rt-thread/components/libc/compilers/common/extension/fcntl/octal",
           "rt-thread/components/net/at/include",
@@ -788,20 +867,21 @@
           "rt-thread/components/net/sal/include/dfs_net",
           "packages/SEGGER_RTT-latest/RTT",
           "libraries/drivers",
-          "packages/SEGGER_RTT-latest",
+          "nrf_sdk/components/libraries/log/src",
           "packages/pahomqtt-latest/MQTTClient-RT",
           "rt-thread/components/libc/compilers/common/include",
-          "packages/nrfx-latest/hal",
+          "nrf_sdk/modules/nrfx/drivers/src",
           "applications",
           "rt-thread/libcpu/arm/common",
-          "packages/pahomqtt-latest/MQTTPacket/src",
           "rt-thread/components/libc/posix/io/poll",
           "libraries/cmsis/include",
+          "nrf_sdk/components/libraries/log",
           "packages/wiznet-latest/ioLibrary",
           "packages/gps_rmc-latest",
           "services/mqtt-api",
           "rt-thread/components/legacy/dfs",
           "board",
+          "nrf_sdk/modules/nrfx/hal",
           "rt-thread/components/dfs/dfs_v1/include",
           "modules/ccm3310",
           "rt-thread/include",
@@ -814,11 +894,9 @@
           ".",
           "packages/at_device-latest/inc",
           "rt-thread/components/libc/posix/ipc",
-          "packages/nrfx-latest",
           "rt-thread/components/net/sal/include",
-          ".cmsis/include",
           "RTE/_rtthread",
-          ".eide/deps"
+          "nrf_sdk/components/drivers_nrf/nrf_soc_nosd"
         ],
         "libList": [],
         "sourceDirList": [],
@@ -829,6 +907,7 @@
           "RT_USING_LIBC",
           "__CLK_TCK=RT_TICK_PER_SECOND",
           "__RTTHREAD__",
+          "CONFIG_GPIO_AS_PINRESET",
           "USE_APP_CONFIG"
         ]
       }

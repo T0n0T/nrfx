@@ -1,0 +1,161 @@
+# for nRF5_SDK module compiling
+from building import *
+import os
+Import('rtconfig')
+
+# nrfx_hal
+cwd  = GetCurrentDir() + '/modules/nrfx/'
+src = Glob('./modules/nrfx/drivers/src/*.c')
+path = []
+define = []
+
+#include
+path += [cwd]
+path += [cwd + 'drivers']
+path += [cwd + 'drivers/include']
+path += [cwd + 'drivers/src']
+path += [cwd + 'soc']
+path += [cwd + 'mdk']
+path += [cwd + 'hal']
+
+
+#chip toolchain
+if GetDepend('SOC_NRF52840') == True:
+	define += ['NRF52840_XXAA']
+	src += [cwd + 'mdk/system_nrf52840.c']
+	src += [cwd + 'mdk/arm_startup_nrf52840.s']
+	if rtconfig.PLATFORM == 'armcc':
+		src += [cwd + 'mdk/arm_startup_nrf52840.s']
+		
+	if rtconfig.PLATFORM == 'gcc':
+		src += [cwd + 'mdk/gcc_startup_nrf52840.S']
+		
+	if rtconfig.PLATFORM == 'iar':
+		D_SRC += [cwd + 'mdk/iar_startup_nrf52840.s']
+
+elif GetDepend('SOC_NRF52833') == True:
+	define += ['NRF52833_XXAA']
+	src += [cwd + 'mdk/system_nrf52833.c']
+	
+	if rtconfig.PLATFORM == 'armcc':
+		src += [cwd + 'mdk/arm_startup_nrf52833.s']
+		
+	if rtconfig.PLATFORM == 'gcc':
+		src += [cwd + 'mdk/gcc_startup_nrf52833.S']
+		
+	if rtconfig.PLATFORM == 'iar':
+		D_SRC += [cwd + 'mdk/iar_startup_nrf52833.s']
+
+elif GetDepend('SOC_NRF52832') == True:
+	define += ['NRF52832_XXAA']
+	src += [cwd + 'mdk/system_nrf52.c']
+	
+	if rtconfig.PLATFORM == 'armcc':
+		src += [cwd + 'mdk/arm_startup_nrf52.s']
+		
+	if rtconfig.PLATFORM == 'gcc':
+		src += [cwd + 'mdk/gcc_startup_nrf52.S']
+		
+	if rtconfig.PLATFORM == 'iar':
+		D_SRC += [cwd + 'mdk/iar_startup_nrf52.s']
+        
+        
+elif GetDepend('SOC_NRF51822') == True:
+	define += ['NRF51822_XXAA']
+	src += [cwd + 'mdk/system_nrf51.c']
+	
+	if rtconfig.PLATFORM == 'armcc':
+		src += [cwd + 'mdk/arm_startup_nrf51.s']
+		
+	if rtconfig.PLATFORM == 'gcc':
+		src += [cwd + 'mdk/gcc_startup_nrf51.S']
+		
+	if rtconfig.PLATFORM == 'iar':
+		D_SRC += [cwd + 'mdk/iar_startup_nrf51.s']
+        
+        
+elif GetDepend('SOC_NRF5340') == True:
+	define += ['NRF5340_XXAA_APPLICATION']
+	src += [cwd + '/mdk/system_nrf5340_application.c']
+	
+	if rtconfig.PLATFORM == 'armcc':
+		src += [cwd + 'mdk/arm_startup_nrf5340_application.s']
+		
+	if rtconfig.PLATFORM == 'gcc':
+		src += [cwd + 'mdk/gcc_startup_nrf5340_application.S']
+		
+	if rtconfig.PLATFORM == 'iar':
+		D_SRC += [cwd + 'mdk/iar_startup_nrf5340_application.s']
+else:
+	pass
+
+# using reset
+define += ['CONFIG_GPIO_AS_PINRESET']
+
+# using gpio_te
+define += ['GPIOTE_ENABLE']
+define += ['NRFX_GPIOTE_ENABLE']
+
+# using clock
+define += ['NRFX_CLOCK_ENABLE']
+
+# using uart
+    
+if GetDepend('BSP_USING_UART') == True:
+    if GetDepend('RT_SERIAL_USING_DMA') == True:
+        define += ['NRFX_UARTE_ENABLE']
+    else:
+        define += ['NRFX_UART_ENABLE']
+
+
+nrf_hal = DefineGroup('nrf_hal', src, depend = [''], CPPPATH = path, CPPDEFINES = define)
+
+
+# nrfx_drivers
+drv_src = []
+drv_path = []
+drv_define = []
+
+cwd = GetCurrentDir() + '/integration/'
+
+drv_path += [cwd + 'nrfx']
+drv_path += [cwd + 'nrfx/legacy']
+print(drv_path)
+drv_src += Glob('./integration/nrfx/legacy/*.c')
+nrf_drivers = DefineGroup('nrf_drivers', drv_src, depend = [''], CPPPATH = drv_path, CPPDEFINES = drv_define)
+
+
+# nrfx_libraries
+# nrf_log
+lib_src = []
+lib_path = []
+lib_define = []
+
+cwd = GetCurrentDir() + '/components/libraries/'
+lib_path += [cwd + 'log']
+lib_path += [cwd + 'log/src']
+lib_src += Glob(cwd + 'log/src/*.c')
+
+# nrf_util
+lib_path += [cwd + 'util']
+lib_src += Glob(cwd + 'util/*.c')
+print(lib_path)
+
+if GetDepend('BSP_USING_SOFTDEVICE') not True:
+    lib_path += [cwd + 'drivers_nrf/nrf_soc_nosd']
+else：
+    lib_path += [cwd + 's/nrf_soc_nosd']
+    lib_define += ['NRF_SD_BLE_API_VERSION_8']
+    lib_define += ['SOFTDEVICE_PRESENT']
+    lib_define += ['NRF52_PAN_74']
+    lib_define += ['__HEAP_SIZE=8192']
+    lib_define += ['__STACK_SIZE=8192']
+    lib_define += ['S122']
+        
+nrf_lib = DefineGroup('nrf_lib', lib_src, depend = [''], CPPPATH = lib_path, CPPDEFINES = lib_define)
+
+
+
+Return('nrf_hal')
+Return('nrf_drivers')
+Return('nrf_lib')

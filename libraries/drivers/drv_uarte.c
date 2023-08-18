@@ -103,8 +103,7 @@ static void uarte_evt_handler(nrfx_uarte_event_t const *p_event,
 
 static rt_err_t _uart_cfg(struct rt_serial_device *serial, struct serial_configure *cfg)
 {
-    nrfx_uarte_config_t config = NRFX_UARTE_DEFAULT_CONFIG(NRF_UARTE_PSEL_DISCONNECTED,
-                                                           NRF_UARTE_PSEL_DISCONNECTED);
+    nrfx_uarte_config_t config = NRFX_UARTE_DEFAULT_CONFIG;
 
     drv_uart_cb_t *p_cb = RT_NULL;
 
@@ -163,11 +162,11 @@ static rt_err_t _uart_cfg(struct rt_serial_device *serial, struct serial_configu
             config.baudrate = NRF_UARTE_BAUDRATE_115200;
             break;
     }
-    config.hal_cfg.parity = (cfg->parity == PARITY_NONE) ? NRF_UARTE_PARITY_EXCLUDED : NRF_UARTE_PARITY_INCLUDED;
-    config.hal_cfg.hwfc   = NRF_UARTE_HWFC_DISABLED;
-    config.pselrxd        = p_cb->rx_pin;
-    config.pseltxd        = p_cb->tx_pin;
-    config.p_context      = (void *)p_cb;
+    config.parity    = (cfg->parity == PARITY_NONE) ? NRF_UARTE_PARITY_EXCLUDED : NRF_UARTE_PARITY_INCLUDED;
+    config.hwfc      = NRF_UARTE_HWFC_DISABLED;
+    config.pselrxd   = p_cb->rx_pin;
+    config.pseltxd   = p_cb->tx_pin;
+    config.p_context = (void *)p_cb;
 
     nrfx_uarte_init(&(p_cb->uarte_instance), (nrfx_uarte_config_t const *)&config, uarte_evt_handler);
     nrfx_uarte_rx(&(p_cb->uarte_instance), p_cb->rx_buffer, 1);

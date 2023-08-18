@@ -246,8 +246,7 @@ static int ec800x_read_rssi(struct at_device *device)
 {
     int result         = -RT_ERROR;
     at_response_t resp = at_create_resp(64, 0, rt_tick_from_millisecond(300));
-    at_resp_set_info() if (resp == RT_NULL)
-    {
+    if (resp == RT_NULL) {
         LOG_D("no memory for resp create.");
         return (result);
     }
