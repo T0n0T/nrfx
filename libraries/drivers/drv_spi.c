@@ -12,7 +12,7 @@
 
 #include <stdint.h>
 #include <string.h>
-#include "board.h"
+
 #include "drv_spi.h"
 #include <nrf_gpio.h>
 #define DBG_LEVEL DBG_LOG

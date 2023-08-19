@@ -9,10 +9,10 @@ src = Split("""
 """)
 
 if GetDepend(['BSP_USING_UART']):
-    if GetDepend(['NRFX_USING_UART']):
-        src += ['drv_uart.c']
-    else:
-        src += ['drv_uarte.c']
+    src += ['drv_uart.c']
+elif GetDepend(['BSP_USING_UARTE']):
+    src += ['drv_uarte.c']
+        
 if GetDepend(['BSP_USING_ON_CHIP_FLASH']):
     src += ['drv_flash.c']
 

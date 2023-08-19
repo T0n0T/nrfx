@@ -114,13 +114,11 @@ menu "On-chip Peripheral Drivers"
                 endif
         endif
 
-
-    config BSP_USING_UART
+	menuconfig BSP_USING_UART
         bool "Enable UART"
-        default y
-        select RT_USING_SERIAL
-		
-        if BSP_USING_UART&&NRFX_USING_UART
+		select RT_USING_SERIAL	
+        default y        	
+        if BSP_USING_UART
             config BSP_USING_UART0
                 bool "Enable UART0"
                 default y
@@ -135,18 +133,22 @@ menu "On-chip Peripheral Drivers"
                         default 6
                 endif
         endif
-        if BSP_USING_UART&&NRFX_USING_UARTE			
+	menuconfig BSP_USING_UARTE
+        bool "Enable UARTE"
+		select RT_USING_SERIAL	
+		select RT_SERIAL_USING_DMA
+        default n        	
+        if BSP_USING_UARTE
             config BSP_USING_UART0
-                bool "Enable UARTE0"
-                default n
-				select RT_SERIAL_USING_DMA
+                bool "Enable UART0"
+                default y
                 if BSP_USING_UART0
                     config BSP_UART0_RX_PIN
-                        int "uarte0 rx pin number"
+                        int "uart0 rx pin number"
                         range 0 31
                         default 8
                     config BSP_UART0_TX_PIN
-                        int "uarte0 tx pin number"
+                        int "uart0 tx pin number"
                         range 0 31
                         default 6
                 endif

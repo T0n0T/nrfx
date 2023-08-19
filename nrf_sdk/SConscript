@@ -120,7 +120,7 @@ cwd = GetCurrentDir() + '/integration/'
 
 drv_path += [cwd + 'nrfx']
 drv_path += [cwd + 'nrfx/legacy']
-print(drv_path)
+
 drv_src += Glob('./integration/nrfx/legacy/*.c')
 nrf_drivers = DefineGroup('nrf_drivers', drv_src, depend = [''], CPPPATH = drv_path, CPPDEFINES = drv_define)
 
@@ -131,20 +131,22 @@ lib_src = []
 lib_path = []
 lib_define = []
 
-cwd = GetCurrentDir() + '/components/libraries/'
-lib_path += [cwd + 'log']
-lib_path += [cwd + 'log/src']
-lib_src += Glob(cwd + 'log/src/*.c')
+cwd = GetCurrentDir() + '/components/'
+lib_path += [cwd + 'libraries/log']
+lib_path += [cwd + 'libraries/log/src']
+lib_path += [cwd + 'libraries/experimental_section_vars']
+lib_src += Glob(cwd + 'libraries/log/src/*.c')
 
 # nrf_util
-lib_path += [cwd + 'util']
-lib_src += Glob(cwd + 'util/*.c')
-print(lib_path)
+lib_path += [cwd + 'libraries/util']
+lib_src += Glob(cwd + 'libraries/util/*.c')
 
-if GetDepend('BSP_USING_SOFTDEVICE') not True:
+if not GetDepend('BSP_USING_SOFTDEVICE') == True:
     lib_path += [cwd + 'drivers_nrf/nrf_soc_nosd']
-else：
-    lib_path += [cwd + 's/nrf_soc_nosd']
+else:
+    lib_path += [cwd + 'softdevice/s132/headers/nrf52']
+    lib_path += [cwd + 'softdevice/s132/headers']
+    lib_path += [cwd + 'softdevice/common']
     lib_define += ['NRF_SD_BLE_API_VERSION_8']
     lib_define += ['SOFTDEVICE_PRESENT']
     lib_define += ['NRF52_PAN_74']

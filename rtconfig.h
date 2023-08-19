@@ -177,10 +177,10 @@
 #define WIZ_USING_W5500
 
 /* WIZnet device configure */
-#define WIZ_DEBUG
+
 #define WIZ_SPI_DEVICE "w5500"
-#define WIZ_RST_PIN    3
-#define WIZ_IRQ_PIN    12
+#define WIZ_RST_PIN    5
+#define WIZ_IRQ_PIN    7
 #define WIZ_USING_DHCP
 #define WIZ_USING_PING
 #define PKG_USING_WIZNET_LATEST_VERSION
@@ -238,11 +238,6 @@
 
 /* touch drivers */
 
-#define NRFX_RTC_ENABLED  1
-#define NRFX_RTC1_ENABLED 1
-#define PKG_USING_NRFX
-#define PKG_USING_NRFX_LATEST_VERSION
-
 /* Kendryte SDK */
 
 /* AI packages */
@@ -284,62 +279,30 @@
 /* Hardware Drivers Config */
 
 #define SOC_NRF52832
-#define NRFX_CLOCK_ENABLED                     1
-#define NRFX_CLOCK_DEFAULT_CONFIG_IRQ_PRIORITY 7
-#define NRFX_CLOCK_CONFIG_LF_SRC               1
 #define SOC_NORDIC
-
-/* Onboard Peripheral Drivers */
-
-#define BSP_USING_JLINK_TO_USART
 
 /* On-chip Peripheral Drivers */
 
 #define BSP_USING_GPIO
-#define NRFX_GPIOTE_ENABLED 1
-
-// #define BSP_USING_UART
-// #define NRFX_USING_UART
-// #define BSP_USING_UART0
-// #define BSP_UART0_RX_PIN   12
-// #define BSP_UART0_TX_PIN   3
-// #define NRFX_UART_ENABLED  1
-// #define NRFX_UART0_ENABLED 1
-
-#define BSP_USING_UARTE
-#define NRFX_USING_UARTE
 #define BSP_USING_UART0
 #define BSP_UART0_RX_PIN 8
 #define BSP_UART0_TX_PIN 6
-// #define BSP_UART0_RX_PIN    12
-// #define BSP_UART0_TX_PIN    3
-#define NRFX_UARTE_ENABLED  1
-#define NRFX_UARTE0_ENABLED 1
-
+#define BSP_USING_UARTE
 #define BSP_USING_I2C
-#define NRFX_TWIM_ENABLED 1
 #define BSP_USING_I2C0
-#define NRFX_TWIM0_ENABLED 1
-#define BSP_I2C0_SCL_PIN   5
-#define BSP_I2C0_SDA_PIN   7
+#define BSP_I2C0_SCL_PIN 5
+#define BSP_I2C0_SDA_PIN 7
 #define BSP_USING_SPI
-#define NRFX_SPIM_ENABLED 1
-// #define BSP_USING_SPI1
-#define NRFX_SPIM1_ENABLED 1
-#define BSP_SPI1_SCK_PIN   13
-#define BSP_SPI1_MOSI_PIN  16
-#define BSP_SPI1_MISO_PIN  14
-#define BSP_SPI1_SS_PIN    15
+#define BSP_USING_SPI1
+#define BSP_SPI1_SCK_PIN  13
+#define BSP_SPI1_MOSI_PIN 15
+#define BSP_SPI1_MISO_PIN 16
+#define BSP_SPI1_SS_PIN   14
 #define BSP_USING_SPI2
-#define NRFX_SPIM2_ENABLED 1
-#define BSP_SPI2_SCK_PIN   13
-#define BSP_SPI2_MOSI_PIN  15
-#define BSP_SPI2_MISO_PIN  16
-#define BSP_SPI2_SS_PIN    14
-// #define BSP_SPI2_SCK_PIN   24
-// #define BSP_SPI2_MOSI_PIN  22
-// #define BSP_SPI2_MISO_PIN  27
-// #define BSP_SPI2_SS_PIN    23
+#define BSP_SPI2_SCK_PIN  26
+#define BSP_SPI2_MOSI_PIN 25
+#define BSP_SPI2_MISO_PIN 24
+#define BSP_SPI2_SS_PIN   27
 
 /* On-chip flash config */
 
@@ -349,9 +312,7 @@
 #define MCU_SRAM_SIZE_KB        64
 #define MCU_FLASH_PAGE_SIZE     0x1000
 #define BSP_USING_ONCHIP_RTC
-#define NRFX_RTC0_ENABLED 1
-#define NRFX_RTC2_ENABLED 1
-#define RTC_INSTANCE_ID   2
+#define RTC_INSTANCE_ID 2
 #define BLE_STACK_USING_NULL
 
 #endif

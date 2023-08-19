@@ -14,9 +14,12 @@
         "CXX_FLAGS": "--reduce_paths",
         "warnings": "all-warnings"
     },
-    "asm-compiler": {},
+    "asm-compiler": {
+        "misc-controls": "--cpreproc_opts=-DBLE_STACK_SUPPORT_REQD,-DNRF_SD_BLE_API_VERSION=4,-DS132,-DSOFTDEVICE_PRESENT,-DSWI_DISABLE0,-DCONFIG_GPIO_AS_PINRESET,-DNRF52,-DNRF52832_XXAA,-DNRF52_PAN_12,-DNRF52_PAN_15,-DNRF52_PAN_20,-DNRF52_PAN_31,-DNRF52_PAN_36,-DNRF52_PAN_51,-DNRF52_PAN_54,-DNRF52_PAN_55,-DNRF52_PAN_58,-DNRF52_PAN_64,-DNRF52_PAN_74"
+    },
     "linker": {
         "output-format": "elf",
+        "xo-base": "",
         "ro-base": "0x00000000",
         "rw-base": "0x20000000"
     }

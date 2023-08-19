@@ -11,6 +11,7 @@
 
 #include <rtthread.h>
 #include <rtdevice.h>
+#include "board.h"
 #include <rthw.h>
 
 #ifndef __DRV_SPI_H_
