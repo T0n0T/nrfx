@@ -93,19 +93,18 @@ else:
 define += ['CONFIG_GPIO_AS_PINRESET']
 
 # using gpio_te
-define += ['GPIOTE_ENABLE']
-define += ['NRFX_GPIOTE_ENABLE']
+define += ['NRFX_GPIOTE_ENABLED']
 
 # using clock
-define += ['NRFX_CLOCK_ENABLE']
+define += ['NRFX_CLOCK_ENABLED']
 
 # using uart
     
 if GetDepend('BSP_USING_UART') == True:
     if GetDepend('RT_SERIAL_USING_DMA') == True:
-        define += ['NRFX_UARTE_ENABLE']
+        define += ['NRFX_UARTE_ENABLED']
     else:
-        define += ['NRFX_UART_ENABLE']
+        define += ['NRFX_UART_ENABLED']
 
 
 nrf_hal = DefineGroup('nrf_hal', src, depend = [''], CPPPATH = path, CPPDEFINES = define)
@@ -118,28 +117,55 @@ drv_define = []
 
 cwd = GetCurrentDir() + '/integration/'
 
-drv_path += [cwd + 'nrfx']
 drv_path += [cwd + 'nrfx/legacy']
 
-drv_src += Glob('./integration/nrfx/legacy/*.c')
+if GetDepend('USING_NRF_DRIVER') == True:
+    drv_src += Glob('./integration/nrfx/legacy/*.c')
+    
 nrf_drivers = DefineGroup('nrf_drivers', drv_src, depend = [''], CPPPATH = drv_path, CPPDEFINES = drv_define)
 
 
 # nrfx_libraries
-# nrf_log
 lib_src = []
 lib_path = []
 lib_define = []
-
 cwd = GetCurrentDir() + '/components/'
-lib_path += [cwd + 'libraries/log']
-lib_path += [cwd + 'libraries/log/src']
-lib_path += [cwd + 'libraries/experimental_section_vars']
-lib_src += Glob(cwd + 'libraries/log/src/*.c')
+
+# nrf_strerror
+lib_path += [cwd + 'libraries/strerror']
+lib_src += [cwd + 'libraries/strerror/nrf_strerror.c']
+    
+# nrf_fprintf
+lib_path += [ GetCurrentDir() +'/external/fprintf']
+lib_src += Glob('./external/fprintf/*.c')
+    
+# nrf_memobj
+lib_path += [cwd + 'libraries/memobj']
+lib_src += [cwd + 'libraries/memobj/nrf_memobj.c']
+
+# nrf_balloc
+lib_path += [cwd + 'libraries/balloc']
+lib_src += [cwd + 'libraries/balloc/nrf_balloc.c']
+
+# nrf_atomic
+lib_path += [cwd + 'libraries/atomic']
+lib_src += [cwd + 'libraries/atomic/nrf_atomic.c']
+    
+# nrf_ringbuf
+lib_path += [cwd + 'libraries/ringbuf']
+lib_src += [cwd + 'libraries/ringbuf/nrf_ringbuf.c']
 
 # nrf_util
 lib_path += [cwd + 'libraries/util']
-lib_src += Glob(cwd + 'libraries/util/*.c')
+lib_src += [cwd + 'libraries/util/app_error.c']
+lib_src += [cwd + 'libraries/util/app_error_weak.c']
+lib_src += [cwd + 'libraries/util/app_util_platform.c']
+if rtconfig.PLATFORM == 'armcc':
+	lib_src += [cwd + 'libraries/util/app_error_handler_keil.c']
+elif rtconfig.PLATFORM == 'gcc':
+	lib_src += [cwd + 'libraries/util/app_error_handler_gcc.c']	
+elif rtconfig.PLATFORM == 'iar':
+	lib_src += [cwd + 'libraries/util/app_error_handler_iar.c']
 
 if not GetDepend('BSP_USING_SOFTDEVICE') == True:
     lib_path += [cwd + 'drivers_nrf/nrf_soc_nosd']
@@ -153,11 +179,42 @@ else:
     lib_define += ['__HEAP_SIZE=8192']
     lib_define += ['__STACK_SIZE=8192']
     lib_define += ['S122']
-        
-nrf_lib = DefineGroup('nrf_lib', lib_src, depend = [''], CPPPATH = lib_path, CPPDEFINES = lib_define)
 
+# nrf_log
+if GetDepend('USING_NRF_LOG') == True:
+
+    log_src = []
+    log_path = []
+    log_define = []
+    
+    log_path += [cwd + 'libraries/log']
+    log_path += [cwd + 'libraries/log/src']
+    log_path += [cwd + 'libraries/experimental_section_vars']
+    
+    log_src += [cwd + 'libraries/log/src/nrf_log_frontend.c']
+    log_src += [cwd + 'libraries/log/src/nrf_log_str_formatter.c']
+    if GetDepend('USING_NRF_LOG_BACKEND_FLASH') == True:
+        log_src += [cwd + 'libraries/log/src/nrf_log_backend_flash.c']
+        log_define += ['NRF_LOG_BACKEND_FLASH_ENABLED']
+        lib_path += [cwd + 'libraries/queue']
+        lib_src += [cwd + 'libraries/queue/nrf_queue.c']
+    if GetDepend('USING_NRF_LOG_BACKEND_RTT') == True:
+        log_src += [cwd + 'libraries/log/src/nrf_log_backend_rtt.c']	
+        log_src += [cwd + 'libraries/log/src/nrf_log_backend_serial.c']
+        lib_path += [cwd + 'libraries/delay']
+        log_define += ['NRF_LOG_BACKEND_RTT_ENABLED']
+    if GetDepend('USING_NRF_LOG_BACKEND_RT_SERIAL') == True:
+        log_src += [cwd + 'libraries/log/src/nrf_log_backend_serial.c']
+        log_src += ['./rtthread_adapter/nrf_log_backend_rt_serial.c']
+        log_define += ['NRF_LOG_BACKEND_RT_SERIAL_ENABLED']
+    
+    nrf_log = DefineGroup('nrf_log', log_src, depend = [''], CPPPATH = log_path, CPPDEFINES = log_define)
+
+nrf_lib = DefineGroup('nrf_lib', lib_src, depend = [''], CPPPATH = lib_path, CPPDEFINES = lib_define)
 
 
 Return('nrf_hal')
 Return('nrf_drivers')
 Return('nrf_lib')
+if GetDepend('USING_NRF_LOG') == True:
+    Return('nrf_log')

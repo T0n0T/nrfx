@@ -6,26 +6,9 @@
     ],
     "settings": {
         "files.associations": {
-            "*.cpp": "cpp",
-            "*.html": "html",
-            "*.env": "dotenv",
-            "*.go": "go",
-            "nrfx_spim.h": "c",
-            "nrfx_log.h": "c",
-            "drv_spi.h": "c",
-            "board.h": "c",
-            "nrf.h": "c",
-            "nrf52.h": "c",
-            "system_nrf52.h": "c",
-            "stdint.h": "c",
-            "nrf_gpio.h": "c",
-            "app_config.h": "c",
-            "nrfx_irqs_nrf52832.h": "c",
-            "nrfx.h": "c",
-            "nrf_spim.h": "c",
-            "nrfx_config.h": "c",
-            "nrf52833_to_nrf52820.h": "c",
-            "rtdbg.h": "c"
+            "sdk_common.h": "c",
+            "nordic_common.h": "c",
+            "nrfx_log.h": "c"
         }
     },
     "extensions": {}
