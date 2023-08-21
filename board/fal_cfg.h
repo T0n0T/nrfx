@@ -14,8 +14,8 @@
 #include <rtconfig.h>
 #include <board.h>
 
-#define ON_CHIP_FLASH_DEV_NAME  "mcu_onchip_flash"
-#define ON_CHIP_PARTION_NAME    "filesystem"
+#define ON_CHIP_FLASH_DEV_NAME "mcu_onchip_flash"
+#define ON_CHIP_PARTION_NAME   "nrfs"
 
 /* ===================== Flash device Configuration ========================= */
 extern const struct fal_flash_dev mcu_onchip_flash;

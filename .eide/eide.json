@@ -14,6 +14,9 @@
         "files": [
           {
             "path": "applications/main.c"
+          },
+          {
+            "path": "applications/mnt.c"
           }
         ],
         "folders": []
@@ -22,16 +25,16 @@
         "name": "AT",
         "files": [
           {
-            "path": "rt-thread/components/net/at/src/at_cli.c"
-          },
-          {
-            "path": "rt-thread/components/net/at/src/at_utils.c"
+            "path": "rt-thread/components/net/at/src/at_client.c"
           },
           {
             "path": "rt-thread/components/net/at/at_socket/at_socket.c"
           },
           {
-            "path": "rt-thread/components/net/at/src/at_client.c"
+            "path": "rt-thread/components/net/at/src/at_utils.c"
+          },
+          {
+            "path": "rt-thread/components/net/at/src/at_cli.c"
           }
         ],
         "folders": []
@@ -169,6 +172,9 @@
             "path": "rt-thread/components/drivers/misc/pin.c"
           },
           {
+            "path": "rt-thread/components/drivers/mtd/mtd_nor.c"
+          },
+          {
             "path": "rt-thread/components/drivers/rtc/rtc.c"
           },
           {
@@ -199,6 +205,9 @@
             "path": "board/sdk_config.h"
           },
           {
+            "path": "libraries/drivers/drv_flash.c"
+          },
+          {
             "path": "libraries/drivers/drv_gpio.c"
           },
           {
@@ -220,13 +229,31 @@
         "name": "ec800x",
         "files": [
           {
-            "path": "modules/ec800x/at_device_ec800x.c"
+            "path": "modules/ec800x/at_socket_ec800x.c"
           },
           {
             "path": "modules/ec800x/at_instance_ec800x.c"
           },
           {
-            "path": "modules/ec800x/at_socket_ec800x.c"
+            "path": "modules/ec800x/at_device_ec800x.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "Fal",
+        "files": [
+          {
+            "path": "rt-thread/components/fal/src/fal_partition.c"
+          },
+          {
+            "path": "rt-thread/components/fal/src/fal.c"
+          },
+          {
+            "path": "rt-thread/components/fal/src/fal_rtt.c"
+          },
+          {
+            "path": "rt-thread/components/fal/src/fal_flash.c"
           }
         ],
         "folders": []
@@ -238,9 +265,6 @@
             "path": "rt-thread/components/dfs/dfs_v1/filesystems/devfs/devfs.c"
           },
           {
-            "path": "rt-thread/components/dfs/dfs_v1/src/dfs.c"
-          },
-          {
             "path": "rt-thread/components/dfs/dfs_v1/src/dfs_file.c"
           },
           {
@@ -248,6 +272,9 @@
           },
           {
             "path": "rt-thread/components/dfs/dfs_v1/src/dfs_posix.c"
+          },
+          {
+            "path": "rt-thread/components/dfs/dfs_v1/src/dfs.c"
           }
         ],
         "folders": []
@@ -334,19 +361,37 @@
         "folders": []
       },
       {
-        "name": "max30102",
+        "name": "littlefs",
         "files": [
           {
-            "path": "modules/max30102/algorithm.c"
+            "path": "services/littlefs/dfs_lfs.c"
           },
+          {
+            "path": "services/littlefs/lfs.c"
+          },
+          {
+            "path": "services/littlefs/lfs_util.c"
+          },
+          {
+            "path": "services/littlefs/lfs_crc.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "max30102",
+        "files": [
           {
             "path": "modules/max30102/port.c"
           },
           {
-            "path": "modules/max30102/blood.c"
+            "path": "modules/max30102/algorithm.c"
           },
           {
             "path": "modules/max30102/max30102.c"
+          },
+          {
+            "path": "modules/max30102/blood.c"
           }
         ],
         "folders": []
@@ -355,10 +400,10 @@
         "name": "mqtt-app",
         "files": [
           {
-            "path": "services/mqtt-api/mqtt_test.c"
+            "path": "services/mqtt-api/mqtt_sample.c"
           },
           {
-            "path": "services/mqtt-api/mqtt_sample.c"
+            "path": "services/mqtt-api/mqtt_test.c"
           }
         ],
         "folders": []
@@ -478,7 +523,16 @@
         "name": "nrf_lib",
         "files": [
           {
-            "path": "nrf_sdk/components/libraries/atomic/nrf_atomic.c"
+            "path": "nrf_sdk/components/libraries/strerror/nrf_strerror.c"
+          },
+          {
+            "path": "nrf_sdk/external/fprintf/nrf_fprintf_format.c"
+          },
+          {
+            "path": "nrf_sdk/external/fprintf/nrf_fprintf.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/util/app_error.c"
           },
           {
             "path": "nrf_sdk/components/libraries/balloc/nrf_balloc.c"
@@ -487,28 +541,19 @@
             "path": "nrf_sdk/components/libraries/memobj/nrf_memobj.c"
           },
           {
-            "path": "nrf_sdk/components/libraries/ringbuf/nrf_ringbuf.c"
-          },
-          {
-            "path": "nrf_sdk/components/libraries/strerror/nrf_strerror.c"
+            "path": "nrf_sdk/components/libraries/util/app_error_weak.c"
           },
           {
             "path": "nrf_sdk/components/libraries/util/app_error_handler_keil.c"
           },
           {
-            "path": "nrf_sdk/components/libraries/util/app_error_weak.c"
-          },
-          {
-            "path": "nrf_sdk/components/libraries/util/app_error.c"
-          },
-          {
             "path": "nrf_sdk/components/libraries/util/app_util_platform.c"
           },
           {
-            "path": "nrf_sdk/external/fprintf/nrf_fprintf_format.c"
+            "path": "nrf_sdk/components/libraries/atomic/nrf_atomic.c"
           },
           {
-            "path": "nrf_sdk/external/fprintf/nrf_fprintf.c"
+            "path": "nrf_sdk/components/libraries/ringbuf/nrf_ringbuf.c"
           }
         ],
         "folders": []
@@ -517,16 +562,16 @@
         "name": "nrf_log",
         "files": [
           {
-            "path": "nrf_sdk/components/libraries/log/src/nrf_log_backend_rtt.c"
+            "path": "nrf_sdk/components/libraries/log/src/nrf_log_str_formatter.c"
           },
           {
-            "path": "nrf_sdk/components/libraries/log/src/nrf_log_backend_serial.c"
+            "path": "nrf_sdk/components/libraries/log/src/nrf_log_backend_rtt.c"
           },
           {
             "path": "nrf_sdk/components/libraries/log/src/nrf_log_frontend.c"
           },
           {
-            "path": "nrf_sdk/components/libraries/log/src/nrf_log_str_formatter.c"
+            "path": "nrf_sdk/components/libraries/log/src/nrf_log_backend_serial.c"
           }
         ],
         "folders": []
@@ -535,37 +580,37 @@
         "name": "paho-mqtt",
         "files": [
           {
-            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTPacket.c"
-          },
-          {
-            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTFormat.c"
-          },
-          {
-            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTConnectServer.c"
-          },
-          {
-            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTSerializePublish.c"
-          },
-          {
-            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTSubscribeServer.c"
-          },
-          {
             "path": "packages/pahomqtt-latest/MQTTClient-RT/paho_mqtt_pipe.c"
-          },
-          {
-            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTSubscribeClient.c"
-          },
-          {
-            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTUnsubscribeServer.c"
-          },
-          {
-            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTUnsubscribeClient.c"
           },
           {
             "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTConnectClient.c"
           },
           {
+            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTConnectServer.c"
+          },
+          {
             "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTDeserializePublish.c"
+          },
+          {
+            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTFormat.c"
+          },
+          {
+            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTPacket.c"
+          },
+          {
+            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTSerializePublish.c"
+          },
+          {
+            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTSubscribeClient.c"
+          },
+          {
+            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTSubscribeServer.c"
+          },
+          {
+            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTUnsubscribeClient.c"
+          },
+          {
+            "path": "packages/pahomqtt-latest/MQTTPacket/src/MQTTUnsubscribeServer.c"
           }
         ],
         "folders": []
@@ -616,10 +661,10 @@
             "path": "packages/SEGGER_RTT-latest/adapter/drv_rtt.c"
           },
           {
-            "path": "packages/SEGGER_RTT-latest/RTT/SEGGER_RTT_printf.c"
+            "path": "packages/SEGGER_RTT-latest/RTT/SEGGER_RTT.c"
           },
           {
-            "path": "packages/SEGGER_RTT-latest/RTT/SEGGER_RTT.c"
+            "path": "packages/SEGGER_RTT-latest/RTT/SEGGER_RTT_printf.c"
           }
         ],
         "folders": []
@@ -640,12 +685,6 @@
             "path": "packages/wiznet-latest/src/wiz.c"
           },
           {
-            "path": "packages/wiznet-latest/ioLibrary/Internet/DHCP/wizchip_dhcp.c"
-          },
-          {
-            "path": "packages/wiznet-latest/ioLibrary/Ethernet/wizchip_socket.c"
-          },
-          {
             "path": "packages/wiznet-latest/src/wiz_ping.c"
           },
           {
@@ -655,13 +694,19 @@
             "path": "packages/wiznet-latest/ioLibrary/Internet/DNS/wizchip_dns.c"
           },
           {
+            "path": "packages/wiznet-latest/ioLibrary/Internet/DHCP/wizchip_dhcp.c"
+          },
+          {
+            "path": "packages/wiznet-latest/ioLibrary/Ethernet/wizchip_conf.c"
+          },
+          {
+            "path": "packages/wiznet-latest/ioLibrary/Ethernet/wizchip_socket.c"
+          },
+          {
             "path": "packages/wiznet-latest/src/wiz_device.c"
           },
           {
             "path": "packages/wiznet-latest/src/wiz_af_inet.c"
-          },
-          {
-            "path": "packages/wiznet-latest/ioLibrary/Ethernet/wizchip_conf.c"
           },
           {
             "path": "packages/wiznet-latest/src/wiz_socket.c"
@@ -680,8 +725,8 @@
   "targets": {
     "rtthread": {
       "excludeList": [
-        "<virtual_root>/ccm3310/ccm3310_nrf.c",
-        "<virtual_root>/WIZnet"
+        "<virtual_root>/WIZnet",
+        "<virtual_root>/ccm3310/ccm3310_nrf.c"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -813,73 +858,75 @@
       "custom_dep": {
         "name": "default",
         "incList": [
-          "nrf_sdk/components/libraries/util",
+          "rt-thread/components/utilities/resource",
+          "rt-thread/components/net/sal/include",
+          "rt-thread/components/libc/posix/io/poll",
+          "services/littlefs",
+          "nrf_sdk/modules/nrfx/soc",
+          "nrf_sdk/modules/nrfx/drivers",
+          "packages/gps_rmc-latest",
+          "rt-thread/components/libc/compilers/common/extension",
+          "board",
+          ".",
+          "rt-thread/components/drivers/include",
+          "rt-thread/components/net/sal/include/dfs_net",
+          "rt-thread/components/legacy/dfs",
+          "rt-thread/components/libc/compilers/common/include",
+          "rt-thread/libcpu/arm/cortex-m4",
+          "rt-thread/components/libc/posix/io/eventfd",
+          "packages/wiznet-latest/ioLibrary/Internet",
+          "rt-thread/components/libc/posix/io/epoll",
+          "nrf_sdk/components/libraries/log/src",
           "applications",
+          "packages/wiznet-latest/inc",
+          "nrf_sdk/components/libraries/balloc",
+          "rt-thread/components/finsh",
+          "nrf_sdk/components/libraries/memobj",
+          "nrf_sdk/components/libraries/strerror",
+          "packages/wiznet-latest/ioLibrary",
+          "rt-thread/components/net/sal/include/socket/sys_socket",
+          "rt-thread/libcpu/arm/common",
+          "nrf_sdk/components/libraries/experimental_section_vars",
+          "nrf_sdk/external/fprintf",
           "services/mqtt-api",
           "packages/SEGGER_RTT-latest",
-          "rt-thread/components/legacy",
-          "rt-thread/components/drivers/spi",
-          "rt-thread/components/net/sal/include/socket/sys_socket",
-          "nrf_sdk/modules/nrfx/mdk",
-          "nrf_sdk/modules/nrfx/drivers/include",
-          "rt-thread/components/libc/posix/io/eventfd",
-          "rt-thread/components/libc/posix/ipc",
-          "rt-thread/components/drivers/include",
-          "modules/max30102",
-          "nrf_sdk/external/fprintf",
-          "board",
-          "rt-thread/components/libc/posix/io/stdio",
-          "rt-thread/components/net/sal/include/dfs_net",
-          "nrf_sdk/modules/nrfx/hal",
-          "nrf_sdk/modules/nrfx/drivers/src",
-          "rt-thread/components/net/at/at_socket",
-          "rt-thread/components/libc/compilers/common/extension/fcntl/octal",
-          "nrf_sdk/components/libraries/memobj",
-          "rt-thread/components/net/sal/include",
           "packages/wiznet-latest/ioLibrary/Ethernet",
-          "rt-thread/include",
-          "rt-thread/components/libc/compilers/common/extension",
-          "nrf_sdk/modules/nrfx",
-          "libraries/cmsis/include",
-          "nrf_sdk/components/libraries/ringbuf",
-          "rt-thread/components/net/at/include",
-          "rt-thread/libcpu/arm/cortex-m4",
-          "libraries/drivers",
-          "nrf_sdk/modules/nrfx/soc",
-          "rt-thread/components/net/sal/impl",
-          "nrf_sdk/components/libraries/log/src",
-          "rt-thread/components/finsh",
-          "packages/wiznet-latest/ioLibrary",
-          "rt-thread/components/utilities/resource",
-          "rt-thread/components/libc/posix/io/epoll",
-          "rt-thread/components/net/netdev/include",
-          "modules/ec800x",
-          "rt-thread/components/legacy/dfs",
           "packages/SEGGER_RTT-latest/RTT",
-          ".",
-          "rt-thread/components/dfs/dfs_v1/filesystems/devfs",
-          "nrf_sdk/components/libraries/atomic",
-          "modules/ccm3310",
-          "rt-thread/components/libc/compilers/common/include",
+          "rt-thread/components/net/netdev/include",
+          "rt-thread/include",
           "packages/pahomqtt-latest/MQTTClient-RT",
-          "rt-thread/components/net/sal/include/socket",
+          "modules/ec800x",
+          "nrf_sdk/components/drivers_nrf/nrf_soc_nosd",
+          "modules/ccm3310",
+          "rt-thread/components/net/at/at_socket",
+          "nrf_sdk/components/libraries/atomic",
+          "libraries/cmsis/include",
+          "rt-thread/components/libc/posix/io/stdio",
+          "rt-thread/components/dfs/dfs_v1/filesystems/devfs",
+          "rt-thread/components/libc/posix/ipc",
           "nrf_sdk/components/libraries/delay",
-          "nrf_sdk/components/libraries/log",
           "nrf_sdk/integration/nrfx/legacy",
           "rt-thread/components/dfs/dfs_v1/include",
-          "packages/pahomqtt-latest/MQTTPacket/src",
-          "rt-thread/libcpu/arm/common",
-          "nrf_sdk/modules/nrfx/drivers",
-          "packages/wiznet-latest/inc",
-          "rt-thread/components/libc/posix/io/poll",
+          "nrf_sdk/components/libraries/util",
+          "rt-thread/components/fal/inc",
+          "nrf_sdk/modules/nrfx/drivers/include",
+          "rt-thread/components/libc/compilers/common/extension/fcntl/octal",
+          "rt-thread/components/net/at/include",
+          "rt-thread/components/drivers/spi",
+          "modules/max30102",
+          "nrf_sdk/components/libraries/ringbuf",
+          "libraries/drivers",
+          "rt-thread/components/net/sal/include/socket",
+          "nrf_sdk/modules/nrfx/mdk",
+          "nrf_sdk/components/libraries/log",
+          "rt-thread/components/net/sal/impl",
           "packages/at_device-latest/inc",
-          "nrf_sdk/components/libraries/experimental_section_vars",
-          "packages/gps_rmc-latest",
+          "nrf_sdk/modules/nrfx",
           "packages/CmBacktrace-v1.4.1",
-          "nrf_sdk/components/drivers_nrf/nrf_soc_nosd",
-          "nrf_sdk/components/libraries/balloc",
-          "nrf_sdk/components/libraries/strerror",
-          "packages/wiznet-latest/ioLibrary/Internet",
+          "nrf_sdk/modules/nrfx/drivers/src",
+          "nrf_sdk/modules/nrfx/hal",
+          "rt-thread/components/legacy",
+          "packages/pahomqtt-latest/MQTTPacket/src",
           "RTE/_rtthread"
         ],
         "libList": [],
@@ -894,6 +941,7 @@
           "__CLK_TCK=RT_TICK_PER_SECOND",
           "__RTTHREAD__",
           "NRFX_CLOCK_ENABLED",
+          "LFS_CONFIG=lfs_config.h",
           "CONFIG_GPIO_AS_PINRESET",
           "USE_APP_CONFIG"
         ]

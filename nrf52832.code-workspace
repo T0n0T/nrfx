@@ -6,9 +6,14 @@
     ],
     "settings": {
         "files.associations": {
-            "sdk_common.h": "c",
-            "nordic_common.h": "c",
-            "nrfx_log.h": "c"
+            "*.cpp": "cpp",
+            "*.html": "html",
+            "*.env": "dotenv",
+            "*.go": "go",
+            "nrfx_nvmc.h": "c",
+            "dfs_file.h": "c",
+            "dfs.h": "c",
+            "dfs_private.h": "c"
         }
     },
     "extensions": {}
