@@ -51,7 +51,9 @@ static rt_err_t spi_configure(struct rt_spi_device *device, struct rt_spi_config
     struct nrfx_drv_spim *spim_instance = (struct nrfx_drv_spim *)device->bus->parent.user_data;
     nrfx_spim_t *p_instance             = &(spim_instance->instance);
     nrfx_spim_config_t config           = spim_instance->nrfx_spim_cfg;
-
+    config.sck_pin                      = spim_instance->pin_cfg.sck_pin;
+    config.mosi_pin                     = spim_instance->pin_cfg.mosi_pin;
+    config.miso_pin                     = spim_instance->pin_cfg.miso_pin;
     if ((rt_base_t)device->parent.user_data != RT_NULL) {
         config.ss_pin = (rt_base_t)device->parent.user_data;
         LOG_D("spi_bus [%s] configure SS_PIN = %d", device->parent.parent.name, config.ss_pin);

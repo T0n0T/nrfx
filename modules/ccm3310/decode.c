@@ -24,6 +24,15 @@ static uint32_t decode_4bytes(uint8_t *msb)
     return *msb | (*(msb + 1) << 8) | (*(msb + 2) << 16) | (*(msb + 3) << 24);
 }
 
+int numalgin(int num, int align)
+{
+    if (num % align != 0) {
+        int p = num / align + 1;
+        return p * align;
+    }
+    return num;
+}
+
 static void decode_test()
 {
     uint8_t *data = 0;
@@ -99,17 +108,19 @@ int decode(uint8_t *raw, uint8_t **data, int *len)
  * @param ins cmd组成参数
  * @param p1 cmd组成参数
  * @param p2 cmd组成参数
- * @param send_pack 发送包在组件前需要先分配好空间
+ * @param send_pack 发送包在进入函数前需要先分配好空间
  * @param data 数据段
  * @param data_len 数据段长度
  * @return size_t 包最终长度
  */
-int encode(uint8_t cla, uint8_t ins, uint8_t p1, uint8_t p2, uint8_t *send_pack, uint8_t *data, uint32_t data_len)
+int encode(uint8_t cla, uint8_t ins, uint8_t p1, uint8_t p2,
+           uint8_t *send_pack,
+           uint8_t *data, uint32_t data_len)
 {
     uint8_t *ptr = 0;
     ptr          = send_pack;
     // 1.包头
-    *ptr     = 0x53;
+    *(ptr++) = 0x53;
     *(ptr++) = 0x02;
     *(ptr++) = 0x10;
     *(ptr++) = 0x33;
@@ -135,7 +146,13 @@ int encode(uint8_t cla, uint8_t ins, uint8_t p1, uint8_t p2, uint8_t *send_pack,
         }
     }
 
-    // 6.包尾
+    // 6.包尾0x55, 0x02, 0x33, 0x01
+    *(ptr++) = 0x55;
+    *(ptr++) = 0x02;
+    *(ptr++) = 0x33;
+    *(ptr++) = 0x01;
+
+    // 7.crc
     if (cla == 0x81) {
         uint32_t crc32_val = crc32(send_pack, ptr - send_pack + 1);
         *(ptr++)           = crc32_val & 0x000000FF;
@@ -143,5 +160,5 @@ int encode(uint8_t cla, uint8_t ins, uint8_t p1, uint8_t p2, uint8_t *send_pack,
         *(ptr++)           = crc32_val & 0x00FF0000;
         *(ptr++)           = crc32_val & 0xFF000000;
     }
-    return (int)(ptr - send_pack + 1);
+    return (int)(ptr - send_pack);
 }

@@ -15,7 +15,10 @@
 #include <ccm3310.h>
 
 uint8_t sm4_id;
-uint8_t code_buf[32];
+// char origin_text[] = "{\"test\":\"hello\",\"description\":\"here's a sm4 test.\"}";
+char origin_text[] = "hello!here's a test,with utf-8";
+ciphertext cipher_text;
+plaintext plain_text;
 
 uint8_t Get_Version[] = {
     0x53, 0x02, 0x10, 0x33,
@@ -156,7 +159,7 @@ static void ccm3310_version(void)
     printf("\n===================================\n");
 }
 
-static void ccm3310_sm2_getkey(void)
+static void ccm3310_sm2_getkey_test(void)
 {
     int len     = 0;
     uint8_t *id = 0, *sm2_key = 0;
@@ -180,60 +183,56 @@ static void ccm3310_sm2_getkey(void)
     printf("\n===================================\n");
 }
 
-static void ccm3310_sm4_setkey(void)
+static void ccm3310_sm4_setkey_test(void)
 {
-    int len           = 0;
     uint8_t *sm4_pack = 0;
-
-    len = ccm3310_transfer(Import_Sym_Key, sizeof(Import_Sym_Key), &sm4_pack, 21);
+    uint8_t key[]     = {
+        0x77, 0x7f, 0x23, 0xc6,
+        0xfe, 0x7b, 0x48, 0x73,
+        0xdd, 0x59, 0x5c, 0xff,
+        0xf6, 0x5f, 0x58, 0xec};
+    sm4_id = ccm3310_sm4_setkey(key);
     printf("\n========= print key id ============\n");
-    if (len >= 0) {
-        printf("\n0x%X\n", *sm4_pack);
-    }
-    sm4_id = *sm4_pack;
+    printf("\n0x%X\n", sm4_id);
     printf("\n===================================\n");
 }
 
-static void ccm3310_sm4_encrypt(void)
+static void ccm3310_sm4_encrypt_test(void)
 {
-    int len               = 0;
-    uint8_t *marshel_data = 0;
+    pdata origin_data;
+    origin_data.data = (uint8_t *)origin_text;
+    origin_data.len  = sizeof(origin_text);
     printf("sm4_id: 0x%02X\n", sm4_id);
-    Sym_Encrypt[17] = sm4_id;
+    cipher_text = ccm3310_sm4_encrypt(sm4_id, origin_data);
 
-    len = ccm3310_transfer(Sym_Encrypt, sizeof(Sym_Encrypt), &marshel_data, 80);
+    for (size_t i = 0; i < sizeof(origin_text); i++) {
+        printf("%02x", origin_text[i]);
+    }
     printf("\n========= print encrypt ===========\n");
-    if (len >= 0) {
-        for (size_t i = 0; i < len; i++) {
-            code_buf[i] = *(marshel_data + i);
-            printf("%02x", *(marshel_data + i));
+    if (cipher_text.len >= 0) {
+        for (size_t i = 0; i < cipher_text.len; i++) {
+            printf("%02x", *(cipher_text.data + i));
         }
     }
     printf("\n===================================\n");
 }
 
-static void ccm3310_sm4_decrypt(void)
+static void ccm3310_sm4_decrypt_test(void)
 {
-    int len                 = 0;
     uint8_t *unmarshel_data = 0;
     printf("sm4_id: 0x%02X\n", sm4_id);
-    Sym_Decrypt[17] = sm4_id;
-    for (size_t i = 0; i < 32; i++) {
-        Sym_Decrypt[24 + i] = code_buf[i];
-    }
-
-    len = ccm3310_transfer(Sym_Decrypt, sizeof(Sym_Decrypt), &unmarshel_data, 80);
+    plain_text = ccm3310_sm4_decrypt(sm4_id, cipher_text);
     printf("\n========= print decrypt ===========\n");
-    if (len >= 0) {
-        for (size_t i = 0; i < len; i++) {
-            printf("%02x", *(unmarshel_data + i));
+    if (plain_text.len >= 0) {
+        for (size_t i = 0; i < plain_text.len; i++) {
+            printf("%c", *(plain_text.data + i));
         }
     }
     printf("\n===================================\n");
 }
 
 MSH_CMD_EXPORT(ccm3310_version, get version);
-MSH_CMD_EXPORT(ccm3310_sm2_getkey, get sm2key);
-MSH_CMD_EXPORT(ccm3310_sm4_setkey, set sm4key);
-MSH_CMD_EXPORT(ccm3310_sm4_encrypt, encode sm4);
-MSH_CMD_EXPORT(ccm3310_sm4_decrypt, decode sm4);
+MSH_CMD_EXPORT(ccm3310_sm2_getkey_test, get sm2key);
+MSH_CMD_EXPORT(ccm3310_sm4_setkey_test, set sm4key);
+MSH_CMD_EXPORT(ccm3310_sm4_encrypt_test, encode sm4);
+MSH_CMD_EXPORT(ccm3310_sm4_decrypt_test, decode sm4);

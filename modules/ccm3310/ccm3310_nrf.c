@@ -61,8 +61,11 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
             .rx_length   = send_len,
         };
     result = nrfx_spim_xfer(&instance, &spim_xfer_desc, 0);
-    printf("\nspim transmit:[%x]\n", result);
-
+    // printf("\nspim transmit:[%x]\n", result);
+    printf("\nspim send: \n");
+    for (size_t i = 0; i < spim_xfer_desc.tx_length; i++) {
+        printf("%02x ", *(spim_xfer_desc.p_tx_buffer + i));
+    }
     printf("\n========= print transmit ========\n");
     for (size_t i = 0; i < send_len; i++) {
         printf("0x%02x ", *(send_buf + i));
@@ -80,7 +83,8 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
     spim_xfer_desc.rx_length   = recv_len;
 
     result = nrfx_spim_xfer(&instance, &spim_xfer_desc, 0);
-    printf("\nspim receive:[%x]\n", result);
+    printf("\nspim receive:[%d]\n", recv_len);
+
     printf("\n========= print receive =========\n");
     for (size_t i = 0; i < recv_len; i++) {
         printf("0x%02x ", recv_buf[i]);
@@ -96,22 +100,4 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
         return len;
     }
     return -1;
-}
-
-void ccm3310_sm4_init(uint8_t *key)
-{
-    uint8_t *pack                 = (uint8_t *)rt_malloc(100);
-    struct ccm3310_key_data *data = rt_malloc(sizeof(struct ccm3310_key_data));
-    data->version                 = 0x00;
-    data->key_id                  = 0x00;
-    data->algo                    = 0x84;
-    data->len                     = 0x10;
-    for (size_t i = 0; i < 16; i++) {
-        data->key_data[i] = *(key + i);
-    }
-
-    uint8_t *id  = 0;
-    int send_len = 0;
-    send_len     = encode(0x80, 0x42, 0x00, 0x00, pack, (uint8_t *)data, sizeof(data));
-    ccm3310_transfer(pack, send_len, &id, 21);
 }

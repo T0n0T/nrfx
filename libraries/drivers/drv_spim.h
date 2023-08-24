@@ -31,44 +31,55 @@ rt_err_t rt_hw_spi_device_attach(const char *bus_name, const char *device_name, 
 
 // SPI bus config
 #ifdef BSP_USING_SPI0
-#define NRFX_SPI0_CONFIG                                                   \
-    {                                                                      \
-        .bus_name      = "spi0",                                           \
-        .instance      = NRFX_SPIM_INSTANCE(0),                            \
-        .nrfx_spim_cfg = NRFX_SPIM_DEFAULT_CONFIG(BSP_SPI0_SCK_PIN,        \
-                                                  BSP_SPI0_MOSI_PIN,       \
-                                                  BSP_SPI0_MISO_PIN,       \
-                                                  NRFX_SPIM_PIN_NOT_USED), \
+#define NRFX_SPI0_CONFIG                              \
+    {                                                 \
+        .bus_name         = "spi0",                   \
+        .instance         = NRFX_SPIM_INSTANCE(0),    \
+        .nrfx_spim_cfg    = NRFX_SPIM_DEFAULT_CONFIG, \
+        .pin_cfg.sck_pin  = BSP_SPI0_SCK_PIN,         \
+        .pin_cfg.mosi_pin = BSP_SPI0_MOSI_PIN,        \
+        .pin_cfg.miso_pin = BSP_SPI0_MISO_PIN,        \
+        .pin_cfg.ss_pin   = BSP_SPI0_SS_PIN,          \
     }
 #endif
 #ifdef BSP_USING_SPI1
-#define NRFX_SPI1_CONFIG                                                   \
-    {                                                                      \
-        .bus_name      = "spi1",                                           \
-        .instance      = NRFX_SPIM_INSTANCE(1),                            \
-        .nrfx_spim_cfg = NRFX_SPIM_DEFAULT_CONFIG(BSP_SPI1_SCK_PIN,        \
-                                                  BSP_SPI1_MOSI_PIN,       \
-                                                  BSP_SPI1_MISO_PIN,       \
-                                                  NRFX_SPIM_PIN_NOT_USED), \
+#define NRFX_SPI1_CONFIG                              \
+    {                                                 \
+        .bus_name         = "spi1",                   \
+        .instance         = NRFX_SPIM_INSTANCE(1),    \
+        .nrfx_spim_cfg    = NRFX_SPIM_DEFAULT_CONFIG, \
+        .pin_cfg.sck_pin  = BSP_SPI1_SCK_PIN,         \
+        .pin_cfg.mosi_pin = BSP_SPI1_MOSI_PIN,        \
+        .pin_cfg.miso_pin = BSP_SPI1_MISO_PIN,        \
+        .pin_cfg.ss_pin   = BSP_SPI1_SS_PIN,          \
     }
 #endif
 
 #ifdef BSP_USING_SPI2
-#define NRFX_SPI2_CONFIG                                                   \
-    {                                                                      \
-        .bus_name      = "spi2",                                           \
-        .instance      = NRFX_SPIM_INSTANCE(2),                            \
-        .nrfx_spim_cfg = NRFX_SPIM_DEFAULT_CONFIG(BSP_SPI2_SCK_PIN,        \
-                                                  BSP_SPI2_MOSI_PIN,       \
-                                                  BSP_SPI2_MISO_PIN,       \
-                                                  NRFX_SPIM_PIN_NOT_USED), \
+#define NRFX_SPI2_CONFIG                              \
+    {                                                 \
+        .bus_name         = "spi2",                   \
+        .instance         = NRFX_SPIM_INSTANCE(2),    \
+        .nrfx_spim_cfg    = NRFX_SPIM_DEFAULT_CONFIG, \
+        .pin_cfg.sck_pin  = BSP_SPI2_SCK_PIN,         \
+        .pin_cfg.mosi_pin = BSP_SPI2_MOSI_PIN,        \
+        .pin_cfg.miso_pin = BSP_SPI2_MISO_PIN,        \
+        .pin_cfg.ss_pin   = BSP_SPI2_SS_PIN,          \
     }
 #endif
+
+struct nrfx_spi_pin_config {
+    rt_uint8_t sck_pin;
+    rt_uint8_t mosi_pin;
+    rt_uint8_t miso_pin;
+    rt_uint8_t ss_pin;
+};
 
 struct nrfx_drv_spim {
     char *bus_name;
     nrfx_spim_t instance;             /* nrfx spi driver instance. */
     nrfx_spim_config_t nrfx_spim_cfg; /* nrfx spi config Configuration */
+    struct nrfx_spi_pin_config pin_cfg;
     struct rt_spi_configuration *cfg;
     struct rt_spi_bus spi_bus;
 };

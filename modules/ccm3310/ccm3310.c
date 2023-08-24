@@ -15,7 +15,7 @@
 #include <ccm3310.h>
 // #include <drv_spim.h>
 
-// #define CCM3310_DEBUG
+#define CCM3310_DEBUG
 #if defined(CCM3310_DEBUG)
 #define CCM3310_RAW_PRINTF
 #define DBG_LVL DBG_LOG
@@ -52,6 +52,15 @@ void ccm3310_init(void)
 }
 INIT_APP_EXPORT(ccm3310_init);
 
+/**
+ * @brief 模块交互low-level
+ *
+ * @param send_buf 下行数据包
+ * @param send_len 下行包长度
+ * @param decode_data 解包上行包数据区，并给出的指针
+ * @param recv_len
+ * @return int
+ */
 int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int recv_len)
 {
     struct rt_spi_message msg;
@@ -81,10 +90,10 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
             printf("\n");
         }
     }
+#endif
     while (status == PIN_HIGH) {
         status = rt_pin_read(GINT1);
     }
-#endif
 
     msg.send_buf   = RT_NULL;
     msg.recv_buf   = recv_buf;
@@ -112,22 +121,4 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
         return len;
     }
     return -1;
-}
-
-void ccm3310_sm4_init(uint8_t *key)
-{
-    uint8_t *pack                 = (uint8_t *)rt_malloc(100);
-    struct ccm3310_key_data *data = rt_malloc(sizeof(struct ccm3310_key_data));
-    data->version                 = 0x00;
-    data->key_id                  = 0x00;
-    data->algo                    = 0x84;
-    data->len                     = 0x10;
-    for (size_t i = 0; i < 16; i++) {
-        data->key_data[i] = *(key + i);
-    }
-
-    uint8_t *id  = 0;
-    int send_len = 0;
-    send_len     = encode(0x80, 0x42, 0x00, 0x00, pack, (uint8_t *)data, sizeof(data));
-    ccm3310_transfer(pack, send_len, &id, 21);
 }

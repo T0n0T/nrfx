@@ -15,7 +15,7 @@
 
 #include "drv_spi.h"
 #include <nrf_gpio.h>
-#define DBG_LEVEL DBG_LOG
+#define DBG_LEVEL DBG_INFO
 #include <rtdbg.h>
 #define LOG_TAG "drv.spi"
 
@@ -217,14 +217,14 @@ static rt_uint32_t spixfer(struct rt_spi_device *device, struct rt_spi_message *
     if (message->cs_release == 1) {
         nrf_gpio_pin_set((uint32_t)device->parent.user_data);
     }
-    printf("\nspim send: \n");
-    for (size_t i = 0; i < p_xfer_desc.tx_length; i++) {
-        printf("%02x ", *(p_xfer_desc.p_tx_buffer + i));
-    }
-    printf("\nspim recv: \n");
-    for (size_t i = 0; i < p_xfer_desc.rx_length; i++) {
-        printf("%02x ", *(p_xfer_desc.p_rx_buffer + i));
-    }
+    // printf("\nspim send: \n");
+    // for (size_t i = 0; i < p_xfer_desc.tx_length; i++) {
+    //     printf("%02x ", *(p_xfer_desc.p_tx_buffer + i));
+    // }
+    // printf("\nspim recv: \n");
+    // for (size_t i = 0; i < p_xfer_desc.rx_length; i++) {
+    //     printf("%02x ", *(p_xfer_desc.p_rx_buffer + i));
+    // }
 
     if (NRFX_SUCCESS != nrf_ret) {
         return 0;
