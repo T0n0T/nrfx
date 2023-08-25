@@ -48,10 +48,10 @@
 #define FS_PARTITION_NAME ON_CHIP_PARTION_NAME
 
 /**
-  * @brief  on chip filesystem init
-  * @param  void
-  * @retval 0: filesystem init success, -1: filesystem init failed
-  */
+ * @brief  on chip filesystem init
+ * @param  void
+ * @retval 0: filesystem init success, -1: filesystem init failed
+ */
 
 static int on_chip_fs_init(void)
 {
@@ -61,41 +61,31 @@ static int on_chip_fs_init(void)
 
     struct rt_device *flash_dev = fal_mtd_nor_device_create(FS_PARTITION_NAME);
 
-    if (flash_dev == NULL)
-    {
+    if (flash_dev == NULL) {
         LOG_E("Can't create a block device on '%s' partition.", FS_PARTITION_NAME);
         result = -1;
         goto err;
-    }
-    else
-    {
+    } else {
         LOG_D("Create a block device on the %s partition of flash successful.", FS_PARTITION_NAME);
     }
 
-    if (rt_device_find(FS_PARTITION_NAME) != RT_NULL)
-    {
-        int mkfs_res = dfs_mkfs("lfs", FS_PARTITION_NAME);
+    if (rt_device_find(FS_PARTITION_NAME) != RT_NULL) {
+        int mkfs_res = dfs_mkfs("elm", FS_PARTITION_NAME);
 
-        if (mkfs_res != 0)
-        {
+        if (mkfs_res != 0) {
             LOG_E("dfs_mkfs error, errno = %d", rt_get_errno());
             result = -1;
             goto err;
         }
 
-        if (dfs_mount(FS_PARTITION_NAME, "/", "lfs", 0, 0) == RT_EOK)
-        {
+        if (dfs_mount(FS_PARTITION_NAME, "/", "elm", 0, 0) == RT_EOK) {
             LOG_D("onchip elm filesystem mount to '/'");
-        }
-        else
-        {
+        } else {
             LOG_E("onchip elm filesystem mount to '/' failed!");
             result = -1;
             goto err;
         }
-    }
-    else
-    {
+    } else {
         LOG_E("find filesystem portion failed");
     }
 err:

@@ -13,7 +13,7 @@
 #include <nrfx_uart.h>
 #include "drv_uart.h"
 
-#ifdef BSP_USING_UART
+#ifdef BSP_USING_UARTE
 
 typedef struct
 {
@@ -65,7 +65,9 @@ static void uart0_event_hander(nrfx_uart_event_t const *p_event, void *p_context
 
 static rt_err_t _uart_cfg(struct rt_serial_device *serial, struct serial_configure *cfg)
 {
-    nrfx_uart_config_t config = NRFX_UART_DEFAULT_CONFIG(BSP_UART0_TX_PIN, BSP_UART0_RX_PIN);
+    nrfx_uart_config_t config = NRFX_UART_DEFAULT_CONFIG;
+    config.pseltxd            = BSP_UART0_TX_PIN;
+    config.pselrxd            = BSP_UART0_RX_PIN;
     drv_uart_cfg_t *instance  = RT_NULL;
 
     RT_ASSERT(serial != RT_NULL);
@@ -92,14 +94,14 @@ static rt_err_t _uart_cfg(struct rt_serial_device *serial, struct serial_configu
     }
 
     if (cfg->parity == PARITY_NONE) {
-        config.hal_cfg.parity = NRF_UART_PARITY_EXCLUDED;
+        config.parity = NRF_UART_PARITY_EXCLUDED;
     } else {
-        config.hal_cfg.parity = NRF_UART_PARITY_INCLUDED;
+        config.parity = NRF_UART_PARITY_INCLUDED;
     }
 
-    config.hal_cfg.hwfc = NRF_UART_HWFC_DISABLED;
-    config.pselrxd      = instance->rx_pin;
-    config.pseltxd      = instance->tx_pin;
+    config.hwfc    = NRF_UART_HWFC_DISABLED;
+    config.pselrxd = instance->rx_pin;
+    config.pseltxd = instance->tx_pin;
 
     nrfx_uart_init(&(instance->uart), &config, instance->event_handler);
     nrfx_uart_rx(&(instance->uart), &(instance->rx_byte), 1);

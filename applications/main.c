@@ -12,6 +12,10 @@
 #include <rtthread.h>
 #include <rtdevice.h>
 #include <stdio.h>
+
+#include "nrf_log.h"
+#include "nrf_log_ctrl.h"
+#include "nrf_log_backend_rtt.h"
 #define DK_BOARD_LED_1 17
 
 int main(void)

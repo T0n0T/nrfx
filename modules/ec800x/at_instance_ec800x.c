@@ -36,7 +36,7 @@ static int ec800x_device_register(void)
                               AT_DEVICE_CLASS_EC800X,
                               (void *)ec800x);
 }
-// INIT_APP_EXPORT(ec800x_device_register);
+INIT_APP_EXPORT(ec800x_device_register);
 
 int ec800x_get_rssi(void)
 {

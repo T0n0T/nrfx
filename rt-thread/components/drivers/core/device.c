@@ -366,6 +366,7 @@ rt_ssize_t rt_device_write(rt_device_t dev,
     /* call device_write interface */
     if (device_write != RT_NULL) {
         return device_write(dev, pos, buffer, size);
+        return 0;
     }
 
     /* set error code */
