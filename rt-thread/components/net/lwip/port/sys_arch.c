@@ -208,11 +208,7 @@ u32_t sys_arch_sem_wait(sys_sem_t *sem, u32_t timeout)
  */
 int sys_sem_valid(sys_sem_t *sem)
 {
-    int ret = 0;
-
-    if (*sem) ret = 1;
-
-    return ret;
+    return (int)(*sem);
 }
 #endif
 
@@ -287,11 +283,7 @@ void sys_mutex_free(sys_mutex_t *mutex)
  */
 int sys_mutex_valid(sys_mutex_t *mutex)
 {
-    int ret = 0;
-
-    if (*mutex) ret = 1;
-
-    return ret;
+    return (int)(*mutex);
 }
 #endif
 
@@ -466,11 +458,7 @@ u32_t sys_arch_mbox_tryfetch(sys_mbox_t *mbox, void **msg)
  */
 int sys_mbox_valid(sys_mbox_t *mbox)
 {
-    int ret = 0;
-
-    if (*mbox) ret = 1;
-
-    return ret;
+    return (int)(*mbox);
 }
 #endif
 
@@ -525,7 +513,7 @@ void sys_arch_unprotect(sys_prot_t pval)
 void sys_arch_assert(const char *file, int line)
 {
     rt_kprintf("\nAssertion: %d in %s, thread %s\n",
-               line, file, rt_thread_self()->parent.name);
+               line, file, rt_thread_self()->name);
     RT_ASSERT(0);
 }
 
@@ -539,7 +527,7 @@ u32_t sys_now(void)
     return rt_tick_get_millisecond();
 }
 
-rt_weak void mem_init(void)
+RT_WEAK void mem_init(void)
 {
 }
 
@@ -675,24 +663,24 @@ struct netif *lwip_ip4_route_src(const ip4_addr_t *dest, const ip4_addr_t *src)
 {
     struct netif *netif;
 
-    if (src == NULL)
-        return NULL;
-
     /* iterate through netifs */
     for (netif = netif_list; netif != NULL; netif = netif->next)
     {
         /* is the netif up, does it have a link and a valid address? */
         if (netif_is_up(netif) && netif_is_link_up(netif) && !ip4_addr_isany_val(*netif_ip4_addr(netif)))
         {
-            /* source ip address equals netif's ip address? */
-            if (ip4_addr_cmp(src, netif_ip4_addr(netif)))
+            /* gateway matches on a non broadcast interface? (i.e. peer in a point to point interface) */
+            if (src != NULL)
             {
-                return netif;
+                if (ip4_addr_cmp(src, netif_ip4_addr(netif)))
+                {
+                    return netif;
+                }
             }
         }
     }
-
-    return NULL;
+    netif = netif_default;
+    return netif;
 }
 #endif /* LWIP_HOOK_IP4_ROUTE_SRC */
 #endif /*LWIP_VERSION_MAJOR >= 2 */

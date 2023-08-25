@@ -196,7 +196,7 @@ bool_t xdr_u_long(XDR* xdrs, unsigned long* ulp)
 /*
  * XDR long long integers
  */
-bool_t xdr_longlong_t (XDR * xdrs, int64_t* llp)
+bool_t xdr_longlong_t (XDR * xdrs, long long* llp)
 {
   int32_t t1, t2;
 
@@ -223,7 +223,7 @@ bool_t xdr_longlong_t (XDR * xdrs, int64_t* llp)
 /*
  * XDR unsigned long long integers
  */
-bool_t xdr_u_longlong_t (XDR * xdrs, uint64_t* ullp)
+bool_t xdr_u_longlong_t (XDR * xdrs, unsigned long long* ullp)
 {
   uint32_t t1, t2;
 
@@ -363,20 +363,10 @@ bool_t xdr_bool(XDR *xdrs, bool_t *bp)
  */
 bool_t xdr_enum(XDR *xdrs, enum_t *ep)
 {
-    enum sizecheck { SIZEVAL };	/* used to find the size of an enum */
-
     /*
      * enums are treated as ints
      */
-    /* LINTED */ if (sizeof (enum sizecheck) == sizeof (long)) {
-        return (xdr_long(xdrs, (long *)(void *)ep));
-    } else /* LINTED */ if (sizeof (enum sizecheck) == sizeof (int)) {
-        return (xdr_int(xdrs, (int *)(void *)ep));
-    } else /* LINTED */ if (sizeof (enum sizecheck) == sizeof (short)) {
-        return (xdr_short(xdrs, (short *)(void *)ep));
-    } else {
-        return (FALSE);
-    }
+    return (xdr_long(xdrs, (long *) ep));
 }
 
 /*

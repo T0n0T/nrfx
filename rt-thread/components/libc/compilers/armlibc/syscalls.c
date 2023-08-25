@@ -282,18 +282,11 @@ int _sys_seek(FILEHANDLE fh, long pos)
 /**
  * used by tmpnam() or tmpfile()
  */
-#if __ARMCC_VERSION >= 6190000
-void _sys_tmpnam(char *name, int fileno, unsigned maxlength)
-{
-    rt_snprintf(name, maxlength, "tem%03d", fileno);
-}
-#else
 int _sys_tmpnam(char *name, int fileno, unsigned maxlength)
 {
     rt_snprintf(name, maxlength, "tem%03d", fileno);
     return 1;
 }
-#endif /* __ARMCC_VERSION >= 6190000 */
 
 char *_sys_command_string(char *cmd, int len)
 {
@@ -310,7 +303,7 @@ void _ttywrch(int ch)
 }
 
 /* for exit() and abort() */
-rt_weak void _sys_exit(int return_code)
+RT_WEAK void _sys_exit(int return_code)
 {
     extern void __rt_libc_exit(int status);
     __rt_libc_exit(return_code);

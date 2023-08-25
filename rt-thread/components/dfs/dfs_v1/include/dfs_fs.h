@@ -21,7 +21,7 @@ extern "C" {
 
 /* Pre-declaration */
 struct dfs_filesystem;
-struct dfs_file;
+struct dfs_fd;
 
 /* File system operations */
 struct dfs_filesystem_ops
@@ -37,7 +37,7 @@ struct dfs_filesystem_ops
     int (*unmount)  (struct dfs_filesystem *fs);
 
     /* make a file system */
-    int (*mkfs)     (rt_device_t dev_id, const char *fs_name);
+    int (*mkfs)     (rt_device_t devid);
     int (*statfs)   (struct dfs_filesystem *fs, struct statfs *buf);
 
     int (*unlink)   (struct dfs_filesystem *fs, const char *pathname);

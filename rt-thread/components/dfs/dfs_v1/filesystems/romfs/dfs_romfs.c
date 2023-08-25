@@ -32,30 +32,9 @@ int dfs_romfs_unmount(struct dfs_filesystem *fs)
     return RT_EOK;
 }
 
-int dfs_romfs_ioctl(struct dfs_file *file, int cmd, void *args)
+int dfs_romfs_ioctl(struct dfs_fd *file, int cmd, void *args)
 {
-    int ret = RT_EOK;
-    struct romfs_dirent *dirent;
-
-    dirent = (struct romfs_dirent *)file->vnode->data;
-    RT_ASSERT(dirent != NULL);
-
-    switch (cmd)
-    {
-    case RT_FIOGETADDR:
-        {
-            *(rt_ubase_t*)args = (rt_ubase_t)dirent->data;
-            break;
-        }
-    case RT_FIOFTRUNCATE:
-        {
-            break;
-        }
-    default:
-        ret = -RT_EINVAL;
-        break;
-    }
-    return ret;
+    return -EIO;
 }
 
 rt_inline int check_dirent(struct romfs_dirent *dirent)
@@ -133,6 +112,9 @@ struct romfs_dirent *dfs_romfs_lookup(struct romfs_dirent *root_dirent, const ch
                 else
                 {
                     /* return file dirent */
+                    if (subpath != NULL)
+                        break; /* not the end of path */
+
                     return &dirent[index];
                 }
             }
@@ -146,12 +128,12 @@ struct romfs_dirent *dfs_romfs_lookup(struct romfs_dirent *root_dirent, const ch
     return NULL;
 }
 
-ssize_t dfs_romfs_read(struct dfs_file *file, void *buf, size_t count)
+int dfs_romfs_read(struct dfs_fd *file, void *buf, size_t count)
 {
     rt_size_t length;
     struct romfs_dirent *dirent;
 
-    dirent = (struct romfs_dirent *)file->vnode->data;
+    dirent = (struct romfs_dirent *)file->data;
     RT_ASSERT(dirent != NULL);
 
     if (check_dirent(dirent) != 0)
@@ -159,10 +141,10 @@ ssize_t dfs_romfs_read(struct dfs_file *file, void *buf, size_t count)
         return -EIO;
     }
 
-    if (count < file->vnode->size - file->pos)
+    if (count < file->size - file->pos)
         length = count;
     else
-        length = file->vnode->size - file->pos;
+        length = file->size - file->pos;
 
     if (length > 0)
         rt_memcpy(buf, &(dirent->data[file->pos]), length);
@@ -173,9 +155,9 @@ ssize_t dfs_romfs_read(struct dfs_file *file, void *buf, size_t count)
     return length;
 }
 
-off_t dfs_romfs_lseek(struct dfs_file *file, off_t offset)
+int dfs_romfs_lseek(struct dfs_fd *file, off_t offset)
 {
-    if (offset <= file->vnode->size)
+    if (offset <= file->size)
     {
         file->pos = offset;
         return file->pos;
@@ -184,81 +166,47 @@ off_t dfs_romfs_lseek(struct dfs_file *file, off_t offset)
     return -EIO;
 }
 
-int dfs_romfs_close(struct dfs_file *file)
+int dfs_romfs_close(struct dfs_fd *file)
 {
-    RT_ASSERT(file->vnode->ref_count > 0);
-    if (file->vnode->ref_count > 1)
-    {
-        return RT_EOK;
-    }
-    file->vnode->data = NULL;
+    file->data = NULL;
     return RT_EOK;
 }
 
-int dfs_romfs_open(struct dfs_file *file)
+int dfs_romfs_open(struct dfs_fd *file)
 {
     rt_size_t size;
     struct romfs_dirent *dirent;
     struct romfs_dirent *root_dirent;
     struct dfs_filesystem *fs;
 
-    if (file->flags & (O_CREAT | O_WRONLY | O_APPEND | O_TRUNC | O_RDWR))
-    {
-        return -EINVAL;
-    }
-
-    RT_ASSERT(file->vnode->ref_count > 0);
-    if (file->vnode->ref_count > 1)
-    {
-        if (file->vnode->type == FT_DIRECTORY
-                && !(file->flags & O_DIRECTORY))
-        {
-            return -ENOENT;
-        }
-        file->pos = 0;
-        return 0;
-    }
-
-    fs = file->vnode->fs;
+    fs = (struct dfs_filesystem *)file->data;
     root_dirent = (struct romfs_dirent *)fs->data;
 
     if (check_dirent(root_dirent) != 0)
-    {
         return -EIO;
-    }
 
     if (file->flags & (O_CREAT | O_WRONLY | O_APPEND | O_TRUNC | O_RDWR))
-    {
         return -EINVAL;
-    }
 
-    dirent = dfs_romfs_lookup(root_dirent, file->vnode->path, &size);
+    dirent = dfs_romfs_lookup(root_dirent, file->path, &size);
     if (dirent == NULL)
-    {
         return -ENOENT;
-    }
 
     /* entry is a directory file type */
     if (dirent->type == ROMFS_DIRENT_DIR)
     {
         if (!(file->flags & O_DIRECTORY))
-        {
             return -ENOENT;
-        }
-        file->vnode->type = FT_DIRECTORY;
     }
     else
     {
         /* entry is a file, but open it as a directory */
         if (file->flags & O_DIRECTORY)
-        {
             return -ENOENT;
-        }
-        file->vnode->type = FT_REGULAR;
     }
 
-    file->vnode->data = dirent;
-    file->vnode->size = size;
+    file->data = dirent;
+    file->size = size;
     file->pos = 0;
 
     return RT_EOK;
@@ -274,9 +222,7 @@ int dfs_romfs_stat(struct dfs_filesystem *fs, const char *path, struct stat *st)
     dirent = dfs_romfs_lookup(root_dirent, path, &size);
 
     if (dirent == NULL)
-    {
         return -ENOENT;
-    }
 
     st->st_dev = 0;
     st->st_mode = S_IFREG | S_IRUSR | S_IRGRP | S_IROTH |
@@ -294,19 +240,16 @@ int dfs_romfs_stat(struct dfs_filesystem *fs, const char *path, struct stat *st)
     return RT_EOK;
 }
 
-int dfs_romfs_getdents(struct dfs_file *file, struct dirent *dirp, uint32_t count)
+int dfs_romfs_getdents(struct dfs_fd *file, struct dirent *dirp, uint32_t count)
 {
     rt_size_t index;
-    rt_size_t len;
     const char *name;
     struct dirent *d;
     struct romfs_dirent *dirent, *sub_dirent;
 
-    dirent = (struct romfs_dirent *)file->vnode->data;
+    dirent = (struct romfs_dirent *)file->data;
     if (check_dirent(dirent) != 0)
-    {
         return -EIO;
-    }
     RT_ASSERT(dirent->type == ROMFS_DIRENT_DIR);
 
     /* enter directory */
@@ -315,12 +258,10 @@ int dfs_romfs_getdents(struct dfs_file *file, struct dirent *dirp, uint32_t coun
     /* make integer count */
     count = (count / sizeof(struct dirent));
     if (count == 0)
-    {
         return -EINVAL;
-    }
 
     index = 0;
-    for (index = 0; index < count && file->pos < file->vnode->size; index++)
+    for (index = 0; index < count && file->pos < file->size; index ++)
     {
         d = dirp + index;
 
@@ -333,9 +274,7 @@ int dfs_romfs_getdents(struct dfs_file *file, struct dirent *dirp, uint32_t coun
         else
             d->d_type = DT_REG;
 
-        len = rt_strlen(name);
-        RT_ASSERT(len <= RT_UINT8_MAX);
-        d->d_namlen = (rt_uint8_t)len;
+        d->d_namlen = rt_strlen(name);
         d->d_reclen = (rt_uint16_t)sizeof(struct dirent);
         rt_strncpy(d->d_name, name, DFS_PATH_MAX);
 

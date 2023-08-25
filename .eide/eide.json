@@ -250,13 +250,13 @@
         "name": "Fal",
         "files": [
           {
+            "path": "rt-thread/components/fal/src/fal_flash.c"
+          },
+          {
             "path": "rt-thread/components/fal/src/fal_partition.c"
           },
           {
             "path": "rt-thread/components/fal/src/fal_rtt.c"
-          },
-          {
-            "path": "rt-thread/components/fal/src/fal_flash.c"
           },
           {
             "path": "rt-thread/components/fal/src/fal.c"
@@ -538,25 +538,13 @@
         "name": "nrf_lib",
         "files": [
           {
-            "path": "nrf_sdk/components/libraries/balloc/nrf_balloc.c"
-          },
-          {
-            "path": "nrf_sdk/components/libraries/util/app_error_weak.c"
-          },
-          {
-            "path": "nrf_sdk/components/libraries/memobj/nrf_memobj.c"
-          },
-          {
-            "path": "nrf_sdk/components/libraries/util/app_util_platform.c"
-          },
-          {
             "path": "nrf_sdk/components/libraries/atomic/nrf_atomic.c"
           },
           {
-            "path": "nrf_sdk/external/fprintf/nrf_fprintf_format.c"
+            "path": "nrf_sdk/components/libraries/balloc/nrf_balloc.c"
           },
           {
-            "path": "nrf_sdk/components/libraries/util/app_error_handler_keil.c"
+            "path": "nrf_sdk/components/libraries/memobj/nrf_memobj.c"
           },
           {
             "path": "nrf_sdk/components/libraries/ringbuf/nrf_ringbuf.c"
@@ -565,7 +553,19 @@
             "path": "nrf_sdk/components/libraries/strerror/nrf_strerror.c"
           },
           {
+            "path": "nrf_sdk/components/libraries/util/app_error_handler_keil.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/util/app_error_weak.c"
+          },
+          {
             "path": "nrf_sdk/components/libraries/util/app_error.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/util/app_util_platform.c"
+          },
+          {
+            "path": "nrf_sdk/external/fprintf/nrf_fprintf_format.c"
           },
           {
             "path": "nrf_sdk/external/fprintf/nrf_fprintf.c"
@@ -676,10 +676,10 @@
             "path": "packages/SEGGER_RTT-latest/adapter/drv_rtt.c"
           },
           {
-            "path": "packages/SEGGER_RTT-latest/RTT/SEGGER_RTT.c"
+            "path": "packages/SEGGER_RTT-latest/RTT/SEGGER_RTT_printf.c"
           },
           {
-            "path": "packages/SEGGER_RTT-latest/RTT/SEGGER_RTT_printf.c"
+            "path": "packages/SEGGER_RTT-latest/RTT/SEGGER_RTT.c"
           }
         ],
         "folders": []
@@ -741,11 +741,13 @@
     "rtthread": {
       "excludeList": [
         "<virtual_root>/WIZnet",
-        "<virtual_root>/nrf_log",
         "<virtual_root>/ccm3310/ccm3310_nrf.c",
         "<virtual_root>/max30102",
         "<virtual_root>/Drivers/drv_uart.c",
-        "<virtual_root>/ec800x"
+        "<virtual_root>/ec800x",
+        "<virtual_root>/Filesystem/dfs_elm.c",
+        "<virtual_root>/Filesystem/ff.c",
+        "<virtual_root>/Filesystem/ffunicode.c"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -871,7 +873,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": "ip 192.168.1.2"
+        "otherCmds": ""
       },
       "uploadConfigMap": {},
       "custom_dep": {

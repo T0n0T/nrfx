@@ -165,7 +165,7 @@ static void event_callback(struct netconn *conn, enum netconn_evt evt, u16_t len
 
     if (event)
     {
-        rt_wqueue_wakeup(&sock->wait_head, (void*)(size_t)event);
+        rt_wqueue_wakeup(&sock->wait_head, (void*) event);
     }
 }
 #endif /* SAL_USING_POSIX */
@@ -225,17 +225,11 @@ static int inet_getsockname(int socket, struct sockaddr *name, socklen_t *namele
 
 int inet_ioctlsocket(int socket, long cmd, void *arg)
 {
-    int flags;
-
     switch (cmd)
     {
     case F_GETFL:
     case F_SETFL:
-        flags = (int)(size_t)arg;
-#ifdef O_LARGEFILE
-        flags &= ~O_LARGEFILE;
-#endif
-        return lwip_fcntl(socket, cmd, flags);
+        return lwip_fcntl(socket, cmd, (int) arg);
 
     default:
         return lwip_ioctl(socket, cmd, arg);
@@ -243,19 +237,19 @@ int inet_ioctlsocket(int socket, long cmd, void *arg)
 }
 
 #ifdef SAL_USING_POSIX
-static int inet_poll(struct dfs_file *file, struct rt_pollreq *req)
+static int inet_poll(struct dfs_fd *file, struct rt_pollreq *req)
 {
     int mask = 0;
     struct lwip_sock *sock;
     struct sal_socket *sal_sock;
 
-    sal_sock = sal_get_socket((int)(size_t)file->vnode->data);
+    sal_sock = sal_get_socket((int) file->data);
     if(!sal_sock)
     {
         return -1;
     }
 
-    sock = lwip_tryget_socket((int)(size_t)sal_sock->user_data);
+    sock = lwip_tryget_socket((int)sal_sock->user_data);
     if (sock != NULL)
     {
         rt_base_t level;

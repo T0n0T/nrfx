@@ -47,23 +47,13 @@
 
 #include <string.h>
 #include <stdint.h>
-
-#ifndef RT_USING_MINILIBC
-typedef unsigned int u_int;
-typedef unsigned char u_char;
-typedef unsigned long u_long;
-#else
 #include <sys/types.h>
-#include <stdint.h>
-#endif
+
+typedef long long   int64_t;
+typedef unsigned long long uint64_t;
 
 typedef int bool_t;
 typedef int enum_t;
-
-#if !defined(RT_USING_NEWLIB) && !defined(RT_USING_MUSL)
-typedef unsigned long dev_t;
-#endif
-
 
 /* This needs to be changed to uint32_t in the future */
 typedef unsigned long rpcprog_t;
