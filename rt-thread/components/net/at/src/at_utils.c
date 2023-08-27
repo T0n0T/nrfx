@@ -25,26 +25,34 @@ static rt_size_t last_cmd_len = 0;
  */
 void at_print_raw_cmd(const char *name, const char *buf, rt_size_t size)
 {
-#define __is_print(ch) ((unsigned int)((ch) - ' ') < 127u - ' ')
-#define WIDTH_SIZE     32
+#define __is_print(ch)       ((unsigned int)((ch) - ' ') < 127u - ' ')
+#define WIDTH_SIZE           32
 
     rt_size_t i, j;
 
-    for (i = 0; i < size; i += WIDTH_SIZE) {
+    for (i = 0; i < size; i += WIDTH_SIZE)
+    {
         rt_kprintf("[D/AT] %s: %04X-%04X: ", name, i, i + WIDTH_SIZE);
-        for (j = 0; j < WIDTH_SIZE; j++) {
-            if (i + j < size) {
+        for (j = 0; j < WIDTH_SIZE; j++)
+        {
+            if (i + j < size)
+            {
                 rt_kprintf("%02X ", (unsigned char)buf[i + j]);
-            } else {
+            }
+            else
+            {
                 rt_kprintf("   ");
             }
-            if ((j + 1) % 8 == 0) {
+            if ((j + 1) % 8 == 0)
+            {
                 rt_kprintf(" ");
             }
         }
         rt_kprintf("  ");
-        for (j = 0; j < WIDTH_SIZE; j++) {
-            if (i + j < size) {
+        for (j = 0; j < WIDTH_SIZE; j++)
+        {
+            if (i + j < size)
+            {
                 rt_kprintf("%c", __is_print(buf[i + j]) ? buf[i + j] : '.');
             }
         }
@@ -59,9 +67,9 @@ const char *at_get_last_cmd(rt_size_t *cmd_size)
 }
 
 rt_weak rt_size_t at_utils_send(rt_device_t dev,
-                                rt_off_t pos,
+                                rt_off_t    pos,
                                 const void *buffer,
-                                rt_size_t size)
+                                rt_size_t   size)
 {
     return rt_device_write(dev, pos, buffer, size);
 }
@@ -69,7 +77,7 @@ rt_weak rt_size_t at_utils_send(rt_device_t dev,
 rt_size_t at_vprintf(rt_device_t device, const char *format, va_list args)
 {
     last_cmd_len = vsnprintf(send_buf, sizeof(send_buf), format, args);
-    if (last_cmd_len > sizeof(send_buf))
+    if(last_cmd_len > sizeof(send_buf))
         last_cmd_len = sizeof(send_buf);
 
 #ifdef AT_PRINT_RAW_CMD
@@ -85,11 +93,13 @@ rt_size_t at_vprintfln(rt_device_t device, const char *format, va_list args)
 
     last_cmd_len = vsnprintf(send_buf, sizeof(send_buf) - 2, format, args);
 
-    if (last_cmd_len == 0) {
+    if(last_cmd_len == 0)
+    {
         return 0;
     }
 
-    if (last_cmd_len > sizeof(send_buf) - 2) {
+    if(last_cmd_len > sizeof(send_buf) - 2)
+    {
         last_cmd_len = sizeof(send_buf) - 2;
     }
     rt_memcpy(send_buf + last_cmd_len, "\r\n", 2);

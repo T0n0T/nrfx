@@ -70,7 +70,7 @@ static int on_chip_fs_init(void)
     }
 
     if (rt_device_find(FS_PARTITION_NAME) != RT_NULL) {
-        int mkfs_res = dfs_mkfs("elm", FS_PARTITION_NAME);
+        int mkfs_res = dfs_mkfs("lfs", FS_PARTITION_NAME);
 
         if (mkfs_res != 0) {
             LOG_E("dfs_mkfs error, errno = %d", rt_get_errno());
@@ -78,7 +78,7 @@ static int on_chip_fs_init(void)
             goto err;
         }
 
-        if (dfs_mount(FS_PARTITION_NAME, "/", "elm", 0, 0) == RT_EOK) {
+        if (dfs_mount(FS_PARTITION_NAME, "/", "lfs", 0, 0) == RT_EOK) {
             LOG_D("onchip elm filesystem mount to '/'");
         } else {
             LOG_E("onchip elm filesystem mount to '/' failed!");

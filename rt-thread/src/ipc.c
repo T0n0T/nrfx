@@ -791,52 +791,58 @@ rt_inline rt_uint8_t _thread_get_mutex_priority(struct rt_thread* thread)
 /* update priority of target thread and the thread suspended it if any */
 rt_inline void _thread_update_priority(struct rt_thread *thread, rt_uint8_t priority, int suspend_flag)
 {
-    rt_err_t ret;
+    rt_err_t ret = -RT_ERROR;
+    struct rt_object* pending_obj = RT_NULL;
+
     LOG_D("thread:%s priority -> %d", thread->parent.name, priority);
 
     /* change priority of the thread */
-    rt_thread_control(thread,
-                      RT_THREAD_CTRL_CHANGE_PRIORITY,
-                      &priority);
+    ret = rt_thread_control(thread, RT_THREAD_CTRL_CHANGE_PRIORITY, &priority);
 
-    if ((thread->stat & RT_THREAD_SUSPEND_MASK) == RT_THREAD_SUSPEND_MASK)
+    while ((ret == RT_EOK) && ((thread->stat & RT_THREAD_SUSPEND_MASK) == RT_THREAD_SUSPEND_MASK))
     {
         /* whether change the priority of taken mutex */
-        struct rt_object* pending_obj = thread->pending_object;
+        pending_obj = thread->pending_object;
 
         if (pending_obj && rt_object_get_type(pending_obj) == RT_Object_Class_Mutex)
         {
-            rt_uint8_t mutex_priority;
+            rt_uint8_t mutex_priority = 0xff;
             struct rt_mutex* pending_mutex = (struct rt_mutex *)pending_obj;
 
             /* re-insert thread to suspended thread list */
             rt_list_remove(&(thread->tlist));
 
             ret = _ipc_list_suspend(&(pending_mutex->parent.suspend_thread),
-                                thread,
-                                pending_mutex->parent.parent.flag,
-                                suspend_flag);
-            if (ret != RT_EOK)
+                                    thread,
+                                    pending_mutex->parent.parent.flag,
+                                    suspend_flag);
+            if (ret == RT_EOK)
             {
-                /* TODO */
-                return ;
-            }
+                /* update priority */
+                _mutex_update_priority(pending_mutex);
+                /* change the priority of mutex owner thread */
+                LOG_D("mutex: %s priority -> %d", pending_mutex->parent.parent.name,
+                        pending_mutex->priority);
 
-            /* update priority */
-            _mutex_update_priority(pending_mutex);
-            /* change the priority of mutex owner thread */
-            LOG_D("mutex: %s priority -> %d", pending_mutex->parent.parent.name,
-                    pending_mutex->priority);
+                mutex_priority = _thread_get_mutex_priority(pending_mutex->owner);
+                if (mutex_priority != pending_mutex->owner->current_priority)
+                {
+                    thread = pending_mutex->owner;
 
-            mutex_priority = _thread_get_mutex_priority(pending_mutex->owner);
-            if (mutex_priority != pending_mutex->owner->current_priority)
-            {
-                _thread_update_priority(pending_mutex->owner, mutex_priority, suspend_flag);
+                    ret = rt_thread_control(thread, RT_THREAD_CTRL_CHANGE_PRIORITY, &mutex_priority);
+                }
+                else
+                {
+                    ret = -RT_ERROR;
+                }
             }
+        }
+        else
+        {
+            ret = -RT_ERROR;
         }
     }
 }
-
 /**
  * @addtogroup mutex
  * @{
@@ -950,8 +956,14 @@ void rt_mutex_drop_thread(rt_mutex_t mutex, rt_thread_t thread)
 
     rt_list_remove(&(thread->tlist));
 
-    /* should change the priority of mutex owner thread */
-    if (mutex->owner->current_priority == thread->current_priority)
+    /**
+     * Should change the priority of mutex owner thread
+     * Note: After current thread is detached from mutex pending list, there is
+     *       a chance that the mutex owner has been released the mutex. Which
+     *       means mutex->owner can be NULL at this point. If that happened,
+     *       it had already reset its priority. So it's okay to skip
+     */
+    if (mutex->owner && mutex->owner->current_priority == thread->current_priority)
         need_update = RT_TRUE;
 
     /* update the priority of mutex */
@@ -1298,8 +1310,14 @@ static rt_err_t _rt_mutex_take(rt_mutex_t mutex, rt_int32_t timeout, int suspend
 
                     rt_bool_t need_update = RT_FALSE;
 
-                    /* should change the priority of mutex owner thread */
-                    if (mutex->owner->current_priority == thread->current_priority)
+                    /**
+                     * Should change the priority of mutex owner thread
+                     * Note: After current thread is detached from mutex pending list, there is
+                     *       a chance that the mutex owner has been released the mutex. Which
+                     *       means mutex->owner can be NULL at this point. If that happened,
+                     *       it had already reset its priority. So it's okay to skip
+                     */
+                    if (mutex->owner && mutex->owner->current_priority == thread->current_priority)
                         need_update = RT_TRUE;
 
                     /* update the priority of mutex */
@@ -1334,8 +1352,12 @@ static rt_err_t _rt_mutex_take(rt_mutex_t mutex, rt_int32_t timeout, int suspend
                     /* enable interrupt */
                     rt_hw_interrupt_enable(level);
 
-                    /* return error */
-                    return thread->error;
+                    /* clear pending object before exit */
+                    thread->pending_object = RT_NULL;
+
+                    /* fix thread error number to negative value and return */
+                    ret = thread->error;
+                    return ret > 0 ? -ret : ret;
                 }
             }
         }

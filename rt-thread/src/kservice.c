@@ -66,8 +66,29 @@ static rt_device_t _console_device = RT_NULL;
 rt_weak void rt_hw_us_delay(rt_uint32_t us)
 {
     (void) us;
-    LOG_D("rt_hw_us_delay() doesn't support for this board."
+    LOG_W("rt_hw_us_delay() doesn't support for this board."
         "Please consider implementing rt_hw_us_delay() in another file.");
+}
+
+rt_weak void rt_hw_cpu_reset(void)
+{
+    LOG_W("rt_hw_cpu_reset() doesn't support for this board."
+        "Please consider implementing rt_hw_cpu_reset() in another file.");
+    return;
+}
+
+rt_weak void rt_hw_cpu_shutdown(void)
+{
+    rt_base_t level;
+    LOG_I("CPU shutdown...");
+    LOG_W("Using default rt_hw_cpu_shutdown()."
+        "Please consider implementing rt_hw_cpu_reset() in another file.");
+    level = rt_hw_interrupt_disable();
+    while (level)
+    {
+        RT_ASSERT(RT_NULL);
+    }
+    return;
 }
 
 rt_weak const char *rt_hw_cpu_arch(void)
