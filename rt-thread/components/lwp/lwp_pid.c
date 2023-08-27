@@ -106,6 +106,11 @@ static void lwp_pid_put(pid_t pid)
     rt_base_t level;
     struct lwp_avl_struct *p;
 
+    if (pid == 0)
+    {
+        return;
+    }
+
     level = rt_hw_interrupt_disable();
     p  = lwp_avl_find(pid, lwp_pid_root);
     if (p)
@@ -464,13 +469,18 @@ void lwp_free(struct rt_lwp* lwp)
         if (lwp->tty != RT_NULL)
         {
             rt_mutex_take(&lwp->tty->lock, RT_WAITING_FOREVER);
-            old_lwp = tty_pop(&lwp->tty->head, RT_NULL);
-            rt_mutex_release(&lwp->tty->lock);
             if (lwp->tty->foreground == lwp)
             {
+                old_lwp = tty_pop(&lwp->tty->head, RT_NULL);
                 lwp->tty->foreground = old_lwp;
-                lwp->tty = RT_NULL;
             }
+            else
+            {
+                tty_pop(&lwp->tty->head, lwp);
+            }
+            rt_mutex_release(&lwp->tty->lock);
+
+            lwp->tty = RT_NULL;
         }
     }
     else
@@ -983,26 +993,31 @@ void lwp_terminate(struct rt_lwp *lwp)
         return;
     }
 
+    LOG_D("%s(lwp=%p \"%s\")", __func__, lwp, lwp->cmd);
+
     level = rt_hw_interrupt_disable();
 
     /* stop the receiving of signals */
-    lwp->terminated = RT_TRUE;
-
-    /* broadcast exit request for sibling threads */
-    for (list = lwp->t_grp.next; list != &lwp->t_grp; list = list->next)
+    if (!lwp->terminated)
     {
-        rt_thread_t thread;
+        lwp->terminated = RT_TRUE;
 
-        thread = rt_list_entry(list, struct rt_thread, sibling);
-        if (thread->exit_request == LWP_EXIT_REQUEST_NONE)
+        /* broadcast exit request for sibling threads */
+        for (list = lwp->t_grp.next; list != &lwp->t_grp; list = list->next)
         {
-            thread->exit_request = LWP_EXIT_REQUEST_TRIGGERED;
-        }
-        if ((thread->stat & RT_THREAD_SUSPEND_MASK) == RT_THREAD_SUSPEND_MASK)
-        {
-            thread->error = RT_EINTR;
-            rt_hw_dsb();
-            rt_thread_wakeup(thread);
+            rt_thread_t thread;
+
+            thread = rt_list_entry(list, struct rt_thread, sibling);
+            if (thread->exit_request == LWP_EXIT_REQUEST_NONE)
+            {
+                thread->exit_request = LWP_EXIT_REQUEST_TRIGGERED;
+            }
+            if ((thread->stat & RT_THREAD_SUSPEND_MASK) == RT_THREAD_SUSPEND_MASK)
+            {
+                thread->error = RT_EINTR;
+                rt_hw_dsb();
+                rt_thread_wakeup(thread);
+            }
         }
     }
     rt_hw_interrupt_enable(level);
@@ -1031,6 +1046,7 @@ void lwp_wait_subthread_exit(void)
     while (1)
     {
         int subthread_is_terminated;
+        LOG_D("%s: wait for subthread exiting", __func__);
 
         level = rt_hw_interrupt_disable();
         subthread_is_terminated = (int)(thread->sibling.prev == &lwp->t_grp);

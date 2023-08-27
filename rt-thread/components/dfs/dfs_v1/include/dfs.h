@@ -37,8 +37,8 @@ extern "C" {
 /*
  * skip stdin/stdout/stderr normally
  */
-#ifndef DFS_FD_OFFSET
-#define DFS_FD_OFFSET           3
+#ifndef DFS_STDIO_OFFSET
+#define DFS_STDIO_OFFSET           3
 #endif
 
 #ifndef DFS_PATH_MAX
@@ -72,7 +72,7 @@ extern "C" {
 struct dfs_fdtable
 {
     uint32_t maxfd;
-    struct dfs_fd **fds;
+    struct dfs_file **fds;
 };
 
 /* Initialization of dfs */
@@ -87,11 +87,29 @@ struct dfs_fdtable *dfs_fdtable_get(void);
 void dfs_lock(void);
 void dfs_unlock(void);
 
+void dfs_file_lock(void);
+void dfs_file_unlock(void);
+
+void dfs_fm_lock(void);
+void dfs_fm_unlock(void);
+
 #ifdef DFS_USING_POSIX
+
 /* FD APIs */
+int fdt_fd_new(struct dfs_fdtable *fdt);
+struct dfs_file *fdt_fd_get(struct dfs_fdtable* fdt, int fd);
+void fdt_fd_release(struct dfs_fdtable* fdt, int fd);
+
 int fd_new(void);
-struct dfs_fd *fd_get(int fd);
-void fd_put(struct dfs_fd *fd);
+struct dfs_file *fd_get(int fd);
+void fd_release(int fd);
+
+void fd_init(struct dfs_file *fd);
+int fd_associate(struct dfs_fdtable *fdt, int fd, struct dfs_file *file);
+int fd_get_fd_index(struct dfs_file *file);
+
+struct dfs_fdtable *dfs_fdtable_get(void);
+struct dfs_fdtable *dfs_fdtable_get_global(void);
 #endif /* DFS_USING_POSIX */
 
 #ifdef __cplusplus

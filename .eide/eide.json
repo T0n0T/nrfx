@@ -298,19 +298,19 @@
         "name": "Finsh",
         "files": [
           {
-            "path": "rt-thread/components/finsh/shell.c"
+            "path": "rt-thread/components/finsh/cmd.c"
           },
           {
-            "path": "rt-thread/components/finsh/msh.c"
+            "path": "rt-thread/components/finsh/msh_file.c"
           },
           {
             "path": "rt-thread/components/finsh/msh_parse.c"
           },
           {
-            "path": "rt-thread/components/finsh/cmd.c"
+            "path": "rt-thread/components/finsh/msh.c"
           },
           {
-            "path": "rt-thread/components/finsh/msh_file.c"
+            "path": "rt-thread/components/finsh/shell.c"
           }
         ],
         "folders": []
@@ -646,10 +646,10 @@
         "name": "SAL",
         "files": [
           {
-            "path": "rt-thread/components/net/netdev/src/netdev.c"
+            "path": "rt-thread/components/net/netdev/src/netdev_ipaddr.c"
           },
           {
-            "path": "rt-thread/components/net/netdev/src/netdev_ipaddr.c"
+            "path": "rt-thread/components/net/netdev/src/netdev.c"
           },
           {
             "path": "rt-thread/components/net/sal/dfs_net/dfs_net.c"

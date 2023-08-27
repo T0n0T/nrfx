@@ -31,7 +31,8 @@ static rt_err_t rt_rtc_init(struct rt_device *dev)
 
     RT_ASSERT(dev != RT_NULL);
     rtc_core = (rt_rtc_dev_t *)dev;
-    if (rtc_core->ops->init) {
+    if (rtc_core->ops->init)
+    {
         return (rtc_core->ops->init());
     }
 
@@ -54,7 +55,7 @@ static rt_err_t rt_rtc_close(struct rt_device *dev)
 static rt_err_t rt_rtc_control(struct rt_device *dev, int cmd, void *args)
 {
 #define TRY_DO_RTC_FUNC(rt_rtc_dev, func_name, args) \
-    rt_rtc_dev->ops->func_name ? rt_rtc_dev->ops->func_name(args) : -RT_EINVAL;
+    rt_rtc_dev->ops->func_name ?  rt_rtc_dev->ops->func_name(args) : -RT_EINVAL;
 
     rt_rtc_dev_t *rtc_device;
     rt_err_t ret = -RT_EINVAL;
@@ -62,7 +63,8 @@ static rt_err_t rt_rtc_control(struct rt_device *dev, int cmd, void *args)
     RT_ASSERT(dev != RT_NULL);
     rtc_device = (rt_rtc_dev_t *)dev;
 
-    switch (cmd) {
+    switch (cmd)
+    {
         case RT_DEVICE_CTRL_RTC_GET_TIME:
             ret = TRY_DO_RTC_FUNC(rtc_device, get_secs, args);
             break;
@@ -92,20 +94,20 @@ static rt_err_t rt_rtc_control(struct rt_device *dev, int cmd, void *args)
 
 #ifdef RT_USING_DEVICE_OPS
 const static struct rt_device_ops rtc_core_ops =
-    {
-        rt_rtc_init,
-        rt_rtc_open,
-        rt_rtc_close,
-        RT_NULL,
-        RT_NULL,
-        rt_rtc_control,
+{
+    rt_rtc_init,
+    rt_rtc_open,
+    rt_rtc_close,
+    RT_NULL,
+    RT_NULL,
+    rt_rtc_control,
 };
 #endif /* RT_USING_DEVICE_OPS */
 
-rt_err_t rt_hw_rtc_register(rt_rtc_dev_t *rtc,
-                            const char *name,
-                            rt_uint32_t flag,
-                            void *data)
+rt_err_t rt_hw_rtc_register(rt_rtc_dev_t  *rtc,
+                            const char    *name,
+                            rt_uint32_t    flag,
+                            void          *data)
 {
     struct rt_device *device;
     RT_ASSERT(rtc != RT_NULL);
@@ -117,16 +119,16 @@ rt_err_t rt_hw_rtc_register(rt_rtc_dev_t *rtc,
     device->tx_complete = RT_NULL;
 
 #ifdef RT_USING_DEVICE_OPS
-    device->ops = &rtc_core_ops;
+    device->ops         = &rtc_core_ops;
 #else
-    device->init    = rt_rtc_init;
-    device->open    = rt_rtc_open;
-    device->close   = rt_rtc_close;
-    device->read    = RT_NULL;
-    device->write   = RT_NULL;
-    device->control = rt_rtc_control;
+    device->init        = rt_rtc_init;
+    device->open        = rt_rtc_open;
+    device->close       = rt_rtc_close;
+    device->read        = RT_NULL;
+    device->write       = RT_NULL;
+    device->control     = rt_rtc_control;
 #endif /* RT_USING_DEVICE_OPS */
-    device->user_data = data;
+    device->user_data   = data;
 
     /* register a character device */
     return rt_device_register(device, name, flag);
@@ -145,18 +147,21 @@ rt_err_t set_date(rt_uint32_t year, rt_uint32_t month, rt_uint32_t day)
 {
     time_t now, old_timestamp = 0;
     struct tm tm_new = {0};
-    rt_err_t ret     = -RT_ERROR;
+    rt_err_t ret = -RT_ERROR;
 
-    if (_rtc_device == RT_NULL) {
+    if (_rtc_device == RT_NULL)
+    {
         _rtc_device = rt_device_find("rtc");
-        if (_rtc_device == RT_NULL) {
+        if (_rtc_device == RT_NULL)
+        {
             return -RT_ERROR;
         }
     }
 
     /* get current time */
     ret = rt_device_control(_rtc_device, RT_DEVICE_CTRL_RTC_GET_TIME, &old_timestamp);
-    if (ret != RT_EOK) {
+    if (ret != RT_EOK)
+    {
         return ret;
     }
 
@@ -189,18 +194,21 @@ rt_err_t set_time(rt_uint32_t hour, rt_uint32_t minute, rt_uint32_t second)
 {
     time_t now, old_timestamp = 0;
     struct tm tm_new = {0};
-    rt_err_t ret     = -RT_ERROR;
+    rt_err_t ret = -RT_ERROR;
 
-    if (_rtc_device == RT_NULL) {
+    if (_rtc_device == RT_NULL)
+    {
         _rtc_device = rt_device_find("rtc");
-        if (_rtc_device == RT_NULL) {
+        if (_rtc_device == RT_NULL)
+        {
             return -RT_ERROR;
         }
     }
 
     /* get current time */
     ret = rt_device_control(_rtc_device, RT_DEVICE_CTRL_RTC_GET_TIME, &old_timestamp);
-    if (ret != RT_EOK) {
+    if (ret != RT_EOK)
+    {
         return ret;
     }
 
@@ -229,9 +237,11 @@ rt_err_t set_time(rt_uint32_t hour, rt_uint32_t minute, rt_uint32_t second)
  */
 rt_err_t set_timestamp(time_t timestamp)
 {
-    if (_rtc_device == RT_NULL) {
+    if (_rtc_device == RT_NULL)
+    {
         _rtc_device = rt_device_find("rtc");
-        if (_rtc_device == RT_NULL) {
+        if (_rtc_device == RT_NULL)
+        {
             return -RT_ERROR;
         }
     }
@@ -249,9 +259,11 @@ rt_err_t set_timestamp(time_t timestamp)
  */
 rt_err_t get_timestamp(time_t *timestamp)
 {
-    if (_rtc_device == RT_NULL) {
+    if (_rtc_device == RT_NULL)
+    {
         _rtc_device = rt_device_find("rtc");
-        if (_rtc_device == RT_NULL) {
+        if (_rtc_device == RT_NULL)
+        {
             return -RT_ERROR;
         }
     }
@@ -269,30 +281,41 @@ static void date(int argc, char **argv)
 {
     time_t now = (time_t)0;
 
-    if (argc == 1) {
-        struct timeval tv  = {0};
-        struct timezone tz = {0};
+    if (argc == 1)
+    {
+        struct timeval tv = { 0 };
+        int32_t tz_offset_sec = 0;
+        uint32_t abs_tz_offset_sec = 0U;
 
-        gettimeofday(&tv, &tz);
+#if defined(RT_LIBC_USING_LIGHT_TZ_DST)
+        tz_offset_sec = rt_tz_get();
+#endif /* RT_LIBC_USING_LIGHT_TZ_DST */
 
+        gettimeofday(&tv, RT_NULL);
         now = tv.tv_sec;
+
+        abs_tz_offset_sec = tz_offset_sec > 0 ? tz_offset_sec : -tz_offset_sec;
         /* output current time */
-        rt_kprintf("local time: %.*s", 25, ctime(&now));
-        rt_kprintf("timestamps: %ld\n", (long)now);
-        rt_kprintf("timezone: UTC%c%d\n", -tz.tz_minuteswest > 0 ? '+' : '-', -tz.tz_minuteswest / 60);
-    } else if (argc >= 7) {
+        rt_kprintf("local time: %.*s", 25U, ctime(&now));
+        rt_kprintf("timestamps: %ld\n", (long)tv.tv_sec);
+        rt_kprintf("timezone: UTC%c%02d:%02d:%02d\n",
+            tz_offset_sec > 0 ? '+' : '-', abs_tz_offset_sec / 3600U, abs_tz_offset_sec % 3600U / 60U, abs_tz_offset_sec % 3600U % 60U);
+    }
+    else if (argc >= 7)
+    {
         /* set time and date */
         struct tm tm_new = {0};
-        time_t old       = (time_t)0;
+        time_t old = (time_t)0;
         rt_err_t err;
 
         tm_new.tm_year = atoi(argv[1]) - 1900;
-        tm_new.tm_mon  = atoi(argv[2]) - 1; /* .tm_min's range is [0-11] */
+        tm_new.tm_mon = atoi(argv[2]) - 1; /* .tm_min's range is [0-11] */
         tm_new.tm_mday = atoi(argv[3]);
         tm_new.tm_hour = atoi(argv[4]);
-        tm_new.tm_min  = atoi(argv[5]);
-        tm_new.tm_sec  = atoi(argv[6]);
-        if (tm_new.tm_year <= 0) {
+        tm_new.tm_min = atoi(argv[5]);
+        tm_new.tm_sec = atoi(argv[6]);
+        if (tm_new.tm_year <= 0)
+        {
             rt_kprintf("year is out of range [1900-]\n");
             return;
         }
@@ -301,44 +324,52 @@ static void date(int argc, char **argv)
             rt_kprintf("month is out of range [1-12]\n");
             return;
         }
-        if (tm_new.tm_mday == 0 || tm_new.tm_mday > 31) {
+        if (tm_new.tm_mday == 0 || tm_new.tm_mday > 31)
+        {
             rt_kprintf("day is out of range [1-31]\n");
             return;
         }
-        if (tm_new.tm_hour > 23) {
+        if (tm_new.tm_hour > 23)
+        {
             rt_kprintf("hour is out of range [0-23]\n");
             return;
         }
-        if (tm_new.tm_min > 59) {
+        if (tm_new.tm_min > 59)
+        {
             rt_kprintf("minute is out of range [0-59]\n");
             return;
         }
-        if (tm_new.tm_sec > 60) {
+        if (tm_new.tm_sec > 60)
+        {
             rt_kprintf("second is out of range [0-60]\n");
             return;
         }
         /* save old timestamp */
         err = get_timestamp(&old);
-        if (err != RT_EOK) {
+        if (err != RT_EOK)
+        {
             rt_kprintf("Get current timestamp failed. %d\n", err);
             return;
         }
         /* converts the local time into the calendar time. */
         now = mktime(&tm_new);
         err = set_timestamp(now);
-        if (err != RT_EOK) {
+        if (err != RT_EOK)
+        {
             rt_kprintf("set date failed. %d\n", err);
             return;
         }
         get_timestamp(&now); /* get new timestamp */
         rt_kprintf("old: %.*s", 25, ctime(&old));
         rt_kprintf("now: %.*s", 25, ctime(&now));
-    } else {
+    }
+    else
+    {
         rt_kprintf("please input: date [year month day hour min sec] or date\n");
         rt_kprintf("e.g: date 2018 01 01 23 59 59 or date\n");
     }
 }
-MSH_CMD_EXPORT(date, get date and time or set(local timezone)[year month day hour min sec])
+MSH_CMD_EXPORT(date, get date and time or set (local timezone) [year month day hour min sec])
 #endif /* RT_USING_FINSH */
 
 #endif /* RT_USING_RTC */

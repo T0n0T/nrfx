@@ -6,6 +6,10 @@
     ],
     "settings": {
         "files.associations": {
+            "*.cpp": "cpp",
+            "*.html": "html",
+            "*.env": "dotenv",
+            "*.go": "go",
             "fal.h": "c",
             "mqttpacket.h": "c",
             "rtthread.h": "c",
@@ -23,7 +27,12 @@
             "drv_gpio.h": "c",
             "ccm3310_sm4.h": "c",
             "ccm3310_type.h": "c",
-            "nrfx_spi.h": "c"
+            "nrfx_spi.h": "c",
+            "dfs.h": "c",
+            "stdio.h": "c",
+            "dfs_file.h": "c",
+            "dfs_fs.h": "c",
+            "dfs_private.h": "c"
         }
     },
     "extensions": {}
