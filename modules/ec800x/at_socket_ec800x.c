@@ -16,7 +16,7 @@
 #define LOG_TAG "at.skt.ec800x"
 #include <at_log.h>
 
-#if defined(AT_DEVICE_USING_EC800X) && defined(AT_USING_SOCKET)
+#if 1
 
 #define EC800X_MODULE_SEND_MAX_SIZE 1460
 

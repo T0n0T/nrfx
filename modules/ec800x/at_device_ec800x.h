@@ -35,6 +35,27 @@ extern "C" {
 
 #define EC800X_GPS_MSG_NUM          128
 
+#define USING_LOC                   1
+#if defined(USING_RMC)
+extern struct gps_info rmcinfo;
+#elif defined(USING_LOC)
+struct LOC_GNSS {
+    char UTC[10];
+    char latitude[15];
+    char longitude[15];
+    char HDOP[10];
+    char altitude[10];
+    int fix;
+    char COG[10];
+    char spkm[10];
+    char spkn[10];
+    char utcdate[10];
+    char nsat[5];
+};
+
+extern struct LOC_GNSS gnssmsg;
+#endif
+
 struct at_device_ec800x {
     char *device_name;
     char *client_name;
@@ -54,7 +75,6 @@ struct at_device_ec800x {
     int rssi;
 
     char rmc[EC800X_GPS_MSG_NUM];
-    gps_info_t rmc_info;
 };
 
 #ifdef AT_USING_SOCKET

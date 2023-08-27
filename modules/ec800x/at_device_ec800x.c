@@ -16,13 +16,17 @@
 #define LOG_TAG "at.dev.ec800x"
 #include <at_log.h>
 
-#ifdef AT_DEVICE_USING_EC800X
+#if 1
 
 #define EC800X_WAIT_CONNECT_TIME 2000
 #define EC800X_THREAD_STACK_SIZE 2048
 #define EC800X_THREAD_PRIORITY   (RT_THREAD_PRIORITY_MAX / 2)
 
+#if defined(USING_RMC)
 struct gps_info rmcinfo;
+#elif defined(USING_LOC)
+struct LOC_GNSS gnssmsg;
+#endif
 
 static int ec800x_power_on(struct at_device *device)
 {
@@ -278,6 +282,7 @@ static int ec800x_read_gnss(struct at_device *device)
         return (result);
     }
 
+#if USING_RMC
     if (at_obj_exec_cmd(device->client, resp, "AT+QGPSGNMEA=\"RMC\"") == RT_EOK) {
         struct at_device_ec800x *ec800x = (struct at_device_ec800x *)device->user_data;
         rt_memset(ec800x->rmc, 0, sizeof(ec800x->rmc));
@@ -286,7 +291,27 @@ static int ec800x_read_gnss(struct at_device *device)
             result = gps_rmc_parse(&rmcinfo, ec800x->rmc);
         }
     }
-
+#elif USING_LOC
+    if (at_obj_exec_cmd(device->client, resp, "AT+QGPSLOC=2") == RT_EOK) {
+        struct at_device_ec800x *ec800x = (struct at_device_ec800x *)device->user_data;
+        rt_memset(&gnssmsg, 0, sizeof(struct LOC_GNSS));
+        if (at_resp_parse_line_args_by_kw(resp, "+QGPSLOC:",
+                                          "+QGPSGNMEA:%[^,],%[^,],%[^,],%[^,],%[^,],%d,%[^,],%[^,],%[^,],%[^,],%[^,]",
+                                          gnssmsg.UTC,
+                                          gnssmsg.latitude,
+                                          gnssmsg.longitude,
+                                          gnssmsg.HDOP,
+                                          gnssmsg.altitude,
+                                          gnssmsg.fix,
+                                          gnssmsg.COG,
+                                          gnssmsg.spkm,
+                                          gnssmsg.spkn,
+                                          gnssmsg.utcdate,
+                                          gnssmsg.nsat) > 0) {
+            result = RT_EOK;
+        }
+    }
+#endif
     at_delete_resp(resp);
 
     return (result);

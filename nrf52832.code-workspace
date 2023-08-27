@@ -4,6 +4,14 @@
             "path": "."
         }
     ],
-    "settings": {},
+    "settings": {
+        "files.associations": {
+            "*.cpp": "cpp",
+            "*.html": "html",
+            "*.env": "dotenv",
+            "*.go": "go",
+            "at_device_ec800x.h": "c"
+        }
+    },
     "extensions": {}
 }
