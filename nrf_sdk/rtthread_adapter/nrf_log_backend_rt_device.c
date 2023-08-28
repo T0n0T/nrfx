@@ -39,6 +39,12 @@
  */
 #include "sdk_common.h"
 
+/**
+ * @brief rt-device log兼容输出
+ * 在是能rt-device的log输出后，此处设备和控制台等其他输出设备不能相同，如果相同需要先屏蔽该设备的log，否则会出现递归打印
+ * 如使用下面宏定义，直接将某模块的log等级设为off
+ * #define NRF_LOG_FILTER 0
+ */
 #if NRF_MODULE_ENABLED(NRF_LOG) && NRF_MODULE_ENABLED(NRF_LOG_BACKEND_RT_DEVICE)
 #include "nrf_log_backend_rt_device.h"
 #include "nrf_log_backend_serial.h"

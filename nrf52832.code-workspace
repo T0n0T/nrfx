@@ -18,7 +18,8 @@
             "nrf_log_backend_rtt.h": "c",
             "nrf_log_backend_rt_device.h": "c",
             "nrf_log_default_backends.h": "c",
-            "nrfx_log.h": "c"
+            "nrfx_log.h": "c",
+            "nrf_gpio.h": "c"
         }
     },
     "extensions": {}

@@ -79,9 +79,9 @@ static int on_chip_fs_init(void)
         }
 
         if (dfs_mount(FS_PARTITION_NAME, "/", "lfs", 0, 0) == RT_EOK) {
-            LOG_D("onchip elm filesystem mount to '/'");
+            LOG_D("onchip lfs filesystem mount to '/'");
         } else {
-            LOG_E("onchip elm filesystem mount to '/' failed!");
+            LOG_E("onchip lfs filesystem mount to '/' failed!");
             result = -1;
             goto err;
         }

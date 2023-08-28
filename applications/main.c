@@ -78,5 +78,5 @@ static int log_init(void)
     // nrf_log_backend_rt_device_init();
     NRF_LOG_DEFAULT_BACKENDS_INIT();
 
-    NRF_LOG_DEBUG("Log use RT-DEVICE as output terminal");
+    NRF_LOG_INFO("Log use RT-DEVICE as output terminal");
 }
