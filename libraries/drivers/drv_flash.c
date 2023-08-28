@@ -19,29 +19,23 @@
 #endif
 
 #include <rtdbg.h>
-#define LOG_TAG                "drv.flash"
-
-
+#define LOG_TAG "drv.flash"
 
 /**
-  * @brief  Gets the page of a given address
-  * @param  Addr: Address of the FLASH Memory
-  * @retval The page of a given address
-  */
+ * @brief  Gets the page of a given address
+ * @param  Addr: Address of the FLASH Memory
+ * @retval The page of a given address
+ */
 static uint32_t GetPage(uint32_t Addr)
 {
     uint32_t page = 0;
-    if (Addr < (MCU_FLASH_START_ADDRESS + MCU_FLASH_SIZE))
-    {
+    if (Addr < (MCU_FLASH_START_ADDRESS + MCU_FLASH_SIZE)) {
         page = (Addr - MCU_FLASH_START_ADDRESS) / MCU_FLASH_PAGE_SIZE;
-    }
-    else
-    {
+    } else {
         return 0xffffffff;
     }
     return page;
 }
-
 
 /**
  * Read data from flash.
@@ -58,15 +52,13 @@ int mcu_flash_read(rt_uint32_t addr, rt_uint8_t *buf, size_t size)
 
     size_t i;
 
-    if ((addr + size) > MCU_FLASH_END_ADDRESS)
-    {
+    if ((addr + size) > MCU_FLASH_END_ADDRESS) {
         LOG_E("read outrange flash size! addr is (0x%p)", (void *)(addr + size));
         return -RT_EINVAL;
     }
 
-    for (i = 0; i < size; i++, buf++, addr++)
-    {
-        *buf = *(rt_uint8_t *) addr;
+    for (i = 0; i < size; i++, buf++, addr++) {
+        *buf = *(rt_uint8_t *)addr;
     }
 
     return size;
@@ -85,36 +77,28 @@ int mcu_flash_read(rt_uint32_t addr, rt_uint8_t *buf, size_t size)
  */
 int mcu_flash_write(rt_uint32_t addr, const uint8_t *buf, size_t size)
 {
-    if ((addr + size) > MCU_FLASH_END_ADDRESS)
-    {
+    if ((addr + size) > MCU_FLASH_END_ADDRESS) {
         LOG_E("ERROR: write outrange flash size! addr is (0x%p)\n", (void *)(addr + size));
         return -RT_EINVAL;
     }
 
-
-    if (addr % 4 != 0)
-    {
+    if (addr % 4 != 0) {
         LOG_E("write addr should be 4-byte alignment");
-        //4byte write
-        //else byts
+        // 4byte write
+        // else byts
         return -RT_EINVAL;
     }
 
-    if (size < 1)
-    {
+    if (size < 1) {
         return -RT_ERROR;
     }
-    if (size % 4 != 0)
-    {
+    if (size % 4 != 0) {
         nrfx_nvmc_bytes_write(addr, buf, size);
         return size;
-    }
-    else
-    {
+    } else {
         nrfx_nvmc_words_write(addr, buf, size / 4);
         return size;
     }
-
 }
 
 /**
@@ -133,8 +117,7 @@ int mcu_flash_erase(rt_uint32_t addr, size_t size)
 
     uint32_t FirstPage = 0, NbOfPages = 0;
 
-    if ((addr + size) > MCU_FLASH_END_ADDRESS)
-    {
+    if ((addr + size) > MCU_FLASH_END_ADDRESS) {
         LOG_E("ERROR: erase outrange flash size! addr is (0x%p)\n", (void *)(addr + size));
         return -RT_EINVAL;
     }
@@ -142,11 +125,9 @@ int mcu_flash_erase(rt_uint32_t addr, size_t size)
     FirstPage = GetPage(addr);
     NbOfPages = GetPage(addr + size - 1) - FirstPage + 1;
 
-    for (int i = 0; i < NbOfPages ; i++)
-    {
+    for (int i = 0; i < NbOfPages; i++) {
         result = nrfx_nvmc_page_erase((FirstPage + i) * MCU_FLASH_PAGE_SIZE);
-        if (NRFX_SUCCESS != result)
-        {
+        if (NRFX_SUCCESS != result) {
             LOG_E("ERROR: erase flash page %d ! error code  is (%x)\n", FirstPage + i, result);
             return -RT_EINVAL;
         }
@@ -178,7 +159,7 @@ static int fal_flash_erase(long offset, size_t size)
 const struct fal_flash_dev mcu_onchip_flash =
     {
         .name       = ON_CHIP_FLASH_DEV_NAME,
-        .addr       = MCU_FLASH_START_ADDRESS,
+        .addr       = 0x26000,
         .len        = 0x5a000,
         .blk_size   = MCU_FLASH_PAGE_SIZE,
         .ops        = {NULL, fal_flash_read, fal_flash_write, fal_flash_erase},

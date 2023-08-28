@@ -66,7 +66,7 @@ static rt_err_t rt_rtc_config(struct rt_device *dev)
     nrfx_rtc_config_t config = NRFX_RTC_DEFAULT_CONFIG;
     config.prescaler         = RTC_PRESCALER;
 
-    nrfx_rtc_init(&rtc_instance, &config, rtc_callback);
+    // nrfx_rtc_init(&rtc_instance, &config, rtc_callback);
 
     nrfx_rtc_tick_enable(&rtc_instance, true);
 
@@ -186,6 +186,6 @@ int rt_hw_rtc_init(void)
     LOG_D("rtc init success");
     return RT_EOK;
 }
-// INIT_DEVICE_EXPORT(rt_hw_rtc_init);
+INIT_DEVICE_EXPORT(rt_hw_rtc_init);
 
 #endif /* BSP_USING_ONCHIP_RTC */
