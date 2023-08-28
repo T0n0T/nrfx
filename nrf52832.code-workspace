@@ -4,6 +4,16 @@
             "path": "."
         }
     ],
-    "settings": {},
+    "settings": {
+        "files.associations": {
+            "*.cpp": "cpp",
+            "*.html": "html",
+            "*.env": "dotenv",
+            "*.go": "go",
+            "fal.h": "c",
+            "unistd.h": "c",
+            "fal_cfg.h": "c"
+        }
+    },
     "extensions": {}
 }

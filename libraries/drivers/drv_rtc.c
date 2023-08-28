@@ -186,6 +186,6 @@ int rt_hw_rtc_init(void)
     LOG_D("rtc init success");
     return RT_EOK;
 }
-INIT_DEVICE_EXPORT(rt_hw_rtc_init);
+// INIT_DEVICE_EXPORT(rt_hw_rtc_init);
 
 #endif /* BSP_USING_ONCHIP_RTC */

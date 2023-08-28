@@ -25,6 +25,9 @@
         "name": "AT",
         "files": [
           {
+            "path": "rt-thread/components/net/at/at_socket/at_socket.c"
+          },
+          {
             "path": "rt-thread/components/net/at/src/at_cli.c"
           },
           {
@@ -32,9 +35,6 @@
           },
           {
             "path": "rt-thread/components/net/at/src/at_utils.c"
-          },
-          {
-            "path": "rt-thread/components/net/at/at_socket/at_socket.c"
           }
         ],
         "folders": []
@@ -229,6 +229,9 @@
             "path": "libraries/drivers/drv_spi.c"
           },
           {
+            "path": "libraries/drivers/drv_uart.c"
+          },
+          {
             "path": "libraries/drivers/drv_uarte.c"
           }
         ],
@@ -274,9 +277,6 @@
             "path": "rt-thread/components/dfs/dfs_v1/filesystems/devfs/devfs.c"
           },
           {
-            "path": "rt-thread/components/dfs/dfs_v1/src/dfs.c"
-          },
-          {
             "path": "rt-thread/components/dfs/dfs_v1/src/dfs_file.c"
           },
           {
@@ -284,6 +284,9 @@
           },
           {
             "path": "rt-thread/components/dfs/dfs_v1/src/dfs_posix.c"
+          },
+          {
+            "path": "rt-thread/components/dfs/dfs_v1/src/dfs.c"
           }
         ],
         "folders": []
@@ -292,19 +295,19 @@
         "name": "Finsh",
         "files": [
           {
-            "path": "rt-thread/components/finsh/shell.c"
+            "path": "rt-thread/components/finsh/cmd.c"
           },
           {
-            "path": "rt-thread/components/finsh/msh.c"
+            "path": "rt-thread/components/finsh/msh_file.c"
           },
           {
             "path": "rt-thread/components/finsh/msh_parse.c"
           },
           {
-            "path": "rt-thread/components/finsh/cmd.c"
+            "path": "rt-thread/components/finsh/msh.c"
           },
           {
-            "path": "rt-thread/components/finsh/msh_file.c"
+            "path": "rt-thread/components/finsh/shell.c"
           }
         ],
         "folders": []
@@ -421,25 +424,25 @@
         "name": "nrf_ble",
         "files": [
           {
-            "path": "nrf_sdk/components/ble/common/ble_srv_common.c"
-          },
-          {
-            "path": "nrf_sdk/components/ble/nrf_ble_qwr/nrf_ble_qwr.c"
-          },
-          {
-            "path": "nrf_sdk/components/ble/common/ble_conn_params.c"
-          },
-          {
-            "path": "nrf_sdk/components/ble/nrf_ble_gatt/nrf_ble_gatt.c"
-          },
-          {
-            "path": "nrf_sdk/components/ble/common/ble_conn_state.c"
+            "path": "nrf_sdk/components/ble/ble_advertising/ble_advertising.c"
           },
           {
             "path": "nrf_sdk/components/ble/common/ble_advdata.c"
           },
           {
-            "path": "nrf_sdk/components/ble/ble_advertising/ble_advertising.c"
+            "path": "nrf_sdk/components/ble/common/ble_conn_params.c"
+          },
+          {
+            "path": "nrf_sdk/components/ble/common/ble_conn_state.c"
+          },
+          {
+            "path": "nrf_sdk/components/ble/common/ble_srv_common.c"
+          },
+          {
+            "path": "nrf_sdk/components/ble/nrf_ble_gatt/nrf_ble_gatt.c"
+          },
+          {
+            "path": "nrf_sdk/components/ble/nrf_ble_qwr/nrf_ble_qwr.c"
           }
         ],
         "folders": []
@@ -652,13 +655,13 @@
         "name": "nrf_softdev",
         "files": [
           {
-            "path": "nrf_sdk/components/softdevice/common/nrf_sdh.c"
+            "path": "nrf_sdk/components/softdevice/common/nrf_sdh_ble.c"
           },
           {
             "path": "nrf_sdk/components/softdevice/common/nrf_sdh_soc.c"
           },
           {
-            "path": "nrf_sdk/components/softdevice/common/nrf_sdh_ble.c"
+            "path": "nrf_sdk/components/softdevice/common/nrf_sdh.c"
           }
         ],
         "folders": []
@@ -718,10 +721,10 @@
         "name": "SAL",
         "files": [
           {
-            "path": "rt-thread/components/net/netdev/src/netdev.c"
+            "path": "rt-thread/components/net/netdev/src/netdev_ipaddr.c"
           },
           {
-            "path": "rt-thread/components/net/netdev/src/netdev_ipaddr.c"
+            "path": "rt-thread/components/net/netdev/src/netdev.c"
           },
           {
             "path": "rt-thread/components/net/sal/dfs_net/dfs_net.c"
@@ -815,7 +818,9 @@
         "<virtual_root>/ccm3310/ccm3310_nrf.c",
         "<virtual_root>/ec800x",
         "<virtual_root>/max30102",
-        "<virtual_root>/WIZnet"
+        "<virtual_root>/WIZnet",
+        "<virtual_root>/nrf_lib/nrf_pwr_mgmt.c",
+        "<virtual_root>/Drivers/drv_uart.c"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -859,8 +864,8 @@
               "tag": "IRAM",
               "id": 1,
               "mem": {
-                "startAddr": "0x20002260",
-                "size": "0xdda0"
+                "startAddr": "0x20004c00",
+                "size": "0xb400"
               },
               "isChecked": true,
               "noInit": false
@@ -941,7 +946,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": "ip 192.168.1.2"
+        "otherCmds": ""
       },
       "uploadConfigMap": {},
       "custom_dep": {

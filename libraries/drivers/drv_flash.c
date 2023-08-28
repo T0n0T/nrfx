@@ -176,13 +176,12 @@ static int fal_flash_erase(long offset, size_t size)
     return mcu_flash_erase(mcu_onchip_flash.addr + offset, size);
 }
 const struct fal_flash_dev mcu_onchip_flash =
-{
-    .name       = ON_CHIP_FLASH_DEV_NAME,
-    .addr       = MCU_FLASH_START_ADDRESS,
-    .len        = MCU_FLASH_SIZE,
-    .blk_size   = MCU_FLASH_PAGE_SIZE,
-    .ops        = {NULL, fal_flash_read, fal_flash_write, fal_flash_erase},
-    .write_gran = 8
-};
+    {
+        .name       = ON_CHIP_FLASH_DEV_NAME,
+        .addr       = MCU_FLASH_START_ADDRESS,
+        .len        = 0x5a000,
+        .blk_size   = MCU_FLASH_PAGE_SIZE,
+        .ops        = {NULL, fal_flash_read, fal_flash_write, fal_flash_erase},
+        .write_gran = 8};
 #endif
 #endif /* BSP_USING_ON_CHIP_FLASH */

@@ -24,11 +24,11 @@ static int log_init(void);
 
 int main(void)
 {
-    log_init();
+    // log_init();
 
     rt_pin_mode(DK_BOARD_LED_1, PIN_MODE_OUTPUT);
     while (1) {
-        NRF_LOG_INTERNAL_FLUSH();
+        // NRF_LOG_INTERNAL_FLUSH();
         rt_pin_write(DK_BOARD_LED_1, PIN_HIGH);
         rt_thread_mdelay(500);
         rt_pin_write(DK_BOARD_LED_1, PIN_LOW);
