@@ -589,10 +589,16 @@
             "path": "nrf_sdk/components/libraries/log/src/nrf_log_backend_serial.c"
           },
           {
+            "path": "nrf_sdk/components/libraries/log/src/nrf_log_default_backends.c"
+          },
+          {
             "path": "nrf_sdk/components/libraries/log/src/nrf_log_frontend.c"
           },
           {
             "path": "nrf_sdk/components/libraries/log/src/nrf_log_str_formatter.c"
+          },
+          {
+            "path": "nrf_sdk/rtthread_adapter/nrf_log_backend_rt_device.c"
           }
         ],
         "folders": []
@@ -879,7 +885,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": ""
+        "otherCmds": "ip 192.168.1.2"
       },
       "uploadConfigMap": {},
       "custom_dep": {
@@ -956,7 +962,8 @@
           "rt-thread/components/net/sal/include",
           "RTE/_rtthread",
           "packages/at_device-latest/class/ec200x",
-          "modules/ec800x"
+          "modules/ec800x",
+          "nrf_sdk/rtthread_adapter"
         ],
         "libList": [],
         "sourceDirList": [],

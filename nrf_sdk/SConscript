@@ -205,9 +205,8 @@ if GetDepend('USING_NRF_LOG') == True:
         log_define += ['NRF_LOG_BACKEND_RTT_ENABLED']
     if GetDepend('USING_NRF_LOG_BACKEND_RT_SERIAL') == True:
         log_src += [cwd + 'libraries/log/src/nrf_log_backend_serial.c']
-        log_src += ['./rtthread_adapter/nrf_log_backend_rt_serial.c']
-        log_define += ['NRF_LOG_BACKEND_RT_SERIAL_ENABLED']
-    
+        log_src += ['./rtthread_adapter/nrf_log_backend_rt_device.c']
+        lib_path += [GetCurrentDir() + '/rtthread_adapter']
     nrf_log = DefineGroup('nrf_log', log_src, depend = [''], CPPPATH = log_path, CPPDEFINES = log_define)
 
 nrf_lib = DefineGroup('nrf_lib', lib_src, depend = [''], CPPPATH = lib_path, CPPDEFINES = lib_define)

@@ -15,15 +15,20 @@
 
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
+#include "nrf_log_default_backends.h"
 #include "nrf_log_backend_rtt.h"
 #define DK_BOARD_LED_1 17
 
 static int hwtimer_mission(void);
+static int log_init(void);
 
 int main(void)
 {
+    log_init();
+
     rt_pin_mode(DK_BOARD_LED_1, PIN_MODE_OUTPUT);
     while (1) {
+        NRF_LOG_INTERNAL_FLUSH();
         rt_pin_write(DK_BOARD_LED_1, PIN_HIGH);
         rt_thread_mdelay(500);
         rt_pin_write(DK_BOARD_LED_1, PIN_LOW);
@@ -33,7 +38,6 @@ int main(void)
 }
 
 #include <drv_spim.h>
-
 static int w5500_bing_spi(void)
 {
     return rt_hw_spi_device_attach("spi2", WIZ_SPI_DEVICE, BSP_SPI2_SS_PIN);
@@ -57,7 +61,7 @@ static int hwtimer_mission(void)
         return -1;
     }
 
-    if (rt_device_control(device->timer, HWTIMER_CTRL_MODE_SET, &mode) != RT_EOK) {
+    if (rt_device_control(timer, HWTIMER_CTRL_MODE_SET, &mode) != RT_EOK) {
         printf("%s set mode failed!", timer->parent.name);
         return -1;
     }
@@ -65,4 +69,14 @@ static int hwtimer_mission(void)
         printf("open %s device failed!", timer->parent.name);
         return -1;
     }
+}
+
+static int log_init(void)
+{
+    ret_code_t err_code = NRF_LOG_INIT(NULL);
+    APP_ERROR_CHECK(err_code);
+    // nrf_log_backend_rt_device_init();
+    NRF_LOG_DEFAULT_BACKENDS_INIT();
+
+    NRF_LOG_DEBUG("Log use RT-DEVICE as output terminal");
 }

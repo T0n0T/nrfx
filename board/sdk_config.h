@@ -8209,7 +8209,7 @@
 // <e> NRF_LOG_BACKEND_RTT_ENABLED - nrf_log_backend_rtt - Log RTT backend
 //==========================================================
 #ifndef NRF_LOG_BACKEND_RTT_ENABLED
-#define NRF_LOG_BACKEND_RTT_ENABLED 1
+#define NRF_LOG_BACKEND_RTT_ENABLED 0
 #endif
 // <o> NRF_LOG_BACKEND_RTT_TEMP_BUFFER_SIZE - Size of buffer for partially processed strings.
 // <i> Size of the buffer is a trade-off between RAM usage and processing.
@@ -8239,37 +8239,10 @@
 
 // </e>
 
-// <e> NRF_LOG_BACKEND_UART_ENABLED - nrf_log_backend_uart - Log UART backend
+// <e> NRF_LOG_BACKEND_RT_DEVICE_ENABLED - nrf_log_backend_rt_device - Log RT_DEVICE backend
 //==========================================================
-#ifndef NRF_LOG_BACKEND_UART_ENABLED
-#define NRF_LOG_BACKEND_UART_ENABLED 0
-#endif
-// <o> NRF_LOG_BACKEND_UART_TX_PIN - UART TX pin
-#ifndef NRF_LOG_BACKEND_UART_TX_PIN
-#define NRF_LOG_BACKEND_UART_TX_PIN 6
-#endif
-
-// <o> NRF_LOG_BACKEND_UART_BAUDRATE  - Default Baudrate
-
-// <323584=> 1200 baud
-// <643072=> 2400 baud
-// <1290240=> 4800 baud
-// <2576384=> 9600 baud
-// <3862528=> 14400 baud
-// <5152768=> 19200 baud
-// <7716864=> 28800 baud
-// <10289152=> 38400 baud
-// <15400960=> 57600 baud
-// <20615168=> 76800 baud
-// <30801920=> 115200 baud
-// <61865984=> 230400 baud
-// <67108864=> 250000 baud
-// <121634816=> 460800 baud
-// <251658240=> 921600 baud
-// <268435456=> 1000000 baud
-
-#ifndef NRF_LOG_BACKEND_UART_BAUDRATE
-#define NRF_LOG_BACKEND_UART_BAUDRATE 30801920
+#ifndef NRF_LOG_BACKEND_RT_DEVICE_ENABLED
+#define NRF_LOG_BACKEND_RT_DEVICE_ENABLED 0
 #endif
 
 // <o> NRF_LOG_BACKEND_UART_TEMP_BUFFER_SIZE - Size of buffer for partially processed strings.
@@ -8278,8 +8251,8 @@
 // <i> It is recommended to use size which will fit typical log and only the
 // <i> longer one will be fragmented.
 
-#ifndef NRF_LOG_BACKEND_UART_TEMP_BUFFER_SIZE
-#define NRF_LOG_BACKEND_UART_TEMP_BUFFER_SIZE 64
+#ifndef NRF_LOG_BACKEND_RT_DEVICE_TEMP_BUFFER_SIZE
+#define NRF_LOG_BACKEND_RT_DEVICE_TEMP_BUFFER_SIZE 64
 #endif
 
 // </e>
@@ -8287,7 +8260,7 @@
 // <e> NRF_LOG_ENABLED - nrf_log - Logger
 //==========================================================
 #ifndef NRF_LOG_ENABLED
-#define NRF_LOG_ENABLED 0
+#define NRF_LOG_ENABLED 1
 #endif
 // <h> Log message pool - Configuration of log message pool
 
@@ -8356,7 +8329,7 @@
 // <4=> Debug
 
 #ifndef NRF_LOG_DEFAULT_LEVEL
-#define NRF_LOG_DEFAULT_LEVEL 4
+#define NRF_LOG_DEFAULT_LEVEL 3
 #endif
 
 // <q> NRF_LOG_DEFERRED  - Enable deffered logger.
@@ -8659,7 +8632,7 @@
 // <4=> Debug
 
 #ifndef CLOCK_CONFIG_LOG_LEVEL
-#define CLOCK_CONFIG_LOG_LEVEL 3
+#define CLOCK_CONFIG_LOG_LEVEL 4
 #endif
 
 // <o> CLOCK_CONFIG_INFO_COLOR  - ANSI escape code prefix.
@@ -9368,7 +9341,7 @@
 // <e> SPI_CONFIG_LOG_ENABLED - Enables logging in the module.
 //==========================================================
 #ifndef SPI_CONFIG_LOG_ENABLED
-#define SPI_CONFIG_LOG_ENABLED 1
+#define SPI_CONFIG_LOG_ENABLED 0
 #endif
 // <o> SPI_CONFIG_LOG_LEVEL  - Default Severity level
 
@@ -9572,7 +9545,7 @@
 // <e> UART_CONFIG_LOG_ENABLED - Enables logging in the module.
 //==========================================================
 #ifndef UART_CONFIG_LOG_ENABLED
-#define UART_CONFIG_LOG_ENABLED 0
+#define UART_CONFIG_LOG_ENABLED 1
 #endif
 // <o> UART_CONFIG_LOG_LEVEL  - Default Severity level
 
@@ -9583,7 +9556,7 @@
 // <4=> Debug
 
 #ifndef UART_CONFIG_LOG_LEVEL
-#define UART_CONFIG_LOG_LEVEL 3
+#define UART_CONFIG_LOG_LEVEL 4
 #endif
 
 // <o> UART_CONFIG_INFO_COLOR  - ANSI escape code prefix.

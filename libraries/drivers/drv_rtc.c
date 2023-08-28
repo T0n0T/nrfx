@@ -82,9 +82,10 @@ static rt_err_t rt_rtc_control(rt_device_t dev, int cmd, void *args)
     RT_ASSERT(dev != RT_NULL);
 
     switch (cmd) {
-        case RT_DEVICE_CTRL_RTC_GET_TIME: {
+        case RT_DEVICE_CTRL_RTC_GET_TIMEVAL: {
             time  = (time_t *)args;
             *time = init_time + tick;
+            rt_kprintf("%ld\n", init_time + tick);
             break;
         }
         case RT_DEVICE_CTRL_RTC_SET_TIME: {

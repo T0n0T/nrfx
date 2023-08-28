@@ -39,46 +39,57 @@
  */
 #include "sdk_common.h"
 
-#if NRF_MODULE_ENABLED(NRF_LOG) && NRF_MODULE_ENABLED(NRF_LOG_BACKEND_RT_SERIAL)
+#if NRF_MODULE_ENABLED(NRF_LOG) && NRF_MODULE_ENABLED(NRF_LOG_BACKEND_RT_DEVICE)
+#include "nrf_log_backend_rt_device.h"
 #include "nrf_log_backend_serial.h"
 #include "nrf_log_internal.h"
 #include <rtdevice.h>
 #include "app_error.h"
 
-static void rt_serial_init(bool async_mode)
-{
+const nrf_log_backend_api_t nrf_log_backend_rt_device_api;
+NRF_LOG_BACKEND_DEF(rt_device_log_backend, nrf_log_backend_rt_device_api, NULL);
+static uint8_t m_string_buff[NRF_LOG_BACKEND_RT_DEVICE_TEMP_BUFFER_SIZE];
+#define RT_DEVICE_LOG_NAME "uart0"
+rt_device_t dev = RT_NULL;
 
+void nrf_log_backend_rt_device_init(void)
+{
+    int32_t backend_id = -1;
+    (void)backend_id;
+    dev = rt_device_find(RT_DEVICE_LOG_NAME);
+    if (dev == RT_NULL) {
+        printf("can't find rt-device %s for nrf_log module\n", RT_DEVICE_LOG_NAME);
+        return;
+    }
+    backend_id = nrf_log_backend_add(&rt_device_log_backend, NRF_LOG_SEVERITY_DEBUG);
+    ASSERT(backend_id > 0);
+    nrf_log_backend_enable(&rt_device_log_backend);
 }
 
-void nrf_log_backend_rt_serial_init(void)
+void serial_tx(void const *p_context, char const *p_buffer, size_t len)
 {
-
+    if (rt_device_write(dev, 0, (void *)p_buffer, len) != len) {
+        printf("rt-device %s transmit log failed\n", RT_DEVICE_LOG_NAME);
+    }
 }
 
-static void serial_tx(void const * p_context, char const * p_buffer, size_t len)
+static void nrf_log_backend_rt_device_put(nrf_log_backend_t const *p_backend,
+                                          nrf_log_entry_t *p_msg)
 {
-
+    nrf_log_backend_serial_put(p_backend, p_msg, m_string_buff, NRF_LOG_BACKEND_RTT_TEMP_BUFFER_SIZE, serial_tx);
 }
 
-static void nrf_log_backend_rt_serial_put(nrf_log_backend_t const * p_backend,
-                                     nrf_log_entry_t * p_msg)
+static void nrf_log_backend_rt_device_flush(nrf_log_backend_t const *p_backend)
 {
-
 }
 
-static void nrf_log_backend_rt_serial_flush(nrf_log_backend_t const * p_backend)
+static void nrf_log_backend_rt_device_panic_set(nrf_log_backend_t const *p_backend)
 {
-
 }
 
-static void nrf_log_backend_rt_serial_panic_set(nrf_log_backend_t const * p_backend)
-{
-
-}
-
-const nrf_log_backend_api_t nrf_log_backend_rt_serial_api = {
-        .put       = nrf_log_backend_rt_serial_put,
-        .flush     = nrf_log_backend_rt_serial_flush,
-        .panic_set = nrf_log_backend_rt_serial_panic_set,
+const nrf_log_backend_api_t nrf_log_backend_rt_device_api = {
+    .put       = nrf_log_backend_rt_device_put,
+    .flush     = nrf_log_backend_rt_device_flush,
+    .panic_set = nrf_log_backend_rt_device_panic_set,
 };
-#endif //NRF_MODULE_ENABLED(NRF_LOG) && NRF_MODULE_ENABLED(NRF_LOG_BACKEND_RT_SERIAL)
+#endif // NRF_MODULE_ENABLED(NRF_LOG) && NRF_MODULE_ENABLED(NRF_LOG_BACKEND_rt_device)
