@@ -150,7 +150,11 @@ lib_src += [cwd + 'libraries/balloc/nrf_balloc.c']
 # nrf_atomic
 lib_path += [cwd + 'libraries/atomic']
 lib_src += [cwd + 'libraries/atomic/nrf_atomic.c']
-    
+
+# nrf_section_iter
+lib_path += [cwd + 'libraries/experimental_section_vars']
+lib_src += [cwd + 'libraries/experimental_section_vars/nrf_section_iter.c']
+
 # nrf_ringbuf
 lib_path += [cwd + 'libraries/ringbuf']
 lib_src += [cwd + 'libraries/ringbuf/nrf_ringbuf.c']
@@ -167,30 +171,49 @@ elif rtconfig.PLATFORM == 'gcc':
 elif rtconfig.PLATFORM == 'iar':
 	lib_src += [cwd + 'libraries/util/app_error_handler_iar.c']
 
-if not GetDepend('BSP_USING_SOFTDEVICE') == True:
+if GetDepend('BSP_USING_SOFTDEVICE') == False:
     lib_path += [cwd + 'drivers_nrf/nrf_soc_nosd']
 else:
-    lib_path += [cwd + 'softdevice/s132/headers/nrf52']
-    lib_path += [cwd + 'softdevice/s132/headers']
-    lib_path += [cwd + 'softdevice/common']
-    lib_define += ['NRF_SD_BLE_API_VERSION_8']
-    lib_define += ['SOFTDEVICE_PRESENT']
-    lib_define += ['NRF52_PAN_74']
-    lib_define += ['__HEAP_SIZE=8192']
-    lib_define += ['__STACK_SIZE=8192']
-    lib_define += ['S122']
-
+    #pwr_mgmt
+    lib_src += [cwd + 'libraries/pwr_mgmt/nrf_pwr_mgmt.c']
+    lib_path += [cwd + 'libraries/pwr_mgmt']
+    
+    #atomic_fifo
+    lib_src += [cwd + 'libraries/atomic_fifo/nrf_atfifo.c']
+    lib_path += [cwd + 'libraries/atomic_fifo']
+    
+    #atomic_flags
+    lib_src += [cwd + 'libraries/atomic_flags/nrf_atflags.c']
+    lib_path += [cwd + 'libraries/atomic_flags']
+    
+    #timer
+    lib_src += [cwd + 'libraries/timer/app_timer2.c']
+    lib_src += [cwd + 'libraries/timer/drv_rtc.c']
+    lib_path += [cwd + 'libraries/timer']
+    lib_define += ['APP_TIMER_V2']
+    lib_define += ['APP_TIMER_V2_RTC1_ENABLED']
+    
+    #sortlist
+    lib_src += [cwd + 'libraries/sortlist/nrf_sortlist.c']
+    lib_path += [cwd + 'libraries/sortlist']
+    
+    #svc
+    lib_src += [cwd + 'libraries/svc/nrf_svc_handler.c']
+    lib_path += [cwd + 'libraries/svc']
+    
+    #hci
+    lib_src += Glob(cwd + 'libraries/hci/*.c')
+    lib_path += [cwd + 'libraries/timer']
+    
 # nrf_log
 if GetDepend('USING_NRF_LOG') == True:
-
     log_src = []
     log_path = []
     log_define = []
     
     log_path += [cwd + 'libraries/log']
     log_path += [cwd + 'libraries/log/src']
-    log_path += [cwd + 'libraries/experimental_section_vars']
-    
+
     log_src += [cwd + 'libraries/log/src/nrf_log_frontend.c']
     log_src += [cwd + 'libraries/log/src/nrf_log_str_formatter.c']
     if GetDepend('USING_NRF_LOG_BACKEND_FLASH') == True:
@@ -201,6 +224,7 @@ if GetDepend('USING_NRF_LOG') == True:
     if GetDepend('USING_NRF_LOG_BACKEND_RTT') == True:
         log_src += [cwd + 'libraries/log/src/nrf_log_backend_rtt.c']	
         log_src += [cwd + 'libraries/log/src/nrf_log_backend_serial.c']
+        log_src += [cwd + 'libraries/log/src/nrf_log_default_backends.c']
         lib_path += [cwd + 'libraries/delay']
         log_define += ['NRF_LOG_BACKEND_RTT_ENABLED']
     if GetDepend('USING_NRF_LOG_BACKEND_RT_SERIAL') == True:
@@ -211,9 +235,54 @@ if GetDepend('USING_NRF_LOG') == True:
 
 nrf_lib = DefineGroup('nrf_lib', lib_src, depend = [''], CPPPATH = lib_path, CPPDEFINES = lib_define)
 
+if GetDepend('BSP_USING_SOFTDEVICE') == True:
+    # ble
+    ble_src = []
+    ble_path = []
+    ble_define = []
+    
+    #common
+    ble_src += Glob(cwd + 'ble/common/*.c')    
+    ble_path += [cwd + 'ble/common/']
+    
+    #ble_advertise
+    ble_src += [cwd + 'ble/ble_advertising/ble_advertising.c']
+    ble_path += [cwd + 'ble/ble_advertising']
+    
+    #ble_gatt
+    ble_src += [cwd + 'ble/nrf_ble_gatt/nrf_ble_gatt.c']
+    ble_path += [cwd + 'ble/nrf_ble_gatt']    
+    
+    #ble_qwr    
+    ble_src += [cwd + 'ble/nrf_ble_qwr/nrf_ble_qwr.c']
+    ble_path += [cwd + 'ble/nrf_ble_qwr']
+    
+    nrf_ble = DefineGroup('nrf_ble', ble_src, depend = [''], CPPPATH = ble_path, CPPDEFINES = ble_define)
+    
+    #softdevice
+    softdev_src = []
+    softdev_path = []
+    softdev_define = []
+    softdev_src += [cwd + 'softdevice/common/nrf_sdh.c']
+    softdev_src += [cwd + 'softdevice/common/nrf_sdh_ble.c']
+    softdev_src += [cwd + 'softdevice/common/nrf_sdh_soc.c']    
+    softdev_path += [cwd + 'softdevice/common']
+    softdev_path += [cwd + 'softdevice/s132/headers']
+    softdev_path += [cwd + 'softdevice/s132/headers/nrf52']
+    softdev_define += ['SOFTDEVICE_PRESENT']
+    softdev_define += ['NRF52_PAN_74']
+    softdev_define += ['__HEAP_SIZE=8192']
+    softdev_define += ['__STACK_SIZE=8192']
+    softdev_define += ['NRF_SD_BLE_API_VERSION_8']
+    softdev_define += ['S132']
+    
+    nrf_softdev = DefineGroup('nrf_softdev', softdev_src, depend = [''], CPPPATH = softdev_path, CPPDEFINES = softdev_define)
 
 Return('nrf_hal')
 Return('nrf_drivers')
 Return('nrf_lib')
 if GetDepend('USING_NRF_LOG') == True:
     Return('nrf_log')
+if GetDepend('BSP_USING_SOFTDEVICE') == True:
+    Return('nrf_ble')
+    Return('nrf_softdev')

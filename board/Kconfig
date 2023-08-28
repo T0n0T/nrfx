@@ -344,8 +344,8 @@ menu "Hardware Drivers Config"
 	config BLE_STACK_USING_NULL
 		bool "not use the ble stack"
 
-	config  BSP_USING_SOFTDEVICE
-		select PKG_USING_NRF5X_SDK
+	config BSP_USING_SOFTDEVICE
+		select PKG_USING_NRF5X_SOFTDEVICE
 		bool "Nordic softdevice(perpheral)"
 
 	config BSP_USING_NIMBLE
