@@ -28,9 +28,9 @@ extern const struct fal_flash_dev mcu_onchip_flash;
 /* ====================== Partition Configuration ========================== */
 #ifdef FAL_PART_HAS_TABLE_CFG
 /* partition table */
-#define FAL_PART_TABLE                                                                                  \
-    {                                                                                                   \
-        {FAL_PART_MAGIC_WORD, ON_CHIP_PARTION_NAME, ON_CHIP_FLASH_DEV_NAME, 224 * 1024, 120 * 1024, 0}, \
+#define FAL_PART_TABLE                                                                            \
+    {                                                                                             \
+        {FAL_PART_MAGIC_WORD, ON_CHIP_PARTION_NAME, ON_CHIP_FLASH_DEV_NAME, 0x55000, 0x2b000, 0}, \
     }
 #endif /* FAL_PART_HAS_TABLE_CFG */
 

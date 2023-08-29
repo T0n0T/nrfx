@@ -159,8 +159,8 @@ static int fal_flash_erase(long offset, size_t size)
 const struct fal_flash_dev mcu_onchip_flash =
     {
         .name       = ON_CHIP_FLASH_DEV_NAME,
-        .addr       = 0x26000,
-        .len        = 0x5a000,
+        .addr       = MCU_FLASH_START_ADDRESS,
+        .len        = MCU_FLASH_SIZE,
         .blk_size   = MCU_FLASH_PAGE_SIZE,
         .ops        = {NULL, fal_flash_read, fal_flash_write, fal_flash_erase},
         .write_gran = 8};

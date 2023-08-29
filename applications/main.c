@@ -12,11 +12,11 @@
 #include <rtthread.h>
 #include <rtdevice.h>
 #include <stdio.h>
-
+#include <ccm3310.h>
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
-#include "nrf_log_backend_rtt.h"
+
 #define DK_BOARD_LED_1 17
 
 static int hwtimer_mission(void);
@@ -24,11 +24,11 @@ static int log_init(void);
 
 int main(void)
 {
-    // log_init();
+    log_init();
 
     rt_pin_mode(DK_BOARD_LED_1, PIN_MODE_OUTPUT);
     while (1) {
-        // NRF_LOG_INTERNAL_FLUSH();
+        NRF_LOG_INTERNAL_FLUSH();
         rt_pin_write(DK_BOARD_LED_1, PIN_HIGH);
         rt_thread_mdelay(500);
         rt_pin_write(DK_BOARD_LED_1, PIN_LOW);

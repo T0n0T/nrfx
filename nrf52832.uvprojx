@@ -1,46 +1,43 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <Project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="project_projx.xsd">
-
   <SchemaVersion>2.1</SchemaVersion>
-
   <Header>### uVision Project, (C) Keil Software</Header>
-
   <Targets>
     <Target>
       <TargetName>rtthread</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060960::V5.06 update 7 (build 960)::.\ARMCC</pCCUsed>
+      <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>nRF52832_xxAA</Device>
           <Vendor>Nordic Semiconductor</Vendor>
-          <PackID>NordicSemiconductor.nRF_DeviceFamilyPack.8.44.1</PackID>
+          <PackID>NordicSemiconductor.nRF_DeviceFamilyPack.8.32.1</PackID>
           <PackURL>http://developer.nordicsemi.com/nRF5_SDK/pieces/nRF_DeviceFamilyPack/</PackURL>
-          <Cpu>IRAM(0x20000000,0x00010000) IROM(0x00000000,0x00080000) CPUTYPE("Cortex-M4") FPU2 DSP CLOCK(12000000) ELITTLE</Cpu>
-          <FlashUtilSpec></FlashUtilSpec>
-          <StartupFile></StartupFile>
+          <Cpu>IRAM(0x20000000,0x00010000) IRAM2(0x00800000,0x00010000) IROM(0x00000000,0x00080000) CPUTYPE("Cortex-M4") FPU2 DSP CLOCK(12000000) ELITTLE</Cpu>
+          <FlashUtilSpec />
+          <StartupFile />
           <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC4000 -FN2 -FF0nrf52xxx -FS00 -FL0200000 -FF1nrf52xxx_uicr -FS110001000 -FL11000 -FP0($$Device:nRF52832_xxAA$Flash\nrf52xxx.flm) -FP1($$Device:nRF52832_xxAA$Flash\nrf52xxx_uicr.flm))</FlashDriverDll>
           <DeviceId>0</DeviceId>
           <RegisterFile>$$Device:nRF52832_xxAA$Device\Include\nrf.h</RegisterFile>
-          <MemoryEnv></MemoryEnv>
-          <Cmp></Cmp>
-          <Asm></Asm>
-          <Linker></Linker>
-          <OHString></OHString>
-          <InfinionOptionDll></InfinionOptionDll>
-          <SLE66CMisc></SLE66CMisc>
-          <SLE66AMisc></SLE66AMisc>
-          <SLE66LinkerMisc></SLE66LinkerMisc>
+          <MemoryEnv />
+          <Cmp />
+          <Asm />
+          <Linker />
+          <OHString />
+          <InfinionOptionDll />
+          <SLE66CMisc />
+          <SLE66AMisc />
+          <SLE66LinkerMisc />
           <SFDFile>$$Device:nRF52832_xxAA$SVD\nrf52.svd</SFDFile>
           <bCustSvd>0</bCustSvd>
           <UseEnv>0</UseEnv>
-          <BinPath></BinPath>
-          <IncludePath></IncludePath>
-          <LibPath></LibPath>
-          <RegisterFilePath></RegisterFilePath>
-          <DBRegisterFilePath></DBRegisterFilePath>
+          <BinPath />
+          <IncludePath />
+          <LibPath />
+          <RegisterFilePath />
+          <DBRegisterFilePath />
           <TargetStatus>
             <Error>0</Error>
             <ExitCodeStop>0</ExitCodeStop>
@@ -53,8 +50,8 @@
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>0</CreateHexFile>
-          <DebugInformation>1</DebugInformation>
-          <BrowseInformation>1</BrowseInformation>
+          <DebugInformation>0</DebugInformation>
+          <BrowseInformation>0</BrowseInformation>
           <ListingPath>.\build\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -62,8 +59,8 @@
           <BeforeCompile>
             <RunUserProg1>0</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name></UserProg1Name>
-            <UserProg2Name></UserProg2Name>
+            <UserProg1Name />
+            <UserProg2Name />
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
             <nStopU1X>0</nStopU1X>
@@ -72,25 +69,25 @@
           <BeforeMake>
             <RunUserProg1>0</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name></UserProg1Name>
-            <UserProg2Name></UserProg2Name>
+            <UserProg1Name />
+            <UserProg2Name />
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
             <nStopB1X>0</nStopB1X>
             <nStopB2X>0</nStopB2X>
           </BeforeMake>
           <AfterMake>
-            <RunUserProg1>0</RunUserProg1>
+            <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
             <UserProg1Name>fromelf --bin !L --output rtthread.bin</UserProg1Name>
-            <UserProg2Name></UserProg2Name>
+            <UserProg2Name />
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
             <nStopA1X>0</nStopA1X>
             <nStopA2X>0</nStopA2X>
           </AfterMake>
           <SelectedForBatchBuild>0</SelectedForBatchBuild>
-          <SVCSIdString></SVCSIdString>
+          <SVCSIdString />
         </TargetCommonOption>
         <CommonProperty>
           <UseCPPCompiler>0</UseCPPCompiler>
@@ -104,8 +101,8 @@
           <AssembleAssemblyFile>0</AssembleAssemblyFile>
           <PublicsOnly>0</PublicsOnly>
           <StopOnExitCode>3</StopOnExitCode>
-          <CustomArgument></CustomArgument>
-          <IncludeLibraryModules></IncludeLibraryModules>
+          <CustomArgument />
+          <IncludeLibraryModules />
           <ComprImg>1</ComprImg>
         </CommonProperty>
         <DllOption>
@@ -134,15 +131,15 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>4096</DriverSelection>
+            <DriverSelection>4100</DriverSelection>
           </Flash1>
-          <bUseTDR>1</bUseTDR>
-          <Flash2>BIN\UL2CM3.DLL</Flash2>
+          <bUseTDR>0</bUseTDR>
+          <Flash2>Segger\JL2CM3.dll</Flash2>
           <Flash3>"" ()</Flash3>
-          <Flash4></Flash4>
-          <pFcarmOut></pFcarmOut>
-          <pFcarmGrp></pFcarmGrp>
-          <pFcArmRoot></pFcArmRoot>
+          <Flash4 />
+          <pFcarmOut />
+          <pFcarmGrp />
+          <pFcArmRoot />
           <FcArmLst>0</FcArmLst>
         </Utilities>
         <TargetArmAds>
@@ -175,7 +172,7 @@
             <RvctClst>0</RvctClst>
             <GenPPlst>0</GenPPlst>
             <AdsCpuType>"Cortex-M4"</AdsCpuType>
-            <RvctDeviceName></RvctDeviceName>
+            <RvctDeviceName />
             <mOS>0</mOS>
             <uocRom>0</uocRom>
             <uocRam>0</uocRam>
@@ -184,10 +181,7 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>2</RvdsVP>
-            <RvdsMve>0</RvdsMve>
-            <RvdsCdeCp>0</RvdsCdeCp>
-            <nBranchProt>0</nBranchProt>
-            <hadIRAM2>0</hadIRAM2>
+            <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
             <useUlib>0</useUlib>
@@ -195,7 +189,7 @@
             <uLtcg>0</uLtcg>
             <nSecure>0</nSecure>
             <RoSelD>3</RoSelD>
-            <RwSelD>3</RwSelD>
+            <RwSelD>4</RwSelD>
             <CodeSel>0</CodeSel>
             <OptFeed>0</OptFeed>
             <NoZi1>0</NoZi1>
@@ -301,16 +295,16 @@
               </OCR_RVCT8>
               <OCR_RVCT9>
                 <Type>0</Type>
-                <StartAddress>0x20002250</StartAddress>
-                <Size>0xddb0</Size>
+                <StartAddress>0x20004c00</StartAddress>
+                <Size>0xb400</Size>
               </OCR_RVCT9>
               <OCR_RVCT10>
                 <Type>0</Type>
-                <StartAddress>0x800000</StartAddress>
-                <Size>0x10000</Size>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
               </OCR_RVCT10>
             </OnChipMemories>
-            <RvctStartVector></RvctStartVector>
+            <RvctStartVector />
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
@@ -338,9 +332,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--reduce_paths</MiscControls>
-              <Define>APP_TIMER_V2_RTC1_ENABLED, NRF_LOG_BACKEND_RTT_ENABLED, __STDC_LIMIT_MACROS, RT_USING_ARMLIBC, NRF52832_XXAA, NRFX_GPIOTE_ENABLED, NRF_SD_BLE_API_VERSION_8, RT_USING_LIBC, S132, __HEAP_SIZE=8192, APP_TIMER_V2, __CLK_TCK=RT_TICK_PER_SECOND, NRF52_PAN_74, __STACK_SIZE=8192, __RTTHREAD__, NRFX_CLOCK_ENABLED, LFS_CONFIG=lfs_config.h, CONFIG_GPIO_AS_PINRESET, USE_APP_CONFIG</Define>
-              <Undefine></Undefine>
-              <IncludePath>nrf_sdk\components\libraries\timer;rt-thread\components\libc\compilers\common\extension;nrf_sdk\components\libraries\strerror;rt-thread\components\drivers\include;nrf_sdk\modules\nrfx\drivers\include;packages\CmBacktrace-v1.4.1;rt-thread\components\net\at\include;rt-thread\components\net\netdev\include;nrf_sdk\components\libraries\pwr_mgmt;rt-thread\components\drivers\include;rt-thread\components\drivers\include;rt-thread\libcpu\arm\common;rt-thread\components\drivers\include;rt-thread\components\net\sal\include\dfs_net;nrf_sdk\components\libraries\log\src;rt-thread\components\drivers\include;rt-thread\components\legacy\dfs;rt-thread\components\dfs\dfs_v1\include;packages\at_device-latest\inc;nrf_sdk\components\libraries\memobj;packages\wiznet-latest\ioLibrary\Ethernet;nrf_sdk\components\libraries\svc;rt-thread\libcpu\arm\cortex-m4;nrf_sdk\integration\nrfx\legacy;nrf_sdk\components\libraries\atomic_flags;rt-thread\components\drivers\include;rt-thread\components\drivers\spi;rt-thread\components\finsh;modules\max30102;nrf_sdk\components\softdevice\s132\headers\nrf52;rt-thread\components\libc\posix\io\poll;rt-thread\components\net\sal\include\socket;nrf_sdk\components\libraries\log;packages\wiznet-latest\ioLibrary;nrf_sdk\external\fprintf;nrf_sdk\modules\nrfx\hal;rt-thread\components\libc\posix\io\eventfd;rt-thread\include;rt-thread\components\libc\posix\io\epoll;rt-thread\components\legacy;nrf_sdk\components\libraries\experimental_section_vars;nrf_sdk\components\libraries\atomic_fifo;.;nrf_sdk\modules\nrfx\drivers;nrf_sdk\components\ble\ble_advertising;nrf_sdk\components\libraries\ringbuf;rt-thread\components\fal\inc;rt-thread\components\dfs\dfs_v1\filesystems\devfs;nrf_sdk\components\libraries\balloc;nrf_sdk\components\libraries\util;nrf_sdk\modules\nrfx;nrf_sdk\components\libraries\delay;nrf_sdk\components\libraries\atomic;nrf_sdk\modules\nrfx\mdk;nrf_sdk\components\ble\common;rt-thread\components\libc\compilers\common\include;applications;packages\gps_rmc-latest;services\mqtt-api;nrf_sdk\components\ble\nrf_ble_gatt;modules\ccm3310;packages\wiznet-latest\ioLibrary\Internet;nrf_sdk\components\softdevice\common;nrf_sdk\components\ble\nrf_ble_qwr;packages\wiznet-latest\inc;rt-thread\components\net\at\at_socket;libraries\drivers;rt-thread\components\libc\posix\ipc;rt-thread\components\net\sal\impl;packages\SEGGER_RTT-latest;packages\pahomqtt-latest\MQTTPacket\src;services\littlefs;rt-thread\components\libc\compilers\common\extension\fcntl\octal;nrf_sdk\components\libraries\sortlist;rt-thread\components\net\sal\include\socket\sys_socket;packages\SEGGER_RTT-latest\RTT;packages\pahomqtt-latest\MQTTClient-RT;rt-thread\components\drivers\include;rt-thread\components\drivers\include;rt-thread\components\drivers\include;nrf_sdk\modules\nrfx\drivers\src;nrf_sdk\modules\nrfx\soc;libraries\cmsis\include;board;nrf_sdk\components\softdevice\s132\headers;modules\ec800x;rt-thread\components\utilities\resource;rt-thread\components\net\sal\include;.\nrf_sdk\components\libraries\mutex</IncludePath>
+              <Define>NRF_LOG_BACKEND_RTT_ENABLED, __STDC_LIMIT_MACROS, RT_USING_ARMLIBC, NRF52832_XXAA, SOFTDEVICE_PRESENT, NRFX_GPIOTE_ENABLED, RT_USING_LIBC, __CLK_TCK=RT_TICK_PER_SECOND, __RTTHREAD__, NRFX_CLOCK_ENABLED, LFS_CONFIG=lfs_config.h, CONFIG_GPIO_AS_PINRESET, USE_APP_CONFIG</Define>
+              <Undefine />
+              <IncludePath>nrf_sdk\components\libraries\memobj;rt-thread\components\net\sal\include\socket;nrf_sdk\modules\nrfx\drivers;rt-thread\components\net\sal\impl;packages\SEGGER_RTT-latest;nrf_sdk\components\libraries\atomic_flags;nrf_sdk\modules\nrfx\soc;rt-thread\components\libc\compilers\common\extension;packages\pahomqtt-latest\MQTTPacket\src;packages\wiznet-latest\ioLibrary\Internet;nrf_sdk\modules\nrfx\mdk;services\littlefs;packages\wiznet-latest\ioLibrary\Ethernet;rt-thread\libcpu\arm\cortex-m4;nrf_sdk\components\libraries\strerror;rt-thread\components\libc\posix\io\poll;rt-thread\components\fal\inc;rt-thread\components\dfs\dfs_v1\filesystems\devfs;nrf_sdk\components\libraries\balloc;nrf_sdk\integration\nrfx\legacy;rt-thread\components\drivers\include;nrf_sdk\components\libraries\util;nrf_sdk\components\libraries\log;rt-thread\components\drivers\include;rt-thread\components\drivers\spi;nrf_sdk\modules\nrfx;packages\CmBacktrace-v1.4.1;rt-thread\components\libc\compilers\common\extension\fcntl\octal;rt-thread\components\net\at\include;rt-thread\components\libc\posix\ipc;rt-thread\components\net\sal\include\dfs_net;rt-thread\components\net\netdev\include;rt-thread\components\finsh;modules\max30102;rt-thread\components\net\sal\include\socket\sys_socket;nrf_sdk\components\libraries\delay;nrf_sdk\components\libraries\atomic;packages\SEGGER_RTT-latest\RTT;nrf_sdk\components\softdevice\common;nrf_sdk\components\softdevice\s132\headers\nrf52;libraries\drivers;nrf_sdk\components\libraries\log\src;nrf_sdk\components\ble\common;packages\pahomqtt-latest\MQTTClient-RT;rt-thread\components\libc\compilers\common\include;rt-thread\components\drivers\include;packages\wiznet-latest\inc;rt-thread\components\drivers\include;rt-thread\components\drivers\include;nrf_sdk\components\ble\ble_advertising;rt-thread\components\utilities\resource;applications;rt-thread\libcpu\arm\common;rt-thread\components\drivers\include;libraries\cmsis\include;nrf_sdk\modules\nrfx\drivers\src;packages\wiznet-latest\ioLibrary;packages\gps_rmc-latest;rt-thread\components\drivers\include;rt-thread\components\drivers\include;rt-thread\components\libc\posix\io\epoll;rt-thread\components\drivers\include;services\mqtt-api;rt-thread\components\legacy\dfs;board;nrf_sdk\components\ble\nrf_ble_gatt;nrf_sdk\modules\nrfx\hal;rt-thread\components\dfs\dfs_v1\include;modules\ccm3310;rt-thread\include;nrf_sdk\components\softdevice\s132\headers;rt-thread\components\legacy;nrf_sdk\components\libraries\experimental_section_vars;modules\ec800x;nrf_sdk\components\ble\nrf_ble_qwr;nrf_sdk\external\fprintf;rt-thread\components\net\at\at_socket;.;rt-thread\components\libc\posix\io\eventfd;packages\at_device-latest\inc;nrf_sdk\components\libraries\ringbuf;nrf_sdk\modules\nrfx\drivers\include;rt-thread\components\net\sal\include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -353,12 +347,12 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
-            <ClangAsOpt>4</ClangAsOpt>
+            <uClangAs>0</uClangAs>
             <VariousControls>
-              <MiscControls>--cpreproc_opts=-DBLE_STACK_SUPPORT_REQD,-DNRF_SD_BLE_API_VERSION=4,-DS132,-DSOFTDEVICE_PRESENT,-DSWI_DISABLE0,-DCONFIG_GPIO_AS_PINRESET,-DNRF52,-DNRF52832_XXAA,-DNRF52_PAN_12,-DNRF52_PAN_15,-DNRF52_PAN_20,-DNRF52_PAN_31,-DNRF52_PAN_36,-DNRF52_PAN_51,-DNRF52_PAN_54,-DNRF52_PAN_55,-DNRF52_PAN_58,-DNRF52_PAN_64,-DNRF52_PAN_74</MiscControls>
-              <Define></Define>
-              <Undefine></Undefine>
-              <IncludePath></IncludePath>
+              <MiscControls />
+              <Define />
+              <Undefine />
+              <IncludePath />
             </VariousControls>
           </Aads>
           <LDads>
@@ -370,13 +364,13 @@
             <useFile>0</useFile>
             <TextAddressRange>0x00000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
-            <pXoBase></pXoBase>
-            <ScatterFile></ScatterFile>
-            <IncludeLibs></IncludeLibs>
-            <IncludeLibsPath></IncludeLibsPath>
-            <Misc></Misc>
-            <LinkerInputFile></LinkerInputFile>
-            <DisabledWarnings></DisabledWarnings>
+            <pXoBase />
+            <ScatterFile />
+            <IncludeLibs />
+            <IncludeLibsPath />
+            <Misc />
+            <LinkerInputFile />
+            <DisabledWarnings />
           </LDads>
         </TargetArmAds>
       </TargetOption>
@@ -389,6 +383,8 @@
               <FileType>1</FileType>
               <FilePath>applications\main.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>mnt.c</FileName>
               <FileType>1</FileType>
@@ -400,24 +396,30 @@
           <GroupName>AT</GroupName>
           <Files>
             <File>
-              <FileName>at_cli.c</FileName>
+              <FileName>at_socket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>rt-thread\components\net\at\src\at_cli.c</FilePath>
+              <FilePath>rt-thread\components\net\at\at_socket\at_socket.c</FilePath>
             </File>
-            <File>
-              <FileName>at_client.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>rt-thread\components\net\at\src\at_client.c</FilePath>
-            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>at_utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\net\at\src\at_utils.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
-              <FileName>at_socket.c</FileName>
+              <FileName>at_cli.c</FileName>
               <FileType>1</FileType>
-              <FilePath>rt-thread\components\net\at\at_socket\at_socket.c</FilePath>
+              <FilePath>rt-thread\components\net\at\src\at_cli.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>at_client.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>rt-thread\components\net\at\src\at_client.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -435,85 +437,44 @@
           <GroupName>ccm3310</GroupName>
           <Files>
             <File>
-              <FileName>ccm3310_test.c</FileName>
+              <FileName>crc32.c</FileName>
               <FileType>1</FileType>
-              <FilePath>modules\ccm3310\ccm3310_test.c</FilePath>
+              <FilePath>modules\ccm3310\crc32.c</FilePath>
             </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>decode.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>modules\ccm3310\decode.c</FilePath>
+            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>ccm3310.c</FileName>
               <FileType>1</FileType>
               <FilePath>modules\ccm3310\ccm3310.c</FilePath>
             </File>
-            <File>
-              <FileName>crc32.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>modules\ccm3310\crc32.c</FilePath>
-            </File>
-            <File>
-              <FileName>ccm3310_nrf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>modules\ccm3310\ccm3310_nrf.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <uGnu>2</uGnu>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
-            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>ccm3310_sm4.c</FileName>
               <FileType>1</FileType>
               <FilePath>modules\ccm3310\ccm3310_sm4.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
-              <FileName>decode.c</FileName>
+              <FileName>ccm3310_test.c</FileName>
               <FileType>1</FileType>
-              <FilePath>modules\ccm3310\decode.c</FilePath>
+              <FilePath>modules\ccm3310\ccm3310_test.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>ccm3310_nrf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>modules\ccm3310\ccm3310_nrf.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -525,15 +486,19 @@
               <FileType>1</FileType>
               <FilePath>packages\CmBacktrace-v1.4.1\cmb_flash_log.c</FilePath>
             </File>
-            <File>
-              <FileName>cmb_port.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\CmBacktrace-v1.4.1\cmb_port.c</FilePath>
-            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>cm_backtrace.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\CmBacktrace-v1.4.1\cm_backtrace.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>cmb_port.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\CmBacktrace-v1.4.1\cmb_port.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -545,36 +510,50 @@
               <FileType>1</FileType>
               <FilePath>rt-thread\components\libc\compilers\armlibc\syscall_mem.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>syscalls.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\libc\compilers\armlibc\syscalls.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>cctype.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\libc\compilers\common\cctype.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>cstdlib.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\libc\compilers\common\cstdlib.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>cstring.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\libc\compilers\common\cstring.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>ctime.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\libc\compilers\common\ctime.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>cunistd.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\libc\compilers\common\cunistd.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>cwchar.c</FileName>
               <FileType>1</FileType>
@@ -590,16 +569,22 @@
               <FileType>1</FileType>
               <FilePath>rt-thread\libcpu\arm\common\div0.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>showmem.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\libcpu\arm\common\showmem.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>context_rvds.S</FileName>
               <FileType>2</FileType>
               <FilePath>rt-thread\libcpu\arm\cortex-m4\context_rvds.S</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>cpuport.c</FileName>
               <FileType>1</FileType>
@@ -615,96 +600,134 @@
               <FileType>1</FileType>
               <FilePath>rt-thread\components\drivers\core\device.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>hwtimer.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\drivers\hwtimer\hwtimer.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>i2c-bit-ops.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\drivers\i2c\i2c-bit-ops.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>i2c_core.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\drivers\i2c\i2c_core.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>i2c_dev.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\drivers\i2c\i2c_dev.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>completion.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\drivers\ipc\completion.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>dataqueue.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\drivers\ipc\dataqueue.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>pipe.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\drivers\ipc\pipe.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>ringblk_buf.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\drivers\ipc\ringblk_buf.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>ringbuffer.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\drivers\ipc\ringbuffer.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>waitqueue.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\drivers\ipc\waitqueue.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>workqueue.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\drivers\ipc\workqueue.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>pin.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\drivers\misc\pin.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>mtd_nor.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\drivers\mtd\mtd_nor.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>rtc.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\drivers\rtc\rtc.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>sensor.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\drivers\sensor\v1\sensor.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>sensor_cmd.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\drivers\sensor\v1\sensor_cmd.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>serial.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\drivers\serial\serial.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>spi_core.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\drivers\spi\spi_core.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>spi_dev.c</FileName>
               <FileType>1</FileType>
@@ -720,41 +743,57 @@
               <FileType>1</FileType>
               <FilePath>board\board.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>board_sdk_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>board\sdk_config.h</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>drv_flash.c</FileName>
               <FileType>1</FileType>
               <FilePath>libraries\drivers\drv_flash.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>drv_gpio.c</FileName>
               <FileType>1</FileType>
               <FilePath>libraries\drivers\drv_gpio.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>drv_hwtimer.c</FileName>
               <FileType>1</FileType>
               <FilePath>libraries\drivers\drv_hwtimer.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>drv_i2c.c</FileName>
               <FileType>1</FileType>
               <FilePath>libraries\drivers\drv_i2c.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>drv_rtc.c</FileName>
               <FileType>1</FileType>
               <FilePath>libraries\drivers\drv_rtc.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>drv_spi.c</FileName>
               <FileType>1</FileType>
               <FilePath>libraries\drivers\drv_spi.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>drv_uarte.c</FileName>
               <FileType>1</FileType>
@@ -764,86 +803,21 @@
         </Group>
         <Group>
           <GroupName>ec800x</GroupName>
-          <GroupOption>
-            <CommonProperty>
-              <UseCPPCompiler>0</UseCPPCompiler>
-              <RVCTCodeConst>0</RVCTCodeConst>
-              <RVCTZI>0</RVCTZI>
-              <RVCTOtherData>0</RVCTOtherData>
-              <ModuleSelection>0</ModuleSelection>
-              <IncludeInBuild>0</IncludeInBuild>
-              <AlwaysBuild>2</AlwaysBuild>
-              <GenerateAssemblyFile>2</GenerateAssemblyFile>
-              <AssembleAssemblyFile>2</AssembleAssemblyFile>
-              <PublicsOnly>2</PublicsOnly>
-              <StopOnExitCode>11</StopOnExitCode>
-              <CustomArgument></CustomArgument>
-              <IncludeLibraryModules></IncludeLibraryModules>
-              <ComprImg>1</ComprImg>
-            </CommonProperty>
-            <GroupArmAds>
-              <Cads>
-                <interw>2</interw>
-                <Optim>0</Optim>
-                <oTime>2</oTime>
-                <SplitLS>2</SplitLS>
-                <OneElfS>2</OneElfS>
-                <Strict>2</Strict>
-                <EnumInt>2</EnumInt>
-                <PlainCh>2</PlainCh>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <wLevel>0</wLevel>
-                <uThumb>2</uThumb>
-                <uSurpInc>2</uSurpInc>
-                <uC99>2</uC99>
-                <uGnu>2</uGnu>
-                <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
-                <vShortEn>2</vShortEn>
-                <vShortWch>2</vShortWch>
-                <v6Lto>2</v6Lto>
-                <v6WtE>2</v6WtE>
-                <v6Rtti>2</v6Rtti>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Cads>
-              <Aads>
-                <interw>2</interw>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <thumb>2</thumb>
-                <SplitLS>2</SplitLS>
-                <SwStkChk>2</SwStkChk>
-                <NoWarn>2</NoWarn>
-                <uSurpInc>2</uSurpInc>
-                <useXO>2</useXO>
-                <ClangAsOpt>0</ClangAsOpt>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Aads>
-            </GroupArmAds>
-          </GroupOption>
           <Files>
             <File>
               <FileName>at_device_ec800x.c</FileName>
               <FileType>1</FileType>
               <FilePath>modules\ec800x\at_device_ec800x.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>at_socket_ec800x.c</FileName>
               <FileType>1</FileType>
               <FilePath>modules\ec800x\at_socket_ec800x.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>at_instance_ec800x.c</FileName>
               <FileType>1</FileType>
@@ -859,20 +833,26 @@
               <FileType>1</FileType>
               <FilePath>rt-thread\components\fal\src\fal_flash.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>fal_rtt.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\fal\src\fal_rtt.c</FilePath>
             </File>
-            <File>
-              <FileName>fal_partition.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>rt-thread\components\fal\src\fal_partition.c</FilePath>
-            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>fal.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\fal\src\fal.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>fal_partition.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>rt-thread\components\fal\src\fal_partition.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -884,21 +864,29 @@
               <FileType>1</FileType>
               <FilePath>rt-thread\components\dfs\dfs_v1\filesystems\devfs\devfs.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>dfs.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\dfs\dfs_v1\src\dfs.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>dfs_file.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\dfs\dfs_v1\src\dfs_file.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>dfs_fs.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\dfs\dfs_v1\src\dfs_fs.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>dfs_posix.c</FileName>
               <FileType>1</FileType>
@@ -914,21 +902,29 @@
               <FileType>1</FileType>
               <FilePath>rt-thread\components\finsh\shell.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>msh.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\finsh\msh.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>msh_parse.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\finsh\msh_parse.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>cmd.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\finsh\cmd.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>msh_file.c</FileName>
               <FileType>1</FileType>
@@ -954,56 +950,78 @@
               <FileType>1</FileType>
               <FilePath>rt-thread\src\clock.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>components.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\src\components.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>idle.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\src\idle.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>ipc.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\src\ipc.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>irq.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\src\irq.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>kservice.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\src\kservice.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>mem.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\src\mem.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>mempool.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\src\mempool.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>object.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\src\object.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>scheduler_up.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\src\scheduler_up.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>thread.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\src\thread.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>timer.c</FileName>
               <FileType>1</FileType>
@@ -1025,20 +1043,26 @@
           <GroupName>littlefs</GroupName>
           <Files>
             <File>
+              <FileName>lfs_util.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>services\littlefs\lfs_util.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
               <FileName>dfs_lfs.c</FileName>
               <FileType>1</FileType>
               <FilePath>services\littlefs\dfs_lfs.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>lfs.c</FileName>
               <FileType>1</FileType>
               <FilePath>services\littlefs\lfs.c</FilePath>
             </File>
-            <File>
-              <FileName>lfs_util.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>services\littlefs\lfs_util.c</FilePath>
-            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>lfs_crc.c</FileName>
               <FileType>1</FileType>
@@ -1048,95 +1072,32 @@
         </Group>
         <Group>
           <GroupName>max30102</GroupName>
-          <GroupOption>
-            <CommonProperty>
-              <UseCPPCompiler>0</UseCPPCompiler>
-              <RVCTCodeConst>0</RVCTCodeConst>
-              <RVCTZI>0</RVCTZI>
-              <RVCTOtherData>0</RVCTOtherData>
-              <ModuleSelection>0</ModuleSelection>
-              <IncludeInBuild>0</IncludeInBuild>
-              <AlwaysBuild>2</AlwaysBuild>
-              <GenerateAssemblyFile>2</GenerateAssemblyFile>
-              <AssembleAssemblyFile>2</AssembleAssemblyFile>
-              <PublicsOnly>2</PublicsOnly>
-              <StopOnExitCode>11</StopOnExitCode>
-              <CustomArgument></CustomArgument>
-              <IncludeLibraryModules></IncludeLibraryModules>
-              <ComprImg>1</ComprImg>
-            </CommonProperty>
-            <GroupArmAds>
-              <Cads>
-                <interw>2</interw>
-                <Optim>0</Optim>
-                <oTime>2</oTime>
-                <SplitLS>2</SplitLS>
-                <OneElfS>2</OneElfS>
-                <Strict>2</Strict>
-                <EnumInt>2</EnumInt>
-                <PlainCh>2</PlainCh>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <wLevel>0</wLevel>
-                <uThumb>2</uThumb>
-                <uSurpInc>2</uSurpInc>
-                <uC99>2</uC99>
-                <uGnu>2</uGnu>
-                <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
-                <vShortEn>2</vShortEn>
-                <vShortWch>2</vShortWch>
-                <v6Lto>2</v6Lto>
-                <v6WtE>2</v6WtE>
-                <v6Rtti>2</v6Rtti>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Cads>
-              <Aads>
-                <interw>2</interw>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <thumb>2</thumb>
-                <SplitLS>2</SplitLS>
-                <SwStkChk>2</SwStkChk>
-                <NoWarn>2</NoWarn>
-                <uSurpInc>2</uSurpInc>
-                <useXO>2</useXO>
-                <ClangAsOpt>0</ClangAsOpt>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Aads>
-            </GroupArmAds>
-          </GroupOption>
           <Files>
             <File>
               <FileName>blood.c</FileName>
               <FileType>1</FileType>
               <FilePath>modules\max30102\blood.c</FilePath>
             </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>port.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>modules\max30102\port.c</FilePath>
+            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>max30102.c</FileName>
               <FileType>1</FileType>
               <FilePath>modules\max30102\max30102.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>algorithm.c</FileName>
               <FileType>1</FileType>
               <FilePath>modules\max30102\algorithm.c</FilePath>
-            </File>
-            <File>
-              <FileName>port.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>modules\max30102\port.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1144,119 +1105,71 @@
           <GroupName>mqtt-app</GroupName>
           <Files>
             <File>
-              <FileName>mqtt_sample.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>services\mqtt-api\mqtt_sample.c</FilePath>
-            </File>
-            <File>
               <FileName>mqtt_test.c</FileName>
               <FileType>1</FileType>
               <FilePath>services\mqtt-api\mqtt_test.c</FilePath>
             </File>
           </Files>
+          <Files>
+            <File>
+              <FileName>mqtt_sample.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>services\mqtt-api\mqtt_sample.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>nrf_ble</GroupName>
-          <GroupOption>
-            <CommonProperty>
-              <UseCPPCompiler>0</UseCPPCompiler>
-              <RVCTCodeConst>0</RVCTCodeConst>
-              <RVCTZI>0</RVCTZI>
-              <RVCTOtherData>0</RVCTOtherData>
-              <ModuleSelection>0</ModuleSelection>
-              <IncludeInBuild>0</IncludeInBuild>
-              <AlwaysBuild>2</AlwaysBuild>
-              <GenerateAssemblyFile>2</GenerateAssemblyFile>
-              <AssembleAssemblyFile>2</AssembleAssemblyFile>
-              <PublicsOnly>2</PublicsOnly>
-              <StopOnExitCode>11</StopOnExitCode>
-              <CustomArgument></CustomArgument>
-              <IncludeLibraryModules></IncludeLibraryModules>
-              <ComprImg>1</ComprImg>
-            </CommonProperty>
-            <GroupArmAds>
-              <Cads>
-                <interw>2</interw>
-                <Optim>0</Optim>
-                <oTime>2</oTime>
-                <SplitLS>2</SplitLS>
-                <OneElfS>2</OneElfS>
-                <Strict>2</Strict>
-                <EnumInt>2</EnumInt>
-                <PlainCh>2</PlainCh>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <wLevel>0</wLevel>
-                <uThumb>2</uThumb>
-                <uSurpInc>2</uSurpInc>
-                <uC99>2</uC99>
-                <uGnu>2</uGnu>
-                <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
-                <vShortEn>2</vShortEn>
-                <vShortWch>2</vShortWch>
-                <v6Lto>2</v6Lto>
-                <v6WtE>2</v6WtE>
-                <v6Rtti>2</v6Rtti>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Cads>
-              <Aads>
-                <interw>2</interw>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <thumb>2</thumb>
-                <SplitLS>2</SplitLS>
-                <SwStkChk>2</SwStkChk>
-                <NoWarn>2</NoWarn>
-                <uSurpInc>2</uSurpInc>
-                <useXO>2</useXO>
-                <ClangAsOpt>0</ClangAsOpt>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Aads>
-            </GroupArmAds>
-          </GroupOption>
+          <Files>
+            <File>
+              <FileName>ble_conn_params.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\components\ble\common\ble_conn_params.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrf_ble_qwr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\components\ble\nrf_ble_qwr\nrf_ble_qwr.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>ble_conn_params_rtt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\rtthread_adapter\ble_conn_params_rtt.c</FilePath>
+            </File>
+          </Files>
           <Files>
             <File>
               <FileName>ble_srv_common.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\components\ble\common\ble_srv_common.c</FilePath>
             </File>
-            <File>
-              <FileName>nrf_ble_qwr.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\ble\nrf_ble_qwr\nrf_ble_qwr.c</FilePath>
-            </File>
-            <File>
-              <FileName>ble_conn_params.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\ble\common\ble_conn_params.c</FilePath>
-            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>nrf_ble_gatt.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\components\ble\nrf_ble_gatt\nrf_ble_gatt.c</FilePath>
             </File>
-            <File>
-              <FileName>ble_conn_state.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\ble\common\ble_conn_state.c</FilePath>
-            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>ble_advdata.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\components\ble\common\ble_advdata.c</FilePath>
             </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>ble_conn_state.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\components\ble\common\ble_conn_state.c</FilePath>
+            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>ble_advertising.c</FileName>
               <FileType>1</FileType>
@@ -1268,179 +1181,247 @@
           <GroupName>nrf_hal</GroupName>
           <Files>
             <File>
-              <FileName>nrfx_uarte.c</FileName>
+              <FileName>nrfx_systick.c</FileName>
               <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_uarte.c</FilePath>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_systick.c</FilePath>
             </File>
-            <File>
-              <FileName>nrfx_rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_rtc.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrfx_nfct.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_nfct.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrfx_twi_twim.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_twi_twim.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrfx_qdec.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_qdec.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrfx_uart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_uart.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrfx_dppi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_dppi.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrfx_spis.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_spis.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrfx_adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_adc.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrfx_qspi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_qspi.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrfx_comp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_comp.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrfx_twi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_twi.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrfx_saadc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_saadc.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrfx_timer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_timer.c</FilePath>
-            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>nrfx_usbd.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_usbd.c</FilePath>
             </File>
-            <File>
-              <FileName>nrfx_clock.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_clock.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrfx_pwm.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_pwm.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrfx_swi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_swi.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrfx_spim.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_spim.c</FilePath>
-            </File>
-            <File>
-              <FileName>system_nrf52.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\mdk\system_nrf52.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrfx_twis.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_twis.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrfx_spi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_spi.c</FilePath>
-            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>nrfx_temp.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_temp.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
-              <FileName>nrfx_pdm.c</FileName>
+              <FileName>nrfx_saadc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_pdm.c</FilePath>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_saadc.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
-              <FileName>nrfx_nvmc.c</FileName>
+              <FileName>nrfx_twi_twim.c</FileName>
               <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_nvmc.c</FilePath>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_twi_twim.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
-              <FileName>nrfx_twim.c</FileName>
+              <FileName>nrfx_dppi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_twim.c</FilePath>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_dppi.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
-              <FileName>nrfx_power.c</FileName>
+              <FileName>nrfx_twi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_power.c</FilePath>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_twi.c</FilePath>
             </File>
-            <File>
-              <FileName>nrfx_i2s.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_i2s.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrfx_lpcomp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_lpcomp.c</FilePath>
-            </File>
-            <File>
-              <FileName>arm_startup_nrf52.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\mdk\arm_startup_nrf52.s</FilePath>
-            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>nrfx_gpiote.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_gpiote.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
-              <FileName>nrfx_systick.c</FileName>
+              <FileName>nrfx_power.c</FileName>
               <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_systick.c</FilePath>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_power.c</FilePath>
             </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_spi.c</FilePath>
+            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>nrfx_wdt.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_wdt.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>nrfx_ppi.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_ppi.c</FilePath>
             </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_pwm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_pwm.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_spis.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_spis.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_comp.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_qdec.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_qdec.c</FilePath>
+            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>nrfx_rng.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_rng.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_uarte.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_uarte.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_rtc.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_twis.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_twis.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_nvmc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_nvmc.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_qspi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_qspi.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>system_nrf52.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\mdk\system_nrf52.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_lpcomp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_lpcomp.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_pdm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_pdm.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_spim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_spim.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_clock.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_clock.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_twim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_twim.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_i2s.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_i2s.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_adc.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_timer.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>arm_startup_nrf52.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\mdk\arm_startup_nrf52.s</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_uart.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_nfct.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_nfct.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_swi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_swi.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1452,263 +1433,89 @@
               <FileType>1</FileType>
               <FilePath>nrf_sdk\components\libraries\balloc\nrf_balloc.c</FilePath>
             </File>
-            <File>
-              <FileName>nrf_svc_handler.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\libraries\svc\nrf_svc_handler.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <uGnu>2</uGnu>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
-            </File>
-            <File>
-              <FileName>nrf_sortlist.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\libraries\sortlist\nrf_sortlist.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrf_ringbuf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\libraries\ringbuf\nrf_ringbuf.c</FilePath>
-            </File>
-            <File>
-              <FileName>hci_mem_pool.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\libraries\hci\hci_mem_pool.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrf_section_iter.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\libraries\experimental_section_vars\nrf_section_iter.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrf_fprintf_format.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\external\fprintf\nrf_fprintf_format.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_util_platform.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\libraries\util\app_util_platform.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrf_atomic.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\libraries\atomic\nrf_atomic.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_error.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\libraries\util\app_error.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_error_handler_keil.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\libraries\util\app_error_handler_keil.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrf_pwr_mgmt.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\libraries\pwr_mgmt\nrf_pwr_mgmt.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>1</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <uGnu>2</uGnu>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
-            </File>
-            <File>
-              <FileName>nrf_strerror.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\libraries\strerror\nrf_strerror.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_timer2.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\libraries\timer\app_timer2.c</FilePath>
-            </File>
-            <File>
-              <FileName>hci_slip.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\libraries\hci\hci_slip.c</FilePath>
-            </File>
-            <File>
-              <FileName>hci_transport.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\libraries\hci\hci_transport.c</FilePath>
-            </File>
-            <File>
-              <FileName>nrf_atfifo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\libraries\atomic_fifo\nrf_atfifo.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>1</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <uGnu>2</uGnu>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
-            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>app_error_weak.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\components\libraries\util\app_error_weak.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>nrf_memobj.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\components\libraries\memobj\nrf_memobj.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
-              <FileName>timer_drv_rtc.c</FileName>
+              <FileName>app_util_platform.c</FileName>
               <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\libraries\timer\drv_rtc.c</FilePath>
+              <FilePath>nrf_sdk\components\libraries\util\app_util_platform.c</FilePath>
             </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrf_atomic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\components\libraries\atomic\nrf_atomic.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrf_fprintf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\external\fprintf\nrf_fprintf.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>app_error_handler_keil.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\components\libraries\util\app_error_handler_keil.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrf_fprintf_format.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\external\fprintf\nrf_fprintf_format.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrf_ringbuf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\components\libraries\ringbuf\nrf_ringbuf.c</FilePath>
+            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>nrf_atflags.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\components\libraries\atomic_flags\nrf_atflags.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
-              <FileName>nrf_fprintf.c</FileName>
+              <FileName>nrf_strerror.c</FileName>
               <FileType>1</FileType>
-              <FilePath>nrf_sdk\external\fprintf\nrf_fprintf.c</FilePath>
+              <FilePath>nrf_sdk\components\libraries\strerror\nrf_strerror.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>app_error.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\components\libraries\util\app_error.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrf_section_iter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\components\libraries\experimental_section_vars\nrf_section_iter.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1720,110 +1527,53 @@
               <FileType>1</FileType>
               <FilePath>nrf_sdk\components\libraries\log\src\nrf_log_backend_serial.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>nrf_log_backend_rtt.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\components\libraries\log\src\nrf_log_backend_rtt.c</FilePath>
             </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrf_log_default_backends.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\components\libraries\log\src\nrf_log_default_backends.c</FilePath>
+            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>nrf_log_frontend.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\components\libraries\log\src\nrf_log_frontend.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>nrf_log_str_formatter.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\components\libraries\log\src\nrf_log_str_formatter.c</FilePath>
             </File>
-            <File>
-              <FileName>nrf_log_default_backends.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\nrf_sdk\components\libraries\log\src\nrf_log_default_backends.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>nrf_softdev</GroupName>
-          <GroupOption>
-            <CommonProperty>
-              <UseCPPCompiler>0</UseCPPCompiler>
-              <RVCTCodeConst>0</RVCTCodeConst>
-              <RVCTZI>0</RVCTZI>
-              <RVCTOtherData>0</RVCTOtherData>
-              <ModuleSelection>0</ModuleSelection>
-              <IncludeInBuild>0</IncludeInBuild>
-              <AlwaysBuild>2</AlwaysBuild>
-              <GenerateAssemblyFile>2</GenerateAssemblyFile>
-              <AssembleAssemblyFile>2</AssembleAssemblyFile>
-              <PublicsOnly>2</PublicsOnly>
-              <StopOnExitCode>11</StopOnExitCode>
-              <CustomArgument></CustomArgument>
-              <IncludeLibraryModules></IncludeLibraryModules>
-              <ComprImg>1</ComprImg>
-            </CommonProperty>
-            <GroupArmAds>
-              <Cads>
-                <interw>2</interw>
-                <Optim>0</Optim>
-                <oTime>2</oTime>
-                <SplitLS>2</SplitLS>
-                <OneElfS>2</OneElfS>
-                <Strict>2</Strict>
-                <EnumInt>2</EnumInt>
-                <PlainCh>2</PlainCh>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <wLevel>0</wLevel>
-                <uThumb>2</uThumb>
-                <uSurpInc>2</uSurpInc>
-                <uC99>2</uC99>
-                <uGnu>2</uGnu>
-                <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
-                <vShortEn>2</vShortEn>
-                <vShortWch>2</vShortWch>
-                <v6Lto>2</v6Lto>
-                <v6WtE>2</v6WtE>
-                <v6Rtti>2</v6Rtti>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Cads>
-              <Aads>
-                <interw>2</interw>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <thumb>2</thumb>
-                <SplitLS>2</SplitLS>
-                <SwStkChk>2</SwStkChk>
-                <NoWarn>2</NoWarn>
-                <uSurpInc>2</uSurpInc>
-                <useXO>2</useXO>
-                <ClangAsOpt>0</ClangAsOpt>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Aads>
-            </GroupArmAds>
-          </GroupOption>
           <Files>
             <File>
               <FileName>nrf_sdh.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\components\softdevice\common\nrf_sdh.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>nrf_sdh_soc.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\components\softdevice\common\nrf_sdh_soc.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>nrf_sdh_ble.c</FileName>
               <FileType>1</FileType>
@@ -1839,55 +1589,75 @@
               <FileType>1</FileType>
               <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTPacket.c</FilePath>
             </File>
-            <File>
-              <FileName>MQTTConnectClient.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTConnectClient.c</FilePath>
-            </File>
-            <File>
-              <FileName>MQTTUnsubscribeClient.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTUnsubscribeClient.c</FilePath>
-            </File>
-            <File>
-              <FileName>MQTTSerializePublish.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTSerializePublish.c</FilePath>
-            </File>
-            <File>
-              <FileName>paho_mqtt_pipe.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\pahomqtt-latest\MQTTClient-RT\paho_mqtt_pipe.c</FilePath>
-            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>MQTTSubscribeServer.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTSubscribeServer.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
-              <FileName>MQTTSubscribeClient.c</FileName>
+              <FileName>MQTTConnectClient.c</FileName>
               <FileType>1</FileType>
-              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTSubscribeClient.c</FilePath>
+              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTConnectClient.c</FilePath>
             </File>
-            <File>
-              <FileName>MQTTDeserializePublish.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTDeserializePublish.c</FilePath>
-            </File>
-            <File>
-              <FileName>MQTTConnectServer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTConnectServer.c</FilePath>
-            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>MQTTFormat.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTFormat.c</FilePath>
             </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>paho_mqtt_pipe.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\pahomqtt-latest\MQTTClient-RT\paho_mqtt_pipe.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>MQTTDeserializePublish.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTDeserializePublish.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>MQTTUnsubscribeClient.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTUnsubscribeClient.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>MQTTSerializePublish.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTSerializePublish.c</FilePath>
+            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>MQTTUnsubscribeServer.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTUnsubscribeServer.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>MQTTSubscribeClient.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTSubscribeClient.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>MQTTConnectServer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTConnectServer.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1899,6 +1669,8 @@
               <FileType>1</FileType>
               <FilePath>rt-thread\components\libc\posix\io\poll\poll.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>select.c</FileName>
               <FileType>1</FileType>
@@ -1914,31 +1686,43 @@
               <FileType>1</FileType>
               <FilePath>rt-thread\components\net\netdev\src\netdev.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>netdev_ipaddr.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\net\netdev\src\netdev_ipaddr.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>dfs_net.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\net\sal\dfs_net\dfs_net.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>af_inet_at.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\net\sal\impl\af_inet_at.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>net_netdb.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\net\sal\socket\net_netdb.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>net_sockets.c</FileName>
               <FileType>1</FileType>
               <FilePath>rt-thread\components\net\sal\socket\net_sockets.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>sal_socket.c</FileName>
               <FileType>1</FileType>
@@ -1954,11 +1738,15 @@
               <FileType>1</FileType>
               <FilePath>packages\SEGGER_RTT-latest\adapter\drv_rtt.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>SEGGER_RTT.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\SEGGER_RTT-latest\RTT\SEGGER_RTT.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>SEGGER_RTT_printf.c</FileName>
               <FileType>1</FileType>
@@ -1978,121 +1766,70 @@
         </Group>
         <Group>
           <GroupName>WIZnet</GroupName>
-          <GroupOption>
-            <CommonProperty>
-              <UseCPPCompiler>0</UseCPPCompiler>
-              <RVCTCodeConst>0</RVCTCodeConst>
-              <RVCTZI>0</RVCTZI>
-              <RVCTOtherData>0</RVCTOtherData>
-              <ModuleSelection>0</ModuleSelection>
-              <IncludeInBuild>0</IncludeInBuild>
-              <AlwaysBuild>2</AlwaysBuild>
-              <GenerateAssemblyFile>2</GenerateAssemblyFile>
-              <AssembleAssemblyFile>2</AssembleAssemblyFile>
-              <PublicsOnly>2</PublicsOnly>
-              <StopOnExitCode>11</StopOnExitCode>
-              <CustomArgument></CustomArgument>
-              <IncludeLibraryModules></IncludeLibraryModules>
-              <ComprImg>1</ComprImg>
-            </CommonProperty>
-            <GroupArmAds>
-              <Cads>
-                <interw>2</interw>
-                <Optim>0</Optim>
-                <oTime>2</oTime>
-                <SplitLS>2</SplitLS>
-                <OneElfS>2</OneElfS>
-                <Strict>2</Strict>
-                <EnumInt>2</EnumInt>
-                <PlainCh>2</PlainCh>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <wLevel>0</wLevel>
-                <uThumb>2</uThumb>
-                <uSurpInc>2</uSurpInc>
-                <uC99>2</uC99>
-                <uGnu>2</uGnu>
-                <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
-                <vShortEn>2</vShortEn>
-                <vShortWch>2</vShortWch>
-                <v6Lto>2</v6Lto>
-                <v6WtE>2</v6WtE>
-                <v6Rtti>2</v6Rtti>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Cads>
-              <Aads>
-                <interw>2</interw>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <thumb>2</thumb>
-                <SplitLS>2</SplitLS>
-                <SwStkChk>2</SwStkChk>
-                <NoWarn>2</NoWarn>
-                <uSurpInc>2</uSurpInc>
-                <useXO>2</useXO>
-                <ClangAsOpt>0</ClangAsOpt>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Aads>
-            </GroupArmAds>
-          </GroupOption>
           <Files>
             <File>
               <FileName>wiz.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\wiznet-latest\src\wiz.c</FilePath>
             </File>
-            <File>
-              <FileName>wizchip_dhcp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\wiznet-latest\ioLibrary\Internet\DHCP\wizchip_dhcp.c</FilePath>
-            </File>
-            <File>
-              <FileName>wiz_ping.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\wiznet-latest\src\wiz_ping.c</FilePath>
-            </File>
-            <File>
-              <FileName>wizchip_dns.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\wiznet-latest\ioLibrary\Internet\DNS\wizchip_dns.c</FilePath>
-            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>wizchip_socket.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\wiznet-latest\ioLibrary\Ethernet\wizchip_socket.c</FilePath>
             </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>wiz_ping.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\wiznet-latest\src\wiz_ping.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>wizchip_dhcp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\wiznet-latest\ioLibrary\Internet\DHCP\wizchip_dhcp.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>wizchip_dns.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\wiznet-latest\ioLibrary\Internet\DNS\wizchip_dns.c</FilePath>
+            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>wizchip_conf.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\wiznet-latest\ioLibrary\Ethernet\wizchip_conf.c</FilePath>
             </File>
-            <File>
-              <FileName>w5500.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\wiznet-latest\ioLibrary\Ethernet\W5500\w5500.c</FilePath>
-            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>wiz_device.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\wiznet-latest\src\wiz_device.c</FilePath>
             </File>
+          </Files>
+          <Files>
             <File>
               <FileName>wiz_af_inet.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\wiznet-latest\src\wiz_af_inet.c</FilePath>
             </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>w5500.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\wiznet-latest\ioLibrary\Ethernet\W5500\w5500.c</FilePath>
+            </File>
+          </Files>
+          <Files>
             <File>
               <FileName>wiz_socket.c</FileName>
               <FileType>1</FileType>
@@ -2102,12 +1839,382 @@
         </Group>
       </Groups>
     </Target>
+    <Target>
+      <TargetName>softdevice</TargetName>
+      <ToolsetNumber>0x4</ToolsetNumber>
+      <ToolsetName>ARM-ADS</ToolsetName>
+      <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
+      <uAC6>0</uAC6>
+      <TargetOption>
+        <TargetCommonOption>
+          <Device>nRF52832_xxAA</Device>
+          <Vendor>Nordic Semiconductor</Vendor>
+          <PackID>NordicSemiconductor.nRF_DeviceFamilyPack.8.32.1</PackID>
+          <PackURL>http://developer.nordicsemi.com/nRF5_SDK/pieces/nRF_DeviceFamilyPack/</PackURL>
+          <Cpu>IRAM(0x20000000,0x40000) IROM(0x00000000,0x100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
+          <FlashUtilSpec />
+          <StartupFile />
+          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC4000 -FN2 -FF0nrf52xxx -FS00 -FL0200000 -FF1nrf52xxx_uicr -FS110001000 -FL11000 -FP0($$Device:nRF52832_xxAA$Flash\nrf52xxx.flm) -FP1($$Device:nRF52832_xxAA$Flash\nrf52xxx_uicr.flm))</FlashDriverDll>
+          <DeviceId>0</DeviceId>
+          <RegisterFile>$$Device:nRF52832_xxAA$Device\Include\nrf.h</RegisterFile>
+          <MemoryEnv />
+          <Cmp />
+          <Asm />
+          <Linker />
+          <OHString />
+          <InfinionOptionDll />
+          <SLE66CMisc />
+          <SLE66AMisc />
+          <SLE66LinkerMisc />
+          <SFDFile>$$Device:nRF52832_xxAA$SVD\nrf52832.svd</SFDFile>
+          <bCustSvd>0</bCustSvd>
+          <UseEnv>0</UseEnv>
+          <BinPath />
+          <IncludePath />
+          <LibPath />
+          <RegisterFilePath />
+          <DBRegisterFilePath />
+          <TargetStatus>
+            <Error>0</Error>
+            <ExitCodeStop>0</ExitCodeStop>
+            <ButtonStop>0</ButtonStop>
+            <NotGenerated>0</NotGenerated>
+            <InvalidFlash>1</InvalidFlash>
+          </TargetStatus>
+          <OutputDirectory>.\packages\nrf5x_sdk-v16.1.0\components\softdevice\s132\hex\</OutputDirectory>
+          <OutputName>s132_nrf52_7.0.1_softdevice.hex</OutputName>
+          <CreateExecutable>1</CreateExecutable>
+          <CreateLib>0</CreateLib>
+          <CreateHexFile>0</CreateHexFile>
+          <DebugInformation>1</DebugInformation>
+          <BrowseInformation>1</BrowseInformation>
+          <ListingPath>.\build\</ListingPath>
+          <HexFormatSelection>1</HexFormatSelection>
+          <Merge32K>0</Merge32K>
+          <CreateBatchFile>0</CreateBatchFile>
+          <BeforeCompile>
+            <RunUserProg1>0</RunUserProg1>
+            <RunUserProg2>0</RunUserProg2>
+            <UserProg1Name />
+            <UserProg2Name />
+            <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
+            <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
+            <nStopU1X>0</nStopU1X>
+            <nStopU2X>0</nStopU2X>
+          </BeforeCompile>
+          <BeforeMake>
+            <RunUserProg1>0</RunUserProg1>
+            <RunUserProg2>0</RunUserProg2>
+            <UserProg1Name />
+            <UserProg2Name />
+            <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
+            <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
+            <nStopB1X>0</nStopB1X>
+            <nStopB2X>0</nStopB2X>
+          </BeforeMake>
+          <AfterMake>
+            <RunUserProg1>1</RunUserProg1>
+            <RunUserProg2>0</RunUserProg2>
+            <UserProg1Name>fromelf --bin !L --output rtthread.bin</UserProg1Name>
+            <UserProg2Name />
+            <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
+            <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
+            <nStopA1X>0</nStopA1X>
+            <nStopA2X>0</nStopA2X>
+          </AfterMake>
+          <SelectedForBatchBuild>0</SelectedForBatchBuild>
+          <SVCSIdString />
+        </TargetCommonOption>
+        <CommonProperty>
+          <UseCPPCompiler>0</UseCPPCompiler>
+          <RVCTCodeConst>0</RVCTCodeConst>
+          <RVCTZI>0</RVCTZI>
+          <RVCTOtherData>0</RVCTOtherData>
+          <ModuleSelection>0</ModuleSelection>
+          <IncludeInBuild>1</IncludeInBuild>
+          <AlwaysBuild>0</AlwaysBuild>
+          <GenerateAssemblyFile>0</GenerateAssemblyFile>
+          <AssembleAssemblyFile>0</AssembleAssemblyFile>
+          <PublicsOnly>0</PublicsOnly>
+          <StopOnExitCode>3</StopOnExitCode>
+          <CustomArgument />
+          <IncludeLibraryModules />
+          <ComprImg>1</ComprImg>
+        </CommonProperty>
+        <DllOption>
+          <SimDllName>SARMCM3.DLL</SimDllName>
+          <SimDllArguments>  -MPU</SimDllArguments>
+          <SimDlgDll>DCM.DLL</SimDlgDll>
+          <SimDlgDllArguments>-pCM4</SimDlgDllArguments>
+          <TargetDllName>SARMCM3.DLL</TargetDllName>
+          <TargetDllArguments> -MPU</TargetDllArguments>
+          <TargetDlgDll>TCM.DLL</TargetDlgDll>
+          <TargetDlgDllArguments>-pCM4</TargetDlgDllArguments>
+        </DllOption>
+        <DebugOption>
+          <OPTHX>
+            <HexSelection>1</HexSelection>
+            <HexRangeLowAddress>0</HexRangeLowAddress>
+            <HexRangeHighAddress>0</HexRangeHighAddress>
+            <HexOffset>0</HexOffset>
+            <Oh166RecLen>16</Oh166RecLen>
+          </OPTHX>
+        </DebugOption>
+        <Utilities>
+          <Flash1>
+            <UseTargetDll>1</UseTargetDll>
+            <UseExternalTool>0</UseExternalTool>
+            <RunIndependent>0</RunIndependent>
+            <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
+            <Capability>1</Capability>
+            <DriverSelection>4096</DriverSelection>
+          </Flash1>
+          <bUseTDR>1</bUseTDR>
+          <Flash2>BIN\UL2CM3.DLL</Flash2>
+          <Flash3>"" ()</Flash3>
+          <Flash4 />
+          <pFcarmOut />
+          <pFcarmGrp />
+          <pFcArmRoot />
+          <FcArmLst>0</FcArmLst>
+        </Utilities>
+        <TargetArmAds>
+          <ArmAdsMisc>
+            <GenerateListings>0</GenerateListings>
+            <asHll>1</asHll>
+            <asAsm>1</asAsm>
+            <asMacX>1</asMacX>
+            <asSyms>1</asSyms>
+            <asFals>1</asFals>
+            <asDbgD>1</asDbgD>
+            <asForm>1</asForm>
+            <ldLst>0</ldLst>
+            <ldmm>1</ldmm>
+            <ldXref>1</ldXref>
+            <BigEnd>0</BigEnd>
+            <AdsALst>1</AdsALst>
+            <AdsACrf>1</AdsACrf>
+            <AdsANop>0</AdsANop>
+            <AdsANot>0</AdsANot>
+            <AdsLLst>1</AdsLLst>
+            <AdsLmap>1</AdsLmap>
+            <AdsLcgr>1</AdsLcgr>
+            <AdsLsym>1</AdsLsym>
+            <AdsLszi>1</AdsLszi>
+            <AdsLtoi>1</AdsLtoi>
+            <AdsLsun>1</AdsLsun>
+            <AdsLven>1</AdsLven>
+            <AdsLsxf>1</AdsLsxf>
+            <RvctClst>0</RvctClst>
+            <GenPPlst>0</GenPPlst>
+            <AdsCpuType>"Cortex-M4"</AdsCpuType>
+            <RvctDeviceName />
+            <mOS>0</mOS>
+            <uocRom>0</uocRom>
+            <uocRam>0</uocRam>
+            <hadIROM>1</hadIROM>
+            <hadIRAM>1</hadIRAM>
+            <hadXRAM>0</hadXRAM>
+            <uocXRam>0</uocXRam>
+            <RvdsVP>2</RvdsVP>
+            <hadIRAM2>0</hadIRAM2>
+            <hadIROM2>0</hadIROM2>
+            <StupSel>8</StupSel>
+            <useUlib>0</useUlib>
+            <EndSel>0</EndSel>
+            <uLtcg>0</uLtcg>
+            <nSecure>0</nSecure>
+            <RoSelD>3</RoSelD>
+            <RwSelD>3</RwSelD>
+            <CodeSel>0</CodeSel>
+            <OptFeed>0</OptFeed>
+            <NoZi1>0</NoZi1>
+            <NoZi2>0</NoZi2>
+            <NoZi3>0</NoZi3>
+            <NoZi4>0</NoZi4>
+            <NoZi5>0</NoZi5>
+            <Ro1Chk>0</Ro1Chk>
+            <Ro2Chk>0</Ro2Chk>
+            <Ro3Chk>0</Ro3Chk>
+            <Ir1Chk>1</Ir1Chk>
+            <Ir2Chk>0</Ir2Chk>
+            <Ra1Chk>0</Ra1Chk>
+            <Ra2Chk>0</Ra2Chk>
+            <Ra3Chk>0</Ra3Chk>
+            <Im1Chk>1</Im1Chk>
+            <Im2Chk>0</Im2Chk>
+            <OnChipMemories>
+              <Ocm1>
+                <Type>0</Type>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
+              </Ocm1>
+              <Ocm2>
+                <Type>0</Type>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
+              </Ocm2>
+              <Ocm3>
+                <Type>0</Type>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
+              </Ocm3>
+              <Ocm4>
+                <Type>0</Type>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
+              </Ocm4>
+              <Ocm5>
+                <Type>0</Type>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
+              </Ocm5>
+              <Ocm6>
+                <Type>0</Type>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
+              </Ocm6>
+              <IRAM>
+                <Type>0</Type>
+                <StartAddress>0x20000000</StartAddress>
+                <Size>0x40000</Size>
+              </IRAM>
+              <IROM>
+                <Type>1</Type>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x100000</Size>
+              </IROM>
+              <XRAM>
+                <Type>0</Type>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
+              </XRAM>
+              <OCR_RVCT1>
+                <Type>1</Type>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
+              </OCR_RVCT1>
+              <OCR_RVCT2>
+                <Type>1</Type>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
+              </OCR_RVCT2>
+              <OCR_RVCT3>
+                <Type>1</Type>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
+              </OCR_RVCT3>
+              <OCR_RVCT4>
+                <Type>1</Type>
+                <StartAddress>0x27000</StartAddress>
+                <Size>0xd9000</Size>
+              </OCR_RVCT4>
+              <OCR_RVCT5>
+                <Type>1</Type>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
+              </OCR_RVCT5>
+              <OCR_RVCT6>
+                <Type>0</Type>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
+              </OCR_RVCT6>
+              <OCR_RVCT7>
+                <Type>0</Type>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
+              </OCR_RVCT7>
+              <OCR_RVCT8>
+                <Type>0</Type>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
+              </OCR_RVCT8>
+              <OCR_RVCT9>
+                <Type>0</Type>
+                <StartAddress>0x20002300</StartAddress>
+                <Size>0x40000</Size>
+              </OCR_RVCT9>
+              <OCR_RVCT10>
+                <Type>0</Type>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
+              </OCR_RVCT10>
+            </OnChipMemories>
+            <RvctStartVector />
+          </ArmAdsMisc>
+          <Cads>
+            <interw>1</interw>
+            <Optim>1</Optim>
+            <oTime>0</oTime>
+            <SplitLS>0</SplitLS>
+            <OneElfS>1</OneElfS>
+            <Strict>0</Strict>
+            <EnumInt>0</EnumInt>
+            <PlainCh>0</PlainCh>
+            <Ropi>0</Ropi>
+            <Rwpi>0</Rwpi>
+            <wLevel>2</wLevel>
+            <uThumb>0</uThumb>
+            <uSurpInc>0</uSurpInc>
+            <uC99>1</uC99>
+            <uGnu>0</uGnu>
+            <useXO>0</useXO>
+            <v6Lang>1</v6Lang>
+            <v6LangP>1</v6LangP>
+            <vShortEn>1</vShortEn>
+            <vShortWch>1</vShortWch>
+            <v6Lto>0</v6Lto>
+            <v6WtE>0</v6WtE>
+            <v6Rtti>0</v6Rtti>
+            <VariousControls>
+              <MiscControls>--reduce_paths</MiscControls>
+              <Define>NRF52832_XXAA, USE_APP_CONFIG, RT_USING_ARM_LIBC  APP_TIMER_V2 APP_TIMER_V2_RTC1_ENABLED BOARD_PCA10040 CONFIG_GPIO_AS_PINRESET FLOAT_ABI_HARD NRF52832_XXAA NRF_SD_BLE_API_VERSION=7 S132 SOFTDEVICE_PRESENT __HEAP_SIZE=8192 __STACK_SIZE=8192</Define>
+              <Undefine />
+              <IncludePath />
+            </VariousControls>
+          </Cads>
+          <Aads>
+            <interw>1</interw>
+            <Ropi>0</Ropi>
+            <Rwpi>0</Rwpi>
+            <thumb>0</thumb>
+            <SplitLS>0</SplitLS>
+            <SwStkChk>0</SwStkChk>
+            <NoWarn>0</NoWarn>
+            <uSurpInc>0</uSurpInc>
+            <useXO>0</useXO>
+            <uClangAs>0</uClangAs>
+            <VariousControls>
+              <MiscControls> --cpreproc_opts=-DAPP_TIMER_V2,-DAPP_TIMER_V2_RTC1_ENABLED,-DBOARD_PCA10040,-DCONFIG_GPIO_AS_PINRESET,-DFLOAT_ABI_HARD,-DNRF52832_XXAA,-DNRF_SD_BLE_API_VERSION=7,-DS132,-DSOFTDEVICE_PRESENT,-D__HEAP_SIZE=8192,-D__STACK_SIZE=8192</MiscControls>
+              <Define>APP_TIMER_V2 APP_TIMER_V2_RTC1_ENABLED BOARD_PCA10040 CONFIG_GPIO_AS_PINRESET FLOAT_ABI_HARD NRF52832_XXAA NRF_SD_BLE_API_VERSION=7 S132 SOFTDEVICE_PRESENT __HEAP_SIZE=8192 __STACK_SIZE=8192</Define>
+              <Undefine />
+              <IncludePath />
+            </VariousControls>
+          </Aads>
+          <LDads>
+            <umfTarg>1</umfTarg>
+            <Ropi>0</Ropi>
+            <Rwpi>0</Rwpi>
+            <noStLib>0</noStLib>
+            <RepFail>1</RepFail>
+            <useFile>0</useFile>
+            <TextAddressRange>0x00000000</TextAddressRange>
+            <DataAddressRange>0x20000000</DataAddressRange>
+            <pXoBase />
+            <ScatterFile />
+            <IncludeLibs />
+            <IncludeLibsPath />
+            <Misc>--diag_suppress 6330</Misc>
+            <LinkerInputFile />
+            <DisabledWarnings />
+          </LDads>
+        </TargetArmAds>
+      </TargetOption>
+    </Target>
   </Targets>
-
   <RTE>
-    <apis/>
-    <components/>
-    <files/>
+    <apis />
+    <components />
+    <files />
   </RTE>
-
 </Project>

@@ -108,11 +108,11 @@ void rt_hw_board_init(void)
     extern uint32_t Image$$RW_IRAM1$$Base;
     uint32_t const *const m_ram_start = &Image$$RW_IRAM1$$Base;
     if ((uint32_t)m_ram_start == 0x20000000) {
-        rt_kprintf("\r\n using softdevice the RAM couldn't be %p,please use the templete from package\r\n", m_ram_start);
+        rt_kprintf("\r\nusing softdevice the RAM couldn't be %p,please use the templete from package\r\n", m_ram_start);
         while (1)
             ;
     } else {
-        rt_kprintf("\r\n using softdevice the RAM at %p\r\n", m_ram_start);
+        rt_kprintf("\r\nusing softdevice the RAM at %p\r\n", m_ram_start);
     }
 #endif
 }

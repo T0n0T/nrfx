@@ -14,11 +14,14 @@
         "CXX_FLAGS": "--reduce_paths",
         "warnings": "all-warnings"
     },
-    "asm-compiler": {},
+    "asm-compiler": {
+        "misc-controls": "--cpreproc_opts=-DAPP_TIMER_V2,-DAPP_TIMER_V2_RTC1_ENABLED,-DBOARD_PCA10040,-DCONFIG_GPIO_AS_PINRESET,-DFLOAT_ABI_HARD,-DNRF52832_XXAA,-DNRF_SD_BLE_API_VERSION=7,-DS132,-DSOFTDEVICE_PRESENT,-D__HEAP_SIZE=8192,-D__STACK_SIZE=8192"
+    },
     "linker": {
         "output-format": "elf",
         "xo-base": "",
         "ro-base": "0x00000000",
-        "rw-base": "0x20000000"
+        "rw-base": "0x20000000",
+        "misc-controls": "--diag_suppress 6330"
     }
 }

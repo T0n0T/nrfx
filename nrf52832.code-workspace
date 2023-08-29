@@ -5,15 +5,26 @@
         }
     ],
     "settings": {
+        "search.exclude": {
+            "**/.git": true,
+            "*.uvprojx": true,
+            "*.uvprox": true,
+            "*.Administrator": true,
+            "*.json": true,
+            "*.sct": true,
+            "*.ld": true,
+            "*.d": true,
+            "*.hex": true,
+            "*.txt": true,
+            "*.out": true,
+            "*.map": true,
+            ".clang-format*": true,
+            ".gitignore": true,
+        },
         "files.associations": {
-            "*.cpp": "cpp",
-            "*.html": "html",
-            "*.env": "dotenv",
-            "*.go": "go",
-            "fal.h": "c",
-            "unistd.h": "c",
-            "fal_cfg.h": "c"
-        }
+            "segger_rtt.h": "c",
+            "segger_rtt_conf.h": "c"
+        },
     },
     "extensions": {}
 }
