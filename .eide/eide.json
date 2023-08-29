@@ -59,6 +59,9 @@
           },
           {
             "path": "modules/ble_test/my_ble_hrs.c"
+          },
+          {
+            "path": "nrf_sdk/rtthread_adapter/ble_app_hrs.c"
           }
         ],
         "folders": []
@@ -442,6 +445,18 @@
             "path": "nrf_sdk/components/ble/ble_advertising/ble_advertising.c"
           },
           {
+            "path": "nrf_sdk/components/ble/ble_services/ble_bas/ble_bas.c"
+          },
+          {
+            "path": "nrf_sdk/components/ble/ble_services/ble_dis/ble_dis.c"
+          },
+          {
+            "path": "nrf_sdk/components/ble/ble_services/ble_hrs/ble_hrs.c"
+          },
+          {
+            "path": "nrf_sdk/components/ble/ble_services/ble_lbs/ble_lbs.c"
+          },
+          {
             "path": "nrf_sdk/components/ble/common/ble_advdata.c"
           },
           {
@@ -593,6 +608,9 @@
           },
           {
             "path": "nrf_sdk/components/libraries/ringbuf/nrf_ringbuf.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/sensorsim/sensorsim.c"
           },
           {
             "path": "nrf_sdk/components/libraries/strerror/nrf_strerror.c"
@@ -806,7 +824,10 @@
         "<virtual_root>/WIZnet",
         "<virtual_root>/ccm3310/ccm3310_nrf.c",
         "<virtual_root>/ec800x",
-        "<virtual_root>/nrf_ble/ble_conn_params.c"
+        "<virtual_root>/nrf_ble/ble_conn_params.c",
+        "<virtual_root>/ble_services/ble_srv.c",
+        "<virtual_root>/ble_services/my_ble_dis.c",
+        "<virtual_root>/ble_services/my_ble_hrs.c"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -1015,7 +1036,12 @@
           "rt-thread/components/net/sal/include",
           "RTE/_rtthread",
           "modules/ble_test",
-          "nrf_sdk/components/libraries/svc"
+          "nrf_sdk/components/libraries/svc",
+          "nrf_sdk/components/ble/ble_services/ble_lbs",
+          "nrf_sdk/components/libraries/sensorsim",
+          "nrf_sdk/components/ble/ble_services/ble_bas",
+          "nrf_sdk/components/ble/ble_services/ble_dis",
+          "nrf_sdk/components/ble/ble_services/ble_hrs"
         ],
         "libList": [],
         "sourceDirList": [],

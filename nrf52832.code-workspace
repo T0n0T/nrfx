@@ -12,7 +12,15 @@
             "*.go": "go",
             "nrf_ble_gatt.h": "c",
             "ble_conn_params.h": "c",
-            "nrf_log_default_backends.h": "c"
+            "nrf_log_default_backends.h": "c",
+            "ble_advdata.h": "c",
+            "ble_lbs.h": "c",
+            "nrf_ble_qwr.h": "c",
+            "sensorsim.h": "c",
+            "ble_advertising.h": "c",
+            "ble_bas.h": "c",
+            "ble_hrs.h": "c",
+            "ble_dis.h": "c"
         }
     },
     "extensions": {}
