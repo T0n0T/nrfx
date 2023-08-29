@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <string.h>
+#include <string.H>
 #include <stdint.h>
 
 #include <rtthread.h>

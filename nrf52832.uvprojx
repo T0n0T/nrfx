@@ -403,16 +403,16 @@
           </Files>
           <Files>
             <File>
-              <FileName>at_utils.c</FileName>
+              <FileName>at_cli.c</FileName>
               <FileType>1</FileType>
-              <FilePath>rt-thread\components\net\at\src\at_utils.c</FilePath>
+              <FilePath>rt-thread\components\net\at\src\at_cli.c</FilePath>
             </File>
           </Files>
           <Files>
             <File>
-              <FileName>at_cli.c</FileName>
+              <FileName>at_utils.c</FileName>
               <FileType>1</FileType>
-              <FilePath>rt-thread\components\net\at\src\at_cli.c</FilePath>
+              <FilePath>rt-thread\components\net\at\src\at_utils.c</FilePath>
             </File>
           </Files>
           <Files>
@@ -458,16 +458,16 @@
           </Files>
           <Files>
             <File>
-              <FileName>ccm3310_sm4.c</FileName>
+              <FileName>ccm3310_test.c</FileName>
               <FileType>1</FileType>
-              <FilePath>modules\ccm3310\ccm3310_sm4.c</FilePath>
+              <FilePath>modules\ccm3310\ccm3310_test.c</FilePath>
             </File>
           </Files>
           <Files>
             <File>
-              <FileName>ccm3310_test.c</FileName>
+              <FileName>ccm3310_sm4.c</FileName>
               <FileType>1</FileType>
-              <FilePath>modules\ccm3310\ccm3310_test.c</FilePath>
+              <FilePath>modules\ccm3310\ccm3310_sm4.c</FilePath>
             </File>
           </Files>
           <Files>
@@ -482,13 +482,6 @@
           <GroupName>cm_backtrace</GroupName>
           <Files>
             <File>
-              <FileName>cmb_flash_log.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\CmBacktrace-v1.4.1\cmb_flash_log.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
               <FileName>cm_backtrace.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\CmBacktrace-v1.4.1\cm_backtrace.c</FilePath>
@@ -499,6 +492,13 @@
               <FileName>cmb_port.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\CmBacktrace-v1.4.1\cmb_port.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>cmb_flash_log.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\CmBacktrace-v1.4.1\cmb_flash_log.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -805,16 +805,16 @@
           <GroupName>ec800x</GroupName>
           <Files>
             <File>
-              <FileName>at_device_ec800x.c</FileName>
+              <FileName>at_socket_ec800x.c</FileName>
               <FileType>1</FileType>
-              <FilePath>modules\ec800x\at_device_ec800x.c</FilePath>
+              <FilePath>modules\ec800x\at_socket_ec800x.c</FilePath>
             </File>
           </Files>
           <Files>
             <File>
-              <FileName>at_socket_ec800x.c</FileName>
+              <FileName>at_device_ec800x.c</FileName>
               <FileType>1</FileType>
-              <FilePath>modules\ec800x\at_socket_ec800x.c</FilePath>
+              <FilePath>modules\ec800x\at_device_ec800x.c</FilePath>
             </File>
           </Files>
           <Files>
@@ -843,16 +843,16 @@
           </Files>
           <Files>
             <File>
-              <FileName>fal.c</FileName>
+              <FileName>fal_partition.c</FileName>
               <FileType>1</FileType>
-              <FilePath>rt-thread\components\fal\src\fal.c</FilePath>
+              <FilePath>rt-thread\components\fal\src\fal_partition.c</FilePath>
             </File>
           </Files>
           <Files>
             <File>
-              <FileName>fal_partition.c</FileName>
+              <FileName>fal.c</FileName>
               <FileType>1</FileType>
-              <FilePath>rt-thread\components\fal\src\fal_partition.c</FilePath>
+              <FilePath>rt-thread\components\fal\src\fal.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1050,9 +1050,9 @@
           </Files>
           <Files>
             <File>
-              <FileName>dfs_lfs.c</FileName>
+              <FileName>lfs_crc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>services\littlefs\dfs_lfs.c</FilePath>
+              <FilePath>services\littlefs\lfs_crc.c</FilePath>
             </File>
           </Files>
           <Files>
@@ -1064,21 +1064,14 @@
           </Files>
           <Files>
             <File>
-              <FileName>lfs_crc.c</FileName>
+              <FileName>dfs_lfs.c</FileName>
               <FileType>1</FileType>
-              <FilePath>services\littlefs\lfs_crc.c</FilePath>
+              <FilePath>services\littlefs\dfs_lfs.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
           <GroupName>max30102</GroupName>
-          <Files>
-            <File>
-              <FileName>blood.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>modules\max30102\blood.c</FilePath>
-            </File>
-          </Files>
           <Files>
             <File>
               <FileName>port.c</FileName>
@@ -1091,6 +1084,13 @@
               <FileName>max30102.c</FileName>
               <FileType>1</FileType>
               <FilePath>modules\max30102\max30102.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>blood.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>modules\max30102\blood.c</FilePath>
             </File>
           </Files>
           <Files>
@@ -1122,9 +1122,16 @@
           <GroupName>nrf_ble</GroupName>
           <Files>
             <File>
-              <FileName>ble_conn_params.c</FileName>
+              <FileName>ble_conn_state.c</FileName>
               <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\ble\common\ble_conn_params.c</FilePath>
+              <FilePath>nrf_sdk\components\ble\common\ble_conn_state.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>ble_srv_common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\components\ble\common\ble_srv_common.c</FilePath>
             </File>
           </Files>
           <Files>
@@ -1143,20 +1150,6 @@
           </Files>
           <Files>
             <File>
-              <FileName>ble_srv_common.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\ble\common\ble_srv_common.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>nrf_ble_gatt.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\ble\nrf_ble_gatt\nrf_ble_gatt.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
               <FileName>ble_advdata.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\components\ble\common\ble_advdata.c</FilePath>
@@ -1164,9 +1157,9 @@
           </Files>
           <Files>
             <File>
-              <FileName>ble_conn_state.c</FileName>
+              <FileName>nrf_ble_gatt.c</FileName>
               <FileType>1</FileType>
-              <FilePath>nrf_sdk\components\ble\common\ble_conn_state.c</FilePath>
+              <FilePath>nrf_sdk\components\ble\nrf_ble_gatt\nrf_ble_gatt.c</FilePath>
             </File>
           </Files>
           <Files>
@@ -1181,37 +1174,16 @@
           <GroupName>nrf_hal</GroupName>
           <Files>
             <File>
-              <FileName>nrfx_systick.c</FileName>
+              <FileName>nrfx_clock.c</FileName>
               <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_systick.c</FilePath>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_clock.c</FilePath>
             </File>
           </Files>
           <Files>
             <File>
-              <FileName>nrfx_usbd.c</FileName>
+              <FileName>nrfx_swi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_usbd.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>nrfx_temp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_temp.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>nrfx_saadc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_saadc.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>nrfx_twi_twim.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_twi_twim.c</FilePath>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_swi.c</FilePath>
             </File>
           </Files>
           <Files>
@@ -1223,23 +1195,9 @@
           </Files>
           <Files>
             <File>
-              <FileName>nrfx_twi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_twi.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>nrfx_gpiote.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_gpiote.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>nrfx_power.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_power.c</FilePath>
+              <FileName>arm_startup_nrf52.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\mdk\arm_startup_nrf52.s</FilePath>
             </File>
           </Files>
           <Files>
@@ -1251,65 +1209,9 @@
           </Files>
           <Files>
             <File>
-              <FileName>nrfx_wdt.c</FileName>
+              <FileName>nrfx_power.c</FileName>
               <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_wdt.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>nrfx_ppi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_ppi.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>nrfx_pwm.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_pwm.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>nrfx_spis.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_spis.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>nrfx_comp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_comp.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>nrfx_qdec.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_qdec.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>nrfx_rng.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_rng.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>nrfx_uarte.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_uarte.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>nrfx_rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_rtc.c</FilePath>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_power.c</FilePath>
             </File>
           </Files>
           <Files>
@@ -1321,23 +1223,9 @@
           </Files>
           <Files>
             <File>
-              <FileName>nrfx_nvmc.c</FileName>
+              <FileName>nrfx_rng.c</FileName>
               <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_nvmc.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>nrfx_qspi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_qspi.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>system_nrf52.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\mdk\system_nrf52.c</FilePath>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_rng.c</FilePath>
             </File>
           </Files>
           <Files>
@@ -1349,23 +1237,44 @@
           </Files>
           <Files>
             <File>
-              <FileName>nrfx_pdm.c</FileName>
+              <FileName>nrfx_temp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_pdm.c</FilePath>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_temp.c</FilePath>
             </File>
           </Files>
           <Files>
             <File>
-              <FileName>nrfx_spim.c</FileName>
+              <FileName>nrfx_twi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_spim.c</FilePath>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_twi.c</FilePath>
             </File>
           </Files>
           <Files>
             <File>
-              <FileName>nrfx_clock.c</FileName>
+              <FileName>nrfx_ppi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_clock.c</FilePath>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_ppi.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_qdec.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_qdec.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_qspi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_qspi.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_nvmc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_nvmc.c</FilePath>
             </File>
           </Files>
           <Files>
@@ -1384,6 +1293,13 @@
           </Files>
           <Files>
             <File>
+              <FileName>nrfx_wdt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_wdt.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
               <FileName>nrfx_adc.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_adc.c</FilePath>
@@ -1391,16 +1307,37 @@
           </Files>
           <Files>
             <File>
-              <FileName>nrfx_timer.c</FileName>
+              <FileName>nrfx_rtc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_timer.c</FilePath>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_rtc.c</FilePath>
             </File>
           </Files>
           <Files>
             <File>
-              <FileName>arm_startup_nrf52.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\mdk\arm_startup_nrf52.s</FilePath>
+              <FileName>nrfx_uarte.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_uarte.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>system_nrf52.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\mdk\system_nrf52.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_pdm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_pdm.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_gpiote.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_gpiote.c</FilePath>
             </File>
           </Files>
           <Files>
@@ -1412,6 +1349,27 @@
           </Files>
           <Files>
             <File>
+              <FileName>nrfx_saadc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_saadc.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_timer.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_spim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_spim.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
               <FileName>nrfx_nfct.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_nfct.c</FilePath>
@@ -1419,9 +1377,44 @@
           </Files>
           <Files>
             <File>
-              <FileName>nrfx_swi.c</FileName>
+              <FileName>nrfx_spis.c</FileName>
               <FileType>1</FileType>
-              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_swi.c</FilePath>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_spis.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_comp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_comp.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_systick.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_systick.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_twi_twim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_twi_twim.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_pwm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_pwm.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrfx_usbd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\modules\nrfx\drivers\src\nrfx_usbd.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1457,6 +1450,13 @@
           </Files>
           <Files>
             <File>
+              <FileName>nrf_fprintf_format.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\external\fprintf\nrf_fprintf_format.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
               <FileName>nrf_atomic.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\components\libraries\atomic\nrf_atomic.c</FilePath>
@@ -1464,23 +1464,9 @@
           </Files>
           <Files>
             <File>
-              <FileName>nrf_fprintf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\external\fprintf\nrf_fprintf.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
               <FileName>app_error_handler_keil.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\components\libraries\util\app_error_handler_keil.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>nrf_fprintf_format.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>nrf_sdk\external\fprintf\nrf_fprintf_format.c</FilePath>
             </File>
           </Files>
           <Files>
@@ -1495,6 +1481,13 @@
               <FileName>nrf_atflags.c</FileName>
               <FileType>1</FileType>
               <FilePath>nrf_sdk\components\libraries\atomic_flags\nrf_atflags.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>nrf_fprintf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>nrf_sdk\external\fprintf\nrf_fprintf.c</FilePath>
             </File>
           </Files>
           <Files>
@@ -1585,13 +1578,6 @@
           <GroupName>paho-mqtt</GroupName>
           <Files>
             <File>
-              <FileName>MQTTPacket.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTPacket.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
               <FileName>MQTTSubscribeServer.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTSubscribeServer.c</FilePath>
@@ -1602,34 +1588,6 @@
               <FileName>MQTTConnectClient.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTConnectClient.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>MQTTFormat.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTFormat.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>paho_mqtt_pipe.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\pahomqtt-latest\MQTTClient-RT\paho_mqtt_pipe.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>MQTTDeserializePublish.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTDeserializePublish.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>MQTTUnsubscribeClient.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTUnsubscribeClient.c</FilePath>
             </File>
           </Files>
           <Files>
@@ -1648,6 +1606,34 @@
           </Files>
           <Files>
             <File>
+              <FileName>MQTTConnectServer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTConnectServer.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>paho_mqtt_pipe.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\pahomqtt-latest\MQTTClient-RT\paho_mqtt_pipe.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>MQTTPacket.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTPacket.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>MQTTDeserializePublish.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTDeserializePublish.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
               <FileName>MQTTSubscribeClient.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTSubscribeClient.c</FilePath>
@@ -1655,9 +1641,16 @@
           </Files>
           <Files>
             <File>
-              <FileName>MQTTConnectServer.c</FileName>
+              <FileName>MQTTUnsubscribeClient.c</FileName>
               <FileType>1</FileType>
-              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTConnectServer.c</FilePath>
+              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTUnsubscribeClient.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
+              <FileName>MQTTFormat.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\pahomqtt-latest\MQTTPacket\src\MQTTFormat.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1775,9 +1768,9 @@
           </Files>
           <Files>
             <File>
-              <FileName>wizchip_socket.c</FileName>
+              <FileName>w5500.c</FileName>
               <FileType>1</FileType>
-              <FilePath>packages\wiznet-latest\ioLibrary\Ethernet\wizchip_socket.c</FilePath>
+              <FilePath>packages\wiznet-latest\ioLibrary\Ethernet\W5500\w5500.c</FilePath>
             </File>
           </Files>
           <Files>
@@ -1789,23 +1782,16 @@
           </Files>
           <Files>
             <File>
+              <FileName>wizchip_socket.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\wiznet-latest\ioLibrary\Ethernet\wizchip_socket.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
               <FileName>wizchip_dhcp.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\wiznet-latest\ioLibrary\Internet\DHCP\wizchip_dhcp.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>wizchip_dns.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\wiznet-latest\ioLibrary\Internet\DNS\wizchip_dns.c</FilePath>
-            </File>
-          </Files>
-          <Files>
-            <File>
-              <FileName>wizchip_conf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\wiznet-latest\ioLibrary\Ethernet\wizchip_conf.c</FilePath>
             </File>
           </Files>
           <Files>
@@ -1817,6 +1803,13 @@
           </Files>
           <Files>
             <File>
+              <FileName>wizchip_conf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\wiznet-latest\ioLibrary\Ethernet\wizchip_conf.c</FilePath>
+            </File>
+          </Files>
+          <Files>
+            <File>
               <FileName>wiz_af_inet.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\wiznet-latest\src\wiz_af_inet.c</FilePath>
@@ -1824,16 +1817,16 @@
           </Files>
           <Files>
             <File>
-              <FileName>w5500.c</FileName>
+              <FileName>wiz_socket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>packages\wiznet-latest\ioLibrary\Ethernet\W5500\w5500.c</FilePath>
+              <FilePath>packages\wiznet-latest\src\wiz_socket.c</FilePath>
             </File>
           </Files>
           <Files>
             <File>
-              <FileName>wiz_socket.c</FileName>
+              <FileName>wizchip_dns.c</FileName>
               <FileType>1</FileType>
-              <FilePath>packages\wiznet-latest\src\wiz_socket.c</FilePath>
+              <FilePath>packages\wiznet-latest\ioLibrary\Internet\DNS\wizchip_dns.c</FilePath>
             </File>
           </Files>
         </Group>

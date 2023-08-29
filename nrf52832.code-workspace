@@ -4,27 +4,6 @@
             "path": "."
         }
     ],
-    "settings": {
-        "search.exclude": {
-            "**/.git": true,
-            "*.uvprojx": true,
-            "*.uvprox": true,
-            "*.Administrator": true,
-            "*.json": true,
-            "*.sct": true,
-            "*.ld": true,
-            "*.d": true,
-            "*.hex": true,
-            "*.txt": true,
-            "*.out": true,
-            "*.map": true,
-            ".clang-format*": true,
-            ".gitignore": true,
-        },
-        "files.associations": {
-            "segger_rtt.h": "c",
-            "segger_rtt_conf.h": "c"
-        },
-    },
+    "settings": {},
     "extensions": {}
 }
