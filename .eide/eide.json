@@ -1058,7 +1058,8 @@
           "NRFX_CLOCK_ENABLED",
           "LFS_CONFIG=lfs_config.h",
           "CONFIG_GPIO_AS_PINRESET",
-          "USE_APP_CONFIG"
+          "USE_APP_CONFIG",
+          "DEBUG"
         ]
       }
     },
