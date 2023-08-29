@@ -279,8 +279,8 @@ int rt_hw_max30102_init(struct rt_sensor_config *cfg)
     RT_ASSERT(cfg);
     RT_ASSERT(cfg->mode == RT_SENSOR_MODE_POLLING); // Only support polling.
 
-    char *err_msg = RT_NULL;
-    rt_thread_t tid;
+    char *err_msg      = RT_NULL;
+    rt_thread_t tid    = RT_NULL;
     rt_sensor_t sensor = RT_NULL;
 
     do {

@@ -4,6 +4,16 @@
             "path": "."
         }
     ],
-    "settings": {},
+    "settings": {
+        "files.associations": {
+            "*.cpp": "cpp",
+            "*.html": "html",
+            "*.env": "dotenv",
+            "*.go": "go",
+            "nrf_ble_gatt.h": "c",
+            "ble_conn_params.h": "c",
+            "nrf_log_default_backends.h": "c"
+        }
+    },
     "extensions": {}
 }
