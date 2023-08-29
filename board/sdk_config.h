@@ -1141,88 +1141,43 @@
 #define BLE_ADVERTISING_ENABLED 1
 #endif
 
-// <e> BLE_DTM_ENABLED - ble_dtm - Module for testing RF/PHY using DTM commands
-//==========================================================
+// <q> BLE_DTM_ENABLED  - ble_dtm - Module for testing RF/PHY using DTM commands
+
 #ifndef BLE_DTM_ENABLED
 #define BLE_DTM_ENABLED 0
 #endif
-// <o> NRF_RADIO_ANTENNA_PIN_1 - Antenna 1 GPIO pin
-#ifndef NRF_RADIO_ANTENNA_PIN_1
-#define NRF_RADIO_ANTENNA_PIN_1 21
-#endif
-
-// <o> NRF_RADIO_ANTENNA_PIN_2 - Antenna 2 GPIO pin
-#ifndef NRF_RADIO_ANTENNA_PIN_2
-#define NRF_RADIO_ANTENNA_PIN_2 23
-#endif
-
-// <o> NRF_RADIO_ANTENNA_PIN_3 - Antenna 3 GPIO pin
-#ifndef NRF_RADIO_ANTENNA_PIN_3
-#define NRF_RADIO_ANTENNA_PIN_3 26
-#endif
-
-// <o> NRF_RADIO_ANTENNA_PIN_4 - Antenna 4 GPIO pin
-#ifndef NRF_RADIO_ANTENNA_PIN_4
-#define NRF_RADIO_ANTENNA_PIN_4 27
-#endif
-
-// <o> NRF_RADIO_ANTENNA_PIN_5 - Antenna 5 GPIO pin
-#ifndef NRF_RADIO_ANTENNA_PIN_5
-#define NRF_RADIO_ANTENNA_PIN_5 28
-#endif
-
-// <o> NRF_RADIO_ANTENNA_PIN_6 - Antenna 6 GPIO pin
-#ifndef NRF_RADIO_ANTENNA_PIN_6
-#define NRF_RADIO_ANTENNA_PIN_6 29
-#endif
-
-// <o> NRF_RADIO_ANTENNA_PIN_7 - Antenna 7 GPIO pin
-#ifndef NRF_RADIO_ANTENNA_PIN_7
-#define NRF_RADIO_ANTENNA_PIN_7 30
-#endif
-
-// <o> NRF_RADIO_ANTENNA_PIN_8 - Antenna 8 GPIO pin
-#ifndef NRF_RADIO_ANTENNA_PIN_8
-#define NRF_RADIO_ANTENNA_PIN_8 31
-#endif
-
-// <o> NRF_RADIO_ANTENNA_COUNT
-#ifndef NRF_RADIO_ANTENNA_COUNT
-#define NRF_RADIO_ANTENNA_COUNT 12
-#endif
-
-// <o> DTM_RADIO_IRQ_PRIORITY - RADIO interrupt priority
-#ifndef DTM_RADIO_IRQ_PRIORITY
-#define DTM_RADIO_IRQ_PRIORITY 2
-#endif
-
-// <o> DTM_TIMER_IRQ_PRIORITY - DTM timer interrupt priority
-#ifndef DTM_TIMER_IRQ_PRIORITY
-#define DTM_TIMER_IRQ_PRIORITY 3
-#endif
-
-// <o> DTM_ANOMALY_172_TIMER_IRQ_PRIORITY - DTM anomaly 172 timer interrupt priority
-#ifndef DTM_ANOMALY_172_TIMER_IRQ_PRIORITY
-#define DTM_ANOMALY_172_TIMER_IRQ_PRIORITY 2
-#endif
-
-// <o> NRF_DTM_TIMER_INSTANCE  - DTM TIMER instance
-
-// <0=> TIMER0
-// <2=> TIMER2
-// <3=> TIMER3
-// <4=> TIMER4
-
-#ifndef NRF_DTM_TIMER_INSTANCE
-#define NRF_DTM_TIMER_INSTANCE 0
-#endif
-
-// </e>
 
 // <q> BLE_RACP_ENABLED  - ble_racp - Record Access Control Point library
 
 #ifndef BLE_RACP_ENABLED
 #define BLE_RACP_ENABLED 0
+#endif
+
+// <e> NRF_BLE_CONN_PARAMS_ENABLED - ble_conn_params - Initiating and executing a connection parameters negotiation procedure
+//==========================================================
+#ifndef NRF_BLE_CONN_PARAMS_ENABLED
+#define NRF_BLE_CONN_PARAMS_ENABLED 1
+#endif
+// <o> NRF_BLE_CONN_PARAMS_MAX_SLAVE_LATENCY_DEVIATION - The largest acceptable deviation in slave latency.
+// <i> The largest deviation (+ or -) from the requested slave latency that will not be renegotiated.
+
+#ifndef NRF_BLE_CONN_PARAMS_MAX_SLAVE_LATENCY_DEVIATION
+#define NRF_BLE_CONN_PARAMS_MAX_SLAVE_LATENCY_DEVIATION 499
+#endif
+
+// <o> NRF_BLE_CONN_PARAMS_MAX_SUPERVISION_TIMEOUT_DEVIATION - The largest acceptable deviation (in 10 ms units) in supervision timeout.
+// <i> The largest deviation (+ or -, in 10 ms units) from the requested supervision timeout that will not be renegotiated.
+
+#ifndef NRF_BLE_CONN_PARAMS_MAX_SUPERVISION_TIMEOUT_DEVIATION
+#define NRF_BLE_CONN_PARAMS_MAX_SUPERVISION_TIMEOUT_DEVIATION 65535
+#endif
+
+// </e>
+
+// <q> NRF_BLE_GATT_ENABLED  - nrf_ble_gatt - GATT module
+
+#ifndef NRF_BLE_GATT_ENABLED
+#define NRF_BLE_GATT_ENABLED 1
 #endif
 
 // <e> NRF_BLE_QWR_ENABLED - nrf_ble_qwr - Queued writes support module (prepare/execute write)
@@ -1240,7 +1195,7 @@
 // <e> PEER_MANAGER_ENABLED - peer_manager - Peer Manager
 //==========================================================
 #ifndef PEER_MANAGER_ENABLED
-#define PEER_MANAGER_ENABLED 0
+#define PEER_MANAGER_ENABLED 1
 #endif
 // <o> PM_MAX_REGISTRANTS - Number of event handlers that can be registered.
 #ifndef PM_MAX_REGISTRANTS
@@ -1259,7 +1214,7 @@
 // <i> Enable/disable central-specific Peer Manager functionality.
 
 #ifndef PM_CENTRAL_ENABLED
-#define PM_CENTRAL_ENABLED 1
+#define PM_CENTRAL_ENABLED 0
 #endif
 
 // <q> PM_SERVICE_CHANGED_ENABLED  - Enable/disable the service changed management for GATT server in Peer Manager.
@@ -8260,7 +8215,7 @@
 // <e> NRF_LOG_ENABLED - nrf_log - Logger
 //==========================================================
 #ifndef NRF_LOG_ENABLED
-#define NRF_LOG_ENABLED 1
+#define NRF_LOG_ENABLED 0
 #endif
 // <h> Log message pool - Configuration of log message pool
 
@@ -11200,7 +11155,7 @@
 // <q> NRF_LOG_STR_FORMATTER_TIMESTAMP_FORMAT_ENABLED  - nrf_log_str_formatter - Log string formatter
 
 #ifndef NRF_LOG_STR_FORMATTER_TIMESTAMP_FORMAT_ENABLED
-#define NRF_LOG_STR_FORMATTER_TIMESTAMP_FORMAT_ENABLED 1
+#define NRF_LOG_STR_FORMATTER_TIMESTAMP_FORMAT_ENABLED 0
 #endif
 
 // </h>
