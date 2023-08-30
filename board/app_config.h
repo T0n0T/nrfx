@@ -10,7 +10,7 @@
 #define BLE_DIS_ENABLED   1
 #define BLE_HRS_ENABLED   1
 
-#if 1
+#if 0
 // ccm3310s-t
 #define CCM_POR         -1
 #define CCM_GINT0       11

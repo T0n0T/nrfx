@@ -44,11 +44,10 @@ int ec800x_get_rssi(void)
     return (ec800x->rssi);
 }
 
-#define USING_LOC 1
 #if defined(USING_RMC)
 struct gps_info *ec800x_get_gnss(void)
 {
-    return &rmc_info;
+    return &rmcinfo;
 }
 #elif defined(USING_LOC)
 struct LOC_GNSS *ec800x_get_gnss(void)

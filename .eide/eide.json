@@ -20,6 +20,9 @@
           },
           {
             "path": "applications/mnt.c"
+          },
+          {
+            "path": "nrf_sdk/external/cJSON/cJSON.c"
           }
         ],
         "folders": []
@@ -54,15 +57,6 @@
       {
         "name": "ble_services",
         "files": [
-          {
-            "path": "modules/ble_test/ble_srv.c"
-          },
-          {
-            "path": "modules/ble_test/my_ble_dis.c"
-          },
-          {
-            "path": "modules/ble_test/my_ble_hrs.c"
-          },
           {
             "path": "nrf_sdk/rtthread_adapter/ble_app_hrs.c"
           }
@@ -958,7 +952,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": "ip 192.168.1.2"
+        "otherCmds": ""
       },
       "uploadConfigMap": {},
       "custom_dep": {
@@ -1046,7 +1040,8 @@
           "nrf_sdk/components/libraries/sensorsim",
           "nrf_sdk/components/ble/ble_services/ble_bas",
           "nrf_sdk/components/ble/ble_services/ble_dis",
-          "nrf_sdk/components/ble/ble_services/ble_hrs"
+          "nrf_sdk/components/ble/ble_services/ble_hrs",
+          "nrf_sdk/external/cJSON"
         ],
         "libList": [],
         "sourceDirList": [],

@@ -12,40 +12,53 @@
 #include <stdio.h>
 #include <ccm3310.h>
 #include "app.h"
+#include "cJSON.h"
+#include "at_device_ec800x.h"
 #include "paho_mqtt.h"
 
 #define DBG_LVL DBG_INFO
 #define DBG_TAG "app"
 #include <rtdbg.h>
 
-static MQTTClient client;
+#define TIMER_DEV "timer1"
+MQTTClient client;
+rt_device_t timer = NULL;
 
-char format_str[] = "todo";
+char *build_msg_updata(char *device_id, struct LOC_GNSS *info, int battry, int pulse_rate);
+char *build_msg_reply(char *device_id);
 
 static rt_err_t hwtimer_call(rt_device_t dev, rt_size_t size)
 {
-    return paho_mqtt_publish(&client, QOS1, MQTT_TOPIC_DATA, format_str);
+    char *out = build_msg_updata(DEVICE_ID, ec800x_get_gnss(), 99, 75);
+    paho_mqtt_publish(&client, QOS1, MQTT_TOPIC_DATA, out);
+    printf("%s\n", out);
+    free(out);
+    return 0;
 }
 
 static int hwtimer_mission(void)
 {
-    rt_hwtimer_mode_t mode = HWTIMER_MODE_PERIOD;
-    rt_device_t timer      = rt_device_find("timer1");
+    rt_hwtimerval_t timeout_s = {30, 0};
+    rt_hwtimer_mode_t mode    = HWTIMER_MODE_PERIOD;
+    timer                     = rt_device_find(TIMER_DEV);
     if (timer == RT_NULL) {
-        /* todo */
+        LOG_E("%s set callback failed!", TIMER_DEV);
         return -1;
     }
     if (rt_device_set_rx_indicate(timer, hwtimer_call)) {
-        printf("%s set callback failed!", timer->parent.name);
+        LOG_E("%s set callback failed!", TIMER_DEV);
         return -1;
     }
-
     if (rt_device_control(timer, HWTIMER_CTRL_MODE_SET, &mode) != RT_EOK) {
-        printf("%s set mode failed!", timer->parent.name);
+        LOG_E("%s set mode failed!", TIMER_DEV);
+        return -1;
+    }
+    if (rt_device_write(timer, 0, &timeout_s, sizeof(timeout_s)) != sizeof(timeout_s)) {
+        LOG_E("set timeout value failed\n");
         return -1;
     }
     if (rt_device_open(timer, RT_DEVICE_OFLAG_RDWR) != RT_EOK) {
-        printf("open %s device failed!", timer->parent.name);
+        LOG_E("open %s device failed!", TIMER_DEV);
         return -1;
     }
     return 0;
@@ -53,22 +66,22 @@ static int hwtimer_mission(void)
 
 static void mqtt_sub_callback(MQTTClient *c, MessageData *msg_data)
 {
-    paho_mqtt_publish(&client, QOS1, MQTT_TOPIC_DATA, format_str);
+    char *out = build_msg_reply(DEVICE_ID);
+    paho_mqtt_publish(&client, QOS1, MQTT_TOPIC_REPLY, out);
+    printf("%s\n", out);
+    free(out);
 }
 
 static int br_mqtt_init(void)
 {
     rt_memset(&client, 0, sizeof(MQTTClient));
     MQTTPacket_connectData condata = MQTTPacket_connectData_initializer;
-    static char cid[20]            = {0};
     client.isconnected             = 0;
     client.uri                     = MQTT_URI;
 
-    /* generate the random client ID */
-    rt_snprintf(cid, sizeof(cid), "CYGC_%d", rt_tick_get());
     /* config connect param */
     rt_memcpy(&client.condata, &condata, sizeof(condata));
-    client.condata.clientID.cstring  = cid;
+    client.condata.clientID.cstring  = DEVICE_ID;
     client.condata.keepAliveInterval = 30;
     client.condata.cleansession      = 1;
 
@@ -90,3 +103,57 @@ static int br_mqtt_init(void)
         LOG_E("MQTT client start fail!");
     }
 }
+MSH_CMD_EXPORT(br_mqtt_init, test);
+
+char *build_msg_updata(char *device_id, struct LOC_GNSS *info, int battry, int pulse_rate)
+{
+    cJSON *root, *body;
+    char *out;
+    root              = cJSON_CreateObject();
+    struct timeval tv = {0};
+    gettimeofday(&tv, RT_NULL);
+
+    cJSON_AddNumberToObject(root, "timestamp", tv.tv_sec);
+    cJSON_AddStringToObject(root, "type", "SmartBraceletServiceUp");
+    cJSON_AddItemToObject(root, "body", body = cJSON_CreateObject());
+    cJSON_AddStringToObject(body, "deviceId", device_id);
+    cJSON_AddNumberToObject(body, "routePointLon", strtod(info->longitude, NULL));
+    cJSON_AddNumberToObject(body, "routePointLat", strtod(info->latitude, NULL));
+    // cJSON_AddNumberToObject(body, "routePointEle", strtod(info->longitude, NULL));
+    cJSON_AddNumberToObject(body, "routePointEle", 0);
+    cJSON_AddNumberToObject(body, "batteryLevel", battry);
+    cJSON_AddNumberToObject(body, "pulseRate", pulse_rate);
+    out = cJSON_Print(root);
+    cJSON_Delete(root);
+    return out;
+}
+
+char *build_msg_reply(char *device_id)
+{
+    cJSON *root, *body;
+    char *out;
+    root              = cJSON_CreateObject();
+    struct timeval tv = {0};
+    gettimeofday(&tv, RT_NULL);
+
+    cJSON_AddStringToObject(root, "code", "200");
+    cJSON_AddStringToObject(root, "msg", "OK");
+    cJSON_AddNumberToObject(root, "timestamp", tv.tv_sec);
+    cJSON_AddStringToObject(root, "type", "SmartBraceletServiceDown");
+    cJSON_AddItemToObject(root, "body", body = cJSON_CreateObject());
+    cJSON_AddStringToObject(body, "deviceId", device_id);
+    out = cJSON_Print(root);
+    cJSON_Delete(root);
+    return out;
+}
+
+void test_json(void)
+{
+    char *out = build_msg_updata(DEVICE_ID, ec800x_get_gnss(), 99, 75);
+    printf("%s\n", out);
+    free(out);
+    char *out2 = build_msg_reply(DEVICE_ID);
+    printf("%s\n", out2);
+    free(out2);
+}
+MSH_CMD_EXPORT(test_json, test);

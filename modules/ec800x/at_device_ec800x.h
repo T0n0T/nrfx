@@ -38,6 +38,7 @@ extern "C" {
 #define USING_LOC                   1
 #if defined(USING_RMC)
 extern struct gps_info rmcinfo;
+struct gps_info *ec800x_get_gnss(void);
 #elif defined(USING_LOC)
 struct LOC_GNSS {
     char UTC[10];
@@ -54,6 +55,7 @@ struct LOC_GNSS {
 };
 
 extern struct LOC_GNSS gnssmsg;
+struct LOC_GNSS *ec800x_get_gnss(void);
 #endif
 
 struct at_device_ec800x {
@@ -76,6 +78,8 @@ struct at_device_ec800x {
 
     char rmc[EC800X_GPS_MSG_NUM];
 };
+
+int ec800x_get_rssi(void);
 
 #ifdef AT_USING_SOCKET
 

@@ -19,7 +19,7 @@
 #if 1
 
 #define EC800X_WAIT_CONNECT_TIME 2000
-#define EC800X_THREAD_STACK_SIZE 2048
+#define EC800X_THREAD_STACK_SIZE 1024
 #define EC800X_THREAD_PRIORITY   (RT_THREAD_PRIORITY_MAX / 2)
 
 #if defined(USING_RMC)
@@ -204,7 +204,7 @@ static int ec800x_read_rssi(struct at_device *device)
 static int ec800x_read_gnss(struct at_device *device)
 {
     int result         = -RT_ERROR;
-    at_response_t resp = at_create_resp(64, 0, rt_tick_from_millisecond(300));
+    at_response_t resp = at_create_resp(128, 0, rt_tick_from_millisecond(300));
     if (resp == RT_NULL) {
         LOG_D("no memory for resp create.");
         return (result);
@@ -236,6 +236,17 @@ static int ec800x_read_gnss(struct at_device *device)
                                           gnssmsg.spkn,
                                           gnssmsg.utcdate,
                                           gnssmsg.nsat) > 0) {
+
+#if 1
+            printf("time:%s\r\n"
+                  "latitude:%s\r\n"
+                  "longitude:%s\r\n"
+                  "altitude:%s \r\n",
+                  gnssmsg.UTC,
+                  gnssmsg.latitude,
+                  gnssmsg.longitude,
+                  gnssmsg.altitude);
+#endif // 1
             result = RT_EOK;
         }
     }
@@ -864,9 +875,30 @@ static void ec800x_init_thread_entry(void *parameter)
 
         /* configure gnss */
         resp = at_resp_set_info(resp, RESP_SIZE, 0, rt_tick_from_millisecond(300 * 1000));
-        if (at_obj_exec_cmd(device->client, resp, "AT+QGPS=1") != RT_EOK) {
-            result = -RT_ERROR;
-            goto __exit;
+        if (at_obj_exec_cmd(device->client, resp, "AT+QGPS?") == RT_EOK) {
+            int gnss_status = 3;
+            if (at_resp_parse_line_args_by_kw(resp, "+QGPS:", "+QGPS: %d", &gnss_status) > 0) {
+                switch (gnss_status) {
+                    case 0:
+                        if (at_obj_exec_cmd(device->client, resp, "AT+QGPS=1") != RT_EOK) {
+                            LOG_I("open gnss success!");
+                        } else {
+                            LOG_E("open gnss fail!");
+                        }
+                        break;
+                    case 1:
+                        LOG_I("gnss has already open!");
+                        break;
+                    default:
+                        LOG_E("Command AT+QGPS? fail!");
+                        result = -RT_ERROR;
+                        goto __exit;
+                }
+            } else {
+                LOG_E("Command AT+QGPS resp invalid!");
+                result = -RT_ERROR;
+                goto __exit;
+            }
         }
 
         /* only use rmc */

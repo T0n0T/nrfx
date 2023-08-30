@@ -479,16 +479,22 @@ static void timeout(void *param)
 
 int ble_app_hrs(void)
 {
-    static rt_thread_t tid1 = RT_NULL;
-    tid1                    = rt_thread_create("softdevice",
-                                               ble_app_softdevice, RT_NULL,
-                                               4096,
-                                               22, 5);
-    if (tid1 != RT_NULL)
+    rt_thread_t tid1 = RT_NULL;
+    tid1             = rt_thread_create("softdevice",
+                                        ble_app_softdevice, RT_NULL,
+                                        2048,
+                                        22, 5);
+    if (tid1 != RT_NULL) {
+        rt_kprintf("start ble thread hrs\n");
         rt_thread_startup(tid1);
+    } else {
+        rt_kprintf("start ble hrs thread fail %ld\n", (long *)tid1);
+        return -1;
+    }
+
     rt_timer_t update = rt_timer_create("update", timeout, RT_NULL, rt_tick_from_millisecond(1000), RT_TIMER_FLAG_PERIODIC | RT_TIMER_FLAG_SOFT_TIMER);
     if (update != RT_NULL)
         rt_timer_start(update);
-    return RT_EOK;
+    return 0;
 }
 MSH_CMD_EXPORT(ble_app_hrs, ble app heart rate service);

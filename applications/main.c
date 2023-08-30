@@ -38,10 +38,10 @@ int main(void)
 
 static int log_init(void)
 {
-    ret_code_t err_code = NRF_LOG_INIT(NULL);
-    APP_ERROR_CHECK(err_code);
-    // nrf_log_backend_rt_device_init();
-    NRF_LOG_DEFAULT_BACKENDS_INIT();
+    // ret_code_t err_code = NRF_LOG_INIT(NULL);
+    // APP_ERROR_CHECK(err_code);
+    // // nrf_log_backend_rt_device_init();
+    // NRF_LOG_DEFAULT_BACKENDS_INIT();
 
-    NRF_LOG_INFO("Log use RT-DEVICE as output terminal");
+    // NRF_LOG_INFO("Log use RT-DEVICE as output terminal");
 }
