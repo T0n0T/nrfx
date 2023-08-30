@@ -27,8 +27,8 @@ extern "C" {
 #define AT_DEVICE_EC800X_SOCKET
 #define AT_DEVICE_EC800X_SAMPLE
 #define AT_DEVICE_EC800X_INIT_ASYN
-#define EC800X_SAMPLE_POWER_PIN     -1
-#define EC800X_SAMPLE_STATUS_PIN    -1
+#define EC800X_SAMPLE_POWER_PIN     EC800_PIN_PWR
+#define EC800X_SAMPLE_RESET_PIN     EC800_PIN_RESET
 #define EC800X_SAMPLE_WAKEUP_PIN    -1
 #define EC800X_SAMPLE_CLIENT_NAME   "uart0"
 #define EC800X_SAMPLE_RECV_BUFF_LEN 512
@@ -61,7 +61,7 @@ struct at_device_ec800x {
     char *client_name;
 
     int power_pin;
-    int power_status_pin;
+    int reset_pin;
     int wakeup_pin;
     size_t recv_line_num;
     void (*power_ctrl)(int is_on);

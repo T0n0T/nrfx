@@ -12,16 +12,14 @@
 #include "drv_spi.h"
 #include <ccm3310_sm4.h>
 
-#define CS_PIN   BSP_SPI1_SS_PIN
+#define POR      CCM_POR
+#define GINT0    CCM_GINT0
+#define GINT1    CCM_GINT1
 
-#define POR      18
-#define GINT0    19
-#define GINT1    20
-
-#define PIN_SCK  BSP_SPI1_SCK_PIN
-#define PIN_MOSI BSP_SPI1_MOSI_PIN
-#define PIN_MISO BSP_SPI1_MISO_PIN
-#define PIN_SS   BSP_SPI1_SS_PIN
+#define PIN_SCK  CCM_PIN_SCK
+#define PIN_MOSI CCM_PIN_MOSI
+#define PIN_MISO CCM_PIN_MISO
+#define PIN_SS   CCM_PIN_SS
 
 extern void ccm3310_init(void);
 extern void ccm3310_thread_start(void);

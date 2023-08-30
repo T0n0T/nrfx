@@ -33,41 +33,6 @@ static int ec800x_power_on(struct at_device *device)
     struct at_device_ec800x *ec800x = RT_NULL;
 
     ec800x = (struct at_device_ec800x *)device->user_data;
-
-    if (ec800x->power_ctrl) {
-        (ec800x->power_ctrl)(1);
-        rt_thread_mdelay(2000);
-    }
-
-    if (ec800x->power_pin == -1) // no power on pin
-    {
-        ec800x->power_status = RT_TRUE;
-        return (RT_EOK);
-    }
-    if (ec800x->power_status_pin != -1) // use power status pin
-    {
-        ec800x->power_status = rt_pin_read(ec800x->power_status_pin); // read power status
-    }
-    if (ec800x->power_status) // power is on
-    {
-        return (RT_EOK);
-    }
-
-    rt_pin_write(ec800x->power_pin, PIN_HIGH);
-
-    if (ec800x->power_status_pin != -1) // use power status pin
-    {
-        while (rt_pin_read(ec800x->power_status_pin) == PIN_LOW) {
-            rt_thread_mdelay(10);
-        }
-    }
-
-    rt_thread_mdelay(500);
-
-    rt_pin_write(ec800x->power_pin, PIN_LOW);
-
-    ec800x->power_status = RT_TRUE;
-
     return (RT_EOK);
 }
 
@@ -76,43 +41,6 @@ static int ec800x_power_off(struct at_device *device)
     struct at_device_ec800x *ec800x = RT_NULL;
 
     ec800x = (struct at_device_ec800x *)device->user_data;
-
-    if (ec800x->power_ctrl) {
-        ec800x->power_status = RT_FALSE;
-        (ec800x->power_ctrl)(0);
-        rt_thread_mdelay(2 * 1000);
-        return (RT_EOK);
-    }
-
-    if (ec800x->power_pin == -1) // no power on pin
-    {
-        return (RT_EOK);
-    }
-    if (ec800x->power_status_pin != -1) // use power status pin
-    {
-        ec800x->power_status = rt_pin_read(ec800x->power_status_pin); // read power status
-    }
-    if (!ec800x->power_status) // power is off
-    {
-        return (RT_EOK);
-    }
-
-    if (ec800x->power_status_pin != -1) // use power status pin
-    {
-        rt_pin_write(ec800x->power_pin, PIN_HIGH);
-        rt_thread_mdelay(1000);
-        rt_pin_write(ec800x->power_pin, PIN_LOW);
-
-        while (rt_pin_read(ec800x->power_status_pin) == PIN_HIGH) // wait power down
-        {
-            rt_thread_mdelay(100);
-        }
-    } else {
-        at_obj_exec_cmd(device->client, RT_NULL, "AT+QPOWD=0");
-        rt_thread_mdelay(5 * 1000);
-    }
-
-    ec800x->power_status = RT_FALSE;
 
     return (RT_EOK);
 }
@@ -296,7 +224,7 @@ static int ec800x_read_gnss(struct at_device *device)
         struct at_device_ec800x *ec800x = (struct at_device_ec800x *)device->user_data;
         rt_memset(&gnssmsg, 0, sizeof(struct LOC_GNSS));
         if (at_resp_parse_line_args_by_kw(resp, "+QGPSLOC:",
-                                          "+QGPSGNMEA:%[^,],%[^,],%[^,],%[^,],%[^,],%d,%[^,],%[^,],%[^,],%[^,],%[^,]",
+                                          "+QGPSLOC:%[^,],%[^,],%[^,],%[^,],%[^,],%d,%[^,],%[^,],%[^,],%[^,],%[^,]",
                                           gnssmsg.UTC,
                                           gnssmsg.latitude,
                                           gnssmsg.longitude,
@@ -948,7 +876,7 @@ static void ec800x_init_thread_entry(void *parameter)
         }
 
         /* only use beidou*/
-        if (at_obj_exec_cmd(device->client, resp, "AT+QGPSCFG=\"gpssconfig\",7") != RT_EOK) {
+        if (at_obj_exec_cmd(device->client, resp, "AT+QGPSCFG=\"gnssconfig\",7") != RT_EOK) {
             result = -RT_ERROR;
             goto __exit;
         }
@@ -1039,11 +967,16 @@ static int ec800x_init(struct at_device *device)
 
     /* initialize ec800x pin configuration */
     if (ec800x->power_pin != -1) {
-        rt_pin_write(ec800x->power_pin, PIN_LOW);
         rt_pin_mode(ec800x->power_pin, PIN_MODE_OUTPUT);
+        rt_pin_write(ec800x->power_pin, PIN_HIGH);
+        rt_thread_mdelay(700);
+        rt_pin_write(ec800x->power_pin, PIN_LOW);
     }
-    if (ec800x->power_status_pin != -1) {
-        rt_pin_mode(ec800x->power_status_pin, PIN_MODE_INPUT);
+    if (ec800x->reset_pin != -1) {
+        rt_pin_mode(ec800x->reset_pin, PIN_MODE_OUTPUT);
+        rt_pin_write(ec800x->reset_pin, PIN_HIGH);
+        rt_thread_mdelay(700);
+        rt_pin_write(ec800x->reset_pin, PIN_LOW);
     }
     if (ec800x->wakeup_pin != -1) {
         rt_pin_write(ec800x->wakeup_pin, PIN_LOW);

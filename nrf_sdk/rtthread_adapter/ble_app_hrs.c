@@ -132,7 +132,6 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context)
             NRF_LOG_INFO("Disconnected, reason %d.",
                          p_ble_evt->evt.gap_evt.params.disconnected.reason);
             m_conn_handle = BLE_CONN_HANDLE_INVALID;
-            // advertising_start();
             break;
 
         case BLE_GAP_EVT_PHY_UPDATE_REQUEST: {

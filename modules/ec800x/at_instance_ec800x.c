@@ -21,7 +21,7 @@ static struct at_device_ec800x _dev =
         EC800X_SAMPLE_CLIENT_NAME,
 
         EC800X_SAMPLE_POWER_PIN,
-        EC800X_SAMPLE_STATUS_PIN,
+        EC800X_SAMPLE_RESET_PIN,
         EC800X_SAMPLE_WAKEUP_PIN,
         EC800X_SAMPLE_RECV_BUFF_LEN,
         RT_NULL};

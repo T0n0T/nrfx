@@ -13,6 +13,9 @@
         "name": "Applications",
         "files": [
           {
+            "path": "applications/app.c"
+          },
+          {
             "path": "applications/main.c"
           },
           {
@@ -433,10 +436,10 @@
         "name": "mqtt-app",
         "files": [
           {
-            "path": "services/mqtt-api/mqtt_test.c"
+            "path": "services/mqtt-api/mqtt_sample.c"
           },
           {
-            "path": "services/mqtt-api/mqtt_sample.c"
+            "path": "services/mqtt-api/mqtt_test.c"
           }
         ],
         "folders": []
@@ -826,7 +829,6 @@
       "excludeList": [
         "<virtual_root>/WIZnet",
         "<virtual_root>/ccm3310/ccm3310_nrf.c",
-        "<virtual_root>/ec800x",
         "<virtual_root>/nrf_ble/ble_conn_params.c",
         "<virtual_root>/ble_services/ble_srv.c",
         "<virtual_root>/ble_services/my_ble_dis.c",

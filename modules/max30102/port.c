@@ -2,7 +2,7 @@
 
 struct rt_sensor_config cfg = {
     .intf.dev_name = "i2c0",                 // i2c bus name
-    .irq_pin.pin   = 4,                      // interrupt pin
+    .irq_pin.pin   = MAX_PIN_INT,            // interrupt pin
     .mode          = RT_SENSOR_MODE_POLLING, // must have
 };
 
@@ -14,4 +14,5 @@ int max30102_port_init(void)
 
     return RT_EOK;
 }
-INIT_APP_EXPORT(max30102_port_init);
+// INIT_APP_EXPORT(max30102_port_init);
+MSH_CMD_EXPORT(max30102_port_init, test);

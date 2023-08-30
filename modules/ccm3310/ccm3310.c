@@ -36,7 +36,7 @@ void ccm3310_init(void)
     rt_pin_mode(GINT0, PIN_MODE_OUTPUT);
     rt_pin_mode(GINT1, PIN_MODE_INPUT);
 
-    if (rt_spi_bus_attach_device(&ccm, "ccm", "spi1", (void *)CS_PIN) != RT_EOK) {
+    if (rt_spi_bus_attach_device(&ccm, "ccm", "spi1", (void *)PIN_SS) != RT_EOK) {
         LOG_E("Fail to attach %s creating spi_device %s failed.", "spi1", "ccm");
         return;
     }

@@ -66,7 +66,7 @@ static rt_err_t rt_rtc_config(struct rt_device *dev)
     nrfx_rtc_config_t config = NRFX_RTC_DEFAULT_CONFIG;
     config.prescaler         = RTC_PRESCALER;
 
-    nrfx_rtc_init(&rtc_instance, &config, rtc_callback);
+    // nrfx_rtc_init(&rtc_instance, &config, rtc_callback);
 
     nrfx_rtc_tick_enable(&rtc_instance, true);
 

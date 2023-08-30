@@ -3,7 +3,9 @@
 
 /* Automatically generated file; DO NOT EDIT. */
 /* RT-Thread Configuration */
-
+#ifdef USE_APP_CONFIG
+#include "app_config.h"
+#endif
 /* RT-Thread Kernel */
 
 #define RT_NAME_MAX   8
@@ -198,28 +200,6 @@
 
 /* IoT Cloud */
 
-#define PKG_USING_NIMBLE
-
-/* Bluetooth Role support */
-
-#define PKG_NIMBLE_ROLE_PERIPHERAL
-#define PKG_NIMBLE_ROLE_CENTRAL
-#define PKG_NIMBLE_ROLE_BROADCASTER
-#define PKG_NIMBLE_ROLE_OBSERVER
-
-/* Host Stack Configuration */
-
-#define PKG_NIMBLE_HOST
-#define PKG_NIMBLE_HOST_THREAD_STACK_SIZE 1536
-#define PKG_NIMBLE_HOST_THREAD_PRIORITY   8
-
-/* Controller Configuration */
-
-#define PKG_NIMBLE_CTLR
-#define PKG_NIMBLE_CTLR_THREAD_STACK_SIZE 1024
-#define PKG_NIMBLE_CTLR_THREAD_PRIORITY   7
-#define PKG_NIMBLE_BSP_NRF52
-
 /* Bluetooth Mesh support */
 
 /* HCI Transport support */
@@ -260,9 +240,9 @@
 #define SEGGER_RTT_ENABLE
 #define SEGGER_RTT_MAX_NUM_UP_BUFFERS   3
 #define SEGGER_RTT_MAX_NUM_DOWN_BUFFERS 3
-#define BUFFER_SIZE_UP                  1024
+#define BUFFER_SIZE_UP                  2048
 #define BUFFER_SIZE_DOWN                16
-#define SEGGER_RTT_PRINTF_BUFFER_SIZE   64
+#define SEGGER_RTT_PRINTF_BUFFER_SIZE   128
 #define RTT_DEFAULT_BUFFER_INDEX        0
 #define RTT_DEFAULT_TERMINAL_INDEX      0
 #define PKG_USING_SEGGER_RTT_LATEST_VERSION
@@ -294,24 +274,6 @@
 /* sensors drivers */
 
 /* touch drivers */
-
-#define PKG_USING_NRF5X_SDK
-#define NRFX_RTC_ENABLED                                      1
-#define NRFX_RTC1_ENABLED                                     1
-#define NRF_CLOCK_ENABLED                                     1
-#define NRF_SDH_BLE_ENABLED                                   1
-#define NRF_SDH_ENABLED                                       1
-#define NRF_SDH_SOC_ENABLED                                   1
-#define NRF_SDH_BLE_PERIPHERAL_LINK_COUNT                     1
-#define BLE_ADVERTISING_ENABLED                               1
-#define NRF_BLE_QWR_ENABLED                                   1
-#define NRF_SDH_BLE_VS_UUID_COUNT                             1
-#define NRF_BLE_CONN_PARAMS_ENABLED                           1
-#define NRF_BLE_CONN_PARAMS_MAX_SLAVE_LATENCY_DEVIATION       499
-#define NRF_BLE_CONN_PARAMS_MAX_SUPERVISION_TIMEOUT_DEVIATION 65535
-#define NRF_BLE_GATT_ENABLED                                  1
-#define SD_BLE_APP_BEACON
-#define PKG_USING_NRF5X_SDK_V1610
 
 /* Kendryte SDK */
 
@@ -360,24 +322,24 @@
 
 #define BSP_USING_GPIO
 #define BSP_USING_UART0
-#define BSP_UART0_RX_PIN 8
-#define BSP_UART0_TX_PIN 6
+#define BSP_UART0_RX_PIN UART_PIN_RX
+#define BSP_UART0_TX_PIN UART_PIN_TX
 #define BSP_USING_UARTE
 #define BSP_USING_I2C
 #define BSP_USING_I2C0
-#define BSP_I2C0_SCL_PIN 5
-#define BSP_I2C0_SDA_PIN 7
+#define BSP_I2C0_SCL_PIN MAX_PIN_SCL
+#define BSP_I2C0_SDA_PIN MAX_PIN_SDA
 #define BSP_USING_SPI
 #define BSP_USING_SPI1
-#define BSP_SPI1_SCK_PIN  13
-#define BSP_SPI1_MOSI_PIN 15
-#define BSP_SPI1_MISO_PIN 16
-#define BSP_SPI1_SS_PIN   14
+#define BSP_SPI1_SCK_PIN  CCM_PIN_SCK
+#define BSP_SPI1_MOSI_PIN CCM_PIN_MOSI
+#define BSP_SPI1_MISO_PIN CCM_PIN_MISO
+#define BSP_SPI1_SS_PIN   CCM_PIN_SS
 // #define BSP_USING_SPI2
-#define BSP_SPI2_SCK_PIN  26
-#define BSP_SPI2_MOSI_PIN 25
-#define BSP_SPI2_MISO_PIN 24
-#define BSP_SPI2_SS_PIN   27
+// #define BSP_SPI2_SCK_PIN  26
+// #define BSP_SPI2_MOSI_PIN 25
+// #define BSP_SPI2_MISO_PIN 24
+// #define BSP_SPI2_SS_PIN   27
 #define BSP_USING_ON_CHIP_FLASH
 #define BSP_USING_ON_CHIP_FS
 
@@ -389,7 +351,7 @@
 #define MCU_SRAM_SIZE_KB        64
 #define MCU_FLASH_PAGE_SIZE     0x1000
 #define BSP_USING_ONCHIP_RTC
-#define RTC_INSTANCE_ID 2
+#define RTC_INSTANCE_ID 0
 #define BSP_USING_TIM
 #define BSP_USING_TIM1
 #define BSP_USING_SOFTDEVICE
