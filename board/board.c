@@ -14,9 +14,9 @@
 
 #include "board.h"
 #include "drv_uart.h"
-#include <nrfx_clock.h>
+#include <nrf_drv_clock.h>
 
-/**
+/*
  * This is the timer interrupt service routine.
  *
  */
@@ -37,10 +37,11 @@ static void clk_event_handler(nrfx_clock_evt_type_t event)
 
 void SysTick_Configuration(void)
 {
-    nrfx_clock_init(clk_event_handler);
-    nrfx_clock_enable();
-    nrfx_clock_lfclk_start();
-    /* Set interrupt priority */
+    nrf_drv_clock_init();
+    // nrfx_clock_init(clk_event_handler);
+    // nrfx_clock_enable();
+    // // nrfx_clock_lfclk_start();
+    // /* Set interrupt priority */
     NVIC_SetPriority(SysTick_IRQn, 0xf);
 
     /* Configure SysTick to interrupt at the requested rate. */

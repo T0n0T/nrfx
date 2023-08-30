@@ -4,7 +4,7 @@ from building import *
 
 cwd = GetCurrentDir()
 src = Glob('*.c')
-src += ['./sdk_config.h']
+src += ['../board/sdk_config.h']
 CPPPATH = [cwd]
 define = ['USE_APP_CONFIG']
 

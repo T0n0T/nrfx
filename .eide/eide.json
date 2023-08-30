@@ -251,6 +251,9 @@
           },
           {
             "path": "libraries/drivers/drv_uarte.c"
+          },
+          {
+            "path": "nrf_sdk/integration/nrfx/legacy/nrf_drv_clock.c"
           }
         ],
         "folders": []
@@ -953,7 +956,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": ""
+        "otherCmds": "ip 192.168.1.2"
       },
       "uploadConfigMap": {},
       "custom_dep": {
@@ -1059,7 +1062,9 @@
           "LFS_CONFIG=lfs_config.h",
           "CONFIG_GPIO_AS_PINRESET",
           "USE_APP_CONFIG",
-          "DEBUG"
+          "DEBUG",
+          "NRF_SD_BLE_API_VERSION=7",
+          " S132"
         ]
       }
     },

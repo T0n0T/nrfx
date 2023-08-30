@@ -20,7 +20,9 @@
             "ble_advertising.h": "c",
             "ble_bas.h": "c",
             "ble_hrs.h": "c",
-            "ble_dis.h": "c"
+            "ble_dis.h": "c",
+            "nrfx_clock.h": "c",
+            "nrf_clock.h": "c"
         }
     },
     "extensions": {}
