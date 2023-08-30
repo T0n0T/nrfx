@@ -110,16 +110,15 @@ static rt_err_t soft_rtc_control(rt_device_t dev, int cmd, void *args)
 
     switch (cmd)
     {
-    case RT_DEVICE_CTRL_RTC_GET_TIME:
-        t = (time_t *) args;
-        *t = init_time + (rt_tick_get() - init_tick) / RT_TICK_PER_SECOND;
-        break;
-    case RT_DEVICE_CTRL_RTC_SET_TIME:
-    {
-        t = (time_t *) args;
-        set_rtc_time(*t);
-        _source_device_control(RT_DEVICE_CTRL_RTC_SET_TIME, t);
-        break;
+        case RT_DEVICE_CTRL_RTC_GET_TIMEVAL:
+            t  = (time_t *)args;
+            *t = init_time + (rt_tick_get() - init_tick) / RT_TICK_PER_SECOND;
+            break;
+        case RT_DEVICE_CTRL_RTC_SET_TIME: {
+            t = (time_t *)args;
+            set_rtc_time(*t);
+            _source_device_control(RT_DEVICE_CTRL_RTC_SET_TIME, t);
+            break;
     }
 #ifdef RT_USING_ALARM
     case RT_DEVICE_CTRL_RTC_GET_ALARM:

@@ -199,6 +199,9 @@
             "path": "rt-thread/components/drivers/rtc/rtc.c"
           },
           {
+            "path": "rt-thread/components/drivers/rtc/soft_rtc.c"
+          },
+          {
             "path": "rt-thread/components/drivers/sensor/v1/sensor_cmd.c"
           },
           {
@@ -826,7 +829,8 @@
         "<virtual_root>/nrf_ble/ble_conn_params.c",
         "<virtual_root>/ble_services/ble_srv.c",
         "<virtual_root>/ble_services/my_ble_dis.c",
-        "<virtual_root>/ble_services/my_ble_hrs.c"
+        "<virtual_root>/ble_services/my_ble_hrs.c",
+        "<virtual_root>/Drivers/drv_rtc.c"
       ],
       "toolchain": "AC5",
       "compileConfig": {

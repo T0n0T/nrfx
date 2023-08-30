@@ -32,7 +32,8 @@
             "at_log.h": "c",
             "paho_mqtt.h": "c",
             "app.h": "c",
-            "stacktrace.h": "c"
+            "stacktrace.h": "c",
+            "app_config.h": "c"
         }
     },
     "extensions": {}
