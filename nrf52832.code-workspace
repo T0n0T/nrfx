@@ -33,7 +33,12 @@
             "paho_mqtt.h": "c",
             "app.h": "c",
             "stacktrace.h": "c",
-            "app_config.h": "c"
+            "app_config.h": "c",
+            "nrfx_systick.h": "c",
+            "nrfx.h": "c",
+            "nrf_systick.h": "c",
+            "board.h": "c",
+            "mqttconnect.h": "c"
         }
     },
     "extensions": {}

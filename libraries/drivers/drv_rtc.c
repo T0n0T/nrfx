@@ -55,8 +55,8 @@ static void rtc_callback(nrfx_rtc_int_type_t int_type)
 
 static rt_err_t rt_rtc_config(struct rt_device *dev)
 {
-#define SYSTICK_CLOCK_HZ (32768UL)
-#define RTC_PRESCALER    ((uint32_t)(NRFX_ROUNDED_DIV(SYSTICK_CLOCK_HZ, TICK_FREQUENCE_HZ) - 1))
+#define LF_CLK_HZ     (32768UL)
+#define RTC_PRESCALER ((uint32_t)(NRFX_ROUNDED_DIV(LF_CLK_HZ, TICK_FREQUENCE_HZ) - 1))
 
     const nrfx_rtc_t rtc_instance = NRFX_RTC_INSTANCE(RTC_INSTANCE_ID);
     nrf_clock_lf_src_set((nrf_clock_lfclk_t)NRFX_CLOCK_CONFIG_LF_SRC);

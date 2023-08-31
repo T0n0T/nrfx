@@ -6,6 +6,7 @@ Import('rtconfig')
 # nrfx_hal
 cwd  = GetCurrentDir() + '/modules/nrfx/'
 src = Glob('./modules/nrfx/drivers/src/*.c')
+src += ['./integration/nrfx/legacy/nrf_drv_clock.c']
 path = []
 define = []
 

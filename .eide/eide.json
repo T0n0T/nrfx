@@ -830,7 +830,8 @@
         "<virtual_root>/ble_services/ble_srv.c",
         "<virtual_root>/ble_services/my_ble_dis.c",
         "<virtual_root>/ble_services/my_ble_hrs.c",
-        "<virtual_root>/Drivers/drv_rtc.c"
+        "<virtual_root>/ccm3310",
+        "<virtual_root>/DeviceDrivers/soft_rtc.c"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -956,7 +957,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": ""
+        "otherCmds": "ip 192.168.1.2"
       },
       "uploadConfigMap": {},
       "custom_dep": {

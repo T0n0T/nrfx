@@ -14,6 +14,7 @@
 
 #include "board.h"
 #include "drv_uart.h"
+#include <nrfx_rtc.h>
 #include <nrf_drv_clock.h>
 
 /*
@@ -29,25 +30,56 @@ void SysTick_Handler(void)
 
     /* leave interrupt */
     rt_interrupt_leave();
+    // rt_kprintf("systick event!\n");
 }
 
-static void clk_event_handler(nrfx_clock_evt_type_t event)
+void RTC1_IRQ(void)
 {
+    rt_interrupt_enter();
+
+    rt_tick_increase();
+
+    /* leave interrupt */
+    rt_interrupt_leave();
+    // rt_kprintf("clk_event!\n");
+}
+
+void RTC_tick_configure(void)
+{
+#define LF_CLK_HZ     (32768UL)
+#define RTC_PRESCALER ((uint32_t)(NRFX_ROUNDED_DIV(LF_CLK_HZ, RT_TICK_PER_SECOND) - 1))
+    NVIC_SetPriority(RTC1_IRQn, 0xf);
+
+    const nrfx_rtc_t rtc_instance = NRFX_RTC_INSTANCE(1);
+    nrf_clock_lf_src_set((nrf_clock_lfclk_t)NRFX_CLOCK_CONFIG_LF_SRC);
+    nrfx_clock_lfclk_start();
+
+    // Initialize RTC instance
+    nrfx_rtc_config_t config = NRFX_RTC_DEFAULT_CONFIG;
+    config.prescaler         = RTC_PRESCALER;
+
+    nrfx_rtc_init(&rtc_instance, &config, RTC1_IRQ);
+
+    nrfx_rtc_tick_enable(&rtc_instance, true);
+
+    // Power on RTC instance
+    nrfx_rtc_enable(&rtc_instance);
 }
 
 void SysTick_Configuration(void)
 {
     // nrf_drv_clock_init();
-    nrfx_clock_init(clk_event_handler);
-    nrfx_clock_enable();
-    // nrfx_clock_lfclk_start();
-    /* Set interrupt priority */
+    // nrfx_clock_init(clk_event_handler);
+    // nrfx_clock_enable();
+    // // nrfx_clock_lfclk_start();
+    // nrfx_clock_hfclk_start();
+    // /* Set interrupt priority */
     NVIC_SetPriority(SysTick_IRQn, 0xf);
 
-    /* Configure SysTick to interrupt at the requested rate. */
+    // /* Configure SysTick to interrupt at the requested rate. */
     nrf_systick_load_set(SystemCoreClock / RT_TICK_PER_SECOND);
     nrf_systick_val_clear();
-    nrf_systick_csr_set(NRF_SYSTICK_CSR_CLKSOURCE_CPU | NRF_SYSTICK_CSR_TICKINT_ENABLE | NRF_SYSTICK_CSR_ENABLE);
+    nrf_systick_csr_set(NRF_SYSTICK_CSR_CLKSOURCE_REF | NRF_SYSTICK_CSR_TICKINT_ENABLE | NRF_SYSTICK_CSR_ENABLE);
 }
 
 /**
@@ -86,7 +118,9 @@ void rt_hw_board_init(void)
     /* Activate deep sleep mode */
     SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
 
-    SysTick_Configuration();
+    // SysTick_Configuration();
+    // SystemInit();
+    RTC_tick_configure();
 
 #if defined(RT_USING_HEAP)
     rt_system_heap_init((void *)HEAP_BEGIN, (void *)HEAP_END);

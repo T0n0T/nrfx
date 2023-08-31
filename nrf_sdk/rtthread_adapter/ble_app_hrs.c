@@ -466,7 +466,7 @@ static void ble_app_softdevice(void *param)
     conn_params_init();
     rt_kprintf("hrs example started.\r\n");
     advertising_start();
-    // rt_kprintf("hrs !!!!!!!!!!!!!!!!!.\r\n");
+    rt_kprintf("hrs !!!!!!!!!!!!!!!!!.\r\n");
 }
 
 static void timeout(void *param)
