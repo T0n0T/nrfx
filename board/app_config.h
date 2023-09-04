@@ -29,8 +29,8 @@
 #define LED3        27
 
 // ec800m
-#define UART_PIN_RX     5
-#define UART_PIN_TX     4
+#define UART_PIN_RX     4
+#define UART_PIN_TX     5
 #define EC800_PIN_RESET 22
 #define EC800_PIN_PWR   3
 
