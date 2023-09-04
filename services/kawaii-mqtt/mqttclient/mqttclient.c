@@ -1232,6 +1232,9 @@ int mqtt_release(mqtt_client_t* c)
         c->mqtt_write_buf = NULL;
     }
 
+    platform_mutex_destroy(&c->mqtt_write_lock);
+    platform_mutex_destroy(&c->mqtt_global_lock);
+
     memset(c, 0, sizeof(mqtt_client_t));
 
     RETURN_ERROR(KAWAII_MQTT_SUCCESS_ERROR);
