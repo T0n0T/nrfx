@@ -998,17 +998,18 @@ static int ec800x_init(struct at_device *device)
     }
 
     /* initialize ec800x pin configuration */
-    if (ec800x->power_pin != -1) {
-        rt_pin_mode(ec800x->power_pin, PIN_MODE_OUTPUT);
-        rt_pin_write(ec800x->power_pin, PIN_HIGH);
-        rt_thread_mdelay(700);
-        rt_pin_write(ec800x->power_pin, PIN_LOW);
-    }
+
     if (ec800x->reset_pin != -1) {
         rt_pin_mode(ec800x->reset_pin, PIN_MODE_OUTPUT);
         rt_pin_write(ec800x->reset_pin, PIN_HIGH);
         rt_thread_mdelay(700);
         rt_pin_write(ec800x->reset_pin, PIN_LOW);
+    }
+    if (ec800x->power_pin != -1) {
+        rt_pin_mode(ec800x->power_pin, PIN_MODE_OUTPUT);
+        rt_pin_write(ec800x->power_pin, PIN_HIGH);
+        rt_thread_mdelay(700);
+        rt_pin_write(ec800x->power_pin, PIN_LOW);
     }
     if (ec800x->wakeup_pin != -1) {
         rt_pin_write(ec800x->wakeup_pin, PIN_LOW);

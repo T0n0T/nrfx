@@ -40,6 +40,8 @@ int main(void)
     // rt_device_open(dev, RT_DEVICE_OFLAG_RDWR | RT_DEVICE_FLAG_DMA_RX);
     // rt_device_set_rx_indicate(dev, rx_ind);
     rt_pin_mode(DK_BOARD_LED_1, PIN_MODE_OUTPUT);
+    rt_pin_mode(7, PIN_MODE_OUTPUT);
+    rt_pin_write(7, PIN_LOW);
     while (1) {
         NRF_LOG_INTERNAL_FLUSH();
         // rt_device_write(dev, 0, "hello", 6);

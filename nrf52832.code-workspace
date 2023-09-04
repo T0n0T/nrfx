@@ -4,43 +4,6 @@
             "path": "."
         }
     ],
-    "settings": {
-        "files.associations": {
-            "*.cpp": "cpp",
-            "*.html": "html",
-            "*.env": "dotenv",
-            "*.go": "go",
-            "nrf_ble_gatt.h": "c",
-            "ble_conn_params.h": "c",
-            "nrf_log_default_backends.h": "c",
-            "ble_advdata.h": "c",
-            "ble_lbs.h": "c",
-            "nrf_ble_qwr.h": "c",
-            "sensorsim.h": "c",
-            "ble_advertising.h": "c",
-            "ble_bas.h": "c",
-            "ble_hrs.h": "c",
-            "ble_dis.h": "c",
-            "nrfx_clock.h": "c",
-            "nrf_clock.h": "c",
-            "ccm3310.h": "c",
-            "rtconfig.h": "c",
-            "drv_uart.h": "c",
-            "nrf_drv_clock.h": "c",
-            "at_device_ec800x.h": "c",
-            "string.h": "c",
-            "at_log.h": "c",
-            "paho_mqtt.h": "c",
-            "app.h": "c",
-            "stacktrace.h": "c",
-            "app_config.h": "c",
-            "nrfx_systick.h": "c",
-            "nrfx.h": "c",
-            "nrf_systick.h": "c",
-            "board.h": "c",
-            "mqttconnect.h": "c",
-            "max30102.h": "c"
-        }
-    },
+    "settings": {},
     "extensions": {}
 }
