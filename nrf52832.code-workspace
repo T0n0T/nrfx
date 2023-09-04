@@ -38,7 +38,8 @@
             "nrfx.h": "c",
             "nrf_systick.h": "c",
             "board.h": "c",
-            "mqttconnect.h": "c"
+            "mqttconnect.h": "c",
+            "max30102.h": "c"
         }
     },
     "extensions": {}

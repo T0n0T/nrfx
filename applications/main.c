@@ -25,13 +25,25 @@
 
 static int log_init(void);
 
+static rt_err_t rx_ind(rt_device_t dev, rt_size_t size)
+{
+    char buf[64] = {0};
+    rt_device_read(dev, 0, (void *)buf, size);
+    printf("recv: %s\n", buf);
+    return RT_EOK;
+}
+
 int main(void)
 {
     log_init();
-
+    // rt_device_t dev = rt_device_find("uart0");
+    // rt_device_open(dev, RT_DEVICE_OFLAG_RDWR | RT_DEVICE_FLAG_DMA_RX);
+    // rt_device_set_rx_indicate(dev, rx_ind);
     rt_pin_mode(DK_BOARD_LED_1, PIN_MODE_OUTPUT);
     while (1) {
         NRF_LOG_INTERNAL_FLUSH();
+        // rt_device_write(dev, 0, "hello", 6);
+        // printf("uart has already sent\n");
         rt_pin_write(DK_BOARD_LED_1, PIN_HIGH);
         rt_thread_mdelay(500);
         rt_pin_write(DK_BOARD_LED_1, PIN_LOW);

@@ -317,12 +317,21 @@ int rt_hw_max30102_init(struct rt_sensor_config *cfg)
 
         // MAX30102 Init.
         uint8_t uch_dummy;
-        maxim_max30102_reset(); // resets the MAX30102
+        if (!maxim_max30102_reset()) {
+            err_msg = "reset max30102 error.";
+            break;
+        } // resets the MAX30102
         rt_thread_mdelay(1000);
 
-        maxim_max30102_read_reg(REG_INTR_STATUS_1, &uch_dummy, sizeof(uch_dummy)); // Reads/clears the interrupt status register
+        if (!maxim_max30102_read_reg(REG_INTR_STATUS_1, &uch_dummy, sizeof(uch_dummy))) {
+            err_msg = "clean max30102 interrupt status error.";
+            break;
+        } // Reads/clears the interrupt status register
         // maxim_max30102_init();                                                     // initialize the MAX30102
-        maxim_max30102_init_proximity_mode(); // initialize the MAX30102
+        if (!maxim_max30102_init_proximity_mode()) {
+            err_msg = "set max30102 proximity_mode error.";
+            break;
+        } // initialize the MAX30102
 
         tid = rt_thread_create("max30102", max30102_thread_entry, sensor,
                                MAX30102_STACK_SIZE, 20, MAX30102_TICKS);
@@ -331,7 +340,6 @@ int rt_hw_max30102_init(struct rt_sensor_config *cfg)
             break;
         }
         rt_thread_startup(tid);
-
     } while (0);
 
     if (err_msg) {

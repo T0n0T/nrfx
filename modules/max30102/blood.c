@@ -299,6 +299,7 @@ void max30102_thread_entry(void *args)
 
     rt_pin_mode(cfg.irq_pin.pin, PIN_MODE_INPUT_PULLUP);
     while (1) {
+        // max30102_read_fifo();
         blood_Loop();
         // LOG_D("-------------------------------------------");
         rt_thread_mdelay(500);
