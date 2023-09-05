@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <app.h>
 
+#include <at.h>
 #include <nrfx_systick.h>
 #include <nrf_drv_clock.h>
 
@@ -36,6 +37,7 @@ static rt_err_t rx_ind(rt_device_t dev, rt_size_t size)
 int main(void)
 {
     log_init();
+    // at_client_init("uart0", 256);
     // rt_device_t dev = rt_device_find("uart0");
     // rt_device_open(dev, RT_DEVICE_OFLAG_RDWR | RT_DEVICE_FLAG_DMA_RX);
     // rt_device_set_rx_indicate(dev, rx_ind);
@@ -79,3 +81,12 @@ static int log_init(void)
 
     NRF_LOG_INFO("Log use RT-DEVICE as output terminal");
 }
+
+static void pwr_test(void)
+{
+    rt_pin_mode(3, PIN_MODE_OUTPUT);
+    rt_pin_write(3, PIN_HIGH);
+    rt_thread_mdelay(700);
+    rt_pin_write(3, PIN_LOW);
+}
+MSH_CMD_EXPORT(pwr_test, test);

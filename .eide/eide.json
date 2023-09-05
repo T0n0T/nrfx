@@ -31,13 +31,13 @@
         "name": "AT",
         "files": [
           {
+            "path": "rt-thread/components/net/at/at_socket/at_socket.c"
+          },
+          {
             "path": "rt-thread/components/net/at/src/at_cli.c"
           },
           {
             "path": "rt-thread/components/net/at/src/at_client.c"
-          },
-          {
-            "path": "rt-thread/components/net/at/at_socket/at_socket.c"
           },
           {
             "path": "rt-thread/components/net/at/src/at_utils.c"
@@ -151,13 +151,13 @@
             "path": "rt-thread/components/drivers/hwtimer/hwtimer.c"
           },
           {
-            "path": "rt-thread/components/drivers/i2c/i2c-bit-ops.c"
-          },
-          {
             "path": "rt-thread/components/drivers/i2c/i2c_core.c"
           },
           {
             "path": "rt-thread/components/drivers/i2c/i2c_dev.c"
+          },
+          {
+            "path": "rt-thread/components/drivers/i2c/i2c-bit-ops.c"
           },
           {
             "path": "rt-thread/components/drivers/ipc/completion.c"
@@ -193,10 +193,10 @@
             "path": "rt-thread/components/drivers/rtc/soft_rtc.c"
           },
           {
-            "path": "rt-thread/components/drivers/sensor/v1/sensor.c"
+            "path": "rt-thread/components/drivers/sensor/v1/sensor_cmd.c"
           },
           {
-            "path": "rt-thread/components/drivers/sensor/v1/sensor_cmd.c"
+            "path": "rt-thread/components/drivers/sensor/v1/sensor.c"
           },
           {
             "path": "rt-thread/components/drivers/serial/serial.c"
@@ -213,6 +213,9 @@
       {
         "name": "Drivers",
         "files": [
+          {
+            "path": "board/app_config.h"
+          },
           {
             "path": "board/board.c"
           },
@@ -247,13 +250,13 @@
         "name": "ec800x",
         "files": [
           {
-            "path": "modules/ec800x/at_socket_ec800x.c"
-          },
-          {
             "path": "modules/ec800x/at_device_ec800x.c"
           },
           {
             "path": "modules/ec800x/at_instance_ec800x.c"
+          },
+          {
+            "path": "modules/ec800x/at_socket_ec800x.c"
           }
         ],
         "folders": []
@@ -826,7 +829,12 @@
   },
   "targets": {
     "rtthread": {
-      "excludeList": [],
+      "excludeList": [
+        "<virtual_root>/ccm3310",
+        "<virtual_root>/max30102",
+        "<virtual_root>/WIZnet",
+        "<virtual_root>/DeviceDrivers/soft_rtc.c"
+      ],
       "toolchain": "AC5",
       "compileConfig": {
         "cpuType": "Cortex-M4",

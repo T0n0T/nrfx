@@ -8,8 +8,10 @@
  * @copyright Copyright (c) 2023
  *
  */
-#define DEVICE_ID        "test"
-#define MQTT_URI_HOST    "broker.emqx.io"
-#define MQTT_URI_PORT    "1883"
-#define MQTT_TOPIC_REPLY "/topic/test"
-#define MQTT_TOPIC_DATA  "/topic/test"
+#define DEVICE_ID "CYGC_00122367"
+#define MQTT_URI_HOST    "172.16.248.66"
+#define MQTT_URI_PORT    "18891"
+// #define MQTT_URI_HOST    "broker.emqx.io"
+// #define MQTT_URI_PORT    "1883"
+#define MQTT_TOPIC_REPLY "/iot/CYGC_00122367/GW/device/reply"
+#define MQTT_TOPIC_DATA  "/iot/CYGC_00122367/GW/device/data"

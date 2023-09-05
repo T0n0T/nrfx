@@ -30,18 +30,23 @@ mqtt_message_t msg;
 
 char *build_msg_updata(char *device_id, struct LOC_GNSS *info, int battry, int pulse_rate);
 
-static void mqtt_entry(void *p)
+static void publish_handle(void)
 {
     memset(&msg, 0, sizeof(msg));
     mqtt_error_t err = KAWAII_MQTT_SUCCESS_ERROR;
     msg.qos          = QOS0;
-    msg.payload      = (void *)"this is a kawaii mqtt test ...";
+    msg.payload      = build_msg_updata(DEVICE_ID, ec800x_get_gnss(), 99, 78);
+    err              = mqtt_publish(client, MQTT_TOPIC_DATA, &msg);
+    if (err != KAWAII_MQTT_SUCCESS_ERROR) {
+        LOG_E("publish msg fail, err[%d]", err);
+    }
+    LOG_D("publish msg success!!!!!!!!\n");
+}
+
+static void mqtt_entry(void *p)
+{
     while (1) {
-        // err = mqtt_publish(client, "/topic/test", &msg);
-        if (err != KAWAII_MQTT_SUCCESS_ERROR) {
-            LOG_E("publish msg fail, err[%d]", err);
-        }
-        LOG_D("publish msg success!!!!!!!!\n");
+        publish_handle();
         rt_thread_mdelay(MQTT_DELAY_MS);
     }
 }
@@ -89,8 +94,8 @@ static int mqtt_mission_init(void)
 
     mqtt_set_host(client, MQTT_URI_HOST);
     mqtt_set_port(client, MQTT_URI_PORT);
-    mqtt_set_user_name(client, "test");
-    mqtt_set_password(client, "public");
+    // mqtt_set_user_name(client, "test");
+    // mqtt_set_password(client, "public");
     mqtt_set_client_id(client, DEVICE_ID);
     mqtt_set_clean_session(client, 1);
 
@@ -102,7 +107,7 @@ static int mqtt_mission_init(void)
         return -1;
     }
     rt_thread_delay(1000);
-    err = mqtt_subscribe(client, "/topic/test", QOS1, sub_handle);
+    err = mqtt_subscribe(client, MQTT_TOPIC_DATA, QOS1, sub_handle);
     if (err != KAWAII_MQTT_SUCCESS_ERROR) {
         LOG_E("mqtt set subscribe fail, err[%d]", err);
         return -1;
@@ -116,13 +121,12 @@ void mission_init(void)
     if (mqtt_mission_init() != 0) {
         return;
     }
-    if (thread_mission_init() != 0) {
-        mqtt_disconnect(client);
-        mqtt_release(client);
-        rt_free(client);
-    }
+    // if (thread_mission_init() != 0) {
+    //     mqtt_disconnect(client);
+    //     mqtt_release(client);
+    //     rt_free(client);
+    // }
 }
-MSH_CMD_EXPORT(mission_init, test);
 
 void mission_deinit(void)
 {
@@ -135,7 +139,6 @@ void mission_deinit(void)
     rt_free(client);
     printf("4\n");
 }
-MSH_CMD_EXPORT(mission_deinit, test);
 
 char *build_msg_updata(char *device_id, struct LOC_GNSS *info, int battry, int pulse_rate)
 {
@@ -159,3 +162,7 @@ char *build_msg_updata(char *device_id, struct LOC_GNSS *info, int battry, int p
     cJSON_Delete(root);
     return out;
 }
+
+MSH_CMD_EXPORT_ALIAS(publish_handle, publish, test);
+MSH_CMD_EXPORT(mission_init, test);
+MSH_CMD_EXPORT(mission_deinit, test);
