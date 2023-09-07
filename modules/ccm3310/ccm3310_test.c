@@ -14,7 +14,7 @@
 #include <board.h>
 #include <ccm3310.h>
 
-uint8_t sm4_id;
+static uint8_t sm4_id;
 // char origin_text[] = "{\"test\":\"hello\",\"description\":\"here's a sm4 test.\"}";
 char origin_text[] = "hello!here's a test,with utf-8";
 ciphertext cipher_text;

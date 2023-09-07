@@ -33,6 +33,7 @@ static int ec800x_power_on(struct at_device *device)
     struct at_device_ec800x *ec800x = RT_NULL;
 
     ec800x = (struct at_device_ec800x *)device->user_data;
+
     return (RT_EOK);
 }
 
@@ -184,9 +185,10 @@ static int ec800x_read_rssi(struct at_device *device)
     }
 
     if (at_obj_exec_cmd(device->client, resp, "AT+CSQ") == RT_EOK) {
-        int rssi = 0;
-        if (at_resp_parse_line_args_by_kw(resp, "+CSQ:", "+CSQ: %d", &rssi) > 0) {
+        int rssi = 0, err_rate = 0;
+        if (at_resp_parse_line_args_by_kw(resp, "+CSQ:", "+CSQ: %d,%d", &rssi, &err_rate) > 0) {
             struct at_device_ec800x *ec800x = (struct at_device_ec800x *)device->user_data;
+            rt_kprintf("AT+CSQ get rssi: %d\n", rssi);
             if (rssi < 99) {
                 ec800x->rssi = rssi * 2 - 113;
             } else if (rssi >= 100 && rssi < 199) {
@@ -239,13 +241,13 @@ static int ec800x_read_gnss(struct at_device *device)
 
 #if 1
             printf("time:%s\r\n"
-                  "latitude:%s\r\n"
-                  "longitude:%s\r\n"
-                  "altitude:%s \r\n",
-                  gnssmsg.UTC,
-                  gnssmsg.latitude,
-                  gnssmsg.longitude,
-                  gnssmsg.altitude);
+                   "latitude:%s\r\n"
+                   "longitude:%s\r\n"
+                   "altitude:%s \r\n",
+                   gnssmsg.UTC,
+                   gnssmsg.latitude,
+                   gnssmsg.longitude,
+                   gnssmsg.altitude);
 #endif // 1
             result = RT_EOK;
         }
@@ -414,14 +416,14 @@ static void ec800x_check_link_status_entry(void *parameter)
             LOG_E("ec800x read rssi failed");
         }
 
-        result = ec800x_read_gnss(device);
-        if (result != RT_EOK) {
-            if (result = -RT_ERROR) {
-                LOG_E("ec800x read gnss failed");
-            } else if (result = RT_ERROR) {
-                LOG_E("ec800x gnss valid");
-            }
-        }
+        // result = ec800x_read_gnss(device);
+        // if (result != RT_EOK) {
+        //     if (result = -RT_ERROR) {
+        //         LOG_E("ec800x read gnss failed");
+        //     } else if (result = RT_ERROR) {
+        //         LOG_E("ec800x gnss valid");
+        //     }
+        // }
 
         rt_thread_delay(EC800X_LINK_DELAY_TIME);
 

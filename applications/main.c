@@ -88,5 +88,10 @@ static void pwr_test(void)
     rt_pin_write(3, PIN_HIGH);
     rt_thread_mdelay(700);
     rt_pin_write(3, PIN_LOW);
+
+    rt_pin_mode(22, PIN_MODE_OUTPUT);
+    rt_pin_write(22, PIN_HIGH);
+    rt_thread_mdelay(700);
+    rt_pin_write(22, PIN_LOW);
 }
 MSH_CMD_EXPORT(pwr_test, test);

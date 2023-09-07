@@ -58,22 +58,22 @@
         "name": "ccm3310",
         "files": [
           {
-            "path": "modules/ccm3310/ccm3310_test.c"
+            "path": "modules/ccm3310/ccm3310_nrf.c"
           },
           {
-            "path": "modules/ccm3310/crc32.c"
+            "path": "modules/ccm3310/ccm3310_sm4.c"
+          },
+          {
+            "path": "modules/ccm3310/ccm3310_test.c"
           },
           {
             "path": "modules/ccm3310/ccm3310.c"
           },
           {
-            "path": "modules/ccm3310/ccm3310_nrf.c"
+            "path": "modules/ccm3310/crc32.c"
           },
           {
             "path": "modules/ccm3310/decode.c"
-          },
-          {
-            "path": "modules/ccm3310/ccm3310_sm4.c"
           }
         ],
         "folders": []
@@ -830,10 +830,10 @@
   "targets": {
     "rtthread": {
       "excludeList": [
-        "<virtual_root>/ccm3310",
         "<virtual_root>/max30102",
         "<virtual_root>/WIZnet",
-        "<virtual_root>/DeviceDrivers/soft_rtc.c"
+        "<virtual_root>/DeviceDrivers/soft_rtc.c",
+        "<virtual_root>/ccm3310/ccm3310_nrf.c"
       ],
       "toolchain": "AC5",
       "compileConfig": {
