@@ -6,7 +6,11 @@
     ],
     "settings": {
         "files.associations": {
-            "app.h": "c"
+            "app.h": "c",
+            "rtconfig.h": "c",
+            "button.h": "c",
+            "rthw.h": "c",
+            "rtthread.h": "c"
         }
     },
     "extensions": {}

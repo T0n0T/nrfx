@@ -736,7 +736,7 @@ static struct netdev *ec800x_netdev_add(const char *netdev_name)
 static void ec800x_init_thread_entry(void *parameter)
 {
 #define RESP_SIZE    128
-#define INIT_RETRY   5
+#define INIT_RETRY   1
 #define CPIN_RETRY   10
 #define CSQ_RETRY    20
 #define CGREG_RETRY  50

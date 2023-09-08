@@ -23,10 +23,14 @@
 #define MAX_PIN_INT 29
 #define MAX_PIN_SCL 30
 #define MAX_PIN_SDA 31
-#define BEEP        2
-#define LED1        25
-#define LED2        26
-#define LED3        27
+
+// hal
+#define BEEP       2
+#define SW         19
+#define LED1       25
+#define LED2       26
+#define LED3       27
+#define POWER_KEEP 28
 
 // ec800m
 #define UART_PIN_RX     4

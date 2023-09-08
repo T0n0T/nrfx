@@ -118,9 +118,9 @@ void rt_hw_board_init(void)
     /* Activate deep sleep mode */
     SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
 
-    // SysTick_Configuration();
-    // SystemInit();
-    RTC_tick_configure();
+    SysTick_Configuration();
+
+    // RTC_tick_configure();
 
 #if defined(RT_USING_HEAP)
     rt_system_heap_init((void *)HEAP_BEGIN, (void *)HEAP_END);

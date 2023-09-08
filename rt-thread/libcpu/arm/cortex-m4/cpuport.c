@@ -20,13 +20,10 @@
 
 #include <rtthread.h>
 
-#if               /* ARMCC */ (  (defined ( __CC_ARM ) && defined ( __TARGET_FPU_VFP ))    \
-                  /* Clang */ || (defined ( __clang__ ) && defined ( __VFP_FP__ ) && !defined(__SOFTFP__)) \
-                  /* IAR */   || (defined ( __ICCARM__ ) && defined ( __ARMVFP__ ))        \
-                  /* GNU */   || (defined ( __GNUC__ ) && defined ( __VFP_FP__ ) && !defined(__SOFTFP__)) )
-#define USE_FPU   1
+#if /* ARMCC */ ((defined(__CC_ARM) && defined(__TARGET_FPU_VFP)) /* Clang */ || (defined(__clang__) && defined(__VFP_FP__) && !defined(__SOFTFP__)) /* IAR */ || (defined(__ICCARM__) && defined(__ARMVFP__)) /* GNU */ || (defined(__GNUC__) && defined(__VFP_FP__) && !defined(__SOFTFP__)))
+#define USE_FPU 1
 #else
-#define USE_FPU   0
+#define USE_FPU 0
 #endif
 
 /* exception and interrupt handler table */
@@ -36,8 +33,7 @@ rt_uint32_t rt_thread_switch_interrupt_flag;
 /* exception hook */
 static rt_err_t (*rt_exception_hook)(void *context) = RT_NULL;
 
-struct exception_stack_frame
-{
+struct exception_stack_frame {
     rt_uint32_t r0;
     rt_uint32_t r1;
     rt_uint32_t r2;
@@ -48,8 +44,7 @@ struct exception_stack_frame
     rt_uint32_t psr;
 };
 
-struct stack_frame
-{
+struct stack_frame {
 #if USE_FPU
     rt_uint32_t flag;
 #endif /* USE_FPU */
@@ -67,8 +62,7 @@ struct stack_frame
     struct exception_stack_frame exception_stack_frame;
 };
 
-struct exception_stack_frame_fpu
-{
+struct exception_stack_frame_fpu {
     rt_uint32_t r0;
     rt_uint32_t r1;
     rt_uint32_t r2;
@@ -101,8 +95,7 @@ struct exception_stack_frame_fpu
 #endif
 };
 
-struct stack_frame_fpu
-{
+struct stack_frame_fpu {
     rt_uint32_t flag;
 
     /* r4 ~ r11 register */
@@ -138,24 +131,23 @@ struct stack_frame_fpu
     struct exception_stack_frame_fpu exception_stack_frame;
 };
 
-rt_uint8_t *rt_hw_stack_init(void       *tentry,
-                             void       *parameter,
+rt_uint8_t *rt_hw_stack_init(void *tentry,
+                             void *parameter,
                              rt_uint8_t *stack_addr,
-                             void       *texit)
+                             void *texit)
 {
     struct stack_frame *stack_frame;
-    rt_uint8_t         *stk;
-    unsigned long       i;
+    rt_uint8_t *stk;
+    unsigned long i;
 
-    stk  = stack_addr + sizeof(rt_uint32_t);
-    stk  = (rt_uint8_t *)RT_ALIGN_DOWN((rt_uint32_t)stk, 8);
+    stk = stack_addr + sizeof(rt_uint32_t);
+    stk = (rt_uint8_t *)RT_ALIGN_DOWN((rt_uint32_t)stk, 8);
     stk -= sizeof(struct stack_frame);
 
     stack_frame = (struct stack_frame *)stk;
 
     /* init all register */
-    for (i = 0; i < sizeof(struct stack_frame) / sizeof(rt_uint32_t); i ++)
-    {
+    for (i = 0; i < sizeof(struct stack_frame) / sizeof(rt_uint32_t); i++) {
         ((rt_uint32_t *)stack_frame)[i] = 0xdeadbeef;
     }
 
@@ -193,9 +185,9 @@ void rt_hw_exception_install(rt_err_t (*exception_handle)(void *context))
 #define SCB_AIRCR       (*(volatile unsigned long *)0xE000ED0C)  /* Reset control Address Register */
 #define SCB_RESET_VALUE 0x05FA0004                               /* Reset value, write to SCB_AIRCR can reset cpu */
 
-#define SCB_CFSR_MFSR   (*(volatile const unsigned char*)0xE000ED28)  /* Memory-management Fault Status Register */
-#define SCB_CFSR_BFSR   (*(volatile const unsigned char*)0xE000ED29)  /* Bus Fault Status Register */
-#define SCB_CFSR_UFSR   (*(volatile const unsigned short*)0xE000ED2A) /* Usage Fault Status Register */
+#define SCB_CFSR_MFSR   (*(volatile const unsigned char *)0xE000ED28)  /* Memory-management Fault Status Register */
+#define SCB_CFSR_BFSR   (*(volatile const unsigned char *)0xE000ED29)  /* Bus Fault Status Register */
+#define SCB_CFSR_UFSR   (*(volatile const unsigned short *)0xE000ED2A) /* Usage Fault Status Register */
 
 #ifdef RT_USING_FINSH
 static void usage_fault_track(void)
@@ -203,38 +195,32 @@ static void usage_fault_track(void)
     rt_kprintf("usage fault:\n");
     rt_kprintf("SCB_CFSR_UFSR:0x%02X ", SCB_CFSR_UFSR);
 
-    if(SCB_CFSR_UFSR & (1<<0))
-    {
+    if (SCB_CFSR_UFSR & (1 << 0)) {
         /* [0]:UNDEFINSTR */
         rt_kprintf("UNDEFINSTR ");
     }
 
-    if(SCB_CFSR_UFSR & (1<<1))
-    {
+    if (SCB_CFSR_UFSR & (1 << 1)) {
         /* [1]:INVSTATE */
         rt_kprintf("INVSTATE ");
     }
 
-    if(SCB_CFSR_UFSR & (1<<2))
-    {
+    if (SCB_CFSR_UFSR & (1 << 2)) {
         /* [2]:INVPC */
         rt_kprintf("INVPC ");
     }
 
-    if(SCB_CFSR_UFSR & (1<<3))
-    {
+    if (SCB_CFSR_UFSR & (1 << 3)) {
         /* [3]:NOCP */
         rt_kprintf("NOCP ");
     }
 
-    if(SCB_CFSR_UFSR & (1<<8))
-    {
+    if (SCB_CFSR_UFSR & (1 << 8)) {
         /* [8]:UNALIGNED */
         rt_kprintf("UNALIGNED ");
     }
 
-    if(SCB_CFSR_UFSR & (1<<9))
-    {
+    if (SCB_CFSR_UFSR & (1 << 9)) {
         /* [9]:DIVBYZERO */
         rt_kprintf("DIVBYZERO ");
     }
@@ -247,42 +233,34 @@ static void bus_fault_track(void)
     rt_kprintf("bus fault:\n");
     rt_kprintf("SCB_CFSR_BFSR:0x%02X ", SCB_CFSR_BFSR);
 
-    if(SCB_CFSR_BFSR & (1<<0))
-    {
+    if (SCB_CFSR_BFSR & (1 << 0)) {
         /* [0]:IBUSERR */
         rt_kprintf("IBUSERR ");
     }
 
-    if(SCB_CFSR_BFSR & (1<<1))
-    {
+    if (SCB_CFSR_BFSR & (1 << 1)) {
         /* [1]:PRECISERR */
         rt_kprintf("PRECISERR ");
     }
 
-    if(SCB_CFSR_BFSR & (1<<2))
-    {
+    if (SCB_CFSR_BFSR & (1 << 2)) {
         /* [2]:IMPRECISERR */
         rt_kprintf("IMPRECISERR ");
     }
 
-    if(SCB_CFSR_BFSR & (1<<3))
-    {
+    if (SCB_CFSR_BFSR & (1 << 3)) {
         /* [3]:UNSTKERR */
         rt_kprintf("UNSTKERR ");
     }
 
-    if(SCB_CFSR_BFSR & (1<<4))
-    {
+    if (SCB_CFSR_BFSR & (1 << 4)) {
         /* [4]:STKERR */
         rt_kprintf("STKERR ");
     }
 
-    if(SCB_CFSR_BFSR & (1<<7))
-    {
+    if (SCB_CFSR_BFSR & (1 << 7)) {
         rt_kprintf("SCB->BFAR:%08X\n", SCB_BFAR);
-    }
-    else
-    {
+    } else {
         rt_kprintf("\n");
     }
 }
@@ -292,79 +270,65 @@ static void mem_manage_fault_track(void)
     rt_kprintf("mem manage fault:\n");
     rt_kprintf("SCB_CFSR_MFSR:0x%02X ", SCB_CFSR_MFSR);
 
-    if(SCB_CFSR_MFSR & (1<<0))
-    {
+    if (SCB_CFSR_MFSR & (1 << 0)) {
         /* [0]:IACCVIOL */
         rt_kprintf("IACCVIOL ");
     }
 
-    if(SCB_CFSR_MFSR & (1<<1))
-    {
+    if (SCB_CFSR_MFSR & (1 << 1)) {
         /* [1]:DACCVIOL */
         rt_kprintf("DACCVIOL ");
     }
 
-    if(SCB_CFSR_MFSR & (1<<3))
-    {
+    if (SCB_CFSR_MFSR & (1 << 3)) {
         /* [3]:MUNSTKERR */
         rt_kprintf("MUNSTKERR ");
     }
 
-    if(SCB_CFSR_MFSR & (1<<4))
-    {
+    if (SCB_CFSR_MFSR & (1 << 4)) {
         /* [4]:MSTKERR */
         rt_kprintf("MSTKERR ");
     }
 
-    if(SCB_CFSR_MFSR & (1<<7))
-    {
+    if (SCB_CFSR_MFSR & (1 << 7)) {
         /* [7]:MMARVALID */
         rt_kprintf("SCB->MMAR:%08X\n", SCB_MMAR);
-    }
-    else
-    {
+    } else {
         rt_kprintf("\n");
     }
 }
 
 static void hard_fault_track(void)
 {
-    if(SCB_HFSR & (1UL<<1))
-    {
+    if (SCB_HFSR & (1UL << 1)) {
         /* [1]:VECTBL, Indicates hard fault is caused by failed vector fetch. */
         rt_kprintf("failed vector fetch\n");
     }
 
-    if(SCB_HFSR & (1UL<<30))
-    {
+    if (SCB_HFSR & (1UL << 30)) {
         /* [30]:FORCED, Indicates hard fault is taken because of bus fault,
                         memory management fault, or usage fault. */
-        if(SCB_CFSR_BFSR)
-        {
+        if (SCB_CFSR_BFSR) {
             bus_fault_track();
         }
 
-        if(SCB_CFSR_MFSR)
-        {
+        if (SCB_CFSR_MFSR) {
             mem_manage_fault_track();
         }
 
-        if(SCB_CFSR_UFSR)
-        {
+        if (SCB_CFSR_UFSR) {
             usage_fault_track();
         }
     }
 
-    if(SCB_HFSR & (1UL<<31))
-    {
+    if (SCB_HFSR & (1UL << 31)) {
         /* [31]:DEBUGEVT, Indicates hard fault is triggered by debug event. */
         rt_kprintf("debug event\n");
     }
 }
 #endif /* RT_USING_FINSH */
 
-struct exception_info
-{
+struct exception_info {
     rt_uint32_t exc_return;
     struct stack_frame stack_frame;
 };
@@ -375,10 +339,9 @@ void rt_hw_hard_fault_exception(struct exception_info *exception_info)
     extern long list_thread(void);
 #endif
     struct exception_stack_frame *exception_stack = &exception_info->stack_frame.exception_stack_frame;
-    struct stack_frame *context = &exception_info->stack_frame;
+    struct stack_frame *context                   = &exception_info->stack_frame;
 
-    if (rt_exception_hook != RT_NULL)
-    {
+    if (rt_exception_hook != RT_NULL) {
         rt_err_t result;
 
         result = rt_exception_hook(exception_stack);
@@ -403,21 +366,17 @@ void rt_hw_hard_fault_exception(struct exception_info *exception_info)
     rt_kprintf(" lr: 0x%08x\n", context->exception_stack_frame.lr);
     rt_kprintf(" pc: 0x%08x\n", context->exception_stack_frame.pc);
 
-    if (exception_info->exc_return & (1 << 2))
-    {
+    if (exception_info->exc_return & (1 << 2)) {
         rt_kprintf("hard fault on thread: %s\r\n\r\n", rt_thread_self()->parent.name);
 
 #if defined(RT_USING_FINSH) && defined(MSH_USING_BUILT_IN_COMMANDS)
         list_thread();
 #endif
-    }
-    else
-    {
+    } else {
         rt_kprintf("hard fault on handler\r\n\r\n");
     }
 
-    if ( (exception_info->exc_return & 0x10) == 0)
-    {
+    if ((exception_info->exc_return & 0x10) == 0) {
         rt_kprintf("FPU active!\r\n");
     }
 
@@ -425,7 +384,8 @@ void rt_hw_hard_fault_exception(struct exception_info *exception_info)
     hard_fault_track();
 #endif /* RT_USING_FINSH */
 
-    while (1);
+    while (1)
+        ;
 }
 
 /**
@@ -435,6 +395,7 @@ void rt_hw_cpu_reset(void)
 {
     SCB_AIRCR = SCB_RESET_VALUE;
 }
+MSH_CMD_EXPORT_ALIAS(rt_hw_cpu_reset, reboot, Reboot System);
 
 #ifdef RT_USING_CPU_FFS
 /**
@@ -450,15 +411,16 @@ void rt_hw_cpu_reset(void)
 #if defined(__CC_ARM)
 __asm int __rt_ffs(int value)
 {
-    CMP     r0, #0x00
-    BEQ     exit
+    CMP r0, #0x00 BEQ exit
 
-    RBIT    r0, r0
-    CLZ     r0, r0
-    ADDS    r0, r0, #0x01
+                RBIT r0,
+        r0
+            CLZ r0,
+        r0
+            ADDS r0,
+        r0, #0x01
 
-exit
-    BX      lr
+        exit BX lr
 }
 #elif defined(__clang__)
 int __rt_ffs(int value)
@@ -474,8 +436,7 @@ int __rt_ffs(int value)
         "1:                           \n"
 
         : "=r"(value)
-        : "r"(value)
-    );
+        : "r"(value));
     return value;
 }
 #elif defined(__IAR_SYSTEMS_ICC__)
@@ -483,9 +444,15 @@ int __rt_ffs(int value)
 {
     if (value == 0) return value;
 
-    asm("RBIT %0, %1" : "=r"(value) : "r"(value));
-    asm("CLZ  %0, %1" : "=r"(value) : "r"(value));
-    asm("ADDS %0, %1, #0x01" : "=r"(value) : "r"(value));
+    asm("RBIT %0, %1"
+        : "=r"(value)
+        : "r"(value));
+    asm("CLZ  %0, %1"
+        : "=r"(value)
+        : "r"(value));
+    asm("ADDS %0, %1, #0x01"
+        : "=r"(value)
+        : "r"(value));
 
     return value;
 }

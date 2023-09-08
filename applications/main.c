@@ -13,7 +13,7 @@
 #include <rtdevice.h>
 #include <stdio.h>
 #include <app.h>
-
+#include <button.h>
 #include <at.h>
 #include <nrfx_systick.h>
 #include <nrf_drv_clock.h>
@@ -25,29 +25,54 @@
 #define DK_BOARD_LED_1 LED1
 
 static int log_init(void);
+Button_t SW_BUTTON;
 
-static rt_err_t rx_ind(rt_device_t dev, rt_size_t size)
+rt_uint8_t read_sw_btn(void)
 {
-    char buf[64] = {0};
-    rt_device_read(dev, 0, (void *)buf, size);
-    printf("recv: %s\n", buf);
-    return RT_EOK;
+    return rt_pin_read(SW);
+}
+
+void btn_double(void)
+{
+    rt_kprintf("power off!\n");
+    rt_pin_write(POWER_KEEP, PIN_LOW);
+}
+
+void btn_click(void)
+{
+    rt_kprintf("power on!\n");
+    rt_pin_write(POWER_KEEP, PIN_HIGH);
+}
+
+void test_entry(void *p)
+{
+    rt_pin_mode(SW, PIN_MODE_INPUT);
+    Button_Create(
+        "SW",
+        &SW_BUTTON,
+        read_sw_btn,
+        PIN_LOW);
+    Button_Attach(&SW_BUTTON, BUTTON_DOWM, btn_click);
+    Button_Attach(&SW_BUTTON, BUTTON_DOUBLE, btn_double);
+    while (1) {
+        Button_Process();
+        rt_thread_mdelay(40);
+    }
 }
 
 int main(void)
 {
     log_init();
-    // at_client_init("uart0", 256);
-    // rt_device_t dev = rt_device_find("uart0");
-    // rt_device_open(dev, RT_DEVICE_OFLAG_RDWR | RT_DEVICE_FLAG_DMA_RX);
-    // rt_device_set_rx_indicate(dev, rx_ind);
+    rt_pin_mode(POWER_KEEP, PIN_MODE_OUTPUT);
+    rt_pin_write(POWER_KEEP, PIN_HIGH);
+
     rt_pin_mode(DK_BOARD_LED_1, PIN_MODE_OUTPUT);
-    rt_pin_mode(7, PIN_MODE_OUTPUT);
-    rt_pin_write(7, PIN_LOW);
+
+    rt_thread_t test_thread = rt_thread_create("pin_test", test_entry, 0, 1024, 22, 5);
+    rt_thread_startup(test_thread);
     while (1) {
         NRF_LOG_INTERNAL_FLUSH();
-        // rt_device_write(dev, 0, "hello", 6);
-        // printf("uart has already sent\n");
+
         rt_pin_write(DK_BOARD_LED_1, PIN_HIGH);
         rt_thread_mdelay(500);
         rt_pin_write(DK_BOARD_LED_1, PIN_LOW);
@@ -55,22 +80,6 @@ int main(void)
     }
     return RT_EOK;
 }
-
-static void systic_test(void)
-{
-    // nrfx_systick_init();
-    // nrf_systick_csr_set(NRF_SYSTICK_CSR_CLKSOURCE_REF | NRF_SYSTICK_CSR_TICKINT_ENABLE | NRF_SYSTICK_CSR_ENABLE);
-    printf("systick csr : %ld\n", nrf_systick_csr_get());
-    printf("systick val: %ld\n", nrf_systick_val_get());
-    printf("systick load: %ld\n", nrf_systick_load_get());
-    printf("hfclk is: %d\n", nrfx_clock_hfclk_is_running());
-    printf("lfclk is: %d\n", nrfx_clock_lfclk_is_running());
-    for (size_t i = 0; i < 10; i++) {
-        nrfx_systick_delay_ms(500);
-        printf("systick 500ms!\n");
-    }
-}
-MSH_CMD_EXPORT(systic_test, test);
 
 static int log_init(void)
 {

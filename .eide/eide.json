@@ -22,6 +22,9 @@
             "path": "applications/mnt.c"
           },
           {
+            "path": "modules/button/button.c"
+          },
+          {
             "path": "nrf_sdk/external/cJSON/cJSON.c"
           }
         ],
@@ -529,112 +532,112 @@
         "name": "nrf_hal",
         "files": [
           {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_uart.c"
-          },
-          {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_rng.c"
-          },
-          {
-            "path": "nrf_sdk/modules/nrfx/mdk/arm_startup_nrf52.s"
-          },
-          {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_i2s.c"
-          },
-          {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_spim.c"
-          },
-          {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_timer.c"
-          },
-          {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_ppi.c"
-          },
-          {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_pdm.c"
-          },
-          {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_rtc.c"
-          },
-          {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_dppi.c"
-          },
-          {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_qspi.c"
-          },
-          {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_gpiote.c"
-          },
-          {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_temp.c"
-          },
-          {
             "path": "nrf_sdk/integration/nrfx/legacy/nrf_drv_clock.c"
-          },
-          {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_swi.c"
-          },
-          {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_twim.c"
-          },
-          {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_uarte.c"
-          },
-          {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_qdec.c"
           },
           {
             "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_adc.c"
           },
           {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_twis.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_clock.c"
           },
           {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_twi.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_comp.c"
           },
           {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_spi.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_dppi.c"
           },
           {
-            "path": "nrf_sdk/modules/nrfx/mdk/system_nrf52.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_gpiote.c"
           },
           {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_power.c"
-          },
-          {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_pwm.c"
-          },
-          {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_wdt.c"
-          },
-          {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_systick.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_i2s.c"
           },
           {
             "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_lpcomp.c"
           },
           {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_saadc.c"
-          },
-          {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_twi_twim.c"
-          },
-          {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_usbd.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_nfct.c"
           },
           {
             "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_nvmc.c"
           },
           {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_nfct.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_pdm.c"
           },
           {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_clock.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_power.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_ppi.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_pwm.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_qdec.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_qspi.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_rng.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_rtc.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_saadc.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_spi.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_spim.c"
           },
           {
             "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_spis.c"
           },
           {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_comp.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_swi.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_systick.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_temp.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_timer.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_twi_twim.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_twi.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_twim.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_twis.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_uart.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_uarte.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_usbd.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_wdt.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/mdk/arm_startup_nrf52.s"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/mdk/system_nrf52.c"
           }
         ],
         "folders": []
@@ -1045,7 +1048,8 @@
           "services/kawaii-mqtt/platform/RT-Thread",
           "rt-thread/components/net/sal/include",
           "RTE/_rtthread",
-          "nrf_sdk/external/cJSON"
+          "nrf_sdk/external/cJSON",
+          "modules/button"
         ],
         "libList": [],
         "sourceDirList": [],
