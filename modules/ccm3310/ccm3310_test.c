@@ -129,7 +129,7 @@ uint8_t Sym_Decrypt[] = {
     // 5.8保留，
     // (5.9无初始向量置空)
     0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
-    // 5.10明文
+    // 5.10密文
     0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00,
@@ -219,7 +219,6 @@ static void ccm3310_sm4_encrypt_test(void)
 
 static void ccm3310_sm4_decrypt_test(void)
 {
-    uint8_t *unmarshel_data = 0;
     printf("sm4_id: 0x%02X\n", sm4_id);
     plain_text = ccm3310_sm4_decrypt(sm4_id, cipher_text);
     printf("\n========= print decrypt ===========\n");

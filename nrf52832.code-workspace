@@ -10,7 +10,12 @@
             "rtconfig.h": "c",
             "button.h": "c",
             "rthw.h": "c",
-            "rtthread.h": "c"
+            "rtthread.h": "c",
+            "platform_mutex.h": "c",
+            "rtdbg.h": "c",
+            "salof.h": "c",
+            "platform_net_socket.h": "c",
+            "mqtt_error.h": "c"
         }
     },
     "extensions": {}

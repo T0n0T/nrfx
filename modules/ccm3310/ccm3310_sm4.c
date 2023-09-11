@@ -44,8 +44,8 @@ ciphertext ccm3310_sm4_encrypt(uint8_t key_id, pdata p)
 {
     int plen                                   = numalgin(p.len, 16);
     int sm4_crypt_struct_len                   = sizeof(ccm3310_sym_crypt_data) + plen - 1;
-    ccm3310_sym_crypt_data *sm4_encrypt_struct = (ccm3310_sym_crypt_data *)rt_malloc(sm4_crypt_struct_len);
-    uint8_t *pack                              = (uint8_t *)rt_malloc(sm4_crypt_struct_len + RECV_PRE_LEN);
+    ccm3310_sym_crypt_data *sm4_encrypt_struct = (ccm3310_sym_crypt_data *)rt_calloc(1, sm4_crypt_struct_len);
+    uint8_t *pack                              = (uint8_t *)rt_calloc(1, sm4_crypt_struct_len + RECV_PRE_LEN);
     sm4_encrypt_struct->version                = 0;
     sm4_encrypt_struct->key_id                 = key_id;
     sm4_encrypt_struct->mode                   = 0x00;
@@ -82,8 +82,8 @@ plaintext ccm3310_sm4_decrypt(uint8_t key_id, pdata p)
 {
     int plen                                   = numalgin(p.len, 16);
     int sm4_crypt_struct_len                   = sizeof(ccm3310_sym_crypt_data) + plen - 1;
-    ccm3310_sym_crypt_data *sm4_decrypt_struct = (ccm3310_sym_crypt_data *)rt_malloc(sm4_crypt_struct_len);
-    uint8_t *pack                              = (uint8_t *)rt_malloc(sm4_crypt_struct_len + RECV_PRE_LEN);
+    ccm3310_sym_crypt_data *sm4_decrypt_struct = (ccm3310_sym_crypt_data *)rt_calloc(1, sm4_crypt_struct_len);
+    uint8_t *pack                              = (uint8_t *)rt_calloc(1, sm4_crypt_struct_len + RECV_PRE_LEN);
     sm4_decrypt_struct->version                = 0;
     sm4_decrypt_struct->key_id                 = key_id;
     sm4_decrypt_struct->mode                   = 0x00;

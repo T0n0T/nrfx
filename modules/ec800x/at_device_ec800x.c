@@ -768,6 +768,10 @@ static void ec800x_init_thread_entry(void *parameter)
             goto __exit;
         }
 
+        if (at_obj_exec_cmd(device->client, resp, "AT&F") != RT_EOK) {
+            result = -RT_ERROR;
+            goto __exit;
+        }
         /* disable echo */
         if (at_obj_exec_cmd(device->client, resp, "ATE0") != RT_EOK) {
             result = -RT_ERROR;

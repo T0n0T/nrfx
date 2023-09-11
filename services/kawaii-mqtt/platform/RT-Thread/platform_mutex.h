@@ -14,11 +14,11 @@ typedef struct platform_mutex {
     rt_mutex_t mutex;
 } platform_mutex_t;
 
-#define platform_mutex_init(m) \
-    (printf("mutex_init, %s:%d %s\n", __FILE__, __LINE__, __FUNCTION__), mutex_init(m))
+#define platform_mutex_init(m) mutex_init(m)
+// (printf("mutex_init, %s:%d %s\n", __FILE__, __LINE__, __FUNCTION__), mutex_init(m))
 
-#define platform_mutex_destroy(m) \
-    (printf("mutex_destroy, %s:%d %s\n", __FILE__, __LINE__, __FUNCTION__), mutex_destroy(m))
+#define platform_mutex_destroy(m) mutex_destroy(m)
+// (printf("mutex_destroy, %s:%d %s\n", __FILE__, __LINE__, __FUNCTION__), mutex_destroy(m))
 
 int mutex_init(platform_mutex_t *m);
 int platform_mutex_lock(platform_mutex_t *m);

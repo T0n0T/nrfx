@@ -27,49 +27,49 @@
 static int log_init(void);
 Button_t SW_BUTTON;
 
-rt_uint8_t read_sw_btn(void)
-{
-    return rt_pin_read(SW);
-}
+// rt_uint8_t read_sw_btn(void)
+// {
+//     return rt_pin_read(SW);
+// }
 
-void btn_double(void)
-{
-    rt_kprintf("power off!\n");
-    rt_pin_write(POWER_KEEP, PIN_LOW);
-}
+// void btn_double(void)
+// {
+//     rt_kprintf("power off!\n");
+//     rt_pin_write(POWER_KEEP, PIN_LOW);
+// }
 
-void btn_click(void)
-{
-    rt_kprintf("power on!\n");
-    rt_pin_write(POWER_KEEP, PIN_HIGH);
-}
+// void btn_click(void)
+// {
+//     rt_kprintf("power on!\n");
+//     rt_pin_write(POWER_KEEP, PIN_HIGH);
+// }
 
-void test_entry(void *p)
-{
-    rt_pin_mode(SW, PIN_MODE_INPUT);
-    Button_Create(
-        "SW",
-        &SW_BUTTON,
-        read_sw_btn,
-        PIN_LOW);
-    Button_Attach(&SW_BUTTON, BUTTON_DOWM, btn_click);
-    Button_Attach(&SW_BUTTON, BUTTON_DOUBLE, btn_double);
-    while (1) {
-        Button_Process();
-        rt_thread_mdelay(40);
-    }
-}
+// void test_entry(void *p)
+// {
+//     rt_pin_mode(SW, PIN_MODE_INPUT);
+//     Button_Create(
+//         "SW",
+//         &SW_BUTTON,
+//         read_sw_btn,
+//         PIN_LOW);
+//     Button_Attach(&SW_BUTTON, BUTTON_DOWM, btn_click);
+//     Button_Attach(&SW_BUTTON, BUTTON_DOUBLE, btn_double);
+//     while (1) {
+//         Button_Process();
+//         rt_thread_mdelay(40);
+//     }
+// }
 
 int main(void)
 {
     log_init();
-    rt_pin_mode(POWER_KEEP, PIN_MODE_OUTPUT);
-    rt_pin_write(POWER_KEEP, PIN_HIGH);
+    // rt_pin_mode(POWER_KEEP, PIN_MODE_OUTPUT);
+    // rt_pin_write(POWER_KEEP, PIN_HIGH);
 
     rt_pin_mode(DK_BOARD_LED_1, PIN_MODE_OUTPUT);
 
-    rt_thread_t test_thread = rt_thread_create("pin_test", test_entry, 0, 1024, 22, 5);
-    rt_thread_startup(test_thread);
+    // rt_thread_t test_thread = rt_thread_create("pin_test", test_entry, 0, 1024, 22, 5);
+    // rt_thread_startup(test_thread);
     while (1) {
         NRF_LOG_INTERNAL_FLUSH();
 

@@ -20,7 +20,7 @@
 #define LOG_TAG "at.clnt"
 #include <at_log.h>
 
-#define AT_PRINT_RAW_CMD
+// #define AT_PRINT_RAW_CMD
 
 #ifdef AT_USING_CLIENT
 
