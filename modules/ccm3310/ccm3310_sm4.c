@@ -65,7 +65,6 @@ ciphertext ccm3310_sm4_encrypt(uint8_t key_id, pdata p)
     ciphertext encrypt_data;
     int send_len     = encode(0x80, 0x44, 0x00, 0x00, pack, (uint8_t *)sm4_encrypt_struct, sm4_crypt_struct_len);
     encrypt_data.len = ccm3310_transfer(pack, send_len, &encrypt_data.data, plen + RECV_PRE_LEN);
-    printf("align wordnum: %d\n", plen);
     rt_free((void *)pack);
     rt_free((void *)sm4_encrypt_struct);
     return encrypt_data;

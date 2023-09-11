@@ -61,9 +61,6 @@
         "name": "ccm3310",
         "files": [
           {
-            "path": "modules/ccm3310/ccm3310_nrf.c"
-          },
-          {
             "path": "modules/ccm3310/ccm3310_sm4.c"
           },
           {
@@ -268,6 +265,9 @@
         "name": "Fal",
         "files": [
           {
+            "path": "rt-thread/components/fal/src/fal_flash.c"
+          },
+          {
             "path": "rt-thread/components/fal/src/fal_partition.c"
           },
           {
@@ -275,9 +275,6 @@
           },
           {
             "path": "rt-thread/components/fal/src/fal.c"
-          },
-          {
-            "path": "rt-thread/components/fal/src/fal_flash.c"
           }
         ],
         "folders": []
@@ -712,13 +709,13 @@
         "name": "nrf_softdev",
         "files": [
           {
-            "path": "nrf_sdk/components/softdevice/common/nrf_sdh.c"
+            "path": "nrf_sdk/components/softdevice/common/nrf_sdh_ble.c"
           },
           {
             "path": "nrf_sdk/components/softdevice/common/nrf_sdh_soc.c"
           },
           {
-            "path": "nrf_sdk/components/softdevice/common/nrf_sdh_ble.c"
+            "path": "nrf_sdk/components/softdevice/common/nrf_sdh.c"
           }
         ],
         "folders": []
@@ -739,10 +736,10 @@
         "name": "SAL",
         "files": [
           {
-            "path": "rt-thread/components/net/netdev/src/netdev.c"
+            "path": "rt-thread/components/net/netdev/src/netdev_ipaddr.c"
           },
           {
-            "path": "rt-thread/components/net/netdev/src/netdev_ipaddr.c"
+            "path": "rt-thread/components/net/netdev/src/netdev.c"
           },
           {
             "path": "rt-thread/components/net/sal/dfs_net/dfs_net.c"
@@ -769,10 +766,10 @@
             "path": "packages/SEGGER_RTT-latest/adapter/drv_rtt.c"
           },
           {
-            "path": "packages/SEGGER_RTT-latest/RTT/SEGGER_RTT.c"
+            "path": "packages/SEGGER_RTT-latest/RTT/SEGGER_RTT_printf.c"
           },
           {
-            "path": "packages/SEGGER_RTT-latest/RTT/SEGGER_RTT_printf.c"
+            "path": "packages/SEGGER_RTT-latest/RTT/SEGGER_RTT.c"
           }
         ],
         "folders": []
@@ -836,7 +833,17 @@
         "<virtual_root>/max30102",
         "<virtual_root>/WIZnet",
         "<virtual_root>/DeviceDrivers/soft_rtc.c",
-        "<virtual_root>/ccm3310/ccm3310_nrf.c"
+        "<virtual_root>/ccm3310/ccm3310_nrf.c",
+        "<virtual_root>/cm_backtrace",
+        "<virtual_root>/Applications/mnt.c",
+        "<virtual_root>/Fal",
+        "<virtual_root>/littlefs",
+        "<virtual_root>/Drivers/drv_flash.c",
+        "<virtual_root>/DeviceDrivers/i2c-bit-ops.c",
+        "<virtual_root>/DeviceDrivers/hwtimer.c",
+        "<virtual_root>/Drivers/drv_hwtimer.c",
+        "<virtual_root>/ccm3310/crc32.c",
+        "<virtual_root>/ccm3310/ccm3310_test.c"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -962,7 +969,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": "ip 192.168.1.2"
+        "otherCmds": ""
       },
       "uploadConfigMap": {},
       "custom_dep": {

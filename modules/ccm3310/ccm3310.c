@@ -15,7 +15,7 @@
 #include <ccm3310.h>
 // #include <drv_spim.h>
 
-#define CCM3310_DEBUG
+// #define CCM3310_DEBUG
 #if defined(CCM3310_DEBUG)
 #define CCM3310_RAW_PRINTF
 #define DBG_LVL DBG_LOG
@@ -90,7 +90,10 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
             printf("\n");
         }
     }
+#else
+    rt_hw_us_delay(100);
 #endif
+
     while (status == PIN_HIGH) {
         status = rt_pin_read(GINT1);
     }

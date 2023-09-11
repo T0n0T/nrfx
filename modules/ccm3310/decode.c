@@ -93,7 +93,7 @@ int decode(uint8_t *raw, uint8_t **data, int *len)
 
     *len = (int)decode_4bytes(&raw[4]);
     if (decode_2bytes(&raw[8]) != 0x9000) {
-        LOG_E("decode wrong with status 0x%X", decode_4bytes(&raw[0]));
+        LOG_E("decode wrong with status 0x%X", decode_4bytes(&raw[8]));
         return -2;
     }
     *data = &raw[16];
@@ -153,12 +153,12 @@ int encode(uint8_t cla, uint8_t ins, uint8_t p1, uint8_t p2,
     *(ptr++) = 0x01;
 
     // 7.crc
-    if (cla == 0x81) {
-        uint32_t crc32_val = crc32(send_pack, ptr - send_pack + 1);
-        *(ptr++)           = crc32_val & 0x000000FF;
-        *(ptr++)           = crc32_val & 0x0000FF00;
-        *(ptr++)           = crc32_val & 0x00FF0000;
-        *(ptr++)           = crc32_val & 0xFF000000;
-    }
+    // if (cla == 0x81) {
+    //     uint32_t crc32_val = crc32(send_pack, ptr - send_pack + 1);
+    //     *(ptr++)           = crc32_val & 0x000000FF;
+    //     *(ptr++)           = crc32_val & 0x0000FF00;
+    //     *(ptr++)           = crc32_val & 0x00FF0000;
+    //     *(ptr++)           = crc32_val & 0xFF000000;
+    // }
     return (int)(ptr - send_pack);
 }

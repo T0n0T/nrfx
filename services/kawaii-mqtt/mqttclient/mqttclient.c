@@ -1209,7 +1209,7 @@ int mqtt_release(mqtt_client_t *c)
             RETURN_ERROR(KAWAII_MQTT_FAILED_ERROR)
         }
     }
-
+    network_release(c->mqtt_network);
     if (NULL != c->mqtt_network) {
         platform_memory_free(c->mqtt_network);
         c->mqtt_network = NULL;

@@ -159,14 +159,14 @@ static int ec800x_socket_close(struct at_socket *socket)
     int device_socket        = (int)socket->user_data;
     struct at_device *device = (struct at_device *)socket->device;
 
-    resp = at_create_resp(64, 0, rt_tick_from_millisecond(300));
+    resp = at_create_resp(64, 0, rt_tick_from_millisecond(1000));
     if (resp == RT_NULL) {
         LOG_E("no memory for resp create.");
         return -RT_ENOMEM;
     }
 
     result = at_obj_exec_cmd(device->client, resp, "AT+QICLOSE=%d", device_socket);
-
+    rt_kprintf("[ec800x]close socket %d\n", device_socket);
     at_delete_resp(resp);
 
     return result;
@@ -589,6 +589,9 @@ static void urc_close_func(struct at_client *client, const char *data, rt_size_t
     sscanf(data, "+QIURC: \"closed\",%d", &device_socket);
     /* get at socket object by device socket descriptor */
     socket = &(device->sockets[device_socket]);
+    rt_kprintf("[ec800x]close event callback socket");
+
+    ec800x_socket_close(socket);
 
     /* notice the socket is disconnect by remote */
     if (at_evt_cb_set[AT_SOCKET_EVT_CLOSED]) {

@@ -213,8 +213,8 @@
 #define KAWAII_MQTT_LOG_LEVEL                  4
 #define KAWAII_MQTT_VERSION                    4
 #define KAWAII_MQTT_KEEP_ALIVE_INTERVAL        60
-#define KAWAII_MQTT_THREAD_STACK_SIZE          4096
-#define KAWAII_MQTT_THREAD_PRIO                20
+#define KAWAII_MQTT_THREAD_STACK_SIZE          2048
+#define KAWAII_MQTT_THREAD_PRIO                19
 #define KAWAII_MQTT_THREAD_TICK                50
 #define KAWAII_MQTT_MAX_PACKET_ID              0xFFFE
 #define KAWAII_MQTT_TOPIC_LEN_MAX              64
@@ -267,7 +267,7 @@
 #define SEGGER_RTT_MAX_NUM_DOWN_BUFFERS 3
 #define BUFFER_SIZE_UP                  1024
 #define BUFFER_SIZE_DOWN                16
-#define SEGGER_RTT_PRINTF_BUFFER_SIZE   256
+#define SEGGER_RTT_PRINTF_BUFFER_SIZE   512
 #define RTT_DEFAULT_BUFFER_INDEX        0
 #define RTT_DEFAULT_TERMINAL_INDEX      0
 #define PKG_USING_SEGGER_RTT_LATEST_VERSION
