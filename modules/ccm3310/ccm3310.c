@@ -93,7 +93,8 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
 #else
     rt_hw_us_delay(100);
 #endif
-
+    status = PIN_HIGH;
+    // rt_pin_write(GINT0, PIN_LOW);
     while (status == PIN_HIGH) {
         status = rt_pin_read(GINT1);
     }

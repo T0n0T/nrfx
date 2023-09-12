@@ -1,18 +1,17 @@
 #ifndef RT_CONFIG_H__
 #define RT_CONFIG_H__
 
-/* Automatically generated file; DO NOT EDIT. */
-/* RT-Thread Configuration */
 #ifdef USE_APP_CONFIG
 #include "app_config.h"
 #endif
+
 /* RT-Thread Kernel */
 
 #define RT_NAME_MAX   8
 #define RT_ALIGN_SIZE 8
 #define RT_THREAD_PRIORITY_32
 #define RT_THREAD_PRIORITY_MAX 32
-#define RT_TICK_PER_SECOND     1000
+#define RT_TICK_PER_SECOND     100
 #define RT_USING_OVERFLOW_CHECK
 #define RT_USING_HOOK
 #define RT_HOOK_USING_FUNC_PTR
@@ -41,8 +40,10 @@
 /* Memory Management */
 
 #define RT_USING_MEMPOOL
-#define RT_USING_SMALL_MEM
-#define RT_USING_SMALL_MEM_AS_HEAP
+#define RT_USING_MEMHEAP
+#define RT_MEMHEAP_FAST_MODE
+#define RT_USING_MEMHEAP_AS_HEAP
+#define RT_USING_MEMHEAP_AUTO_BINDING
 #define RT_USING_HEAP
 
 /* Kernel Device Object */
@@ -102,11 +103,9 @@
 #define RT_SERIAL_RB_BUFSZ 256
 #define RT_USING_HWTIMER
 #define RT_USING_I2C
-#define RT_USING_I2C_BITOPS
 #define RT_USING_PIN
 #define RT_USING_MTD_NOR
 #define RT_USING_RTC
-#define RT_USING_SOFT_RTC
 #define RT_USING_SPI
 #define RT_USING_SENSOR
 #define RT_USING_SENSOR_CMD
@@ -171,12 +170,31 @@
 
 /* IoT - internet of things */
 
-#define PKG_USING_PAHOMQTT
-#define PAHOMQTT_PIPE_MODE
-#define RT_PKG_MQTT_THREAD_STACK_SIZE   2048
-#define PKG_PAHOMQTT_SUBSCRIBE_HANDLERS 1
-#define MQTT_DEBUG
-#define PKG_USING_PAHOMQTT_LATEST
+#define PKG_USING_KAWAII_MQTT
+#define KAWAII_MQTT_NETSOCKET_USE_SAL
+// #define KAWAII_MQTT_LOG_IS_SALOF
+// #define SALOF_USING_LOG
+#define SALOF_USING_SALOF
+#define SALOF_BUFF_SIZE                        512
+#define SALOF_FIFO_SIZE                        2048
+#define SALOF_TASK_STACK_SIZE                  2048
+#define SALOF_TASK_TICK                        50
+#define SALOF_LOG_LEVEL                        4
+#define KAWAII_MQTT_LOG_LEVEL                  4
+#define KAWAII_MQTT_VERSION                    4
+#define KAWAII_MQTT_KEEP_ALIVE_INTERVAL        60
+#define KAWAII_MQTT_THREAD_STACK_SIZE          1024
+#define KAWAII_MQTT_THREAD_PRIO                19
+#define KAWAII_MQTT_THREAD_TICK                50
+#define KAWAII_MQTT_MAX_PACKET_ID              0xFFFE
+#define KAWAII_MQTT_TOPIC_LEN_MAX              64
+#define KAWAII_MQTT_ACK_HANDLER_NUM_MAX        64
+#define KAWAII_MQTT_DEFAULT_BUF_SIZE           512
+#define KAWAII_MQTT_DEFAULT_CMD_TIMEOUT        4000
+#define KAWAII_MQTT_MAX_CMD_TIMEOUT            20000
+#define KAWAII_MQTT_MIN_CMD_TIMEOUT            1000
+#define KAWAII_MQTT_RECONNECT_DEFAULT_DURATION 1000
+#define PKG_USING_KAWAII_MQTT_LATEST_VERSION
 
 /* Wi-Fi */
 
@@ -187,57 +205,8 @@
 #define PKG_USING_AT_DEVICE
 #define PKG_USING_AT_DEVICE_LATEST_VERSION
 #define PKG_AT_DEVICE_VER_NUM 0x99999
-#define PKG_USING_WIZNET
-#define WIZ_USING_W5500
-
-/* WIZnet device configure */
-
-#define WIZ_SPI_DEVICE "w5500"
-#define WIZ_RST_PIN    5
-#define WIZ_IRQ_PIN    7
-#define WIZ_USING_DHCP
-#define WIZ_USING_PING
-#define PKG_USING_WIZNET_LATEST_VERSION
 
 /* IoT Cloud */
-#define PKG_USING_KAWAII_MQTT
-#define KAWAII_MQTT_NETSOCKET_USE_SAL
-#define KAWAII_MQTT_LOG_IS_SALOF
-#define SALOF_USING_LOG
-#define SALOF_USING_SALOF
-#define SALOF_BUFF_SIZE                        512
-#define SALOF_FIFO_SIZE                        2048
-#define SALOF_TASK_STACK_SIZE                  2048
-#define SALOF_TASK_TICK                        50
-#define SALOF_LOG_LEVEL                        4
-#define KAWAII_MQTT_LOG_LEVEL                  4
-#define KAWAII_MQTT_VERSION                    4
-#define KAWAII_MQTT_KEEP_ALIVE_INTERVAL        60
-#define KAWAII_MQTT_THREAD_STACK_SIZE          2048
-#define KAWAII_MQTT_THREAD_PRIO                19
-#define KAWAII_MQTT_THREAD_TICK                50
-#define KAWAII_MQTT_MAX_PACKET_ID              0xFFFE
-#define KAWAII_MQTT_TOPIC_LEN_MAX              64
-#define KAWAII_MQTT_ACK_HANDLER_NUM_MAX        64
-#define KAWAII_MQTT_DEFAULT_BUF_SIZE           1024
-#define KAWAII_MQTT_DEFAULT_CMD_TIMEOUT        4000
-#define KAWAII_MQTT_MAX_CMD_TIMEOUT            20000
-#define KAWAII_MQTT_MIN_CMD_TIMEOUT            1000
-#define KAWAII_MQTT_RECONNECT_DEFAULT_DURATION 1000
-#define PKG_USING_KAWAII_MQTT_LATEST_VERSION
-/* Bluetooth Mesh support */
-
-/* HCI Transport support */
-
-/* Device Driver support */
-
-#define NIMBLE_DEBUG_LEVEL_I
-#define NIMBLE_DEBUG_LEVEL 2
-#define PKG_NIMBLE_SAMPLE_DISABLE
-#define PKG_NIMBLE_MAX_CONNECTIONS 1
-#define PKG_NIMBLE_WHITELIST
-#define PKG_NIMBLE_MULTI_ADV_INSTANCES 0
-#define PKG_USING_NIMBLE_V100
 
 /* security packages */
 
@@ -267,7 +236,7 @@
 #define SEGGER_RTT_MAX_NUM_DOWN_BUFFERS 3
 #define BUFFER_SIZE_UP                  1024
 #define BUFFER_SIZE_DOWN                16
-#define SEGGER_RTT_PRINTF_BUFFER_SIZE   512
+#define SEGGER_RTT_PRINTF_BUFFER_SIZE   64
 #define RTT_DEFAULT_BUFFER_INDEX        0
 #define RTT_DEFAULT_TERMINAL_INDEX      0
 #define PKG_USING_SEGGER_RTT_LATEST_VERSION
@@ -299,6 +268,24 @@
 /* sensors drivers */
 
 /* touch drivers */
+
+#define PKG_USING_NRF5X_SDK
+#define NRFX_RTC_ENABLED                                      1
+#define NRFX_RTC1_ENABLED                                     1
+#define NRF_CLOCK_ENABLED                                     1
+#define NRF_SDH_BLE_ENABLED                                   1
+#define NRF_SDH_ENABLED                                       1
+#define NRF_SDH_SOC_ENABLED                                   1
+#define NRF_SDH_BLE_PERIPHERAL_LINK_COUNT                     1
+#define BLE_ADVERTISING_ENABLED                               1
+#define NRF_BLE_QWR_ENABLED                                   1
+#define NRF_SDH_BLE_VS_UUID_COUNT                             1
+#define NRF_BLE_CONN_PARAMS_ENABLED                           1
+#define NRF_BLE_CONN_PARAMS_MAX_SLAVE_LATENCY_DEVIATION       499
+#define NRF_BLE_CONN_PARAMS_MAX_SUPERVISION_TIMEOUT_DEVIATION 65535
+#define NRF_BLE_GATT_ENABLED                                  1
+#define SD_BLE_APP_BEACON
+#define PKG_USING_NRF5X_SDK_V1610
 
 /* Kendryte SDK */
 

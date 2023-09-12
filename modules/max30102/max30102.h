@@ -14,7 +14,7 @@
 #include <drivers/sensor.h>
 
 #ifndef MAX30102_STACK_SIZE
-#define MAX30102_STACK_SIZE 1024
+#define MAX30102_STACK_SIZE 0x300
 #endif
 
 #ifndef MAX30102_PRIORITY

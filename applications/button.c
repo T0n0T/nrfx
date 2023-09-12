@@ -11,11 +11,6 @@
 
 #include "button.h"
 
-// #ifdef RT_DEBUG_THREAD
-// #undef RT_DEBUG_THREAD
-// #define RT_DEBUG_THREAD 1
-// #endif
-
 #define SINGLE_AND_DOUBLE_TRIGGER
 // #define LONG_FREE_TRIGGER
 /*******************************************************************

@@ -15,6 +15,17 @@
 #include <ccm3310.h>
 #include "nrfx_spim.h"
 
+// #define CCM3310_DEBUG
+#if defined(CCM3310_DEBUG)
+#define CCM3310_RAW_PRINTF
+#define DBG_LVL DBG_LOG
+#else
+#define DBG_LVL DBG_INFO
+#endif
+
+#define DBG_TAG "ccm3310.dev"
+#include <rtdbg.h>
+
 struct rt_spi_device ccm;
 nrfx_spim_t instance = NRFX_SPIM_INSTANCE(1);
 uint8_t recv_buf[1024];
@@ -50,7 +61,7 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
     rt_pin_write(GINT0, PIN_LOW);
     while (status == PIN_HIGH) {
         status = rt_pin_read(GINT1);
-        printf("status: %d", status);
+        printf("status: %d\n", status);
     }
 
     nrfx_spim_xfer_desc_t spim_xfer_desc =
@@ -61,11 +72,8 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
             .rx_length   = send_len,
         };
     result = nrfx_spim_xfer(&instance, &spim_xfer_desc, 0);
-    // printf("\nspim transmit:[%x]\n", result);
-    printf("\nspim send: \n");
-    for (size_t i = 0; i < spim_xfer_desc.tx_length; i++) {
-        printf("%02x ", *(spim_xfer_desc.p_tx_buffer + i));
-    }
+
+#if defined(CCM3310_RAW_PRINTF)
     printf("\n========= print transmit ========\n");
     for (size_t i = 0; i < send_len; i++) {
         printf("0x%02x ", *(send_buf + i));
@@ -73,6 +81,11 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
             printf("\n");
         }
     }
+#else
+    rt_hw_us_delay(1000);
+#endif
+    status = PIN_HIGH;
+    // rt_pin_write(GINT0, PIN_LOW);
     while (status == PIN_HIGH) {
         status = rt_pin_read(GINT1);
     }
@@ -83,8 +96,7 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
     spim_xfer_desc.rx_length   = recv_len;
 
     result = nrfx_spim_xfer(&instance, &spim_xfer_desc, 0);
-    printf("\nspim receive:[%d]\n", recv_len);
-
+#if defined(CCM3310_RAW_PRINTF)
     printf("\n========= print receive =========\n");
     for (size_t i = 0; i < recv_len; i++) {
         printf("0x%02x ", recv_buf[i]);
@@ -95,6 +107,7 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
             break;
         }
     }
+#endif
     int err = decode(recv_buf, decode_data, &len);
     if (err == 0) {
         return len;

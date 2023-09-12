@@ -6,16 +6,11 @@
     ],
     "settings": {
         "files.associations": {
-            "app.h": "c",
-            "rtconfig.h": "c",
             "button.h": "c",
-            "rthw.h": "c",
-            "rtthread.h": "c",
-            "platform_mutex.h": "c",
-            "rtdbg.h": "c",
-            "salof.h": "c",
-            "platform_net_socket.h": "c",
-            "mqtt_error.h": "c"
+            "nrfx_spim.h": "c",
+            "dfs_private.h": "c",
+            "nrf_ble_gatt.h": "c",
+            "ble_advertising.h": "c"
         }
     },
     "extensions": {}
