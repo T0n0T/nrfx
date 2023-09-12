@@ -822,7 +822,8 @@
         "<virtual_root>/ccm3310/ccm3310.c",
         "<virtual_root>/ccm3310/crc32.c",
         "<virtual_root>/Drivers/drv_hwtimer.c",
-        "<virtual_root>/nrf_log"
+        "<virtual_root>/nrf_log",
+        "<virtual_root>/max30102"
       ],
       "toolchain": "AC5",
       "compileConfig": {
