@@ -511,6 +511,18 @@
             "path": "nrf_sdk/components/ble/ble_advertising/ble_advertising.c"
           },
           {
+            "path": "nrf_sdk/components/ble/ble_services/ble_bas/ble_bas.c"
+          },
+          {
+            "path": "nrf_sdk/components/ble/ble_services/ble_dis/ble_dis.c"
+          },
+          {
+            "path": "nrf_sdk/components/ble/ble_services/ble_hrs/ble_hrs.c"
+          },
+          {
+            "path": "nrf_sdk/components/ble/ble_services/ble_lbs/ble_lbs.c"
+          },
+          {
             "path": "nrf_sdk/components/ble/common/ble_advdata.c"
           },
           {
@@ -1018,7 +1030,13 @@
           "services/kawaii-mqtt/platform/RT-Thread",
           "rt-thread/components/net/sal/include",
           "RTE/_rtthread",
-          "nrf_sdk/external/cJSON"
+          "nrf_sdk/external/cJSON",
+          "modules/ble_test",
+          "nrf_sdk/components/ble/ble_services/ble_lbs",
+          "nrf_sdk/components/libraries/sensorsim",
+          "nrf_sdk/components/ble/ble_services/ble_bas",
+          "nrf_sdk/components/ble/ble_services/ble_dis",
+          "nrf_sdk/components/ble/ble_services/ble_hrs"
         ],
         "libList": [],
         "sourceDirList": [],

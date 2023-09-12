@@ -10,7 +10,8 @@
             "nrfx_spim.h": "c",
             "dfs_private.h": "c",
             "nrf_ble_gatt.h": "c",
-            "ble_advertising.h": "c"
+            "ble_advertising.h": "c",
+            "sensorsim.h": "c"
         }
     },
     "extensions": {}

@@ -42,31 +42,31 @@
 #define APP_BLE_CONN_CFG_TAG             1 /**< A tag identifying the SoftDevice BLE configuration. */
 #define APP_BLE_OBSERVER_PRIO            3 /**< Application's BLE observer priority. You shouldn't need to modify this value. */
 
-#define BATTERY_LEVEL_MEAS_INTERVAL      APP_TIMER_TICKS(2000) /**< Battery level measurement interval (ticks). */
-#define MIN_BATTERY_LEVEL                81                    /**< Minimum simulated battery level. */
-#define MAX_BATTERY_LEVEL                100                   /**< Maximum simulated 7battery level. */
-#define BATTERY_LEVEL_INCREMENT          1                     /**< Increment between each simulated battery level measurement. */
+#define BATTERY_LEVEL_MEAS_INTERVAL      (2000) /**< Battery level measurement interval (ticks). */
+#define MIN_BATTERY_LEVEL                81     /**< Minimum simulated battery level. */
+#define MAX_BATTERY_LEVEL                100    /**< Maximum simulated 7battery level. */
+#define BATTERY_LEVEL_INCREMENT          1      /**< Increment between each simulated battery level measurement. */
 
-#define HEART_RATE_MEAS_INTERVAL         APP_TIMER_TICKS(1000) /**< Heart rate measurement interval (ticks). */
-#define MIN_HEART_RATE                   140                   /**< Minimum heart rate as returned by the simulated measurement function. */
-#define MAX_HEART_RATE                   300                   /**< Maximum heart rate as returned by the simulated measurement function. */
-#define HEART_RATE_INCREMENT             10                    /**< Value by which the heart rate is incremented/decremented for each call to the simulated measurement function. */
+#define HEART_RATE_MEAS_INTERVAL         (1000) /**< Heart rate measurement interval (ticks). */
+#define MIN_HEART_RATE                   140    /**< Minimum heart rate as returned by the simulated measurement function. */
+#define MAX_HEART_RATE                   300    /**< Maximum heart rate as returned by the simulated measurement function. */
+#define HEART_RATE_INCREMENT             10     /**< Value by which the heart rate is incremented/decremented for each call to the simulated measurement function. */
 
-#define RR_INTERVAL_INTERVAL             APP_TIMER_TICKS(300) /**< RR interval interval (ticks). */
-#define MIN_RR_INTERVAL                  100                  /**< Minimum RR interval as returned by the simulated measurement function. */
-#define MAX_RR_INTERVAL                  500                  /**< Maximum RR interval as returned by the simulated measurement function. */
-#define RR_INTERVAL_INCREMENT            1                    /**< Value by which the RR interval is incremented/decremented for each call to the simulated measurement function. */
+#define RR_INTERVAL_INTERVAL             (300) /**< RR interval interval (ticks). */
+#define MIN_RR_INTERVAL                  100   /**< Minimum RR interval as returned by the simulated measurement function. */
+#define MAX_RR_INTERVAL                  500   /**< Maximum RR interval as returned by the simulated measurement function. */
+#define RR_INTERVAL_INCREMENT            1     /**< Value by which the RR interval is incremented/decremented for each call to the simulated measurement function. */
 
-#define SENSOR_CONTACT_DETECTED_INTERVAL APP_TIMER_TICKS(5000) /**< Sensor Contact Detected toggle interval (ticks). */
+#define SENSOR_CONTACT_DETECTED_INTERVAL (5000) /**< Sensor Contact Detected toggle interval (ticks). */
 
 #define MIN_CONN_INTERVAL                MSEC_TO_UNITS(400, UNIT_1_25_MS) /**< Minimum acceptable connection interval (0.4 seconds). */
 #define MAX_CONN_INTERVAL                MSEC_TO_UNITS(650, UNIT_1_25_MS) /**< Maximum acceptable connection interval (0.65 second). */
 #define SLAVE_LATENCY                    0                                /**< Slave latency. */
 #define CONN_SUP_TIMEOUT                 MSEC_TO_UNITS(4000, UNIT_10_MS)  /**< Connection supervisory timeout (4 seconds). */
 
-#define FIRST_CONN_PARAMS_UPDATE_DELAY   APP_TIMER_TICKS(5000)  /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
-#define NEXT_CONN_PARAMS_UPDATE_DELAY    APP_TIMER_TICKS(30000) /**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
-#define MAX_CONN_PARAMS_UPDATE_COUNT     3                      /**< Number of attempts before giving up the connection parameter negotiation. */
+#define FIRST_CONN_PARAMS_UPDATE_DELAY   (5000)  /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
+#define NEXT_CONN_PARAMS_UPDATE_DELAY    (30000) /**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
+#define MAX_CONN_PARAMS_UPDATE_COUNT     3       /**< Number of attempts before giving up the connection parameter negotiation. */
 
 #define LESC_DEBUG_MODE                  0 /**< Set to 1 to use LESC debug keys, allows you to use a sniffer to inspect traffic. */
 
@@ -477,24 +477,28 @@ static void timeout(void *param)
     ble_hrs_heart_rate_measurement_send(&m_hrs, i % (MAX_HEART_RATE - MIN_HEART_RATE + 1) + MIN_HEART_RATE);
 }
 
+static char ble_stack[512];
+static struct rt_thread ble_thread;
+static struct rt_timer ble_timer;
 int ble_app_hrs(void)
 {
-    rt_thread_t tid1 = RT_NULL;
-    tid1             = rt_thread_create("softdevice",
-                                        ble_app_softdevice, RT_NULL,
-                                        2048,
-                                        22, 5);
-    if (tid1 != RT_NULL) {
-        rt_kprintf("start ble thread hrs\n");
-        rt_thread_startup(tid1);
-    } else {
-        rt_kprintf("start ble hrs thread fail %ld\n", (long *)tid1);
-        return -1;
+    rt_err_t err = 0;
+    err          = rt_thread_init(&ble_thread, "softdevice",
+                                  ble_app_softdevice, RT_NULL,
+                                  ble_stack, sizeof(ble_stack),
+                                  22, 5);
+    if (err != 0) {
+        rt_kprintf("ble_app_softdevice start fail!\n");
+        return err;
     }
+    rt_thread_startup(&ble_thread);
 
-    rt_timer_t update = rt_timer_create("update", timeout, RT_NULL, rt_tick_from_millisecond(1000), RT_TIMER_FLAG_PERIODIC | RT_TIMER_FLAG_SOFT_TIMER);
-    if (update != RT_NULL)
-        rt_timer_start(update);
+    rt_timer_init(&ble_timer, "update", timeout, RT_NULL, rt_tick_from_millisecond(1000), RT_TIMER_FLAG_PERIODIC | RT_TIMER_FLAG_SOFT_TIMER);
+    err = rt_timer_start(&ble_timer);
+    if (err != 0) {
+        rt_kprintf("ble_time start fail!\n");
+        return err;
+    }
     return 0;
 }
-MSH_CMD_EXPORT(ble_app_hrs, ble app heart rate service);
+INIT_APP_EXPORT(ble_app_hrs);

@@ -274,6 +274,9 @@ static struct rt_sensor_ops max30102_ops = {
     .control    = max30102_control,
 };
 
+static struct rt_thread max_thread = {0};
+static char max_stack[768]         = {0};
+
 int rt_hw_max30102_init(struct rt_sensor_config *cfg)
 {
     RT_ASSERT(cfg);
@@ -333,13 +336,13 @@ int rt_hw_max30102_init(struct rt_sensor_config *cfg)
             break;
         } // initialize the MAX30102
 
-        tid = rt_thread_create("max30102", max30102_thread_entry, sensor,
-                               MAX30102_STACK_SIZE, 20, MAX30102_TICKS);
-        if (tid == RT_NULL) {
-            err_msg = "Create max30102 thread error.";
+        if (rt_thread_init(&max_thread, "app", max30102_thread_entry, RT_NULL, max_stack, sizeof(max_stack), 21, 10) != RT_EOK) {
+            err_msg = "max30102 thread init fail";
             break;
+        } else {
+            rt_thread_startup(&max_thread);
         }
-        rt_thread_startup(tid);
+
     } while (0);
 
     if (err_msg) {
