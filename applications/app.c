@@ -155,7 +155,7 @@ static int mqtt_mission_init(void)
         return -1;
     }
     rt_thread_delay(1000);
-    err = mqtt_subscribe(client, MQTT_TOPIC_DATA, QOS1, sub_handle);
+    err = mqtt_subscribe(client, MQTT_TOPIC_REPLY, QOS1, sub_handle);
     if (err != KAWAII_MQTT_SUCCESS_ERROR) {
         LOG_E("mqtt set subscribe fail, err[%d]", err);
         return -1;

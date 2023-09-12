@@ -13,8 +13,7 @@
 #include <rtdevice.h>
 #include <stdio.h>
 #include <app.h>
-#include <button.h>
-#include <at.h>
+
 #include <nrfx_systick.h>
 #include <nrf_drv_clock.h>
 

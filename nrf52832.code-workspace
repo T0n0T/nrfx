@@ -11,7 +11,8 @@
             "dfs_private.h": "c",
             "nrf_ble_gatt.h": "c",
             "ble_advertising.h": "c",
-            "sensorsim.h": "c"
+            "sensorsim.h": "c",
+            "rtdevice.h": "c"
         }
     },
     "extensions": {}

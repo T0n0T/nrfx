@@ -16,7 +16,7 @@
             "path": "applications/app.c"
           },
           {
-            "path": "applications/button.c"
+            "path": "applications/btn_event.c"
           },
           {
             "path": "applications/main.c"
