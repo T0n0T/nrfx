@@ -10,7 +10,7 @@
  */
 
 #include <ccm3310.h>
-
+#include <stdlib.h>
 #define RECV_PRE_LEN 30
 
 uint8_t ccm3310_sm4_setkey(uint8_t *key)
@@ -28,6 +28,27 @@ uint8_t ccm3310_sm4_setkey(uint8_t *key)
     uint8_t *id  = 0;
     int send_len = 0;
     send_len     = encode(0x80, 0x42, 0x00, 0x00, pack, (uint8_t *)data, sizeof(ccm3310_key_data) + 16 - 1);
+    ccm3310_transfer(pack, send_len, &id, 21);
+    rt_free((void *)pack);
+    rt_free((void *)data);
+    return *id;
+}
+
+uint8_t ccm3310_sm4_updatekey(uint8_t update_id, uint8_t *key)
+{
+    uint8_t *pack          = (uint8_t *)rt_malloc(100);
+    ccm3310_key_data *data = (ccm3310_key_data *)rt_malloc(sizeof(ccm3310_key_data) + 16 - 1);
+    data->version          = 0x00;
+    data->key_id           = update_id;
+    data->algo             = 0x84;
+    data->len              = 0x10;
+    for (size_t i = 0; i < 16; i++) {
+        *(&data->key_data + i) = *(key + i);
+    }
+
+    uint8_t *id  = 0;
+    int send_len = 0;
+    send_len     = encode(0x80, 0x42, 0x01, 0x00, pack, (uint8_t *)data, sizeof(ccm3310_key_data) + 16 - 1);
     ccm3310_transfer(pack, send_len, &id, 21);
     rt_free((void *)pack);
     rt_free((void *)data);

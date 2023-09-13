@@ -659,7 +659,7 @@ static int at_recv_readline(at_client_t client)
         }
         last_ch = ch;
     }
-
+    at_print_raw_cmd("recvline", client->recv_line_buf, read_len);
 #ifdef AT_PRINT_RAW_CMD
     at_print_raw_cmd("recvline", client->recv_line_buf, read_len);
 #endif

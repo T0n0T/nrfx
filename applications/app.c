@@ -14,7 +14,6 @@
 #include "at_device_ec800x.h"
 #include <ccm3310.h>
 #include <rtdevice.h>
-#include <stdio.h>
 
 #define DBG_LVL DBG_INFO
 #define DBG_TAG "app"
@@ -29,8 +28,9 @@ char stack[1024]             = {0};
 /*-------client init---------*/
 mqtt_client_t *client      = NULL;
 mqtt_message_t publish_msg = {0};
-
+uint8_t mission_status     = 0;
 /*-------sm4 init---------*/
+uint8_t sm4_flag           = 0;
 static uint8_t sm4_id      = 0;
 const static uint8_t key[] = {
     0x77, 0x7f, 0x23, 0xc6,
@@ -38,12 +38,11 @@ const static uint8_t key[] = {
     0xdd, 0x59, 0x5c, 0xff,
     0xf6, 0x5f, 0x58, 0xec};
 
-static uint8_t sm4_flag = 0;
-
 char *build_msg_updata(char *device_id, struct LOC_GNSS *info, int battry, int pulse_rate);
 
-static void publish_handle(void)
+void publish_handle(void)
 {
+    rt_pin_write(LED2, PIN_LOW);
     mqtt_error_t err   = KAWAII_MQTT_SUCCESS_ERROR;
     char *publish_data = build_msg_updata(DEVICE_ID, ec800x_get_gnss(), 99, 78);
     if (sm4_flag) {
@@ -76,12 +75,14 @@ static void publish_handle(void)
             LOG_D("publish msg success!!!!!!!!");
         }
     }
+    rt_pin_write(LED2, PIN_HIGH);
 
     free(publish_data);
 }
 
 static void sub_handle(void *client, message_data_t *msg)
 {
+    rt_pin_write(LED3, PIN_LOW);
     (void)client;
     LOG_I("-----------------------------------------------------------------------------------");
     if (sm4_flag) {
@@ -101,30 +102,7 @@ static void sub_handle(void *client, message_data_t *msg)
     }
 
     LOG_I("-----------------------------------------------------------------------------------");
-}
-
-static void mqtt_entry(void *p)
-{
-    while (1) {
-        publish_handle();
-        rt_thread_mdelay(MQTT_DELAY_MS);
-    }
-}
-
-static int thread_mission_init(void)
-{
-    rt_err_t err = RT_EOK;
-    err          = rt_thread_init(&mqtt_thread, "app", mqtt_entry, RT_NULL, stack, sizeof(stack), 21, 10);
-    if (err != RT_EOK) {
-        LOG_E("mqtt thread init fail, err[%d]", err);
-        return err;
-    }
-    return rt_thread_startup(&mqtt_thread);
-}
-
-static void thread_mission_deinit(void)
-{
-    rt_thread_detach(&mqtt_thread);
+    rt_pin_write(LED3, PIN_LOW);
 }
 
 int logisinit = 0;
@@ -161,26 +139,66 @@ static int mqtt_mission_init(void)
         return -1;
     }
     sm4_id = ccm3310_sm4_setkey((uint8_t *)key);
-    LOG_I("mqtt app init success, keyid = 0x%02x", sm4_id);
+    if (!sm4_id) {
+        sm4_id = ccm3310_sm4_updatekey(0x81, (uint8_t *)key);
+        if (!sm4_id) {
+            LOG_W("mqtt app init success, but cannot get new keyid, work without sm4");
+            sm4_flag = 0;
+        } else {
+            sm4_flag = 1;
+        }
+
+    } else {
+        LOG_I("mqtt app init success, keyid = 0x%02x", sm4_id);
+        sm4_flag = 1;
+    }
+
     return 0;
+}
+
+static void mqtt_entry(void *p)
+{
+    while (ec800x_isinit() == RT_FALSE) {
+        rt_thread_mdelay(3000);
+    }
+    rt_thread_mdelay(2500);
+    rt_pin_write(LED2, PIN_LOW);
+    rt_pin_write(LED3, PIN_LOW);
+    rt_thread_mdelay(2500);
+    rt_pin_write(LED2, PIN_HIGH);
+    rt_pin_write(LED3, PIN_HIGH);
+
+    if (mqtt_mission_init() != 0) {
+        if (client) {
+            mqtt_disconnect(client);
+            mqtt_release(client);
+            rt_free(client);
+        }
+        return;
+    }
+    while (1) {
+        publish_handle();
+        rt_thread_mdelay(MQTT_DELAY_MS);
+    }
 }
 
 void mission_init(void)
 {
-    if (mqtt_mission_init() != 0) {
+    if (rt_thread_init(&mqtt_thread, "app", mqtt_entry, RT_NULL, stack, sizeof(stack), 21, 10) != RT_EOK) {
+        LOG_E("mqtt thread init fail");
         return;
     }
-    if (thread_mission_init() != 0) {
-        mqtt_disconnect(client);
-        mqtt_release(client);
-        rt_free(client);
-    }
-    sm4_flag = 1;
+    rt_thread_startup(&mqtt_thread);
+
+    mission_status = 1;
 }
 
 void mission_deinit(void)
 {
-    thread_mission_deinit();
+    if (rt_thread_detach(&mqtt_thread) != RT_EOK) {
+        printf("deinit app fail\n");
+        return;
+    }
     printf("1\n");
     mqtt_disconnect(client);
     printf("2\n");
@@ -188,6 +206,7 @@ void mission_deinit(void)
     printf("3\n");
     rt_free(client);
     printf("4\n");
+    mission_status = 0;
 }
 
 char *build_msg_updata(char *device_id, struct LOC_GNSS *info, int battry, int pulse_rate)
@@ -227,7 +246,45 @@ void sm4flag(int argc, char **argv)
         sm4_flag = 0;
     }
 }
-MSH_CMD_EXPORT(sm4flag, test);
+
+void sm4_setkey(int argc, char **argv)
+{
+    if (argc < 18) {
+        printf("sm4_key set/update xx[0] xx[1] xx[2]... xx[15]   - using hex key\n");
+    }
+    uint8_t key[16] = {0};
+    for (size_t i = 0; i < 16; i++) {
+        key[i] = strtol(argv[3 + i], NULL, 16);
+    }
+    if (strncmp("set", argv[2], 3)) {
+        uint8_t id = ccm3310_sm4_setkey(key);
+        if (!id) {
+            printf("set sm4 key fail! no id to allocate");
+            return;
+        }
+        sm4_id = id;
+        printf("set sm4 key success! key_id = 0x%02x\n", sm4_id);
+    } else if (strncmp("update", argv[2], 3)) {
+        uint8_t update_id = 0;
+        if (sm4_id) {
+            update_id = sm4_id;
+        } else {
+            update_id = 0x81; // 0x81 is the default key id
+        }
+
+        uint8_t id = ccm3310_sm4_updatekey(update_id, key);
+        if (!id) {
+            printf("update sm4 key fail!");
+            return;
+        }
+        sm4_id = id;
+        printf("update sm4 key success! key_id = 0x%02x\n", sm4_id);
+    }
+}
+
 MSH_CMD_EXPORT_ALIAS(publish_handle, publish, test);
 MSH_CMD_EXPORT(mission_init, test);
 MSH_CMD_EXPORT(mission_deinit, test);
+MSH_CMD_EXPORT(sm4flag, test);
+
+MSH_CMD_EXPORT(sm4_setkey, setkey with input);

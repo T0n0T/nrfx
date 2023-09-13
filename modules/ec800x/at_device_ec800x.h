@@ -80,12 +80,12 @@ struct at_device_ec800x {
 };
 
 int ec800x_get_rssi(void);
-
+rt_bool_t ec800x_isinit(void);
 #ifdef AT_USING_SOCKET
 
 /* ec800x device socket initialize */
 int ec800x_socket_init(struct at_device *device);
-
+void ec800x_init_thread_entry(void *parameter);
 /* ec800x device class socket register */
 int ec800x_socket_class_register(struct at_device_class *class);
 

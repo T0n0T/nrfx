@@ -18,6 +18,7 @@
 
 #if 1
 
+#define EC800X_WRONG_TIME           10
 #define EC800X_MODULE_SEND_MAX_SIZE 1460
 
 /* set real event by current socket and current state */
@@ -37,8 +38,18 @@ static at_evt_cb_t at_evt_cb_set[] = {
     [AT_SOCKET_EVT_CLOSED] = NULL,
 };
 
-static void at_tcp_ip_errcode_parse(int result) // TCP/IP_QIGETERROR
+static void reset_ec800x(void)
 {
+    struct at_device *device = RT_NULL;
+    device                   = at_device_get_by_name(AT_DEVICE_NAMETYPE_NETDEV, "ec800x");
+    ec800x_init_thread_entry(device);
+}
+MSH_CMD_EXPORT(reset_ec800x, reset ec800x);
+
+static int wrong_time = 0;
+static void at_tcp_ip_errcode_parse(struct at_device *device, int result) // TCP/IP_QIGETERROR
+{
+    wrong_time++;
     switch (result) {
         case 0:
             LOG_D("%d : Operation successful", result);
@@ -121,6 +132,11 @@ static void at_tcp_ip_errcode_parse(int result) // TCP/IP_QIGETERROR
         default:
             LOG_E("%d : Unknown err code", result);
             break;
+    }
+    if (wrong_time > EC800X_WRONG_TIME) {
+        LOG_E("too many wrong has been happened. ec800 will restart");
+        ec800x_init_thread_entry(device);
+        wrong_time = 0;
     }
 }
 
@@ -225,6 +241,21 @@ static int ec800x_socket_connect(struct at_socket *socket, char *ip, int32_t por
     }
 
     for (i = 0; i < CONN_RETRY; i++) {
+        if (at_obj_exec_cmd(device->client, resp, "AT+QIACT?") == RT_EOK) {
+            if (at_resp_get_line_by_kw(resp, "+QIACT:") == RT_NULL) {
+                LOG_I("the device context has been deactivate! and now do reactivate");
+                if (at_obj_exec_cmd(device->client, resp, "AT+QIACT=1") < 0) {
+                    LOG_E("Command AT+QIACT=1 resp invalid!");
+                    result = -RT_ERROR;
+                    continue;
+                }
+            }
+        } else {
+            LOG_E("Command AT+QIACT? resp invalid!");
+            result = -RT_ERROR;
+            continue;
+        }
+
         /* clear socket connect event */
         event = SET_EVENT(device_socket, EC800X_EVENT_CONN_OK | EC800X_EVENT_CONN_FAIL);
         ec800x_socket_event_recv(device, event, 0, RT_EVENT_FLAG_OR);
@@ -265,7 +296,8 @@ static int ec800x_socket_connect(struct at_socket *socket, char *ip, int32_t por
     }
 
     if (i == CONN_RETRY) {
-        LOG_E("%s device socket(%d) connect failed.", device->name, device_socket);
+        LOG_E("%s device socket(%d) connect failed. Try to restart context", device->name, device_socket);
+
         result = -RT_ERROR;
     }
 
@@ -541,7 +573,7 @@ static void urc_connect_func(struct at_client *client, const char *data, rt_size
     if (result == 0) {
         ec800x_socket_event_send(device, SET_EVENT(device_socket, EC800X_EVENT_CONN_OK));
     } else {
-        at_tcp_ip_errcode_parse(result);
+        at_tcp_ip_errcode_parse(device, result);
         ec800x_socket_event_send(device, SET_EVENT(device_socket, EC800X_EVENT_CONN_FAIL));
     }
 }
@@ -706,7 +738,7 @@ static void urc_dnsqip_func(struct at_client *client, const char *data, rt_size_
     } else {
         sscanf(data, "+QIURC: \"dnsgip\",%d,%d,%d", &result, &ip_count, &dns_ttl);
         if (result) {
-            at_tcp_ip_errcode_parse(result);
+            at_tcp_ip_errcode_parse(device, result);
         }
     }
 }

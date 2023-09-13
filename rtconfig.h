@@ -141,7 +141,7 @@
 /* Network */
 
 #define RT_USING_SAL
-#define SAL_INTERNET_CHECK
+// #define SAL_INTERNET_CHECK
 
 /* Docking with protocol stacks */
 

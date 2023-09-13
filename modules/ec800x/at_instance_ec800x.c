@@ -15,7 +15,7 @@
 
 #define EC800X_SAMPLE_DEIVCE_NAME "ec800x"
 
-static struct at_device_ec800x _dev =
+struct at_device_ec800x _dev =
     {
         EC800X_SAMPLE_DEIVCE_NAME,
         EC800X_SAMPLE_CLIENT_NAME,
@@ -37,6 +37,18 @@ static int ec800x_device_register(void)
                               (void *)ec800x);
 }
 INIT_APP_EXPORT(ec800x_device_register);
+
+rt_bool_t ec800x_isinit(void)
+{
+    struct at_device_ec800x *ec800x = &_dev;
+    return (ec800x->device.is_init);
+}
+
+void ec800x_status(void)
+{
+    printf("status of ec800 is%d", ec800x_isinit());
+}
+MSH_CMD_EXPORT(ec800x_status, ec800x status);
 
 int ec800x_get_rssi(void)
 {

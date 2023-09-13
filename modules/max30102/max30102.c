@@ -336,7 +336,7 @@ int rt_hw_max30102_init(struct rt_sensor_config *cfg)
             break;
         } // initialize the MAX30102
 
-        if (rt_thread_init(&max_thread, "app", max30102_thread_entry, RT_NULL, max_stack, sizeof(max_stack), 21, 10) != RT_EOK) {
+        if (rt_thread_init(&max_thread, "max30102", max30102_thread_entry, RT_NULL, max_stack, sizeof(max_stack), 21, 10) != RT_EOK) {
             err_msg = "max30102 thread init fail";
             break;
         } else {

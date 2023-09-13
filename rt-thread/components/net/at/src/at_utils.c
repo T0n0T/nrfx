@@ -12,7 +12,7 @@
 #include <at.h>
 #include <stdlib.h>
 #include <stdio.h>
-
+#define AT_PRINT_RAW_CMD
 static char send_buf[AT_CMD_MAX_LEN];
 static rt_size_t last_cmd_len = 0;
 

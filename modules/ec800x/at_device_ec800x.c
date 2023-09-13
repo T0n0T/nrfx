@@ -205,11 +205,11 @@ static int ec800x_read_rssi(struct at_device *device)
 
 static int ec800x_read_gnss(struct at_device *device)
 {
-    int result         = -RT_ERROR;
+    int result         = 0;
     at_response_t resp = at_create_resp(128, 0, rt_tick_from_millisecond(300));
     if (resp == RT_NULL) {
         LOG_D("no memory for resp create.");
-        return (result);
+        return -3;
     }
 
 #if USING_RMC
@@ -220,6 +220,8 @@ static int ec800x_read_gnss(struct at_device *device)
         if (at_resp_parse_line_args_by_kw(resp, "+QGPSGNMEA:", "+QGPSGNMEA:%s", ec800x->rmc) > 0) {
             result = gps_rmc_parse(&rmcinfo, ec800x->rmc);
         }
+    } else {
+        result = 2;
     }
 #elif USING_LOC
     if (at_obj_exec_cmd(device->client, resp, "AT+QGPSLOC=2") == RT_EOK) {
@@ -249,7 +251,15 @@ static int ec800x_read_gnss(struct at_device *device)
                    gnssmsg.longitude,
                    gnssmsg.altitude);
 #endif // 1
-            result = RT_EOK;
+            result = 0;
+        } else {
+            result = 1;
+        }
+    } else {
+        if (at_resp_get_line_by_kw(resp, "516")) {
+            result = 1;
+        } else {
+            result = 2;
         }
     }
 #endif
@@ -405,6 +415,7 @@ static void ec800x_check_link_status_entry(void *parameter)
     struct netdev *netdev    = (struct netdev *)parameter;
 
     device = at_device_get_by_name(AT_DEVICE_NAMETYPE_NETDEV, netdev->name);
+
     if (device == RT_NULL) {
         LOG_E("get device(%s) failed.", netdev->name);
         return;
@@ -416,14 +427,14 @@ static void ec800x_check_link_status_entry(void *parameter)
             LOG_E("ec800x read rssi failed");
         }
 
-        // result = ec800x_read_gnss(device);
-        // if (result != RT_EOK) {
-        //     if (result = -RT_ERROR) {
-        //         LOG_E("ec800x read gnss failed");
-        //     } else if (result = RT_ERROR) {
-        //         LOG_E("ec800x gnss valid");
-        //     }
-        // }
+        result = ec800x_read_gnss(device);
+        if (result != RT_EOK) {
+            if (result == 2) {
+                LOG_E("ec800x read gnss failed");
+            } else if (result == 1) {
+                LOG_W("ec800x gnss valid");
+            }
+        }
 
         rt_thread_delay(EC800X_LINK_DELAY_TIME);
 
@@ -470,8 +481,6 @@ static int ec800x_netdev_set_up(struct netdev *netdev)
 
     if (device->is_init == RT_FALSE) {
         ec800x_net_init(device);
-        device->is_init = RT_TRUE;
-
         netdev_low_level_set_status(netdev, RT_TRUE);
         LOG_D("network interface device(%s) set up status.", netdev->name);
     }
@@ -733,7 +742,7 @@ static struct netdev *ec800x_netdev_add(const char *netdev_name)
 /* =============================  ec800x device operations ============================= */
 
 /* initialize for ec800x */
-static void ec800x_init_thread_entry(void *parameter)
+void ec800x_init_thread_entry(void *parameter)
 {
 #define RESP_SIZE    128
 #define INIT_RETRY   1
@@ -756,7 +765,6 @@ static void ec800x_init_thread_entry(void *parameter)
     }
 
     LOG_D("start init %s device.", device->name);
-
     while (retry_num--) {
         /* power on the ec800x device */
         ec800x_power_on(device);
@@ -788,6 +796,7 @@ static void ec800x_init_thread_entry(void *parameter)
 
         /* get module version */
         if (at_obj_exec_cmd(device->client, resp, "ATI") != RT_EOK) {
+            LOG_E("Command [ATI] resp invalid!");
             result = -RT_ERROR;
             goto __exit;
         }
@@ -835,7 +844,6 @@ static void ec800x_init_thread_entry(void *parameter)
             rt_thread_mdelay(1000);
             if (at_obj_exec_cmd(device->client, resp, "AT+CGREG?") == RT_EOK) {
                 int link_stat = 0;
-
                 if (at_resp_parse_line_args_by_kw(resp, "+CGREG:", "+CGREG: %*d,%d", &link_stat) > 0) {
                     if ((link_stat == 1) || (link_stat == 5)) {
                         LOG_D("%s device GPRS is registered", device->name);
@@ -854,6 +862,7 @@ static void ec800x_init_thread_entry(void *parameter)
         {
             if (at_obj_exec_cmd(device->client, resp, "AT+QSCLK=1") != RT_EOK) // enable sleep mode fail
             {
+                LOG_E("Command [AT+QSCLK=1] resp invalid!");
                 result = -RT_ERROR;
                 goto __exit;
             }
@@ -861,6 +870,7 @@ static void ec800x_init_thread_entry(void *parameter)
 
         /* Close Echo the Data */
         if (at_obj_exec_cmd(device->client, resp, "AT+QISDE=0") != RT_EOK) {
+            LOG_E("Command [AT+QISDE=0] resp invalid!");
             result = -RT_ERROR;
             goto __exit;
         }
@@ -868,6 +878,7 @@ static void ec800x_init_thread_entry(void *parameter)
         /* Deactivate context profile */
         resp = at_resp_set_info(resp, RESP_SIZE, 0, rt_tick_from_millisecond(40 * 1000));
         if (at_obj_exec_cmd(device->client, resp, "AT+QIDEACT=1") != RT_EOK) {
+            LOG_E("Command [AT+QIDEACT=1] resp invalid!");
             result = -RT_ERROR;
             goto __exit;
         }
@@ -875,6 +886,7 @@ static void ec800x_init_thread_entry(void *parameter)
         /* Activate context profile */
         resp = at_resp_set_info(resp, RESP_SIZE, 0, rt_tick_from_millisecond(150 * 1000));
         if (at_obj_exec_cmd(device->client, resp, "AT+QIACT=1") != RT_EOK) {
+            LOG_E("Command [AT+QIACT=1] resp invalid!");
             result = -RT_ERROR;
             goto __exit;
         }
@@ -886,22 +898,22 @@ static void ec800x_init_thread_entry(void *parameter)
             if (at_resp_parse_line_args_by_kw(resp, "+QGPS:", "+QGPS: %d", &gnss_status) > 0) {
                 switch (gnss_status) {
                     case 0:
-                        if (at_obj_exec_cmd(device->client, resp, "AT+QGPS=1") != RT_EOK) {
+                        if (at_obj_exec_cmd(device->client, resp, "AT+QGPS=1") == RT_EOK) {
                             LOG_I("open gnss success!");
                         } else {
-                            LOG_E("open gnss fail!");
+                            LOG_E("Command [AT+QGPS=1] fail! open gnss fail!");
                         }
                         break;
                     case 1:
                         LOG_I("gnss has already open!");
                         break;
                     default:
-                        LOG_E("Command AT+QGPS? fail!");
+                        LOG_E("Command [AT+QGPS?] fail!");
                         result = -RT_ERROR;
                         goto __exit;
                 }
             } else {
-                LOG_E("Command AT+QGPS resp invalid!");
+                LOG_E("Command [AT+QGPS] resp invalid!");
                 result = -RT_ERROR;
                 goto __exit;
             }
@@ -909,12 +921,14 @@ static void ec800x_init_thread_entry(void *parameter)
 
         /* only use rmc */
         if (at_obj_exec_cmd(device->client, resp, "AT+QGPSCFG=\"gpsnmeatype\",2") != RT_EOK) {
+            LOG_E("Command [AT+QGPSCFG=\"gpsnmeatype\",2] resp invalid!");
             result = -RT_ERROR;
             goto __exit;
         }
 
         /* only use beidou*/
         if (at_obj_exec_cmd(device->client, resp, "AT+QGPSCFG=\"gnssconfig\",7") != RT_EOK) {
+            LOG_E("Command [AT+QGPSCFG=\"gnssconfig\",7] resp invalid!");
             result = -RT_ERROR;
             goto __exit;
         }
@@ -938,14 +952,17 @@ static void ec800x_init_thread_entry(void *parameter)
     }
 
     if (result == RT_EOK) {
-        /* set network interface device status and address information */
-        ec800x_netdev_set_info(device->netdev);
-        /* check and create link staus sync thread  */
-        if (rt_thread_find(device->netdev->name) == RT_NULL) {
-            ec800x_netdev_check_link_status(device->netdev);
+        if (device->is_init == RT_FALSE) {
+            /* set network interface device status and address information */
+            ec800x_netdev_set_info(device->netdev);
+            /* check and create link staus sync thread  */
+            if (rt_thread_find(device->netdev->name) == RT_NULL) {
+                ec800x_netdev_check_link_status(device->netdev);
+            }
         }
 
         LOG_I("%s device network initialize success.", device->name);
+        device->is_init = RT_TRUE;
     } else {
         LOG_E("%s device network initialize failed(%d).", device->name, result);
     }
@@ -956,7 +973,6 @@ static int ec800x_net_init(struct at_device *device)
 {
 #ifdef AT_DEVICE_EC800X_INIT_ASYN
     rt_thread_t tid;
-
     tid = rt_thread_create("ec800x_net", ec800x_init_thread_entry, (void *)device,
                            EC800X_THREAD_STACK_SIZE, EC800X_THREAD_PRIORITY, 20);
     if (tid) {
