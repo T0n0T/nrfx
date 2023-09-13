@@ -310,19 +310,19 @@
         "name": "Finsh",
         "files": [
           {
-            "path": "rt-thread/components/finsh/shell.c"
+            "path": "rt-thread/components/finsh/cmd.c"
           },
           {
-            "path": "rt-thread/components/finsh/msh.c"
+            "path": "rt-thread/components/finsh/msh_file.c"
           },
           {
             "path": "rt-thread/components/finsh/msh_parse.c"
           },
           {
-            "path": "rt-thread/components/finsh/cmd.c"
+            "path": "rt-thread/components/finsh/msh.c"
           },
           {
-            "path": "rt-thread/components/finsh/msh_file.c"
+            "path": "rt-thread/components/finsh/shell.c"
           }
         ],
         "folders": []
@@ -822,8 +822,7 @@
         "<virtual_root>/ccm3310/ccm3310.c",
         "<virtual_root>/ccm3310/crc32.c",
         "<virtual_root>/Drivers/drv_hwtimer.c",
-        "<virtual_root>/nrf_log",
-        "<virtual_root>/max30102"
+        "<virtual_root>/nrf_log"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -949,7 +948,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": "ip 192.168.1.2"
+        "otherCmds": ""
       },
       "uploadConfigMap": {},
       "custom_dep": {

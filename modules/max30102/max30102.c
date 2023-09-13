@@ -43,7 +43,7 @@ rt_bool_t maxim_max30102_write_reg(uint8_t uch_addr, uint8_t uch_data)
     msg.flags = RT_I2C_WR;
     msg.buf   = buf;
     msg.len   = ARRAY_SIZE(buf);
-
+    
     if ((err = rt_i2c_transfer(i2c_bus, &msg, 1)) != 1) {
         LOG_E("I2c write failed (err: %d).", err);
         return RT_FALSE;
@@ -274,8 +274,9 @@ static struct rt_sensor_ops max30102_ops = {
     .control    = max30102_control,
 };
 
-static struct rt_thread max_thread = {0};
-static char max_stack[768]         = {0};
+static struct rt_thread max_thread             = {0};
+static char max_stack[768]                     = {0};
+static struct rt_sensor_device max30102_sensor = {0};
 
 int rt_hw_max30102_init(struct rt_sensor_config *cfg)
 {
@@ -283,7 +284,6 @@ int rt_hw_max30102_init(struct rt_sensor_config *cfg)
     RT_ASSERT(cfg->mode == RT_SENSOR_MODE_POLLING); // Only support polling.
 
     char *err_msg      = RT_NULL;
-    rt_thread_t tid    = RT_NULL;
     rt_sensor_t sensor = RT_NULL;
 
     do {
@@ -292,13 +292,6 @@ int rt_hw_max30102_init(struct rt_sensor_config *cfg)
             err_msg = "Not find i2c bus (cfg->intf.dev_name).";
             break;
         }
-
-        sensor = rt_calloc(1, sizeof(struct rt_sensor_device));
-        if (sensor == RT_NULL) {
-            err_msg = "rt_calloc error.";
-            break;
-        }
-
         struct rt_sensor_info info = {
             .type       = RT_SENSOR_CLASS_HR,
             .vendor     = RT_SENSOR_VENDOR_MAXIM,
@@ -309,16 +302,17 @@ int rt_hw_max30102_init(struct rt_sensor_config *cfg)
             .range_min  = 30,  // 30 bpm
             .period_min = 1,   // 1 ms
         };
-        rt_memcpy(&sensor->info, &info, sizeof(struct rt_sensor_info));
-        rt_memcpy(&sensor->config, cfg, sizeof(struct rt_sensor_config));
-        sensor->ops = &max30102_ops;
+        rt_memcpy(&max30102_sensor.info, &info, sizeof(struct rt_sensor_info));
+        rt_memcpy(&max30102_sensor.config, cfg, sizeof(struct rt_sensor_config));
+        max30102_sensor.ops = &max30102_ops;
 
-        if (rt_hw_sensor_register(sensor, "max30102", RT_DEVICE_FLAG_RDONLY, RT_NULL) != RT_EOK) {
+        if (rt_hw_sensor_register(&max30102_sensor, "max30102", RT_DEVICE_FLAG_RDONLY, RT_NULL) != RT_EOK) {
             err_msg = "Register max30102 sensor device error.";
             break;
         }
 
         // MAX30102 Init.
+        rt_kprintf("[max30102] init max30102 sensor...\n");
         uint8_t uch_dummy;
         if (!maxim_max30102_reset()) {
             err_msg = "reset max30102 error.";
@@ -346,9 +340,6 @@ int rt_hw_max30102_init(struct rt_sensor_config *cfg)
     } while (0);
 
     if (err_msg) {
-        if (sensor) rt_free(sensor);
-        if (tid) rt_thread_delete(tid);
-
         LOG_E(err_msg);
         return RT_ERROR;
     }

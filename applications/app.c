@@ -140,11 +140,12 @@ static int mqtt_mission_init(void)
     }
     sm4_id = ccm3310_sm4_setkey((uint8_t *)key);
     if (!sm4_id) {
-        sm4_id = ccm3310_sm4_updatekey(0x81, (uint8_t *)key);
+        sm4_id = ccm3310_sm4_updatekey_ram(0x81, (uint8_t *)key);
         if (!sm4_id) {
             LOG_W("mqtt app init success, but cannot get new keyid, work without sm4");
             sm4_flag = 0;
         } else {
+            LOG_W("mqtt app init success, updating and using keyid 0x81");
             sm4_flag = 1;
         }
 
@@ -253,26 +254,31 @@ void sm4_setkey(int argc, char **argv)
         printf("sm4_key set/update xx[0] xx[1] xx[2]... xx[15]   - using hex key\n");
     }
     uint8_t key[16] = {0};
+    printf("argv[1] = %s", argv[1]);
     for (size_t i = 0; i < 16; i++) {
-        key[i] = strtol(argv[3 + i], NULL, 16);
+        key[i] = strtol(argv[2 + i], NULL, 16);
     }
-    if (strncmp("set", argv[2], 3)) {
+    if (!strncmp("set", argv[1], 3)) {
+        printf("set new key!!!!!\n");
         uint8_t id = ccm3310_sm4_setkey(key);
         if (!id) {
-            printf("set sm4 key fail! no id to allocate");
+            printf("set sm4 key fail! no id to allocate\n");
             return;
         }
         sm4_id = id;
         printf("set sm4 key success! key_id = 0x%02x\n", sm4_id);
-    } else if (strncmp("update", argv[2], 3)) {
+    } else if (!strncmp("update", argv[1], 6)) {
+
         uint8_t update_id = 0;
         if (sm4_id) {
+            printf("update key 0x%02x!!!!!\n", sm4_id);
             update_id = sm4_id;
         } else {
+            printf("update key 0x81!!!!!\n");
             update_id = 0x81; // 0x81 is the default key id
         }
 
-        uint8_t id = ccm3310_sm4_updatekey(update_id, key);
+        uint8_t id = ccm3310_sm4_updatekey_ram(update_id, key);
         if (!id) {
             printf("update sm4 key fail!");
             return;

@@ -659,7 +659,7 @@ static int at_recv_readline(at_client_t client)
         }
         last_ch = ch;
     }
-    at_print_raw_cmd("recvline", client->recv_line_buf, read_len);
+
 #ifdef AT_PRINT_RAW_CMD
     at_print_raw_cmd("recvline", client->recv_line_buf, read_len);
 #endif
@@ -787,7 +787,7 @@ static int at_client_para_init(at_client_t client)
     client->parser = rt_thread_create(name,
                                       (void (*)(void *parameter))client_parser,
                                       client,
-                                      1024 + 512,
+                                      512,
                                       RT_THREAD_PRIORITY_MAX / 3 - 1,
                                       5);
     if (client->parser == RT_NULL) {

@@ -132,7 +132,7 @@ static rt_ssize_t _master_xfer(struct rt_i2c_bus_device *bus,
                 no_stop_flag = NRFX_TWIM_FLAG_TX_NO_STOP;
             }
         }
-        // printf("new transfer\n");
+        printf("new transfer\n");
         ret = nrfx_twim_xfer(p_instance, &xfer, no_stop_flag);
         if (ret != NRFX_SUCCESS) {
             printf("i2c transfer fail:err[%d]", ret);

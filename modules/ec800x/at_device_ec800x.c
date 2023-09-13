@@ -447,7 +447,7 @@ static void ec800x_check_link_status_entry(void *parameter)
 static int ec800x_netdev_check_link_status(struct netdev *netdev)
 {
 #define EC800X_LINK_THREAD_TICK       20
-#define EC800X_LINK_THREAD_STACK_SIZE (1024 + 512)
+#define EC800X_LINK_THREAD_STACK_SIZE (512)
 #define EC800X_LINK_THREAD_PRIORITY   (RT_THREAD_PRIORITY_MAX - 2)
 
     rt_thread_t tid;

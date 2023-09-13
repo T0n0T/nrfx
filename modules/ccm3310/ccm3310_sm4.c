@@ -34,12 +34,12 @@ uint8_t ccm3310_sm4_setkey(uint8_t *key)
     return *id;
 }
 
-uint8_t ccm3310_sm4_updatekey(uint8_t update_id, uint8_t *key)
+uint8_t ccm3310_sm4_updatekey_ram(uint8_t update_id, uint8_t *key)
 {
     uint8_t *pack          = (uint8_t *)rt_malloc(100);
     ccm3310_key_data *data = (ccm3310_key_data *)rt_malloc(sizeof(ccm3310_key_data) + 16 - 1);
     data->version          = 0x00;
-    data->key_id           = update_id;
+    data->key_id           = update_id & 0x7F;
     data->algo             = 0x84;
     data->len              = 0x10;
     for (size_t i = 0; i < 16; i++) {
