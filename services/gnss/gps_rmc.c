@@ -79,7 +79,7 @@ void gps_float_parse(gps_float_t *info)
     if (p)
         info->value_l = atol(++p);
 #ifdef GPS_RMC_SHOW_DEBUG
-    printf("string: %s --> %ld.%ld\r\n", info->string, info->value_h, info->value_l);
+    printf("string: %s --> %ld.%ld\n", info->string, info->value_h, info->value_l);
 #endif // GPS_RMC_SHOW_DEBUG
 }
 
@@ -105,7 +105,7 @@ void gps_source_to_dms_format(gps_dms_format_t *coord, gps_float_t *source)
     coord->s    = ((temp - coord->d * 100) - coord->m) * 60;
     sprintf(coord->string, "%d`%d\'%d\"", coord->d, coord->m, coord->s);
 #ifdef GPS_RMC_SHOW_DEBUG
-    printf("source: %s --> dms: %s\r\n", source->string, coord->string);
+    printf("source: %s --> dms: %s\n", source->string, coord->string);
 #endif // GPS_RMC_SHOW_DEBUG
 }
 /**
@@ -140,7 +140,7 @@ void gps_source_to_location_format(gps_float_t *location, gps_float_t *source)
     location->value_l = (uint32_t)((location->value - (uint32_t)location->value) * 10000000);
     sprintf(location->string, "%ld.%ld", location->value_h, location->value_l);
 #ifdef GPS_RMC_SHOW_DEBUG
-    printf("source:%s -> location:%s\r\n", source->string, location->string);
+    printf("source:%s -> location:%s\n", source->string, location->string);
 #endif // GPS_RMC_SHOW_DEBUG
 }
 
@@ -185,16 +185,16 @@ void gps_coord_handle(gps_coord_info_t *location)
 void gps_print_info(gps_info_t info)
 {
     if (info->AV == 0 || (info->date.year == 0 || info->date.year == 2000)) {
-        printf("Null\r\n");
+        printf("Null\n");
         return;
     }
-    printf("Mode: %c\r\n", info->ADEN);
-    printf("State: %s\r\n", info->AV == 'A' ? "Effective" : "Invalid");
-    printf("Time: %s\r\n", info->date.string);
+    printf("Mode: %c\n", info->ADEN);
+    printf("State: %s\n", info->AV == 'A' ? "Effective" : "Invalid");
+    printf("Time: %s\n", info->date.string);
     if (info->AV == 'A') {
-        printf("Location coord: %s %c, %s %c\r\n", info->coord.location.latitude.string, info->EW, info->coord.location.longitude.string, info->NS);
-        printf("Speed: %s\r\n", info->speed.string);
-        printf("Direction: %s\r\n", info->direction.string);
+        printf("Location coord: %s %c, %s %c\n", info->coord.location.latitude.string, info->EW, info->coord.location.longitude.string, info->NS);
+        printf("Speed: %s\n", info->speed.string);
+        printf("Direction: %s\n", info->direction.string);
     }
 }
 #define GPS_RMC_SHOW_DEBUG
@@ -209,7 +209,7 @@ char gps_rmc_parse(gps_info_t info, char *buff)
     if (!info) return 0;
     if (strlen(buff) < 30) {
 #ifdef GPS_RMC_SHOW_ERROR_INFO
-        printf("[gps.rmc.parse] Invalid Data.\r\n");
+        printf("[gps.rmc.parse] Invalid Data.\n");
 #endif // GPS_RMC_SHOW_ERROR_INFO
 #ifdef GPS_RMC_SHOW_DEBUG
         printf("invalid gnss msg.\n");
@@ -281,14 +281,14 @@ char gps_rmc_parse(gps_info_t info, char *buff)
 #ifdef GPS_RMC_SHOW_DEBUG
     printf("%s\r\n", buff);
     printf(
-        "time:%s\r\n"
-        "status:%s\r\n"
-        "latitude:%s %c\r\n"
-        "longitude:%s %c\r\n"
-        "speed:%s m/s\r\n"
-        "direction:%s\r\n"
-        "ADEN:%c\r\n"
-        "\r\n",
+        "time:%s\n"
+        "status:%s\n"
+        "latitude:%s %c\n"
+        "longitude:%s %c\n"
+        "speed:%s m/s\n"
+        "direction:%s\n"
+        "ADEN:%c\n"
+        "\n",
         info->date.string, info->AV == 'A' ? "valid" : "invalid",
         info->coord.location.latitude.string, info->EW,
         info->coord.location.longitude.string, info->NS,

@@ -141,7 +141,7 @@ static int mqtt_mission_init(void)
     if (nrf_fstorage_init(&fstorage, &nrf_fstorage_sd, NULL) == NRF_SUCCESS) {
         uint8_t tmp[30] = {0xff};
         if (nrf_fstorage_read(&fstorage, FLASH_CFG_ADDR, &cfg, sizeof(struct mqtt_cfg)) == NRF_SUCCESS) {
-            LOG_I("read success?");
+            LOG_I("read mqtt config success");
         } else {
             LOG_E("flash read fail, using default config");
             LOG_I("using default config!");
@@ -242,7 +242,7 @@ static void mqtt_entry(void *p)
     rt_thread_mdelay(1000);
     rt_pin_write(LED2, PIN_HIGH);
     rt_pin_write(LED3, PIN_HIGH);
-    
+
     while (1) {
         publish_handle();
         rt_thread_mdelay(MQTT_DELAY_MS);
