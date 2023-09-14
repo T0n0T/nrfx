@@ -174,7 +174,7 @@ static int mqtt_mission_init(void)
 
     err = mqtt_connect(client);
     if (err != KAWAII_MQTT_SUCCESS_ERROR) {
-        rt_base_t level = rt_hw_interrupt_disable();
+
         LOG_I("config invalid, use default config and write to flash");
         strcpy(cfg.host, MQTT_URI_HOST);
         strcpy(cfg.port, MQTT_URI_PORT);
@@ -183,7 +183,7 @@ static int mqtt_mission_init(void)
             LOG_E("write config fail");
             return -1;
         }
-        rt_hw_interrupt_enable(level);
+        NRFX_DELAY_US(1000000); // wait for write finish
         err = mqtt_connect(client);
         if (err != KAWAII_MQTT_SUCCESS_ERROR) {
             LOG_E("mqtt connect fail, err[%d]", err);
@@ -220,10 +220,10 @@ static void mqtt_entry(void *p)
     while (ec800x_isinit() == RT_FALSE) {
         rt_thread_mdelay(3000);
     }
-    rt_thread_mdelay(2500);
+    rt_thread_mdelay(1000);
     rt_pin_write(LED2, PIN_LOW);
     rt_pin_write(LED3, PIN_LOW);
-    rt_thread_mdelay(2500);
+    rt_thread_mdelay(1000);
     rt_pin_write(LED2, PIN_HIGH);
     rt_pin_write(LED3, PIN_HIGH);
 
@@ -235,6 +235,14 @@ static void mqtt_entry(void *p)
         }
         return;
     }
+
+    rt_thread_mdelay(1000);
+    rt_pin_write(LED2, PIN_LOW);
+    rt_pin_write(LED3, PIN_LOW);
+    rt_thread_mdelay(1000);
+    rt_pin_write(LED2, PIN_HIGH);
+    rt_pin_write(LED3, PIN_HIGH);
+    
     while (1) {
         publish_handle();
         rt_thread_mdelay(MQTT_DELAY_MS);
@@ -382,18 +390,18 @@ static void set_mqtt(int argc, char **argv)
     strcpy(cfg.port, argv[2]);
     printf("host:%s\n", cfg.host);
     printf("port:%s\n", cfg.port);
-    rt_base_t level = rt_hw_interrupt_disable();
+
     nrf_fstorage_erase(&fstorage, FLASH_CFG_ADDR, 1, NULL);
     if (nrf_fstorage_write(&fstorage, FLASH_CFG_ADDR, &cfg, sizeof(struct mqtt_cfg), NULL) != NRF_SUCCESS) {
         LOG_E("write config fail");
     }
+    NRFX_DELAY_US(1000000); // wait for write finish
     struct mqtt_cfg *after_cfg = 0;
     after_cfg                  = (struct mqtt_cfg *)FLASH_CFG_ADDR;
     printf("host:%s\n", after_cfg->host);
     printf("port:%s\n", after_cfg->port);
     printf("config write success!\n");
     printf("restart machine to make config update\n");
-    rt_hw_interrupt_enable(level);
 }
 
 MSH_CMD_EXPORT_ALIAS(publish_handle, publish, test);
