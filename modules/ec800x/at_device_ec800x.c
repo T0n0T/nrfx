@@ -26,6 +26,15 @@
 struct gps_info rmcinfo;
 #elif defined(USING_LOC)
 struct LOC_GNSS gnssmsg;
+struct _time {
+    uint32_t year;   //  年
+    uint32_t month;  //  月
+    uint32_t day;    //  日
+    uint32_t hour;   //  时
+    uint32_t minute; //  分
+    uint32_t second; //  秒
+};
+struct _time ec800_time = {0};
 #endif
 
 static int ec800x_power_on(struct at_device *device)
@@ -211,21 +220,38 @@ static int ec800x_read_gnss(struct at_device *device)
         LOG_D("no memory for resp create.");
         return -3;
     }
-
+    struct at_device_ec800x *ec800x = (struct at_device_ec800x *)device->user_data;
 #if USING_RMC
     if (at_obj_exec_cmd(device->client, resp, "AT+QGPSGNMEA=\"RMC\"") == RT_EOK) {
-        struct at_device_ec800x *ec800x = (struct at_device_ec800x *)device->user_data;
+
         rt_memset(ec800x->rmc, 0, sizeof(ec800x->rmc));
         rt_memset(&rmcinfo, 0, sizeof(struct gps_info));
         if (at_resp_parse_line_args_by_kw(resp, "+QGPSGNMEA:", "+QGPSGNMEA:%s", ec800x->rmc) > 0) {
-            result = gps_rmc_parse(&rmcinfo, ec800x->rmc);
+            if (!gps_rmc_parse(&rmcinfo, ec800x->rmc)) {
+                ec800x->gnss_status = 0;
+            } else {
+                ec800x->gnss_status = 1;
+                LOG_D("%d %d %d %d %d %d", rmcinfo.date.year, rmcinfo.date.month, rmcinfo.date.day,
+                      rmcinfo.date.hour, rmcinfo.date.minute, rmcinfo.date.second);
+                struct tm tm_new = {0};
+                tm_new.tm_year   = rmcinfo.date.year - 1900;
+                tm_new.tm_mon    = rmcinfo.date.month - 1; /* .tm_min's range is [0-11] */
+                tm_new.tm_mday   = rmcinfo.date.day;
+                tm_new.tm_hour   = rmcinfo.date.hour;
+                tm_new.tm_min    = rmcinfo.date.minute;
+                tm_new.tm_sec    = rmcinfo.date.second;
+                time_t now       = mktime(&tm_new);
+                if (set_timestamp(now) != RT_EOK) {
+                    LOG_W("set date failed");
+                }
+            }
         }
     } else {
-        result = 2;
+        ec800x->gnss_status = 0;
+        result              = 2;
     }
 #elif USING_LOC
     if (at_obj_exec_cmd(device->client, resp, "AT+QGPSLOC=2") == RT_EOK) {
-        struct at_device_ec800x *ec800x = (struct at_device_ec800x *)device->user_data;
         rt_memset(&gnssmsg, 0, sizeof(struct LOC_GNSS));
         if (at_resp_parse_line_args_by_kw(resp, "+QGPSLOC:",
                                           "+QGPSLOC:%[^,],%[^,],%[^,],%[^,],%[^,],%d,%[^,],%[^,],%[^,],%[^,],%[^,]",
@@ -250,12 +276,20 @@ static int ec800x_read_gnss(struct at_device *device)
                    gnssmsg.latitude,
                    gnssmsg.longitude,
                    gnssmsg.altitude);
+            sscanf(gnssmsg.UTC, "%2u%2u%2u", &ec800_time.hour, &ec800_time.minute, &ec800_time.second);
+            ec800_time.hour += 8; // 北京时间+8h
+            set_time(ec800_time.hour, ec800_time.minute, ec800_time.second);
+            sscanf(gnssmsg.utcdate, "%2u%2u%2u", &ec800_time.day, &ec800_time.month, &ec800_time.year);
+            ec800_time.year += 2000;
+            set_date(ec800_time.year, ec800_time.month, ec800_time.day);
+            ec800x->gnss_status = 1;
 #endif // 1
-            result = 0;
+            result              = 0;
         } else {
             result = 1;
         }
     } else {
+        ec800x->gnss_status = 0;
         if (at_resp_get_line_by_kw(resp, "516")) {
             result = 1;
         } else {

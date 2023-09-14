@@ -92,6 +92,6 @@ err:
     return result;
 }
 
-// INIT_ENV_EXPORT(on_chip_fs_init);
+INIT_ENV_EXPORT(on_chip_fs_init);
 
 #endif /* BSP_USING_ON_CHIP_FS */

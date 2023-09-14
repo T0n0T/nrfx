@@ -18,8 +18,9 @@
 #include "fal.h"
 #endif
 
+#define DBG_LVL DBG_LOG
+#define DBG_TAG "drv.flash"
 #include <rtdbg.h>
-#define LOG_TAG "drv.flash"
 
 /**
  * @brief  Gets the page of a given address

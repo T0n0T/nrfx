@@ -22,7 +22,20 @@
             "rtdef.h": "c",
             "ccm3310.h": "c",
             "stdlib.h": "c",
-            "ccm3310_sm4.h": "c"
+            "ccm3310_sm4.h": "c",
+            "stdint.h": "c",
+            "board.h": "c",
+            "nrfx_nvmc.h": "c",
+            "fal.h": "c",
+            "nrf_nvmc.h": "c",
+            "sdk_common.h": "c",
+            "nrf_fstorage_sd.h": "c",
+            "nrf_fstorage.h": "c",
+            "max30102.h": "c",
+            "rtdbg.h": "c",
+            "sensor.h": "c",
+            "blood.h": "c",
+            "math.h": "c"
         }
     },
     "extensions": {}

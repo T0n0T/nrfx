@@ -15,6 +15,7 @@ typedef struct
     float SpO2; // 血氧数据
 } BloodData;
 
+extern BloodData g_blooddata;
 void blood_data_translate(void);
 void blood_data_update(void);
 void blood_Loop(void);

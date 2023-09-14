@@ -198,7 +198,6 @@ void gps_print_info(gps_info_t info)
     }
 }
 
-#define GPS_RMC_SHOW_DEBUG
 /**
  * @name:   gps_rmc_parse
  * @msg:    gps rmc类型信息解析

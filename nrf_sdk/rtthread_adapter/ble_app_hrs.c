@@ -502,3 +502,4 @@ int ble_app_hrs(void)
     return 0;
 }
 INIT_APP_EXPORT(ble_app_hrs);
+// MSH_CMD_EXPORT(ble_app_hrs, test);

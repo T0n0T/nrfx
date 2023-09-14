@@ -11,7 +11,7 @@
 
 #include "button.h"
 
-#define DBG_LVL DBG_LOG
+#define DBG_LVL DBG_INFO
 #define DBG_TAG "button"
 #include <rtdbg.h>
 
@@ -233,8 +233,6 @@ void Button_Cycle_Process(Button_t *btn)
                     if (++(btn->Button_Cycle) >= BUTTON_LONG_CYCLE) {
                         btn->Button_Cycle         = 0;
                         btn->Button_Trigger_Event = BUTTON_LONG;
-
-
                     }
 #endif
 

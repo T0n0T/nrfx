@@ -57,7 +57,7 @@ int ec800x_get_rssi(void)
 }
 
 #if defined(USING_RMC)
-struct gps_info *ec800x_get_gnss(void)
+gps_info_t ec800x_get_gnss(void)
 {
     return &rmcinfo;
 }

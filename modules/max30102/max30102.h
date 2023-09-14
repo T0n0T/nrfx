@@ -60,6 +60,7 @@
 
 #define MAX30102_ADDR       0x57 // 7-bit version of the above
 extern struct rt_sensor_config cfg;
+
 extern void max30102_thread_entry(void *args);
 
 int rt_hw_max30102_init(struct rt_sensor_config *cfg);
