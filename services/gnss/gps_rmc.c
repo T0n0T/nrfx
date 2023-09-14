@@ -225,7 +225,18 @@ char gps_rmc_parse(gps_info_t info, char *buff)
         &info->AV);
     if (info->AV == 'A') {
         //  进一步解析所有数据
-        int num = 0;
+        int num = sscanf(
+            buff,
+            "%*[^,],%[^,],%*c,%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],,,%[^,]",
+            hms_s,
+            info->coord.source.longitude.string,
+            &info->NS,
+            info->coord.source.latitude.string,
+            &info->EW,
+            info->speed.string,
+            info->direction.string,
+            ymd_s,
+            &info->ADEN);
         while (num != 9) {
             char *front_comma, *after_comma;
             char tmp[80] = {0};
