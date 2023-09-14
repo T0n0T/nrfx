@@ -46,7 +46,9 @@ rt_bool_t ec800x_isinit(void)
 
 void ec800x_status(void)
 {
-    printf("status of ec800 is%d", ec800x_isinit());
+    struct at_device_ec800x *ec800x = &_dev;
+    printf("status of ec800 is %d\n", ec800x_isinit());
+    printf("status of gnss is %d\n", ec800x->gnss_status);
 }
 MSH_CMD_EXPORT(ec800x_status, ec800x status);
 

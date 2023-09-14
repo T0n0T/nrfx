@@ -197,7 +197,7 @@ void gps_print_info(gps_info_t info)
         printf("Direction: %s\r\n", info->direction.string);
     }
 }
-
+#define GPS_RMC_SHOW_DEBUG
 /**
  * @name:   gps_rmc_parse
  * @msg:    gps rmc类型信息解析
@@ -212,7 +212,7 @@ char gps_rmc_parse(gps_info_t info, char *buff)
         printf("[gps.rmc.parse] Invalid Data.\r\n");
 #endif // GPS_RMC_SHOW_ERROR_INFO
 #ifdef GPS_RMC_SHOW_DEBUG
-        printf("无效数据.\r\n");
+        printf("invalid gnss msg.\n");
 #endif // GPS_RMC_SHOW_DEBUG
         return 0;
     }
@@ -225,24 +225,46 @@ char gps_rmc_parse(gps_info_t info, char *buff)
         &info->AV);
     if (info->AV == 'A') {
         //  进一步解析所有数据
-        sscanf(
-            buff,
-            "%*[^,],%[^,],%*c,%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],,,%[^,]",
-            hms_s,
-            info->coord.source.longitude.string,
-            &info->NS,
-            info->coord.source.latitude.string,
-            &info->EW,
-            info->speed.string,
-            info->direction.string,
-            ymd_s,
-            &info->ADEN);
+        int num = 0;
+        while (num != 9) {
+            char *front_comma, *after_comma;
+            char tmp[80] = {0};
+
+            front_comma = strchr(buff, ',');
+            after_comma = strchr(front_comma + 1, ',');
+            if (front_comma == NULL || after_comma == NULL) {
+                printf("invalid gnss msg.\n");
+                return 0;
+            }
+            while (after_comma != front_comma + 1) {
+                front_comma = after_comma;
+                after_comma = strchr(front_comma + 1, ',');
+            }
+            memset(tmp, 0, 70);
+            strcpy(tmp, after_comma);
+            strcpy(after_comma + 1, tmp);
+
+            after_comma[0] = '0';
+            num            = sscanf(
+                buff,
+                "%*[^,],%[^,],%*c,%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],,,%[^,]",
+                hms_s,
+                info->coord.source.longitude.string,
+                &info->NS,
+                info->coord.source.latitude.string,
+                &info->EW,
+                info->speed.string,
+                info->direction.string,
+                ymd_s,
+                &info->ADEN);
+        }
+
         //  有效，处理所有数据
         gps_coord_handle(&info->coord);
         sprintf(info->speed.string, "%d.%ld", (int)(atof(info->speed.string) * 1.85), (uint32_t)(atof(info->speed.string) * 1850) % 1000);
         gps_float_parse(&info->speed);
         gps_float_parse(&info->direction);
-    } else
+    } else {
         //  解析正确的时间和模式
         sscanf(
             buff,
@@ -250,6 +272,8 @@ char gps_rmc_parse(gps_info_t info, char *buff)
             hms_s,
             ymd_s,
             &info->ADEN);
+    }
+
     //  处理时间数据
     hms = atol(hms_s);
     ymd = atol(ymd_s);

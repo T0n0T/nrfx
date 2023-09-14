@@ -11,7 +11,7 @@
 
 #include "button.h"
 
-#define DBG_LVL DBG_INFO
+#define DBG_LVL DBG_LOG
 #define DBG_TAG "button"
 #include <rtdbg.h>
 
