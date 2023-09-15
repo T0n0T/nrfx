@@ -32,7 +32,6 @@ int main(void)
     mission_init();
     while (1) {
         NRF_LOG_INTERNAL_FLUSH();
-
         rt_pin_write(DK_BOARD_LED_1, PIN_HIGH);
         rt_thread_mdelay(500);
         rt_pin_write(DK_BOARD_LED_1, PIN_LOW);

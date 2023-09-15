@@ -1,11 +1,12 @@
 SET PATH=D:\keil\ARM\ARMCC\Bin;D:\vmware\bin\;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;D:\SecureCRT\;E:\CUDA_1\development\bin;E:\CUDA_1\development\libnvvp;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\dotnet\;D:\mingw\MinGW\bin;C:\Program Files\NVIDIA Corporation\Nsight Compute 2022.1.0\;E:\Git\bin;E:\CUDA_1\development;E:\CUDA_1\development\lib\x64;D:\Graphviz\bin;D:\Microsoft VS Code\bin;D:\cmake\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Users\Administrator\AppData\Roaming\Code\User\globalStorage\llvm-vs-code-extensions.vscode-clangd\install\15.0.6\clangd_15.0.6\bin;D:\xshell\;D:\xftp\;D:\Node\;C:\ProgramData\chocolatey\bin;D:\Node\node_global;D:\Node\node_global\node_modules;D:\OpenOCD\bin;D:\TortoiseGit\bin;D:\protoc-22.0-win64\bin;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\150\Tools\Binn\;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Program Files\Microsoft SQL Server\150\DTS\Binn\;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit\;D:\keil\ARM\ARMCC\bin;D:\miniconda\Scripts;D:\miniconda;D:\mingw\w64devkit\bin;D:\mingw\llvm-mingw-20230614-ucrt-x86_64\bin;C:\Program Files\PowerShell\7\;D:\mingw\sdl2\bin;D:\mingw\ffmpeg\bin;C:\helios\bin;D:\Jlink6.98;D:\Golang\go_global\bin;F:\code\Embedded\tool\nrf-command-line-tools\bin;F:\code\Embedded\tool\arm-gnu-toolchain-12.3.rel1-mingw-w64-i686-arm-none-eabi\bin;C:\Users\Administrator\AppData\Local\Microsoft\WindowsApps;D:\Bandizip\;D:\Microsoft VS Code\bin;D:\mingw\bin;D:\pyCHARM\PyCharm Community Edition 2021.3.3\bin;;C:\Users\Administrator\.dotnet\tools;C:\Users\Administrator\AppData\Local\Microsoft\WindowsApps;C:\Users\Administrator\AppData\Roaming\npm;D:\cpolar\
+SET ARMCC5_ASMOPT=--diag_suppress=9931
+SET ARMCC5_CCOPT=--diag_suppress=9931
+SET ARMCC5_LINKOPT=--diag_suppress=9931
 SET CPU_TYPE=nRF52832_xxAA
 SET CPU_VENDOR=Nordic Semiconductor
 SET UV2_TARGET=rtthread
 SET CPU_CLOCK=0x00B71B00
 "D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\main.__i"
-"D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\app.__i"
-"D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\btn_event.__i"
 "D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\cjson.__i"
 "D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\at_cli.__i"
 "D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\at_utils.__i"
@@ -60,9 +61,6 @@ SET CPU_CLOCK=0x00B71B00
 "D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\drv_rtc.__i"
 "D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\drv_spi.__i"
 "D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\drv_uarte.__i"
-"D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\at_socket_ec800x.__i"
-"D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\at_device_ec800x.__i"
-"D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\at_instance_ec800x.__i"
 "D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\devfs.__i"
 "D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\dfs.__i"
 "D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\dfs_file.__i"
@@ -108,10 +106,6 @@ SET CPU_CLOCK=0x00B71B00
 "D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\thread.__i"
 "D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\timer.__i"
 "D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\workqueue_legacy.__i"
-"D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\port.__i"
-"D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\blood.__i"
-"D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\algorithm.__i"
-"D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\max30102.__i"
 "D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\nrfx_spi.__i"
 "D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\nrfx_adc.__i"
 "D:\keil\ARM\ARMCC\Bin\ArmCC" --Via ".\build\nrfx_qspi.__i"

@@ -42,9 +42,10 @@ NRF_FSTORAGE_DEF(nrf_fstorage_t fstorage) =
 };
 
 /*-------thread init---------*/
-struct rt_thread mqtt_thread = {0};
-char stack[1024]             = {0};
-
+struct rt_thread check_thread = {0};
+struct rt_thread mqtt_thread  = {0};
+char stack[1024]              = {0};
+char check_stack[1024]        = {0};
 /*-------client init---------*/
 mqtt_client_t *client      = NULL;
 mqtt_message_t publish_msg = {0};
@@ -64,6 +65,8 @@ char *build_msg_updata(char *device_id, gps_info_t info, int battry, int pulse_r
 char *build_msg_updata(char *device_id, struct LOC_GNSS *info, int battry, int pulse_rate);
 #endif
 
+void mqtt_reset_thread(void *p);
+
 void publish_handle(void)
 {
     rt_pin_write(LED2, PIN_LOW);
@@ -82,6 +85,14 @@ void publish_handle(void)
             err                    = mqtt_publish(client, MQTT_TOPIC_DATA, &publish_msg);
             if (err != KAWAII_MQTT_SUCCESS_ERROR) {
                 LOG_E("publish msg fail, err[%d]", err);
+                static int flag = 0;
+
+                if (flag++ == 10) {
+                    flag = 0;
+                    rt_thread_init(&check_thread, "mqtt_reset", mqtt_reset_thread, RT_NULL, check_stack, sizeof(check_stack), 25, 15);
+                    rt_thread_startup(&check_thread);
+                    rt_thread_mdelay(2000);
+                }
             } else {
                 LOG_D("publish msg success!!!!!!!!");
             }
@@ -228,11 +239,9 @@ static void mqtt_entry(void *p)
     rt_pin_write(LED3, PIN_HIGH);
 
     if (mqtt_mission_init() != 0) {
-        if (client) {
-            mqtt_disconnect(client);
-            mqtt_release(client);
-            rt_free(client);
-        }
+        rt_thread_init(&check_thread, "mqtt_reset", mqtt_reset_thread, RT_NULL, check_stack, sizeof(check_stack), 25, 15);
+        rt_thread_startup(&check_thread);
+        rt_thread_mdelay(2000);
         return;
     }
 
@@ -274,6 +283,13 @@ void mission_deinit(void)
     rt_free(client);
     printf("4\n");
     mission_status = 0;
+}
+
+void mqtt_reset_thread(void *p)
+{
+    mission_deinit();
+    rt_thread_mdelay(2000);
+    mission_init();
 }
 
 #if defined(USING_RMC)
