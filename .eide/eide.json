@@ -1222,6 +1222,253 @@
         ]
       },
       "excludeList": []
+    },
+    "bootloader": {
+      "excludeList": [
+        "<virtual_root>/Applications/button.c",
+        "<virtual_root>/ccm3310/ccm3310.c",
+        "<virtual_root>/ccm3310/crc32.c",
+        "<virtual_root>/Drivers/drv_hwtimer.c",
+        "<virtual_root>/nrf_log",
+        "<virtual_root>/Drivers/drv_spi.c",
+        "<virtual_root>/Fal",
+        "<virtual_root>/Applications/mnt.c",
+        "<virtual_root>/littlefs"
+      ],
+      "toolchain": "AC5",
+      "compileConfig": {
+        "cpuType": "Cortex-M4",
+        "floatingPointHardware": "single",
+        "scatterFilePath": "",
+        "useCustomScatterFile": false,
+        "storageLayout": {
+          "RAM": [
+            {
+              "tag": "RAM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            },
+            {
+              "tag": "RAM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            },
+            {
+              "tag": "RAM",
+              "id": 3,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            },
+            {
+              "tag": "IRAM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x20004c00",
+                "size": "0xb400"
+              },
+              "isChecked": true,
+              "noInit": false
+            },
+            {
+              "tag": "IRAM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            }
+          ],
+          "ROM": [
+            {
+              "tag": "ROM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            },
+            {
+              "tag": "ROM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            },
+            {
+              "tag": "ROM",
+              "id": 3,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            },
+            {
+              "tag": "IROM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x26000",
+                "size": "0x5a000"
+              },
+              "isChecked": true,
+              "isStartup": true
+            },
+            {
+              "tag": "IROM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            }
+          ]
+        },
+        "options": "null"
+      },
+      "uploader": "JLink",
+      "uploadConfig": {
+        "bin": "${ExecutableName}.hex",
+        "baseAddr": "0x26000",
+        "cpuInfo": {
+          "vendor": "Nordic Semi",
+          "cpuName": "nRF52832_xxAA"
+        },
+        "proType": 1,
+        "speed": 8000,
+        "otherCmds": ""
+      },
+      "uploadConfigMap": {},
+      "custom_dep": {
+        "name": "default",
+        "incList": [
+          "nrf_sdk/components/libraries/memobj",
+          "rt-thread/components/net/sal/include/socket",
+          "nrf_sdk/components/ble/ble_advertising",
+          "rt-thread/components/net/sal/impl",
+          "packages/SEGGER_RTT-latest",
+          "nrf_sdk/components/libraries/atomic_flags",
+          "services/kawaii-mqtt/common",
+          "nrf_sdk/modules/nrfx/soc",
+          "rt-thread/components/libc/compilers/common/extension",
+          "nrf_sdk/modules/nrfx/mdk",
+          "services/littlefs",
+          "services/kawaii-mqtt/network",
+          "rt-thread/libcpu/arm/cortex-m4",
+          "nrf_sdk/components/libraries/strerror",
+          "nrf_sdk/modules/nrfx/drivers",
+          "rt-thread/components/libc/posix/io/poll",
+          "rt-thread/components/fal/inc",
+          "rt-thread/components/dfs/dfs_v1/filesystems/devfs",
+          "nrf_sdk/components/libraries/balloc",
+          "nrf_sdk/integration/nrfx/legacy",
+          "rt-thread/components/drivers/include",
+          "nrf_sdk/components/libraries/util",
+          "nrf_sdk/components/libraries/log",
+          "rt-thread/components/drivers/spi",
+          "nrf_sdk/modules/nrfx",
+          "packages/CmBacktrace-v1.4.1",
+          "rt-thread/components/libc/compilers/common/extension/fcntl/octal",
+          "rt-thread/components/net/at/include",
+          "rt-thread/components/libc/posix/ipc",
+          "rt-thread/components/net/sal/include/dfs_net",
+          "rt-thread/components/net/netdev/include",
+          "rt-thread/components/finsh",
+          "modules/max30102",
+          "rt-thread/components/net/sal/include/socket/sys_socket",
+          "modules/button",
+          "nrf_sdk/components/libraries/delay",
+          "nrf_sdk/components/libraries/atomic",
+          "packages/SEGGER_RTT-latest/RTT",
+          "nrf_sdk/components/softdevice/common",
+          "nrf_sdk/components/softdevice/s132/headers/nrf52",
+          "libraries/drivers",
+          "nrf_sdk/components/libraries/log/src",
+          "nrf_sdk/components/ble/common",
+          "rt-thread/components/libc/compilers/common/include",
+          "nrf_sdk/components/ble/nrf_ble_qwr",
+          "services/kawaii-mqtt/common/log",
+          "rt-thread/components/utilities/resource",
+          "applications",
+          "rt-thread/libcpu/arm/common",
+          "services/kawaii-mqtt/mqttclient",
+          "libraries/cmsis/include",
+          "nrf_sdk/modules/nrfx/drivers/src",
+          "services/kawaii-mqtt/mqtt",
+          "rt-thread/components/legacy/dfs",
+          "board",
+          "rt-thread/components/libc/posix/io/epoll",
+          "nrf_sdk/components/ble/nrf_ble_gatt",
+          "nrf_sdk/modules/nrfx/hal",
+          "rt-thread/components/dfs/dfs_v1/include",
+          "modules/ccm3310",
+          "rt-thread/include",
+          "nrf_sdk/components/softdevice/s132/headers",
+          "rt-thread/components/legacy",
+          "nrf_sdk/components/libraries/experimental_section_vars",
+          "modules/ec800x",
+          "services/gnss",
+          "nrf_sdk/external/fprintf",
+          "rt-thread/components/net/at/at_socket",
+          ".",
+          "rt-thread/components/libc/posix/io/eventfd",
+          "packages/at_device-latest/inc",
+          "nrf_sdk/components/libraries/ringbuf",
+          "nrf_sdk/modules/nrfx/drivers/include",
+          "services/kawaii-mqtt/platform/RT-Thread",
+          "rt-thread/components/net/sal/include",
+          "RTE/_rtthread",
+          "nrf_sdk/external/cJSON",
+          "modules/ble_test",
+          "nrf_sdk/components/ble/ble_services/ble_lbs",
+          "nrf_sdk/components/libraries/sensorsim",
+          "nrf_sdk/components/ble/ble_services/ble_bas",
+          "nrf_sdk/components/ble/ble_services/ble_dis",
+          "nrf_sdk/components/ble/ble_services/ble_hrs",
+          "nrf_sdk/components/libraries/fstorage",
+          "nrf_sdk/components/libraries/atomic_fifo"
+        ],
+        "libList": [],
+        "sourceDirList": [],
+        "defineList": [
+          "NRF_LOG_BACKEND_RTT_ENABLED",
+          "__STDC_LIMIT_MACROS",
+          "RT_USING_ARMLIBC",
+          "NRF52832_XXAA",
+          "SOFTDEVICE_PRESENT",
+          "NRFX_GPIOTE_ENABLED",
+          "RT_USING_LIBC",
+          "__CLK_TCK=RT_TICK_PER_SECOND",
+          "__RTTHREAD__",
+          "NRFX_CLOCK_ENABLED",
+          "LFS_CONFIG=lfs_config.h",
+          "CONFIG_GPIO_AS_PINRESET",
+          "USE_APP_CONFIG"
+        ]
+      }
     }
   },
   "version": "3.3"
