@@ -24,6 +24,7 @@
 #include "nrf_sdh_ble.h"
 #include "ble_advdata.h"
 #include "app_error.h"
+
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
@@ -56,13 +57,18 @@ BLE_ADVERTISING_DEF(m_advertising); /**< Advertising module instance. */
 
 static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID; /**< Handle of the current connection. */
 
-// static ble_uuid_t m_adv_uuids[] = /**< Universally unique service identifiers. */
-//     {
-//         {BLE_UUID_HEART_RATE_SERVICE, BLE_UUID_TYPE_BLE},
+static ble_uuid_t m_adv_uuids[] = /**< Universally unique service identifiers. */
+    {
+        {BLE_UUID_HEART_RATE_SERVICE, BLE_UUID_TYPE_BLE},
 
-// };
+};
 
+/* handles */
 static void advertising_start(void);
+static void advertising_config_get(ble_adv_modes_config_t *p_config);
+static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context);
+static void ble_dfu_evt_handler(ble_dfu_buttonless_evt_type_t event);
+static void disconnect(uint16_t conn_handle, void *p_context);
 
 /**
  * @brief Function for handling BLE events.
@@ -216,11 +222,11 @@ static void advertising_init(void)
     err_code = ble_advertising_init(&m_advertising, &init);
     APP_ERROR_CHECK(err_code);
 
-    ble_advertising_conn_cfg_tag_set(&m_advertising, APP_BLE_CONN_CFG_TAG);
+    ble_advertising_conn_cfg_tag_set(&m_advertising, APP_BLE_CONN_CFG_TAG);  
 }
 
 /**
- * @brief Clear bond information from persistent storage.
+ * @brief Clear bond information from persistent storage.  
  */
 static void delete_bonds(void)
 {
@@ -255,13 +261,13 @@ static void gap_params_init(void)
 
     BLE_GAP_CONN_SEC_MODE_SET_OPEN(&sec_mode);
 
-    err_code = sd_ble_gap_device_name_set(&sec_mode,
-                                          (const uint8_t *)DEVICE_NAME,
-                                          strlen(DEVICE_NAME));
+    err_code = sd_ble_gap_device_name_set(&sec_mode, (const uint8_t *)DEVICE_NAME, strlen(DEVICE_NAME));
+    APP_ERROR_CHECK(err_code);
+
+    err_code = sd_ble_gap_appearance_set(BLE_APPEARANCE_GENERIC_WATCH);
     APP_ERROR_CHECK(err_code);
 
     memset(&gap_conn_params, 0, sizeof(gap_conn_params));
-
     gap_conn_params.min_conn_interval = MIN_CONN_INTERVAL;
     gap_conn_params.max_conn_interval = MAX_CONN_INTERVAL;
     gap_conn_params.slave_latency     = SLAVE_LATENCY;

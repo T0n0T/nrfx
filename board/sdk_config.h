@@ -4809,7 +4809,7 @@
 // <7=> 7
 
 #ifndef NRFX_TWIM_DEFAULT_CONFIG_IRQ_PRIORITY
-#define NRFX_TWIM_DEFAULT_CONFIG_IRQ_PRIORITY 6
+#define NRFX_TWIM_DEFAULT_CONFIG_IRQ_PRIORITY 7
 #endif
 
 // <e> NRFX_TWIM_CONFIG_LOG_ENABLED - Enables logging in the module.
@@ -5486,7 +5486,7 @@
 // <7=> 7
 
 #ifndef CLOCK_CONFIG_IRQ_PRIORITY
-#define CLOCK_CONFIG_IRQ_PRIORITY 6
+#define CLOCK_CONFIG_IRQ_PRIORITY 5
 #endif
 
 // </e>
@@ -8215,7 +8215,7 @@
 // <e> NRF_LOG_ENABLED - nrf_log - Logger
 //==========================================================
 #ifndef NRF_LOG_ENABLED
-#define NRF_LOG_ENABLED 0
+#define NRF_LOG_ENABLED 1
 #endif
 // <h> Log message pool - Configuration of log message pool
 

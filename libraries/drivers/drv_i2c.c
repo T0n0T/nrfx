@@ -16,6 +16,10 @@
 #include <drv_i2c.h>
 #include <hal/nrf_gpio.h>
 
+#define LOG_TAG "drv.i2c"
+#define DBG_LVL DBG_LOG
+#include <rtdbg.h>
+
 #if defined(BSP_USING_I2C0) || defined(BSP_USING_I2C1) || defined(BSP_USING_I2C2) || defined(BSP_USING_I2C3)
 
 #define TWI_TWIM_PIN_CONFIGURE(_pin) nrf_gpio_cfg((_pin),                     \
@@ -69,6 +73,29 @@ static drv_i2c_cfg_t drv_i2c_3 =
 static struct rt_i2c_bus_device i2c3_bus;
 #endif
 
+void i2c_handle(nrfx_twim_evt_t const *p_event, void *p_context)
+{
+    switch (p_event->type) {
+        case NRFX_TWIM_EVT_DONE: ///< Transfer completed event.
+            LOG_D("i2c transfer done");
+            break;
+        case NRFX_TWIM_EVT_ADDRESS_NACK: ///< Error event: NACK received after sending the address.
+            LOG_E("i2c meet wrong of NACK received after sending the address");
+            break;
+        case NRFX_TWIM_EVT_DATA_NACK: ///< Error event: NACK received after sending a data byte.
+            LOG_E("i2c meet wrong of NACK received after sending a data byte");
+            break;
+        case NRFX_TWIM_EVT_OVERRUN: ///< Error event: The unread data is replaced by new data.
+            LOG_E("i2c meet wrong of The unread data is replaced by new data");
+            break;
+        case NRFX_TWIM_EVT_BUS_ERROR: ///< Error event: An unexpected transition occurred on the bus.
+            LOG_E("i2c meet wrong of An unexpected transition occurred on the bus");
+            break;
+        default:
+            break;
+    }
+}
+
 static int twi_master_init(struct rt_i2c_bus_device *bus)
 {
     nrfx_err_t rtn;
@@ -102,7 +129,7 @@ static int twi_master_init(struct rt_i2c_bus_device *bus)
         return NRFX_ERROR_INTERNAL;
     }
 
-    rtn = nrfx_twim_init(p_instance, &config, NULL, NULL);
+    rtn = nrfx_twim_init(p_instance, &config, i2c_handle, NULL);
     if (rtn != NRFX_SUCCESS) {
         return rtn;
     }
@@ -132,13 +159,14 @@ static rt_ssize_t _master_xfer(struct rt_i2c_bus_device *bus,
                 no_stop_flag = NRFX_TWIM_FLAG_TX_NO_STOP;
             }
         }
-        // printf("new transfer\n");
+
         ret = nrfx_twim_xfer(p_instance, &xfer, no_stop_flag);
         if (ret != NRFX_SUCCESS) {
             printf("i2c transfer fail:err[%d]", ret);
             goto out;
         }
     }
+    
 
 out:
     return i;

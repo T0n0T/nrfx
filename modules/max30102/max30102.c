@@ -290,7 +290,7 @@ int rt_hw_max30102_init(struct rt_sensor_config *cfg)
         i2c_bus = (struct rt_i2c_bus_device *)rt_device_find(cfg->intf.dev_name);
         if (i2c_bus == RT_NULL) {
             err_msg = "Not find i2c bus (cfg->intf.dev_name).";
-            break;
+            goto exit;
         }
         struct rt_sensor_info info = {
             .type       = RT_SENSOR_CLASS_HR,
@@ -308,7 +308,7 @@ int rt_hw_max30102_init(struct rt_sensor_config *cfg)
 
         if (rt_hw_sensor_register(&max30102_sensor, "max30102", RT_DEVICE_FLAG_RDONLY, RT_NULL) != RT_EOK) {
             err_msg = "Register max30102 sensor device error.";
-            break;
+            goto exit;
         }
 
         // MAX30102 Init.
@@ -316,29 +316,30 @@ int rt_hw_max30102_init(struct rt_sensor_config *cfg)
         uint8_t uch_dummy;
         if (!maxim_max30102_reset()) {
             err_msg = "reset max30102 error.";
-            break;
+            goto exit;
         } // resets the MAX30102
         rt_thread_mdelay(1000);
 
         if (!maxim_max30102_read_reg(REG_INTR_STATUS_1, &uch_dummy, sizeof(uch_dummy))) {
             err_msg = "clean max30102 interrupt status error.";
-            break;
+            goto exit;
         } // Reads/clears the interrupt status register
         // maxim_max30102_init();                                                     // initialize the MAX30102
         if (!maxim_max30102_init_proximity_mode()) {
             err_msg = "set max30102 proximity_mode error.";
-            break;
+            goto exit;
         } // initialize the MAX30102
 
         if (rt_thread_init(&max_thread, "max30102", max30102_thread_entry, RT_NULL, max_stack, sizeof(max_stack), 21, 10) != RT_EOK) {
             err_msg = "max30102 thread init fail";
-            break;
+            goto exit;
         } else {
             rt_thread_startup(&max_thread);
         }
 
     } while (0);
 
+exit:
     if (err_msg) {
         LOG_E(err_msg);
         return RT_ERROR;

@@ -29,7 +29,7 @@ int main(void)
 {
     log_init();
     rt_pin_mode(DK_BOARD_LED_1, PIN_MODE_OUTPUT);
-    mission_init();
+    //mission_init();
     while (1) {
         NRF_LOG_INTERNAL_FLUSH();
         rt_pin_write(DK_BOARD_LED_1, PIN_HIGH);

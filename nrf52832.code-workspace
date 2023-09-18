@@ -6,6 +6,10 @@
     ],
     "settings": {
         "files.associations": {
+            "*.cpp": "cpp",
+            "*.html": "html",
+            "*.env": "dotenv",
+            "*.go": "go",
             "button.h": "c",
             "nrfx_spim.h": "c",
             "dfs_private.h": "c",
@@ -40,7 +44,8 @@
             "nrfx_pwm.h": "c",
             "nrfx.h": "c",
             "nrf_pwm.h": "c",
-            "nrf_ble_qwr.h": "c"
+            "nrf_ble_qwr.h": "c",
+            "app_error.h": "c"
         }
     },
     "extensions": {}
