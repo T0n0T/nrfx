@@ -961,11 +961,11 @@ void ec800x_init_thread_entry(void *parameter)
         }
 
         /* only use beidou*/
-        if (at_obj_exec_cmd(device->client, resp, "AT+QGPSCFG=\"gnssconfig\",7") != RT_EOK) {
-            LOG_E("Command [AT+QGPSCFG=\"gnssconfig\",7] resp invalid!");
-            result = -RT_ERROR;
-            goto __exit;
-        }
+        // if (at_obj_exec_cmd(device->client, resp, "AT+QGPSCFG=\"gnssconfig\",7") != RT_EOK) {
+        //     LOG_E("Command [AT+QGPSCFG=\"gnssconfig\",7] resp invalid!");
+        //     result = -RT_ERROR;
+        //     goto __exit;
+        // }
 
         /* initialize successfully  */
         result = RT_EOK;

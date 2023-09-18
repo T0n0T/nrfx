@@ -35,7 +35,12 @@
             "rtdbg.h": "c",
             "sensor.h": "c",
             "blood.h": "c",
-            "math.h": "c"
+            "math.h": "c",
+            "nrf_gpio.h": "c",
+            "nrfx_pwm.h": "c",
+            "nrfx.h": "c",
+            "nrf_pwm.h": "c",
+            "nrf_ble_qwr.h": "c"
         }
     },
     "extensions": {}

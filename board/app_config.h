@@ -3,11 +3,12 @@
 
 #include <rtconfig.h>
 
-#define NRFX_SYSTICK_ENABLED 1
-#define NRFX_NVMC_ENABLED    1
-#define BLE_BAS_ENABLED      1
-#define BLE_DIS_ENABLED      1
-#define BLE_HRS_ENABLED      1
+#define NRF_DFU_TRANSPORT_BLE 1
+#define NRFX_SYSTICK_ENABLED  1
+#define NRFX_NVMC_ENABLED     1
+#define BLE_BAS_ENABLED       1
+#define BLE_DIS_ENABLED       1
+#define BLE_HRS_ENABLED       1
 
 #if 1
 // ccm3310s-t
