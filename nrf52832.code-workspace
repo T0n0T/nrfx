@@ -55,7 +55,10 @@
             "ble_srv_common.h": "c",
             "ble_gatts.h": "c",
             "nrf_log.h": "c",
-            "ble_conn_params.h": "c"
+            "ble_conn_params.h": "c",
+            "ble_common.h": "c",
+            "fal_cfg.h": "c",
+            "ble_dfu.h": "c"
         }
     },
     "extensions": {}

@@ -10,6 +10,7 @@
  */
 #include "sdk_common.h"
 
+#include "ble_common.h"
 #if NRF_MODULE_ENABLED(BLE_LOG)
 #include "ble_app_log.h"
 
@@ -19,6 +20,110 @@
 #include "ble_gatts.h"
 #include "ble_srv_common.h"
 #include "nrf_log.h"
+
+#define UART_TX_BUF_SIZE        256                        // 串口发送缓存大小（字节数）
+#define UART_RX_BUF_SIZE        256                        // 串口接收缓存大小（字节数）
+#define UARTS_SERVICE_UUID_TYPE BLE_UUID_TYPE_VENDOR_BEGIN // 串口透传服务UUID类型：厂商自定义UUID
+
+BLE_UARTS_DEF(m_uarts, NRF_SDH_BLE_TOTAL_LINK_COUNT); // 定义名称为m_uarts的串口透传服务实例
+
+// 发送的最大数据长度
+static uint16_t m_ble_uarts_max_data_len = BLE_GATT_ATT_MTU_DEFAULT - 3;
+static bool uart_enabled                 = false;
+// 定义串口透传服务UUID列表
+static ble_uuid_t m_adv_uuids[] =
+    {
+        {BLE_UUID_UARTS_SERVICE, UARTS_SERVICE_UUID_TYPE}};
+
+// 串口事件回调函数，串口初始化时注册，该函数中判断事件类型并进行处理
+// 当接收的数据长度达到设定的最大值或者接收到换行符后，则认为一包数据接收完成，之后将接收的数据发送给主机
+void uart_event_handle(app_uart_evt_t *p_event)
+{
+    static uint8_t data_array[BLE_UARTS_MAX_DATA_LEN];
+    static uint8_t index = 0;
+    uint32_t err_code;
+    // 判断事件类型
+    switch (p_event->evt_type) {
+        case APP_UART_DATA_READY: // 串口接收事件
+            UNUSED_VARIABLE(app_uart_get(&data_array[index]));
+            index++;
+            // 接收串口数据，当接收的数据长度达到m_ble_uarts_max_data_len或者接收到换行符后认为一包数据接收完成
+            if ((data_array[index - 1] == '\n') ||
+                (data_array[index - 1] == '\r') ||
+                (index >= m_ble_uarts_max_data_len)) {
+                if (index > 1) {
+                    NRF_LOG_DEBUG("Ready to send data over BLE NUS");
+                    NRF_LOG_HEXDUMP_DEBUG(data_array, index);
+                    // 串口接收的数据使用notify发送给BLE主机
+                    do {
+                        uint16_t length = (uint16_t)index;
+                        err_code        = ble_uarts_data_send(&m_uarts, data_array, &length, m_conn_handle);
+                        if ((err_code != NRF_ERROR_INVALID_STATE) &&
+                            (err_code != NRF_ERROR_RESOURCES) &&
+                            (err_code != NRF_ERROR_NOT_FOUND)) {
+                            APP_ERROR_CHECK(err_code);
+                        }
+                    } while (err_code == NRF_ERROR_RESOURCES);
+                }
+
+                index = 0;
+            }
+            break;
+        // 通讯错误事件，进入错误处理
+        case APP_UART_COMMUNICATION_ERROR:
+            APP_ERROR_HANDLER(p_event->data.error_communication);
+            break;
+        // FIFO错误事件，进入错误处理
+        case APP_UART_FIFO_ERROR:
+            APP_ERROR_HANDLER(p_event->data.error_code);
+            break;
+
+        default:
+            break;
+    }
+}
+
+// 串口配置
+void uart_config(void)
+{
+    uint32_t err_code;
+    APP_ERROR_CHECK(err_code);
+}
+
+// 串口透传事件回调函数，串口透出服务初始化时注册
+static void uarts_data_handler(ble_uarts_evt_t *p_evt)
+{
+    // 通知使能后才初始化串口
+    if (p_evt->type == BLE_NUS_EVT_COMM_STARTED) {
+        uart_reconfig();
+    }
+    // 通知关闭后，关闭串口
+    else if (p_evt->type == BLE_NUS_EVT_COMM_STOPPED) {
+        uart_reconfig();
+    }
+    // 判断事件类型:接收到新数据事件
+    if ((p_evt->type == BLE_UARTS_EVT_RX_DATA) && (uart_enabled == true)) {
+        uint32_t err_code;
+        // 串口打印出接收的数据
+        for (uint32_t i = 0; i < p_evt->params.rx_data.length; i++) {
+            do {
+                err_code = app_uart_put(p_evt->params.rx_data.p_data[i]);
+                if ((err_code != NRF_SUCCESS) && (err_code != NRF_ERROR_BUSY)) {
+                    NRF_LOG_ERROR("Failed receiving NUS message. Error 0x%x. ", err_code);
+                    APP_ERROR_CHECK(err_code);
+                }
+            } while (err_code == NRF_ERROR_BUSY);
+        }
+        if (p_evt->params.rx_data.p_data[p_evt->params.rx_data.length - 1] == '\r') {
+            while (app_uart_put('\n') == NRF_ERROR_BUSY)
+                ;
+        }
+    }
+    // 判断事件类型:发送就绪事件，该事件在后面的试验会用到，当前我们在该事件中翻转指示灯D4的状态，指示该事件的产生
+    if (p_evt->type == BLE_UARTS_EVT_TX_RDY) {
+        nrf_gpio_pin_toggle(LED_4);
+    }
+}
 
 #define BLE_UARTS_MAX_RX_CHAR_LEN BLE_UARTS_MAX_DATA_LEN // RX特征最大长度（字节数）
 #define BLE_UARTS_MAX_TX_CHAR_LEN BLE_UARTS_MAX_DATA_LEN // TX特征最大长度（字节数）
@@ -123,6 +228,7 @@ static void on_write(ble_uarts_t *p_uarts, ble_evt_t const *p_ble_evt)
         // 该事件和串口透传服务无关，忽略
     }
 }
+
 // SoftDevice提交的"BLE_GATTS_EVT_HVN_TX_COMPLETE"事件处理函数
 static void on_hvx_tx_complete(ble_uarts_t *p_uarts, ble_evt_t const *p_ble_evt)
 {
@@ -156,6 +262,7 @@ static void on_hvx_tx_complete(ble_uarts_t *p_uarts, ble_evt_t const *p_ble_evt)
         p_uarts->data_handler(&evt);
     }
 }
+
 // 串口透传服务BLE事件监视者的事件回调函数
 void ble_uarts_on_ble_evt(ble_evt_t const *p_ble_evt, void *p_context)
 {
@@ -185,6 +292,7 @@ void ble_uarts_on_ble_evt(ble_evt_t const *p_ble_evt, void *p_context)
             break;
     }
 }
+
 // 初始化串口透传服务
 uint32_t ble_uarts_init(ble_uarts_t *p_uarts, ble_uarts_init_t const *p_uarts_init)
 {
@@ -267,6 +375,7 @@ uint32_t ble_uarts_init(ble_uarts_t *p_uarts, ble_uarts_init_t const *p_uarts_in
     return characteristic_add(p_uarts->service_handle, &add_char_params, &p_uarts->tx_handles);
     /*---------------------添加TX特征-END------------------------*/
 }
+
 uint32_t ble_uarts_data_send(ble_uarts_t *p_uarts,
                              uint8_t *p_data,
                              uint16_t *p_length,
@@ -305,6 +414,18 @@ uint32_t ble_uarts_data_send(ble_uarts_t *p_uarts,
     hvx_params.type = BLE_GATT_HVX_NOTIFICATION;
     // 发送TX特征值通知
     return sd_ble_gatts_hvx(conn_handle, &hvx_params);
+}
+
+static void services_init(void)
+{
+    ble_uarts_init_t uarts_init = {0};
+    uarts_init.data_handler     = uarts_data_handler;
+    APP_ERROR_CHECK(ble_uarts_init(&m_uarts, &uarts_init));
+}
+
+ble_uuid_t ble_app_log = {
+    .uuid = BLE_UUID_UARTS_SERVICE,
+    .type = UARTS_SERVICE_UUID_TYPE,
 }
 
 #endif // NRF_MODULE_ENABLED(BLE_DIS)

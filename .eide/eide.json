@@ -517,6 +517,9 @@
             "path": "nrf_sdk/components/ble/ble_advertising/ble_advertising.c"
           },
           {
+            "path": "nrf_sdk/components/ble/ble_link_ctx_manager/ble_link_ctx_manager.c"
+          },
+          {
             "path": "nrf_sdk/components/ble/ble_services/ble_bas/ble_bas.c"
           },
           {
@@ -548,6 +551,24 @@
           },
           {
             "path": "nrf_sdk/rtthread_adapter/ble_conn_params_rtt.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "nrf_dfu",
+        "files": [
+          {
+            "path": "nrf_sdk/components/ble/ble_services/ble_dfu/ble_dfu_bonded.c"
+          },
+          {
+            "path": "nrf_sdk/components/ble/ble_services/ble_dfu/ble_dfu_unbonded.c"
+          },
+          {
+            "path": "nrf_sdk/components/ble/ble_services/ble_dfu/ble_dfu.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/dfu/nrf_dfu_svci.c"
           }
         ],
         "folders": []
@@ -745,19 +766,10 @@
         "name": "nrf_services",
         "files": [
           {
-            "path": "nrf_sdk/components/ble/ble_services/ble_dfu/ble_dfu_bonded.c"
-          },
-          {
-            "path": "nrf_sdk/components/ble/ble_services/ble_dfu/ble_dfu_unbonded.c"
-          },
-          {
-            "path": "nrf_sdk/components/ble/ble_services/ble_dfu/ble_dfu.c"
-          },
-          {
-            "path": "nrf_sdk/components/libraries/bootloader/dfu/nrf_dfu_svci.c"
-          },
-          {
             "path": "nrf_sdk/rtthread_adapter/ble_app_hrs.c"
+          },
+          {
+            "path": "services/ble_common/ble_common.c"
           },
           {
             "path": "services/ble_dfu/ble_app_dfu.c"
@@ -865,14 +877,15 @@
         "<virtual_root>/ccm3310/crc32.c",
         "<virtual_root>/Drivers/drv_hwtimer.c",
         "<virtual_root>/Drivers/drv_spi.c",
-        "<virtual_root>/Fal",
         "<virtual_root>/Applications/mnt.c",
         "<virtual_root>/littlefs",
         "<virtual_root>/nrf_ble/ble_app_hrs.c",
         "<virtual_root>/nrf_dfu/ble_dfu_bonded.c",
-        "<virtual_root>/max30102",
         "<virtual_root>/nrf_services/ble_app_hrs.c",
-        "<virtual_root>/nrf_ble/ble_conn_params_rtt.c"
+        "<virtual_root>/nrf_ble/ble_conn_params_rtt.c",
+        "<virtual_root>/max30102",
+        "<virtual_root>/nrf_services/dfu.c",
+        "<virtual_root>/Fal"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -998,7 +1011,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": "ip 192.168.1.2"
+        "otherCmds": ""
       },
       "uploadConfigMap": {},
       "custom_dep": {
@@ -1098,7 +1111,9 @@
           "nrf_sdk/components/libraries/pwr_mgmt",
           "nrf_sdk/components/libraries/mutex",
           "nrf_sdk/components/libraries/timer",
-          "services/ble_log"
+          "services/ble_log",
+          "services/ble_common",
+          "nrf_sdk/components/ble/ble_link_ctx_manager"
         ],
         "libList": [],
         "sourceDirList": [],

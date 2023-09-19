@@ -131,8 +131,8 @@ void rt_hw_board_init(void)
 #endif
 
 #if defined(RT_USING_CONSOLE) && defined(RT_USING_DEVICE)
-    rt_hw_jlink_console_init();
-    // rt_console_set_device(RT_CONSOLE_DEVICE_NAME);
+    // rt_hw_jlink_console_init();
+    rt_console_set_device(RT_CONSOLE_DEVICE_NAME);
 #endif
 
 #ifdef RT_USING_COMPONENTS_INIT
