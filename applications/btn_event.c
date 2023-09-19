@@ -14,7 +14,7 @@
 #include <button.h>
 #include "nrfx_pwm.h"
 
-#define DBG_LVL DBG_INFO
+#define DBG_LVL DBG_LOG
 #define DBG_TAG "btn"
 #include <rtdbg.h>
 
@@ -24,9 +24,8 @@ static struct rt_thread btn_thread;
 static char btn_stack[1024];
 
 /* pwm beep */
-static nrfx_pwm_t m_pwm0               = NRFX_PWM_INSTANCE(0);
-static uint16_t const m_top            = 4000; // 4000 = 1/4khz * 1mhz
-nrf_pwm_values_common_t seq0_values[2] = {1, 0};
+static nrfx_pwm_t m_pwm0                     = NRFX_PWM_INSTANCE(0);
+static nrf_pwm_values_common_t seq0_values[] = {125};
 
 static void beep_init(void)
 {
@@ -41,9 +40,9 @@ static void beep_init(void)
                     NRFX_PWM_PIN_NOT_USED  // channel 3
                 },
             .irq_priority = APP_IRQ_PRIORITY_LOWEST,
-            .base_clock   = NRF_PWM_CLK_1MHz,
+            .base_clock   = NRF_PWM_CLK_1MHz, // 1mhz -> 1us; 4khz -> 250us = 250 * 1us
             .count_mode   = NRF_PWM_MODE_UP,
-            .top_value    = m_top,               // count to 4000
+            .top_value    = 250,                 // max period num
             .load_mode    = NRF_PWM_LOAD_COMMON, // common load seq
             .step_mode    = NRF_PWM_STEP_AUTO,
         };
@@ -55,14 +54,14 @@ static void beep_init(void)
 
 static void beep_on(void)
 {
-    nrf_pwm_sequence_t const seq0 =
+    static nrf_pwm_sequence_t const seq0 =
         {
             .values.p_common = seq0_values,
             .length          = NRF_PWM_VALUES_LENGTH(seq0_values),
-            .repeats         = 100,
+            .repeats         = 0,
             .end_delay       = 0,
         };
-    (void)nrfx_pwm_simple_playback(&m_pwm0, &seq0, 1, NRFX_PWM_FLAG_STOP);
+    (void)nrfx_pwm_simple_playback(&m_pwm0, &seq0, 2000, NRFX_PWM_FLAG_STOP);
 }
 
 static void beep_off(void)
@@ -79,7 +78,7 @@ void btn_click(void)
 {
     LOG_D("single click!");
     beep_on();
-    rt_thread_mdelay(150);
+    rt_thread_mdelay(50);
     beep_off();
     // if (mission_status) {
     //     publish_handle();
@@ -90,13 +89,13 @@ void btn_double(void)
 {
     static int flag = 1;
     LOG_D("double click!");
-    // beep_on();
-    // rt_thread_mdelay(150);
-    // beep_off();
-
-    // beep_on();
-    // rt_thread_mdelay(150);
-    // beep_off();
+    beep_on();
+    rt_thread_mdelay(25);
+    beep_off();
+    rt_thread_mdelay(50);
+    beep_on();
+    rt_thread_mdelay(25);
+    beep_off();
 
     if (sm4_flag == 0) {
         printf("sm4 encrypt mode ON !!!!!!!!!\n");
@@ -110,7 +109,8 @@ void btn_double(void)
 void btn_long_free(void)
 {
     LOG_D("long click!");
-    // beep_on();
+    beep_on();
+    rt_thread_mdelay(500);
     rt_hw_cpu_reset();
 }
 

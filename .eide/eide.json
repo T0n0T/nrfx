@@ -857,11 +857,7 @@
         "<virtual_root>/Applications/mnt.c",
         "<virtual_root>/littlefs",
         "<virtual_root>/nrf_ble/ble_app_hrs.c",
-        "<virtual_root>/nrf_dfu/ble_dfu_bonded.c",
-        "<virtual_root>/max30102",
-        "<virtual_root>/Applications/app.c",
-        "<virtual_root>/ec800x",
-        "<virtual_root>/Applications/btn_event.c"
+        "<virtual_root>/nrf_dfu/ble_dfu_bonded.c"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -987,7 +983,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": ""
+        "otherCmds": "ip 192.168.1.2"
       },
       "uploadConfigMap": {},
       "custom_dep": {
