@@ -48,7 +48,7 @@ void RTC_tick_configure(void)
 {
 #define LF_CLK_HZ     (32768UL)
 #define RTC_PRESCALER ((uint32_t)(NRFX_ROUNDED_DIV(LF_CLK_HZ, RT_TICK_PER_SECOND) - 1))
-    NVIC_SetPriority(RTC1_IRQn, 0xf);
+    NVIC_SetPriority(RTC1_IRQn, 5);
 
     const nrfx_rtc_t rtc_instance = NRFX_RTC_INSTANCE(1);
     nrf_clock_lf_src_set((nrf_clock_lfclk_t)NRFX_CLOCK_CONFIG_LF_SRC);

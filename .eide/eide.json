@@ -532,6 +532,9 @@
             "path": "nrf_sdk/components/ble/common/ble_advdata.c"
           },
           {
+            "path": "nrf_sdk/components/ble/common/ble_conn_params.c"
+          },
+          {
             "path": "nrf_sdk/components/ble/common/ble_conn_state.c"
           },
           {
@@ -544,31 +547,7 @@
             "path": "nrf_sdk/components/ble/nrf_ble_qwr/nrf_ble_qwr.c"
           },
           {
-            "path": "nrf_sdk/rtthread_adapter/ble_app_hrs.c"
-          },
-          {
             "path": "nrf_sdk/rtthread_adapter/ble_conn_params_rtt.c"
-          }
-        ],
-        "folders": []
-      },
-      {
-        "name": "nrf_dfu",
-        "files": [
-          {
-            "path": "dfu/dfu.c"
-          },
-          {
-            "path": "nrf_sdk/components/ble/ble_services/ble_dfu/ble_dfu_bonded.c"
-          },
-          {
-            "path": "nrf_sdk/components/ble/ble_services/ble_dfu/ble_dfu_unbonded.c"
-          },
-          {
-            "path": "nrf_sdk/components/ble/ble_services/ble_dfu/ble_dfu.c"
-          },
-          {
-            "path": "nrf_sdk/components/libraries/bootloader/dfu/nrf_dfu_svci.c"
           }
         ],
         "folders": []
@@ -734,6 +713,9 @@
           },
           {
             "path": "nrf_sdk/external/fprintf/nrf_fprintf.c"
+          },
+          {
+            "path": "nrf_sdk/rtthread_adapter/app_timer_rtthread.c"
           }
         ],
         "folders": []
@@ -760,16 +742,46 @@
         "folders": []
       },
       {
+        "name": "nrf_services",
+        "files": [
+          {
+            "path": "nrf_sdk/components/ble/ble_services/ble_dfu/ble_dfu_bonded.c"
+          },
+          {
+            "path": "nrf_sdk/components/ble/ble_services/ble_dfu/ble_dfu_unbonded.c"
+          },
+          {
+            "path": "nrf_sdk/components/ble/ble_services/ble_dfu/ble_dfu.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/dfu/nrf_dfu_svci.c"
+          },
+          {
+            "path": "nrf_sdk/rtthread_adapter/ble_app_hrs.c"
+          },
+          {
+            "path": "services/ble_dfu/ble_app_dfu.c"
+          },
+          {
+            "path": "services/ble_dfu/dfu.c"
+          },
+          {
+            "path": "services/ble_log/ble_app_log.c"
+          }
+        ],
+        "folders": []
+      },
+      {
         "name": "nrf_softdev",
         "files": [
           {
-            "path": "nrf_sdk/components/softdevice/common/nrf_sdh.c"
+            "path": "nrf_sdk/components/softdevice/common/nrf_sdh_ble.c"
           },
           {
             "path": "nrf_sdk/components/softdevice/common/nrf_sdh_soc.c"
           },
           {
-            "path": "nrf_sdk/components/softdevice/common/nrf_sdh_ble.c"
+            "path": "nrf_sdk/components/softdevice/common/nrf_sdh.c"
           }
         ],
         "folders": []
@@ -857,7 +869,10 @@
         "<virtual_root>/Applications/mnt.c",
         "<virtual_root>/littlefs",
         "<virtual_root>/nrf_ble/ble_app_hrs.c",
-        "<virtual_root>/nrf_dfu/ble_dfu_bonded.c"
+        "<virtual_root>/nrf_dfu/ble_dfu_bonded.c",
+        "<virtual_root>/max30102",
+        "<virtual_root>/nrf_services/ble_app_hrs.c",
+        "<virtual_root>/nrf_ble/ble_conn_params_rtt.c"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -1081,7 +1096,9 @@
           "nrf_sdk/components/ble/peer_manager",
           "nrf_sdk/components/libraries/svc",
           "nrf_sdk/components/libraries/pwr_mgmt",
-          "nrf_sdk/components/libraries/mutex"
+          "nrf_sdk/components/libraries/mutex",
+          "nrf_sdk/components/libraries/timer",
+          "services/ble_log"
         ],
         "libList": [],
         "sourceDirList": [],

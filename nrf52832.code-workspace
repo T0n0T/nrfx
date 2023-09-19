@@ -45,7 +45,17 @@
             "nrfx.h": "c",
             "nrf_pwm.h": "c",
             "nrf_ble_qwr.h": "c",
-            "app_error.h": "c"
+            "app_error.h": "c",
+            "app_timer.h": "c",
+            "string.h": "c",
+            "nrf.h": "c",
+            "nrf_power.h": "c",
+            "nrf_svci_async_handler.h": "c",
+            "ble_app_log.h": "c",
+            "ble_srv_common.h": "c",
+            "ble_gatts.h": "c",
+            "nrf_log.h": "c",
+            "ble_conn_params.h": "c"
         }
     },
     "extensions": {}

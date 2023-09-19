@@ -4031,7 +4031,7 @@
 // <7=> 7
 
 #ifndef NRFX_RTC_DEFAULT_CONFIG_IRQ_PRIORITY
-#define NRFX_RTC_DEFAULT_CONFIG_IRQ_PRIORITY 7
+#define NRFX_RTC_DEFAULT_CONFIG_IRQ_PRIORITY 6
 #endif
 
 // <e> NRFX_RTC_CONFIG_LOG_ENABLED - Enables logging in the module.
@@ -6819,7 +6819,7 @@
 // <e> APP_TIMER_ENABLED - app_timer - Application timer functionality
 //==========================================================
 #ifndef APP_TIMER_ENABLED
-#define APP_TIMER_ENABLED 0
+#define APP_TIMER_ENABLED 1
 #endif
 // <o> APP_TIMER_CONFIG_RTC_FREQUENCY  - Configure RTC prescaler.
 

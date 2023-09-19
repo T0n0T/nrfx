@@ -9,8 +9,9 @@
 #define BLE_BAS_ENABLED       1
 #define BLE_DIS_ENABLED       1
 #define BLE_HRS_ENABLED       1
+#define BLE_LOG_ENABLED       1
 
-#if 1
+#if 0 
 // ccm3310s-t
 #define CCM_POR         -1
 #define CCM_GINT0       11
@@ -57,7 +58,7 @@
 
 // hal
 #define BEEP       12
-#define SW         28
+#define SW         13
 #define LED1       17
 #define LED2       18
 #define LED3       19

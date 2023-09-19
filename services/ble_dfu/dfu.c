@@ -222,11 +222,11 @@ static void advertising_init(void)
     err_code = ble_advertising_init(&m_advertising, &init);
     APP_ERROR_CHECK(err_code);
 
-    ble_advertising_conn_cfg_tag_set(&m_advertising, APP_BLE_CONN_CFG_TAG);  
+    ble_advertising_conn_cfg_tag_set(&m_advertising, APP_BLE_CONN_CFG_TAG);
 }
 
 /**
- * @brief Clear bond information from persistent storage.  
+ * @brief Clear bond information from persistent storage.
  */
 static void delete_bonds(void)
 {
@@ -282,7 +282,12 @@ static void gap_params_init(void)
  */
 static void gatt_init(void)
 {
-    ret_code_t err_code = nrf_ble_gatt_init(&m_gatt, NULL);
+    // 初始化GATT程序模块
+    ret_code_t err_code = nrf_ble_gatt_init(&m_gatt, gatt_evt_handler);
+    // 检查函数返回的错误代码
+    APP_ERROR_CHECK(err_code);
+    // 设置ATT MTU的大小,这里设置的值为247
+    err_code = nrf_ble_gatt_att_mtu_periph_set(&m_gatt, NRF_SDH_BLE_GATT_MAX_MTU_SIZE);
     APP_ERROR_CHECK(err_code);
 }
 
