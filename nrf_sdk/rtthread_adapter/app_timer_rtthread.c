@@ -172,7 +172,9 @@ uint32_t app_timer_stop(app_timer_id_t timer_id)
     if (rt_timer_stop(timer) != RT_EOK) {
         return NRF_ERROR_NO_MEM;
     }
-
+    // if (rt_timer_delete(timer) != RT_EOK) {
+    //     return NRF_ERROR_INTERNAL;
+    // }
     pinfo->active = false;
     return NRF_SUCCESS;
 }

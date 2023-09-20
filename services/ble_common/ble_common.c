@@ -32,8 +32,7 @@ NRF_SDH_BLE_OBSERVER(m_ble_observer, APP_BLE_OBSERVER_PRIO, ble_evt_handler, NUL
 /**
  * @brief GAP参数初始化，该函数配置需要的GAP参数，包括设备名称，外观特征、首选连接参数
  */
-static void
-gap_params_init(void)
+static void gap_params_init(void)
 {
     ret_code_t err_code;
     // 定义连接参数结构体变量
@@ -109,12 +108,14 @@ static void services_init(void)
     nrf_ble_qwr_init_t qwr_init = {0};
     qwr_init.error_handler      = nrf_qwr_error_handler;
     APP_ERROR_CHECK(nrf_ble_qwr_init(&m_qwr, &qwr_init));
-
-    ble_serv_init_fn func = 0;
-    for (size_t i = 0; i < sizeof(serv_table) / sizeof(serv_table[0]); i++) {
-        func = *serv_table[i];
-        func();
-    }
+    ble_app_dfu_init();
+    ble_app_log_init();
+    // ble_serv_init_fn func = 0;
+    // for (size_t i = 0; i < sizeof(serv_table) / sizeof(serv_table[0]); i++) {
+    //     func = *serv_table[i];
+    //     NRF_LOG_INFO("%d.", i);
+    //     func();
+    // }
 }
 
 /** @brief 连接参数协商模块事件处理函数 */
@@ -337,13 +338,13 @@ static void advertising_start(void)
  *
  * @return int
  */
-int ble_dfu_init(void)
+int ble_app_init(void)
 {
     ret_code_t err_code;
 
     // 使能中断之前，初始化异步SVCI接口到Bootloader
-    err_code = ble_dfu_buttonless_async_svci_init();
-    APP_ERROR_CHECK(err_code);
+    // err_code = ble_dfu_buttonless_async_svci_init();
+    // APP_ERROR_CHECK(err_code);
 
     // 初始化APP定时器
     timers_init();
@@ -355,9 +356,12 @@ int ble_dfu_init(void)
     // 初始化GATT
     gatt_init();
     // 初始化服务
+
     services_init();
+
     // 初始化广播
     advertising_init();
+
     // 连接参数协商初始化
     conn_params_init();
 
@@ -365,4 +369,5 @@ int ble_dfu_init(void)
     // 启动广播
     advertising_start();
 }
-INIT_APP_EXPORT(ble_dfu_init);
+// INIT_APP_EXPORT(ble_dfu_init);
+MSH_CMD_EXPORT(ble_app_init, ble app init);

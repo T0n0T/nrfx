@@ -69,7 +69,17 @@
             "nrf_log_ctrl.h": "c",
             "sdk_config.h": "c",
             "segger_rtt.h": "c",
-            "segger_rtt_conf.h": "c"
+            "segger_rtt_conf.h": "c",
+            "nrf_log_default_backends.h": "c",
+            "nrf_log_internal.h": "c",
+            "nrfx_log.h": "c",
+            "nrfx_glue.h": "c",
+            "nrfx_common.h": "c",
+            "nrfx_config.h": "c",
+            "nrfx_uarte.h": "c",
+            "nrf_uarte.h": "c",
+            "nrf_log_instance.h": "c",
+            "nrf_pwr_mgmt.h": "c"
         }
     },
     "extensions": {}

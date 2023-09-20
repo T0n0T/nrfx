@@ -748,6 +748,9 @@
         "name": "nrf_log",
         "files": [
           {
+            "path": "board/nrfx_log.h"
+          },
+          {
             "path": "nrf_sdk/components/libraries/log/src/nrf_log_backend_rtt.c"
           },
           {
@@ -886,7 +889,6 @@
         "<virtual_root>/max30102",
         "<virtual_root>/nrf_services/dfu.c",
         "<virtual_root>/Fal",
-        "<virtual_root>/nrf_services",
         "<virtual_root>/Utilities/ulog.c"
       ],
       "toolchain": "AC5",
@@ -932,7 +934,7 @@
               "id": 1,
               "mem": {
                 "startAddr": "0x20003000",
-                "size": "0xD000"
+                "size": "0xd000"
               },
               "isChecked": true,
               "noInit": false
@@ -1013,7 +1015,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": "ip 192.168.1.2"
+        "otherCmds": ""
       },
       "uploadConfigMap": {},
       "custom_dep": {
@@ -1134,7 +1136,8 @@
           "NRFX_CLOCK_ENABLED",
           "LFS_CONFIG=lfs_config.h",
           "CONFIG_GPIO_AS_PINRESET",
-          "USE_APP_CONFIG"
+          "USE_APP_CONFIG",
+          "DEBUG"
         ]
       }
     },

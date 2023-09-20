@@ -5180,7 +5180,7 @@
 // <e> NRFX_UARTE_CONFIG_LOG_ENABLED - Enables logging in the module.
 //==========================================================
 #ifndef NRFX_UARTE_CONFIG_LOG_ENABLED
-#define NRFX_UARTE_CONFIG_LOG_ENABLED 0
+#define NRFX_UARTE_CONFIG_LOG_ENABLED 1
 #endif
 // <o> NRFX_UARTE_CONFIG_LOG_LEVEL  - Default Severity level
 
@@ -8215,7 +8215,7 @@
 // <e> NRF_LOG_ENABLED - nrf_log - Logger
 //==========================================================
 #ifndef NRF_LOG_ENABLED
-#define NRF_LOG_ENABLED 0
+#define NRF_LOG_ENABLED 1
 #endif
 // <h> Log message pool - Configuration of log message pool
 
@@ -8292,13 +8292,13 @@
 // <i> Log data is buffered and can be processed in idle.
 
 #ifndef NRF_LOG_DEFERRED
-#define NRF_LOG_DEFERRED 0
+#define NRF_LOG_DEFERRED 1
 #endif
 
 // <q> NRF_LOG_FILTERS_ENABLED  - Enable dynamic filtering of logs.
 
 #ifndef NRF_LOG_FILTERS_ENABLED
-#define NRF_LOG_FILTERS_ENABLED 0
+#define NRF_LOG_FILTERS_ENABLED 1
 #endif
 
 // <q> NRF_LOG_NON_DEFFERED_CRITICAL_REGION_ENABLED  - Enable use of critical region for non deffered mode when flushing logs.
@@ -12003,7 +12003,7 @@
 
 // <o> NRF_SDH_BLE_VS_UUID_COUNT - The number of vendor-specific UUIDs.
 #ifndef NRF_SDH_BLE_VS_UUID_COUNT
-#define NRF_SDH_BLE_VS_UUID_COUNT 2
+#define NRF_SDH_BLE_VS_UUID_COUNT 3
 #endif
 
 // <q> NRF_SDH_BLE_SERVICE_CHANGED  - Include the Service Changed characteristic in the Attribute Table.

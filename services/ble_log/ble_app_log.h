@@ -32,7 +32,7 @@ extern "C" {
     static ble_log_t _name =                                            \
         {                                                               \
             .p_link_ctx_storage = &CONCAT_2(_name, _link_ctx_storage)}; \
-    NRF_SDH_LOG_OBSERVER(_name##_obs,                                   \
+    NRF_SDH_BLE_OBSERVER(_name##_obs,                                   \
                          BLE_NUS_BLE_OBSERVER_PRIO,                     \
                          ble_log_on_ble_evt,                            \
                          &_name)
@@ -112,7 +112,7 @@ struct ble_log_s {
     ble_log_data_handler_t data_handler;               // 处理接收数据的事件句柄
 };
 
-void ble_log_flush_process(void);
+void ble_log_flush_process(void *p_context);
 void ble_log_on_ble_evt(ble_evt_t const *p_ble_evt, void *p_context);
 uint32_t ble_log_init(ble_log_t *p_log, ble_log_init_t const *p_log_init);
 uint32_t ble_log_data_send(ble_log_t *p_log,

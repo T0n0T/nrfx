@@ -18,6 +18,8 @@
 #define DBG_TAG "btn"
 #include <rtdbg.h>
 
+APP_LOG_DEF(btn);
+
 /* button */
 Button_t SW_BUTTON;
 static struct rt_thread btn_thread;

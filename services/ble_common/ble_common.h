@@ -70,6 +70,5 @@ extern ble_serv_init_fn ble_app_dfu_init;
 extern ble_serv_init_fn ble_app_log_init;
 #define BLE_SERVICE_INIT_TABLE \
     {                          \
-        &ble_app_dfu_init,     \
-            &ble_app_log_init, \
+        &ble_app_log_init,     \
     }
