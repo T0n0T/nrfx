@@ -58,7 +58,18 @@
             "ble_conn_params.h": "c",
             "ble_common.h": "c",
             "fal_cfg.h": "c",
-            "ble_dfu.h": "c"
+            "ble_dfu.h": "c",
+            "sal_low_lvl.h": "c",
+            "netdev_ipaddr.h": "c",
+            "netdev.h": "c",
+            "stdbool.h": "c",
+            "ulog.h": "c",
+            "app_config.h": "c",
+            "rthw.h": "c",
+            "nrf_log_ctrl.h": "c",
+            "sdk_config.h": "c",
+            "segger_rtt.h": "c",
+            "segger_rtt_conf.h": "c"
         }
     },
     "extensions": {}

@@ -29,11 +29,11 @@
 #include <rtthread.h>
 #include <rthw.h>
 
-#define DBG_TAG           "kernel.device"
+#define DBG_TAG "kernel.device"
 #ifdef RT_DEBUG_DEVICE
-#define DBG_LVL           DBG_LOG
+#define DBG_LVL DBG_LOG
 #else
-#define DBG_LVL           DBG_WARNING
+#define DBG_LVL DBG_WARNING
 #endif /* defined (RT_DEBUG_DEVICE) */
 #include <rtdbg.h>
 
@@ -65,15 +65,15 @@ static rt_device_t _console_device = RT_NULL;
 
 rt_weak void rt_hw_us_delay(rt_uint32_t us)
 {
-    (void) us;
+    (void)us;
     LOG_W("rt_hw_us_delay() doesn't support for this board."
-        "Please consider implementing rt_hw_us_delay() in another file.");
+          "Please consider implementing rt_hw_us_delay() in another file.");
 }
 
 rt_weak void rt_hw_cpu_reset(void)
 {
     LOG_W("rt_hw_cpu_reset() doesn't support for this board."
-        "Please consider implementing rt_hw_cpu_reset() in another file.");
+          "Please consider implementing rt_hw_cpu_reset() in another file.");
     return;
 }
 
@@ -82,10 +82,9 @@ rt_weak void rt_hw_cpu_shutdown(void)
     rt_base_t level;
     LOG_I("CPU shutdown...");
     LOG_W("Using default rt_hw_cpu_shutdown()."
-        "Please consider implementing rt_hw_cpu_reset() in another file.");
+          "Please consider implementing rt_hw_cpu_reset() in another file.");
     level = rt_hw_interrupt_disable();
-    while (level)
-    {
+    while (level) {
         RT_ASSERT(RT_NULL);
     }
     return;
@@ -96,21 +95,20 @@ rt_weak const char *rt_hw_cpu_arch(void)
     return "unknown";
 }
 
-static const char* rt_errno_strs[] =
-{
-    "OK",
-    "ERROR",
-    "ETIMOUT",
-    "ERSFULL",
-    "ERSEPTY",
-    "ENOMEM",
-    "ENOSYS",
-    "EBUSY",
-    "EIO",
-    "EINTRPT",
-    "EINVAL",
-    "EUNKNOW"
-};
+static const char *rt_errno_strs[] =
+    {
+        "OK",
+        "ERROR",
+        "ETIMOUT",
+        "ERSFULL",
+        "ERSEPTY",
+        "ENOMEM",
+        "ENOSYS",
+        "EBUSY",
+        "EIO",
+        "EINTRPT",
+        "EINVAL",
+        "EUNKNOW"};
 
 /**
  * @brief This function return a pointer to a string that contains the
@@ -124,9 +122,7 @@ const char *rt_strerror(rt_err_t error)
     if (error < 0)
         error = -error;
 
-    return (error > RT_EINVAL + 1) ?
-           rt_errno_strs[RT_EINVAL + 1] :
-           rt_errno_strs[error];
+    return (error > RT_EINVAL + 1) ? rt_errno_strs[RT_EINVAL + 1] : rt_errno_strs[error];
 }
 RTM_EXPORT(rt_strerror);
 
@@ -139,15 +135,13 @@ rt_err_t rt_get_errno(void)
 {
     rt_thread_t tid = RT_NULL;
 
-    if (rt_interrupt_get_nest() != 0)
-    {
+    if (rt_interrupt_get_nest() != 0) {
         /* it's in interrupt context */
         return __rt_errno;
     }
 
     tid = rt_thread_self();
-    if (tid == RT_NULL)
-    {
+    if (tid == RT_NULL) {
         return __rt_errno;
     }
 
@@ -164,8 +158,7 @@ void rt_set_errno(rt_err_t error)
 {
     rt_thread_t tid = RT_NULL;
 
-    if (rt_interrupt_get_nest() != 0)
-    {
+    if (rt_interrupt_get_nest() != 0) {
         /* it's in interrupt context */
         __rt_errno = error;
 
@@ -173,8 +166,7 @@ void rt_set_errno(rt_err_t error)
     }
 
     tid = rt_thread_self();
-    if (tid == RT_NULL)
-    {
+    if (tid == RT_NULL) {
         __rt_errno = error;
 
         return;
@@ -193,15 +185,13 @@ int *_rt_errno(void)
 {
     rt_thread_t tid = RT_NULL;
 
-    if (rt_interrupt_get_nest() != 0)
-    {
+    if (rt_interrupt_get_nest() != 0) {
         return (int *)&__rt_errno;
     }
 
     tid = rt_thread_self();
-    if (tid != RT_NULL)
-    {
-        return (int *) & (tid->error);
+    if (tid != RT_NULL) {
+        return (int *)&(tid->error);
     }
 
     return (int *)&__rt_errno;
@@ -231,34 +221,31 @@ rt_weak void *rt_memset(void *s, int c, rt_ubase_t count)
 
     return s;
 #else
-#define LBLOCKSIZE      (sizeof(rt_ubase_t))
-#define UNALIGNED(X)    ((long)X & (LBLOCKSIZE - 1))
-#define TOO_SMALL(LEN)  ((LEN) < LBLOCKSIZE)
+#define LBLOCKSIZE     (sizeof(rt_ubase_t))
+#define UNALIGNED(X)   ((long)X & (LBLOCKSIZE - 1))
+#define TOO_SMALL(LEN) ((LEN) < LBLOCKSIZE)
 
-    unsigned int i = 0;
-    char *m = (char *)s;
-    unsigned long buffer = 0;
+    unsigned int i              = 0;
+    char *m                     = (char *)s;
+    unsigned long buffer        = 0;
     unsigned long *aligned_addr = RT_NULL;
-    unsigned char d = (unsigned int)c & (unsigned char)(-1);  /* To avoid sign extension, copy C to an
-                                unsigned variable. (unsigned)((char)(-1))=0xFF for 8bit and =0xFFFF for 16bit: word independent */
+    unsigned char d             = (unsigned int)c & (unsigned char)(-1); /* To avoid sign extension, copy C to an
+                                           unsigned variable. (unsigned)((char)(-1))=0xFF for 8bit and =0xFFFF for 16bit: word independent */
 
     RT_ASSERT(LBLOCKSIZE == 2 || LBLOCKSIZE == 4 || LBLOCKSIZE == 8);
 
-    if (!TOO_SMALL(count) && !UNALIGNED(s))
-    {
+    if (!TOO_SMALL(count) && !UNALIGNED(s)) {
         /* If we get this far, we know that count is large and s is word-aligned. */
         aligned_addr = (unsigned long *)s;
 
         /* Store d into each char sized location in buffer so that
          * we can set large blocks quickly.
          */
-        for (i = 0; i < LBLOCKSIZE; i++)
-        {
-            *(((unsigned char *)&buffer)+i) = d;
+        for (i = 0; i < LBLOCKSIZE; i++) {
+            *(((unsigned char *)&buffer) + i) = d;
         }
 
-        while (count >= LBLOCKSIZE * 4)
-        {
+        while (count >= LBLOCKSIZE * 4) {
             *aligned_addr++ = buffer;
             *aligned_addr++ = buffer;
             *aligned_addr++ = buffer;
@@ -266,8 +253,7 @@ rt_weak void *rt_memset(void *s, int c, rt_ubase_t count)
             count -= 4 * LBLOCKSIZE;
         }
 
-        while (count >= LBLOCKSIZE)
-        {
+        while (count >= LBLOCKSIZE) {
             *aligned_addr++ = buffer;
             count -= LBLOCKSIZE;
         }
@@ -276,8 +262,7 @@ rt_weak void *rt_memset(void *s, int c, rt_ubase_t count)
         m = (char *)aligned_addr;
     }
 
-    while (count--)
-    {
+    while (count--) {
         *m++ = (char)d;
     }
 
@@ -307,14 +292,11 @@ rt_weak void *rt_memcpy(void *dst, const void *src, rt_ubase_t count)
     char *tmp = (char *)dst, *s = (char *)src;
     rt_ubase_t len = 0;
 
-    if (tmp <= s || tmp > (s + count))
-    {
+    if (tmp <= s || tmp > (s + count)) {
         while (count--)
-            *tmp ++ = *s ++;
-    }
-    else
-    {
-        for (len = count; len > 0; len --)
+            *tmp++ = *s++;
+    } else {
+        for (len = count; len > 0; len--)
             tmp[len - 1] = s[len - 1];
     }
 
@@ -322,27 +304,25 @@ rt_weak void *rt_memcpy(void *dst, const void *src, rt_ubase_t count)
 #else
 
 #define UNALIGNED(X, Y) \
-    (((long)X & (sizeof (long) - 1)) | ((long)Y & (sizeof (long) - 1)))
-#define BIGBLOCKSIZE    (sizeof (long) << 2)
-#define LITTLEBLOCKSIZE (sizeof (long))
+    (((long)X & (sizeof(long) - 1)) | ((long)Y & (sizeof(long) - 1)))
+#define BIGBLOCKSIZE    (sizeof(long) << 2)
+#define LITTLEBLOCKSIZE (sizeof(long))
 #define TOO_SMALL(LEN)  ((LEN) < BIGBLOCKSIZE)
 
-    char *dst_ptr = (char *)dst;
-    char *src_ptr = (char *)src;
+    char *dst_ptr     = (char *)dst;
+    char *src_ptr     = (char *)src;
     long *aligned_dst = RT_NULL;
     long *aligned_src = RT_NULL;
-    rt_ubase_t len = count;
+    rt_ubase_t len    = count;
 
     /* If the size is small, or either SRC or DST is unaligned,
     then punt into the byte copy loop.  This should be rare. */
-    if (!TOO_SMALL(len) && !UNALIGNED(src_ptr, dst_ptr))
-    {
+    if (!TOO_SMALL(len) && !UNALIGNED(src_ptr, dst_ptr)) {
         aligned_dst = (long *)dst_ptr;
         aligned_src = (long *)src_ptr;
 
         /* Copy 4X long words at a time if possible. */
-        while (len >= BIGBLOCKSIZE)
-        {
+        while (len >= BIGBLOCKSIZE) {
             *aligned_dst++ = *aligned_src++;
             *aligned_dst++ = *aligned_src++;
             *aligned_dst++ = *aligned_src++;
@@ -351,8 +331,7 @@ rt_weak void *rt_memcpy(void *dst, const void *src, rt_ubase_t count)
         }
 
         /* Copy one long word at a time if possible. */
-        while (len >= LITTLEBLOCKSIZE)
-        {
+        while (len >= LITTLEBLOCKSIZE) {
             *aligned_dst++ = *aligned_src++;
             len -= LITTLEBLOCKSIZE;
         }
@@ -391,16 +370,13 @@ void *rt_memmove(void *dest, const void *src, rt_size_t n)
 {
     char *tmp = (char *)dest, *s = (char *)src;
 
-    if (s < tmp && tmp < s + n)
-    {
+    if (s < tmp && tmp < s + n) {
         tmp += n;
         s += n;
 
         while (n--)
             *(--tmp) = *(--s);
-    }
-    else
-    {
+    } else {
         while (n--)
             *tmp++ = *s++;
     }
@@ -453,21 +429,18 @@ char *rt_strstr(const char *s1, const char *s2)
     int l1 = 0, l2 = 0;
 
     l2 = rt_strlen(s2);
-    if (!l2)
-    {
+    if (!l2) {
         return (char *)s1;
     }
 
     l1 = rt_strlen(s1);
-    while (l1 >= l2)
-    {
-        l1 --;
-        if (!rt_memcmp(s1, s2, l2))
-        {
+    while (l1 >= l2) {
+        l1--;
+        if (!rt_memcmp(s1, s2, l2)) {
             return (char *)s1;
         }
 
-        s1 ++;
+        s1++;
     }
 
     return RT_NULL;
@@ -490,16 +463,14 @@ rt_int32_t rt_strcasecmp(const char *a, const char *b)
 {
     int ca = 0, cb = 0;
 
-    do
-    {
+    do {
         ca = *a++ & 0xff;
         cb = *b++ & 0xff;
         if (ca >= 'A' && ca <= 'Z')
             ca += 'a' - 'A';
         if (cb >= 'A' && cb <= 'Z')
             cb += 'a' - 'A';
-    }
-    while (ca == cb && ca != '\0');
+    } while (ca == cb && ca != '\0');
 
     return ca - cb;
 }
@@ -518,18 +489,14 @@ RTM_EXPORT(rt_strcasecmp);
  */
 char *rt_strncpy(char *dst, const char *src, rt_size_t n)
 {
-    if (n != 0)
-    {
-        char *d = dst;
+    if (n != 0) {
+        char *d       = dst;
         const char *s = src;
 
-        do
-        {
-            if ((*d++ = *s++) == 0)
-            {
+        do {
+            if ((*d++ = *s++) == 0) {
                 /* NUL pad the remaining n-1 bytes */
-                while (--n != 0)
-                {
+                while (--n != 0) {
                     *d++ = 0;
                 }
 
@@ -555,8 +522,7 @@ char *rt_strcpy(char *dst, const char *src)
 {
     char *dest = dst;
 
-    while (*src != '\0')
-    {
+    while (*src != '\0') {
         *dst = *src;
         dst++;
         src++;
@@ -585,14 +551,12 @@ rt_int32_t rt_strncmp(const char *cs, const char *ct, rt_size_t count)
 {
     signed char __res = 0;
 
-    while (count)
-    {
-        if ((__res = *cs - *ct++) != 0 || !*cs++)
-        {
+    while (count) {
+        if ((__res = *cs - *ct++) != 0 || !*cs++) {
             break;
         }
 
-        count --;
+        count--;
     }
 
     return __res;
@@ -613,8 +577,7 @@ RTM_EXPORT(rt_strncmp);
  */
 rt_int32_t rt_strcmp(const char *cs, const char *ct)
 {
-    while (*cs && *cs == *ct)
-    {
+    while (*cs && *cs == *ct) {
         cs++;
         ct++;
     }
@@ -679,10 +642,9 @@ RTM_EXPORT(rt_strnlen);
 char *rt_strdup(const char *s)
 {
     rt_size_t len = rt_strlen(s) + 1;
-    char *tmp = (char *)rt_malloc(len);
+    char *tmp     = (char *)rt_malloc(len);
 
-    if (!tmp)
-    {
+    if (!tmp) {
         return RT_NULL;
     }
 
@@ -711,7 +673,7 @@ void rt_show_version(void)
 RTM_EXPORT(rt_show_version);
 
 /* private function */
-#define _ISDIGIT(c)  ((unsigned)((c) - '0') < 10)
+#define _ISDIGIT(c) ((unsigned)((c) - '0') < 10)
 
 /**
  * @brief  This function will duplicate a string.
@@ -733,10 +695,10 @@ rt_inline int divide(unsigned long *n, int base)
     /* optimized for processor which does not support divide instructions. */
 #ifdef RT_KPRINTF_USING_LONGLONG
     res = (int)((*n) % base);
-    *n = (long long)((*n) / base);
+    *n  = (long long)((*n) / base);
 #else
     res = (int)((*n) % base);
-    *n = (long)((*n) / base);
+    *n  = (long)((*n) / base);
 #endif
 
     return res;
@@ -751,28 +713,28 @@ rt_inline int skip_atoi(const char **s)
     return i;
 }
 
-#define ZEROPAD     (1 << 0)    /* pad with zero */
-#define SIGN        (1 << 1)    /* unsigned/signed long */
-#define PLUS        (1 << 2)    /* show plus */
-#define SPACE       (1 << 3)    /* space if plus */
-#define LEFT        (1 << 4)    /* left justified */
-#define SPECIAL     (1 << 5)    /* 0x */
-#define LARGE       (1 << 6)    /* use 'ABCDEF' instead of 'abcdef' */
+#define ZEROPAD (1 << 0) /* pad with zero */
+#define SIGN    (1 << 1) /* unsigned/signed long */
+#define PLUS    (1 << 2) /* show plus */
+#define SPACE   (1 << 3) /* space if plus */
+#define LEFT    (1 << 4) /* left justified */
+#define SPECIAL (1 << 5) /* 0x */
+#define LARGE   (1 << 6) /* use 'ABCDEF' instead of 'abcdef' */
 
 static char *print_number(char *buf,
                           char *end,
 #ifdef RT_KPRINTF_USING_LONGLONG
-                          unsigned long long  num,
+                          unsigned long long num,
 #else
-                          unsigned long  num,
+                          unsigned long num,
 #endif /* RT_KPRINTF_USING_LONGLONG */
-                          int   base,
-                          int   qualifier,
-                          int   s,
+                          int base,
+                          int qualifier,
+                          int s,
 #ifdef RT_PRINTF_PRECISION
-                          int   precision,
+                          int precision,
 #endif /* RT_PRINTF_PRECISION */
-                          int   type)
+                          int type)
 {
     char c = 0, sign = 0;
 #ifdef RT_KPRINTF_USING_LONGLONG
@@ -780,18 +742,17 @@ static char *print_number(char *buf,
 #else
     char tmp[32] = {0};
 #endif /* RT_KPRINTF_USING_LONGLONG */
-    int precision_bak = precision;
-    const char *digits = RT_NULL;
+    int precision_bak                = precision;
+    const char *digits               = RT_NULL;
     static const char small_digits[] = "0123456789abcdef";
     static const char large_digits[] = "0123456789ABCDEF";
-    int i = 0;
-    int size = 0;
+    int i                            = 0;
+    int size                         = 0;
 
     size = s;
 
     digits = (type & LARGE) ? large_digits : small_digits;
-    if (type & LEFT)
-    {
+    if (type & LEFT) {
         type &= ~ZEROPAD;
     }
 
@@ -799,76 +760,59 @@ static char *print_number(char *buf,
 
     /* get sign */
     sign = 0;
-    if (type & SIGN)
-    {
-        switch (qualifier)
-        {
-        case 'h':
-            if ((rt_int16_t)num < 0)
-            {
-                sign = '-';
-                num = (rt_uint16_t)-num;
-            }
-            break;
-        case 'L':
-        case 'l':
-            if ((long)num < 0)
-            {
-                sign = '-';
-                num = (unsigned long)-num;
-            }
-            break;
-        case 0:
-        default:
-            if ((rt_int32_t)num < 0)
-            {
-                sign = '-';
-                num = (rt_uint32_t)-num;
-            }
-            break;
+    if (type & SIGN) {
+        switch (qualifier) {
+            case 'h':
+                if ((rt_int16_t)num < 0) {
+                    sign = '-';
+                    num  = (rt_uint16_t)-num;
+                }
+                break;
+            case 'L':
+            case 'l':
+                if ((long)num < 0) {
+                    sign = '-';
+                    num  = (unsigned long)-num;
+                }
+                break;
+            case 0:
+            default:
+                if ((rt_int32_t)num < 0) {
+                    sign = '-';
+                    num  = (rt_uint32_t)-num;
+                }
+                break;
         }
 
-        if (sign != '-')
-        {
-            if (type & PLUS)
-            {
+        if (sign != '-') {
+            if (type & PLUS) {
                 sign = '+';
-            }
-            else if (type & SPACE)
-            {
+            } else if (type & SPACE) {
                 sign = ' ';
             }
         }
     }
 
 #ifdef RT_PRINTF_SPECIAL
-    if (type & SPECIAL)
-    {
-        if (base == 2 || base == 16)
-        {
+    if (type & SPECIAL) {
+        if (base == 2 || base == 16) {
             size -= 2;
-        }
-        else if (base == 8)
-        {
+        } else if (base == 8) {
             size--;
         }
     }
 #endif /* RT_PRINTF_SPECIAL */
 
     i = 0;
-    if (num == 0)
-    {
+    if (num == 0) {
         tmp[i++] = '0';
-    }
-    else
-    {
+    } else {
         while (num != 0)
             tmp[i++] = digits[divide(&num, base)];
     }
 
 #ifdef RT_PRINTF_PRECISION
-    if (i > precision)
-    {
+    if (i > precision) {
         precision = i;
     }
     size -= precision;
@@ -876,114 +820,91 @@ static char *print_number(char *buf,
     size -= i;
 #endif /* RT_PRINTF_PRECISION */
 
-    if (!(type & (ZEROPAD | LEFT)))
-    {
-        if ((sign) && (size > 0))
-        {
+    if (!(type & (ZEROPAD | LEFT))) {
+        if ((sign) && (size > 0)) {
             size--;
         }
 
-        while (size-- > 0)
-        {
-            if (buf < end)
-            {
+        while (size-- > 0) {
+            if (buf < end) {
                 *buf = ' ';
             }
 
-            ++ buf;
+            ++buf;
         }
     }
 
-    if (sign)
-    {
-        if (buf < end)
-        {
+    if (sign) {
+        if (buf < end) {
             *buf = sign;
         }
-        -- size;
-        ++ buf;
+        --size;
+        ++buf;
     }
 
 #ifdef RT_PRINTF_SPECIAL
-    if (type & SPECIAL)
-    {
-        if (base == 2)
-        {
+    if (type & SPECIAL) {
+        if (base == 2) {
             if (buf < end)
                 *buf = '0';
-            ++ buf;
+            ++buf;
             if (buf < end)
                 *buf = 'b';
-            ++ buf;
-        }
-        else if (base == 8)
-        {
+            ++buf;
+        } else if (base == 8) {
             if (buf < end)
                 *buf = '0';
-            ++ buf;
-        }
-        else if (base == 16)
-        {
-            if (buf < end)
-            {
+            ++buf;
+        } else if (base == 16) {
+            if (buf < end) {
                 *buf = '0';
             }
 
-            ++ buf;
-            if (buf < end)
-            {
+            ++buf;
+            if (buf < end) {
                 *buf = type & LARGE ? 'X' : 'x';
             }
-            ++ buf;
+            ++buf;
         }
     }
 #endif /* RT_PRINTF_SPECIAL */
 
     /* no align to the left */
-    if (!(type & LEFT))
-    {
-        while (size-- > 0)
-        {
-            if (buf < end)
-            {
+    if (!(type & LEFT)) {
+        while (size-- > 0) {
+            if (buf < end) {
                 *buf = c;
             }
 
-            ++ buf;
+            ++buf;
         }
     }
 
 #ifdef RT_PRINTF_PRECISION
-    while (i < precision--)
-    {
-        if (buf < end)
-        {
+    while (i < precision--) {
+        if (buf < end) {
             *buf = '0';
         }
 
-        ++ buf;
+        ++buf;
     }
 #endif /* RT_PRINTF_PRECISION */
 
     /* put number in the temporary buffer */
-    while (i-- > 0 && (precision_bak != 0))
-    {
-        if (buf < end)
-        {
+    while (i-- > 0 && (precision_bak != 0)) {
+        if (buf < end) {
             *buf = tmp[i];
         }
 
-        ++ buf;
+        ++buf;
     }
 
-    while (size-- > 0)
-    {
-        if (buf < end)
-        {
+    while (size-- > 0) {
+        if (buf < end) {
             *buf = ' ';
         }
 
-        ++ buf;
+        ++buf;
     }
 
     return buf;
@@ -1013,66 +934,63 @@ rt_weak int rt_vsnprintf(char *buf, rt_size_t size, const char *fmt, va_list arg
     char *str = RT_NULL, *end = RT_NULL, c = 0;
     const char *s = RT_NULL;
 
-    rt_uint8_t base = 0;            /* the base of number */
-    rt_uint8_t flags = 0;           /* flags to print number */
-    rt_uint8_t qualifier = 0;       /* 'h', 'l', or 'L' for integer fields */
-    rt_int32_t field_width = 0;     /* width of output field */
+    rt_uint8_t base        = 0; /* the base of number */
+    rt_uint8_t flags       = 0; /* flags to print number */
+    rt_uint8_t qualifier   = 0; /* 'h', 'l', or 'L' for integer fields */
+    rt_int32_t field_width = 0; /* width of output field */
 
 #ifdef RT_PRINTF_PRECISION
-    int precision = 0;      /* min. # of digits for integers and max for a string */
-#endif /* RT_PRINTF_PRECISION */
+    int precision = 0; /* min. # of digits for integers and max for a string */
+#endif                 /* RT_PRINTF_PRECISION */
 
     str = buf;
     end = buf + size;
 
     /* Make sure end is always >= buf */
-    if (end < buf)
-    {
-        end  = ((char *) - 1);
+    if (end < buf) {
+        end  = ((char *)-1);
         size = end - buf;
     }
 
-    for (; *fmt ; ++fmt)
-    {
-        if (*fmt != '%')
-        {
-            if (str < end)
-            {
+    for (; *fmt; ++fmt) {
+        if (*fmt != '%') {
+            if (str < end) {
                 *str = *fmt;
             }
 
-            ++ str;
+            ++str;
             continue;
         }
 
         /* process flags */
         flags = 0;
 
-        while (1)
-        {
+        while (1) {
             /* skips the first '%' also */
-            ++ fmt;
-            if (*fmt == '-') flags |= LEFT;
-            else if (*fmt == '+') flags |= PLUS;
-            else if (*fmt == ' ') flags |= SPACE;
-            else if (*fmt == '#') flags |= SPECIAL;
-            else if (*fmt == '0') flags |= ZEROPAD;
-            else break;
+            ++fmt;
+            if (*fmt == '-')
+                flags |= LEFT;
+            else if (*fmt == '+')
+                flags |= PLUS;
+            else if (*fmt == ' ')
+                flags |= SPACE;
+            else if (*fmt == '#')
+                flags |= SPECIAL;
+            else if (*fmt == '0')
+                flags |= ZEROPAD;
+            else
+                break;
         }
 
         /* get field width */
         field_width = -1;
-        if (_ISDIGIT(*fmt))
-        {
+        if (_ISDIGIT(*fmt)) {
             field_width = skip_atoi(&fmt);
-        }
-        else if (*fmt == '*')
-        {
-            ++ fmt;
+        } else if (*fmt == '*') {
+            ++fmt;
             /* it's the next argument */
             field_width = va_arg(args, int);
-            if (field_width < 0)
-            {
+            if (field_width < 0) {
                 field_width = -field_width;
                 flags |= LEFT;
             }
@@ -1081,21 +999,16 @@ rt_weak int rt_vsnprintf(char *buf, rt_size_t size, const char *fmt, va_list arg
 #ifdef RT_PRINTF_PRECISION
         /* get the precision */
         precision = -1;
-        if (*fmt == '.')
-        {
-            ++ fmt;
-            if (_ISDIGIT(*fmt))
-            {
+        if (*fmt == '.') {
+            ++fmt;
+            if (_ISDIGIT(*fmt)) {
                 precision = skip_atoi(&fmt);
-            }
-            else if (*fmt == '*')
-            {
-                ++ fmt;
+            } else if (*fmt == '*') {
+                ++fmt;
                 /* it's the next argument */
                 precision = va_arg(args, int);
             }
-            if (precision < 0)
-            {
+            if (precision < 0) {
                 precision = 0;
             }
         }
@@ -1109,12 +1022,11 @@ rt_weak int rt_vsnprintf(char *buf, rt_size_t size, const char *fmt, va_list arg
 #endif /* RT_KPRINTF_USING_LONGLONG */
         {
             qualifier = *fmt;
-            ++ fmt;
+            ++fmt;
 #ifdef RT_KPRINTF_USING_LONGLONG
-            if (qualifier == 'l' && *fmt == 'l')
-            {
+            if (qualifier == 'l' && *fmt == 'l') {
                 qualifier = 'L';
-                ++ fmt;
+                ++fmt;
             }
 #endif /* RT_KPRINTF_USING_LONGLONG */
         }
@@ -1122,165 +1034,141 @@ rt_weak int rt_vsnprintf(char *buf, rt_size_t size, const char *fmt, va_list arg
         /* the default base */
         base = 10;
 
-        switch (*fmt)
-        {
-        case 'c':
-            if (!(flags & LEFT))
-            {
-                while (--field_width > 0)
-                {
-                    if (str < end) *str = ' ';
-                    ++ str;
+        switch (*fmt) {
+            case 'c':
+                if (!(flags & LEFT)) {
+                    while (--field_width > 0) {
+                        if (str < end) *str = ' ';
+                        ++str;
+                    }
                 }
-            }
 
-            /* get character */
-            c = (rt_uint8_t)va_arg(args, int);
-            if (str < end)
-            {
-                *str = c;
-            }
-            ++ str;
+                /* get character */
+                c = (rt_uint8_t)va_arg(args, int);
+                if (str < end) {
+                    *str = c;
+                }
+                ++str;
 
-            /* put width */
-            while (--field_width > 0)
-            {
-                if (str < end) *str = ' ';
-                ++ str;
-            }
-            continue;
+                /* put width */
+                while (--field_width > 0) {
+                    if (str < end) *str = ' ';
+                    ++str;
+                }
+                continue;
 
-        case 's':
-            s = va_arg(args, char *);
-            if (!s)
-            {
-                s = "(NULL)";
-            }
+            case 's':
+                s = va_arg(args, char *);
+                if (!s) {
+                    s = "(NULL)";
+                }
 
-            for (len = 0; (len != field_width) && (s[len] != '\0'); len++);
+                for (len = 0; (len != field_width) && (s[len] != '\0'); len++)
+                    ;
 #ifdef RT_PRINTF_PRECISION
-            if (precision > 0 && len > precision)
-            {
-                len = precision;
-            }
+                if (precision > 0 && len > precision) {
+                    len = precision;
+                }
 #endif /* RT_PRINTF_PRECISION */
 
-            if (!(flags & LEFT))
-            {
-                while (len < field_width--)
-                {
+                if (!(flags & LEFT)) {
+                    while (len < field_width--) {
+                        if (str < end) *str = ' ';
+                        ++str;
+                    }
+                }
+
+                for (i = 0; i < len; ++i) {
+                    if (str < end) *str = *s;
+                    ++str;
+                    ++s;
+                }
+
+                while (len < field_width--) {
                     if (str < end) *str = ' ';
-                    ++ str;
+                    ++str;
                 }
-            }
+                continue;
 
-            for (i = 0; i < len; ++i)
-            {
-                if (str < end) *str = *s;
-                ++ str;
-                ++ s;
-            }
-
-            while (len < field_width--)
-            {
-                if (str < end) *str = ' ';
-                ++ str;
-            }
-            continue;
-
-        case 'p':
-            if (field_width == -1)
-            {
-                field_width = sizeof(void *) << 1;
+            case 'p':
+                if (field_width == -1) {
+                    field_width = sizeof(void *) << 1;
 #ifdef RT_PRINTF_SPECIAL
-                field_width += 2; /* `0x` prefix */
-                flags |= SPECIAL;
+                    field_width += 2; /* `0x` prefix */
+                    flags |= SPECIAL;
 #endif
-                flags |= ZEROPAD;
-            }
-#ifdef RT_PRINTF_PRECISION
-            str = print_number(str, end,
-                               (unsigned long)va_arg(args, void *),
-                               16, qualifier, field_width, precision, flags);
-#else
-            str = print_number(str, end,
-                               (unsigned long)va_arg(args, void *),
-                               16, qualifier, field_width, flags);
-#endif
-            continue;
-
-        case '%':
-            if (str < end)
-            {
-                *str = '%';
-            }
-            ++ str;
-            continue;
-
-        /* integer number formats - set up the flags and "break" */
-        case 'b':
-            base = 2;
-            break;
-        case 'o':
-            base = 8;
-            break;
-
-        case 'X':
-            flags |= LARGE;
-        case 'x':
-            base = 16;
-            break;
-
-        case 'd':
-        case 'i':
-            flags |= SIGN;
-        case 'u':
-            break;
-
-        default:
-            if (str < end)
-            {
-                *str = '%';
-            }
-            ++ str;
-
-            if (*fmt)
-            {
-                if (str < end)
-                {
-                    *str = *fmt;
+                    flags |= ZEROPAD;
                 }
-                ++ str;
-            }
-            else
-            {
-                -- fmt;
-            }
-            continue;
+#ifdef RT_PRINTF_PRECISION
+                str = print_number(str, end,
+                                   (unsigned long)va_arg(args, void *),
+                                   16, qualifier, field_width, precision, flags);
+#else
+                str = print_number(str, end,
+                                   (unsigned long)va_arg(args, void *),
+                                   16, qualifier, field_width, flags);
+#endif
+                continue;
+
+            case '%':
+                if (str < end) {
+                    *str = '%';
+                }
+                ++str;
+                continue;
+
+            /* integer number formats - set up the flags and "break" */
+            case 'b':
+                base = 2;
+                break;
+            case 'o':
+                base = 8;
+                break;
+
+            case 'X':
+                flags |= LARGE;
+            case 'x':
+                base = 16;
+                break;
+
+            case 'd':
+            case 'i':
+                flags |= SIGN;
+            case 'u':
+                break;
+
+            default:
+                if (str < end) {
+                    *str = '%';
+                }
+                ++str;
+
+                if (*fmt) {
+                    if (str < end) {
+                        *str = *fmt;
+                    }
+                    ++str;
+                } else {
+                    --fmt;
+                }
+                continue;
         }
 
 #ifdef RT_KPRINTF_USING_LONGLONG
-        if (qualifier == 'L')
-        {
+        if (qualifier == 'L') {
             num = va_arg(args, unsigned long long);
-        }
-        else if (qualifier == 'l')
+        } else if (qualifier == 'l')
 #else
         if (qualifier == 'l')
 #endif /* RT_KPRINTF_USING_LONGLONG */
         {
             num = va_arg(args, unsigned long);
-        }
-        else if (qualifier == 'h')
-        {
+        } else if (qualifier == 'h') {
             num = (rt_uint16_t)va_arg(args, rt_int32_t);
-            if (flags & SIGN)
-            {
+            if (flags & SIGN) {
                 num = (rt_int16_t)num;
             }
-        }
-        else
-        {
+        } else {
             num = (rt_uint32_t)va_arg(args, unsigned long);
         }
 #ifdef RT_PRINTF_PRECISION
@@ -1290,21 +1178,17 @@ rt_weak int rt_vsnprintf(char *buf, rt_size_t size, const char *fmt, va_list arg
 #endif
     }
 
-    if (size > 0)
-    {
-        if (str < end)
-        {
+    if (size > 0) {
+        if (str < end) {
             *str = '\0';
-        }
-        else
-        {
+        } else {
             end[-1] = '\0';
         }
     }
 
     /* the trailing null byte doesn't count towards the total
-    * ++str;
-    */
+     * ++str;
+     */
     return str - buf;
 }
 RTM_EXPORT(rt_vsnprintf);
@@ -1346,7 +1230,7 @@ RTM_EXPORT(rt_snprintf);
  */
 int rt_vsprintf(char *buf, const char *format, va_list arg_ptr)
 {
-    return rt_vsnprintf(buf, (rt_size_t) - 1, format, arg_ptr);
+    return rt_vsnprintf(buf, (rt_size_t)-1, format, arg_ptr);
 }
 RTM_EXPORT(rt_vsprintf);
 
@@ -1402,14 +1286,10 @@ rt_device_t rt_console_set_device(const char *name)
 
     /* find new console device */
     new_iodev = rt_device_find(name);
-    if (new_iodev != RT_NULL)
-    {
-        if (_console_device != RT_NULL)
-        {
+    if (new_iodev != RT_NULL) {
+        if (_console_device != RT_NULL) {
             old_iodev = console_set_iodev(new_iodev);
-        }
-        else
-        {
+        } else {
             console_register("console", new_iodev);
             _console_device = rt_device_find("console");
             rt_device_open(_console_device, RT_DEVICE_OFLAG_RDWR | RT_DEVICE_FLAG_STREAM);
@@ -1429,10 +1309,8 @@ rt_device_t rt_console_set_device(const char *name)
     /* check whether it's a same device */
     if (new_device == old_device) return RT_NULL;
 
-    if (new_device != RT_NULL)
-    {
-        if (_console_device != RT_NULL)
-        {
+    if (new_device != RT_NULL) {
+        if (_console_device != RT_NULL) {
             /* close old console device */
             rt_device_close(_console_device);
         }
@@ -1451,6 +1329,7 @@ RTM_EXPORT(rt_console_set_device);
 rt_weak void rt_hw_console_output(const char *str)
 {
     /* empty console output */
+    rt_kprintf("weak test\n");
 }
 RTM_EXPORT(rt_hw_console_output);
 
@@ -1461,18 +1340,14 @@ RTM_EXPORT(rt_hw_console_output);
  */
 void rt_kputs(const char *str)
 {
-    if (!str)
-    {
+    if (!str) {
         return;
     }
 
 #ifdef RT_USING_DEVICE
-    if (_console_device == RT_NULL)
-    {
+    if (_console_device == RT_NULL) {
         rt_hw_console_output(str);
-    }
-    else
-    {
+    } else {
         rt_device_write(_console_device, 0, str, rt_strlen(str));
     }
 #else
@@ -1500,18 +1375,14 @@ rt_weak int rt_kprintf(const char *fmt, ...)
      * would be larger than the rt_log_buf, we have to adjust the output
      * length. */
     length = rt_vsnprintf(rt_log_buf, sizeof(rt_log_buf) - 1, fmt, args);
-    if (length > RT_CONSOLEBUF_SIZE - 1)
-    {
+    if (length > RT_CONSOLEBUF_SIZE - 1) {
         length = RT_CONSOLEBUF_SIZE - 1;
     }
 
 #ifdef RT_USING_DEVICE
-    if (_console_device == RT_NULL)
-    {
+    if (_console_device == RT_NULL) {
         rt_hw_console_output(rt_log_buf);
-    }
-    else
-    {
+    } else {
         rt_device_write(_console_device, 0, rt_log_buf, length);
     }
 #else
@@ -1604,7 +1475,7 @@ rt_inline void _heap_unlock(rt_base_t level)
 #ifdef RT_USING_UTESTCASES
 /* export to utest to observe the inner statements */
 #ifdef _MSC_VER
-#define rt_heap_lock() _heap_lock()
+#define rt_heap_lock()   _heap_lock()
 #define rt_heap_unlock() _heap_unlock()
 #else
 rt_base_t rt_heap_lock(void) __attribute__((alias("_heap_lock")));
@@ -1615,7 +1486,7 @@ void rt_heap_unlock(rt_base_t level) __attribute__((alias("_heap_unlock")));
 #if defined(RT_USING_SMALL_MEM_AS_HEAP)
 static rt_smem_t system_heap;
 rt_inline void _smem_info(rt_size_t *total,
-    rt_size_t *used, rt_size_t *max_used)
+                          rt_size_t *used, rt_size_t *max_used)
 {
     if (total)
         *total = system_heap->total;
@@ -1626,13 +1497,13 @@ rt_inline void _smem_info(rt_size_t *total,
 }
 #define _MEM_INIT(_name, _start, _size) \
     system_heap = rt_smem_init(_name, _start, _size)
-#define _MEM_MALLOC(_size)  \
+#define _MEM_MALLOC(_size) \
     rt_smem_alloc(system_heap, _size)
-#define _MEM_REALLOC(_ptr, _newsize)\
+#define _MEM_REALLOC(_ptr, _newsize) \
     rt_smem_realloc(system_heap, _ptr, _newsize)
 #define _MEM_FREE(_ptr) \
     rt_smem_free(_ptr)
-#define _MEM_INFO(_total, _used, _max)  \
+#define _MEM_INFO(_total, _used, _max) \
     _smem_info(_total, _used, _max)
 #elif defined(RT_USING_MEMHEAP_AS_HEAP)
 static struct rt_memheap system_heap;
@@ -1641,18 +1512,18 @@ void _memheap_free(void *rmem);
 void *_memheap_realloc(struct rt_memheap *heap, void *rmem, rt_size_t newsize);
 #define _MEM_INIT(_name, _start, _size) \
     rt_memheap_init(&system_heap, _name, _start, _size)
-#define _MEM_MALLOC(_size)  \
+#define _MEM_MALLOC(_size) \
     _memheap_alloc(&system_heap, _size)
-#define _MEM_REALLOC(_ptr, _newsize)    \
+#define _MEM_REALLOC(_ptr, _newsize) \
     _memheap_realloc(&system_heap, _ptr, _newsize)
-#define _MEM_FREE(_ptr)   \
+#define _MEM_FREE(_ptr) \
     _memheap_free(_ptr)
-#define _MEM_INFO(_total, _used, _max)   \
+#define _MEM_INFO(_total, _used, _max) \
     rt_memheap_info(&system_heap, _total, _used, _max)
 #elif defined(RT_USING_SLAB_AS_HEAP)
 static rt_slab_t system_heap;
 rt_inline void _slab_info(rt_size_t *total,
-    rt_size_t *used, rt_size_t *max_used)
+                          rt_size_t *used, rt_size_t *max_used)
 {
     if (total)
         *total = system_heap->total;
@@ -1663,17 +1534,17 @@ rt_inline void _slab_info(rt_size_t *total,
 }
 #define _MEM_INIT(_name, _start, _size) \
     system_heap = rt_slab_init(_name, _start, _size)
-#define _MEM_MALLOC(_size)  \
+#define _MEM_MALLOC(_size) \
     rt_slab_alloc(system_heap, _size)
-#define _MEM_REALLOC(_ptr, _newsize)    \
+#define _MEM_REALLOC(_ptr, _newsize) \
     rt_slab_realloc(system_heap, _ptr, _newsize)
 #define _MEM_FREE(_ptr) \
     rt_slab_free(system_heap, _ptr)
-#define _MEM_INFO       _slab_info
+#define _MEM_INFO _slab_info
 #else
 #define _MEM_INIT(...)
-#define _MEM_MALLOC(...)     RT_NULL
-#define _MEM_REALLOC(...)    RT_NULL
+#define _MEM_MALLOC(...)  RT_NULL
+#define _MEM_REALLOC(...) RT_NULL
 #define _MEM_FREE(...)
 #define _MEM_INFO(...)
 #endif
@@ -1766,8 +1637,7 @@ rt_weak void *rt_calloc(rt_size_t count, rt_size_t size)
     /* allocate 'count' objects of size 'size' */
     p = rt_malloc(count * size);
     /* zero the memory */
-    if (p)
-    {
+    if (p) {
         rt_memset(p, 0, count * size);
     }
     return p;
@@ -1797,15 +1667,15 @@ rt_weak void rt_free(void *ptr)
 RTM_EXPORT(rt_free);
 
 /**
-* @brief This function will caculate the total memory, the used memory, and
-*        the max used memory.
-*
-* @param total is a pointer to get the total size of the memory.
-*
-* @param used is a pointer to get the size of memory used.
-*
-* @param max_used is a pointer to get the maximum memory used.
-*/
+ * @brief This function will caculate the total memory, the used memory, and
+ *        the max used memory.
+ *
+ * @param total is a pointer to get the total size of the memory.
+ *
+ * @param used is a pointer to get the size of memory used.
+ *
+ * @param max_used is a pointer to get the maximum memory used.
+ */
 rt_weak void rt_memory_info(rt_size_t *total,
                             rt_size_t *used,
                             rt_size_t *max_used)
@@ -1861,13 +1731,13 @@ void rt_page_free(void *addr, rt_size_t npages)
  */
 rt_weak void *rt_malloc_align(rt_size_t size, rt_size_t align)
 {
-    void *ptr = RT_NULL;
-    void *align_ptr = RT_NULL;
-    int uintptr_size = 0;
+    void *ptr            = RT_NULL;
+    void *align_ptr      = RT_NULL;
+    int uintptr_size     = 0;
     rt_size_t align_size = 0;
 
     /* sizeof pointer */
-    uintptr_size = sizeof(void*);
+    uintptr_size = sizeof(void *);
     uintptr_size -= 1;
 
     /* align the alignment size to uintptr size byte */
@@ -1877,15 +1747,11 @@ rt_weak void *rt_malloc_align(rt_size_t size, rt_size_t align)
     align_size = ((size + uintptr_size) & ~uintptr_size) + align;
     /* allocate memory block from heap */
     ptr = rt_malloc(align_size);
-    if (ptr != RT_NULL)
-    {
+    if (ptr != RT_NULL) {
         /* the allocated memory block is aligned */
-        if (((rt_ubase_t)ptr & (align - 1)) == 0)
-        {
+        if (((rt_ubase_t)ptr & (align - 1)) == 0) {
             align_ptr = (void *)((rt_ubase_t)ptr + align);
-        }
-        else
-        {
+        } else {
             align_ptr = (void *)(((rt_ubase_t)ptr + (align - 1)) & ~(align - 1));
         }
 
@@ -1911,7 +1777,7 @@ rt_weak void rt_free_align(void *ptr)
 
     /* NULL check */
     if (ptr == RT_NULL) return;
-    real_ptr = (void *) * (rt_ubase_t *)((rt_ubase_t)ptr - sizeof(void *));
+    real_ptr = (void *)*(rt_ubase_t *)((rt_ubase_t)ptr - sizeof(void *));
     rt_free(real_ptr);
 }
 RTM_EXPORT(rt_free_align);
@@ -1920,13 +1786,12 @@ RTM_EXPORT(rt_free_align);
 #ifndef RT_USING_CPU_FFS
 #ifdef RT_USING_TINY_FFS
 const rt_uint8_t __lowest_bit_bitmap[] =
-{
-    /*  0 - 7  */  0,  1,  2, 27,  3, 24, 28, 32,
-    /*  8 - 15 */  4, 17, 25, 31, 29, 12, 32, 14,
-    /* 16 - 23 */  5,  8, 18, 32, 26, 23, 32, 16,
-    /* 24 - 31 */ 30, 11, 13,  7, 32, 22, 15, 10,
-    /* 32 - 36 */  6, 21,  9, 20, 19
-};
+    {
+        /*  0 - 7  */ 0, 1, 2, 27, 3, 24, 28, 32,
+        /*  8 - 15 */ 4, 17, 25, 31, 29, 12, 32, 14,
+        /* 16 - 23 */ 5, 8, 18, 32, 26, 23, 32, 16,
+        /* 24 - 31 */ 30, 11, 13, 7, 32, 22, 15, 10,
+        /* 32 - 36 */ 6, 21, 9, 20, 19};
 
 /**
  * @brief This function finds the first bit set (beginning with the least significant bit)
@@ -1946,24 +1811,23 @@ int __rt_ffs(int value)
 }
 #else
 const rt_uint8_t __lowest_bit_bitmap[] =
-{
-    /* 00 */ 0, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-    /* 10 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-    /* 20 */ 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-    /* 30 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-    /* 40 */ 6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-    /* 50 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-    /* 60 */ 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-    /* 70 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-    /* 80 */ 7, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-    /* 90 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-    /* A0 */ 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-    /* B0 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-    /* C0 */ 6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-    /* D0 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-    /* E0 */ 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-    /* F0 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0
-};
+    {
+        /* 00 */ 0, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+        /* 10 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+        /* 20 */ 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+        /* 30 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+        /* 40 */ 6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+        /* 50 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+        /* 60 */ 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+        /* 70 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+        /* 80 */ 7, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+        /* 90 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+        /* A0 */ 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+        /* B0 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+        /* C0 */ 6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+        /* D0 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+        /* E0 */ 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+        /* F0 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0};
 
 /**
  * @brief This function finds the first bit set (beginning with the least significant bit)
@@ -1979,23 +1843,19 @@ const rt_uint8_t __lowest_bit_bitmap[] =
  */
 int __rt_ffs(int value)
 {
-    if (value == 0)
-    {
+    if (value == 0) {
         return 0;
     }
 
-    if (value & 0xff)
-    {
+    if (value & 0xff) {
         return __lowest_bit_bitmap[value & 0xff] + 1;
     }
 
-    if (value & 0xff00)
-    {
+    if (value & 0xff00) {
         return __lowest_bit_bitmap[(value & 0xff00) >> 8] + 9;
     }
 
-    if (value & 0xff0000)
-    {
+    if (value & 0xff0000) {
         return __lowest_bit_bitmap[(value & 0xff0000) >> 16] + 17;
     }
 
@@ -2005,7 +1865,7 @@ int __rt_ffs(int value)
 #endif /* RT_USING_CPU_FFS */
 
 #ifndef __on_rt_assert_hook
-    #define __on_rt_assert_hook(ex, func, line)         __ON_HOOK_ARGS(rt_assert_hook, (ex, func, line))
+#define __on_rt_assert_hook(ex, func, line) __ON_HOOK_ARGS(rt_assert_hook, (ex, func, line))
 #endif
 
 #ifdef RT_USING_DEBUG
@@ -2036,23 +1896,19 @@ void rt_assert_handler(const char *ex_string, const char *func, rt_size_t line)
 {
     volatile char dummy = 0;
 
-    if (rt_assert_hook == RT_NULL)
-    {
+    if (rt_assert_hook == RT_NULL) {
 #ifdef RT_USING_MODULE
-        if (dlmodule_self())
-        {
+        if (dlmodule_self()) {
             /* close assertion module */
             dlmodule_exit(-1);
-        }
-        else
+        } else
 #endif /*RT_USING_MODULE*/
         {
             rt_kprintf("(%s) assertion failed at function:%s, line number:%d \n", ex_string, func, line);
-            while (dummy == 0);
+            while (dummy == 0)
+                ;
         }
-    }
-    else
-    {
+    } else {
         rt_assert_hook(ex_string, func, line);
     }
 }

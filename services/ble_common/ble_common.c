@@ -16,21 +16,19 @@
 // 用于stack dump的错误代码，可以用于栈回退时确定堆栈位置
 #define DEAD_BEEF 0xDEADBEEF
 
+/** @brief 全局变量 */
+uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID;
+uint16_t max_data_len  = BLE_GATT_ATT_MTU_DEFAULT - 3;
+
 /** @brief 私有变量 */
 /** @brief 该变量用于保存连接句柄，初始值设置为无连接 */
-static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID;
+static const ble_serv_init_fn *serv_table[] = BLE_SERVICE_INIT_TABLE;
+static const ble_uuid_t *uuids[]            = BLE_UUID_SERVICE_TABLE;
+static const size_t uuids_len               = sizeof(uuids) / sizeof(uuids[0]);
 
 /** @brief 私有函数 */
 static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context);
-
-/** @brief 预定义宏 */
-NRF_BLE_GATT_DEF(m_gatt);                                                           // 定义名称为m_gatt的GATT模块实例
-NRF_BLE_QWR_DEF(m_qwr);                                                             // 定义一个名称为m_qwr的排队写入实例
-BLE_ADVERTISING_DEF(m_advertising);                                                 // 定义名称为m_advertising的广播模块实例
-NRF_SDH_BLE_OBSERVER(m_ble_observer, APP_BLE_OBSERVER_PRIO, ble_evt_handler, NULL); // 注册BLE事件回调函数
-
-static ble_uuid_t m_uuids[]              = BLE_UUID_SERVICE_TABLE;
-static ble_serv_init_func_t serv_table[] = BLE_SERVICE_INIT_TABLE;
+NRF_SDH_BLE_OBSERVER(m_ble_observer, APP_BLE_OBSERVER_PRIO, ble_evt_handler, NULL); // 注册BLE事件回调函
 /**
  * @brief GAP参数初始化，该函数配置需要的GAP参数，包括设备名称，外观特征、首选连接参数
  */
@@ -72,11 +70,11 @@ gap_params_init(void)
 void gatt_evt_handler(nrf_ble_gatt_t *p_gatt, nrf_ble_gatt_evt_t const *p_evt)
 {
     // 如果是MTU交换事件
-    // if ((m_conn_handle == p_evt->conn_handle) && (p_evt->evt_id == NRF_BLE_GATT_EVT_ATT_MTU_UPDATED)) {
-    //     // 设置串口透传服务的有效数据长度（MTU-opcode-handle）
-    //     m_ble_uarts_max_data_len = p_evt->params.att_mtu_effective - OPCODE_LENGTH - HANDLE_LENGTH;
-    //     NRF_LOG_INFO("Data len is set to 0x%X(%d)", m_ble_uarts_max_data_len, m_ble_uarts_max_data_len);
-    // }
+    if ((m_conn_handle == p_evt->conn_handle) && (p_evt->evt_id == NRF_BLE_GATT_EVT_ATT_MTU_UPDATED)) {
+        // 设置串口透传服务的有效数据长度（MTU-opcode-handle）
+        max_data_len = p_evt->params.att_mtu_effective - OPCODE_LENGTH - HANDLE_LENGTH;
+        NRF_LOG_INFO("Data len is set to 0x%X(%d)", max_data_len, max_data_len);
+    }
     NRF_LOG_DEBUG("ATT MTU exchange completed. central 0x%x peripheral 0x%x",
                   p_gatt->att_mtu_desired_central,
                   p_gatt->att_mtu_desired_periph);
@@ -91,7 +89,7 @@ static void gatt_init(void)
     ret_code_t err_code = nrf_ble_gatt_init(&m_gatt, gatt_evt_handler);
     // 检查函数返回的错误代码
     APP_ERROR_CHECK(err_code);
-    // 设置ATT MTU的大小,这里设置的值为247
+    // 设置ATT MTU的大小,这里设置的值为23
     err_code = nrf_ble_gatt_att_mtu_periph_set(&m_gatt, NRF_SDH_BLE_GATT_MAX_MTU_SIZE);
     APP_ERROR_CHECK(err_code);
 }
@@ -108,8 +106,14 @@ static void nrf_qwr_error_handler(uint32_t nrf_error)
 /** @brief 服务初始化，包含初始化排队写入模块和初始化应用程序使用的服务 */
 static void services_init(void)
 {
+    nrf_ble_qwr_init_t qwr_init = {0};
+    qwr_init.error_handler      = nrf_qwr_error_handler;
+    APP_ERROR_CHECK(nrf_ble_qwr_init(&m_qwr, &qwr_init));
+
+    ble_serv_init_fn func = 0;
     for (size_t i = 0; i < sizeof(serv_table) / sizeof(serv_table[0]); i++) {
-        serv_table[i]();
+        func = *serv_table[i];
+        func();
     }
 }
 
@@ -200,8 +204,9 @@ static void advertising_init(void)
     // Flag:一般可发现模式，不支持BR/EDR
     init.advdata.flags = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
     // UUID放到扫描响应里面
-    init.srdata.uuids_complete.uuid_cnt = sizeof(m_uuids) / sizeof(m_uuids[0]);
-    init.srdata.uuids_complete.p_uuids  = m_uuids;
+    init.srdata.uuids_complete.uuid_cnt = uuids_len;
+    init.srdata.uuids_complete.p_uuids  = (ble_uuid_t *)uuids[0];
+
     // 设置广播模式为快速广播
     init.config.ble_adv_fast_enabled = true;
     // 设置广播间隔和广播持续时间

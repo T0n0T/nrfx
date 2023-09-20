@@ -60,9 +60,9 @@ const static uint8_t key[] = {
     0xf6, 0x5f, 0x58, 0xec};
 
 #if defined(USING_RMC)
-char *build_msg_updata(char *device_id, gps_info_t info, int battry, int pulse_rate);
+char *build_msg_updata(char *device_id, gps_info_t info, int energyStatus, int correctlyWear);
 #elif defined(USING_LOC)
-char *build_msg_updata(char *device_id, struct LOC_GNSS *info, int battry, int pulse_rate);
+char *build_msg_updata(char *device_id, struct LOC_GNSS *info, int energyStatus, int correctlyWear);
 #endif
 
 void mqtt_reset_thread(void *p);
@@ -72,7 +72,7 @@ void publish_handle(void)
     rt_pin_write(LED2, PIN_LOW);
     mqtt_error_t err = KAWAII_MQTT_SUCCESS_ERROR;
     // char *publish_data = build_msg_updata(DEVICE_ID, ec800x_get_gnss(), 99, g_blooddata.heart);
-    char *publish_data = build_msg_updata(DEVICE_ID, ec800x_get_gnss(), 99, 78);
+    char *publish_data = build_msg_updata(DEVICE_ID, ec800x_get_gnss(), 1, 1);
     if (sm4_flag) {
         pdata origin_mqtt      = {rt_strlen(publish_data), (uint8_t *)publish_data};
         ciphertext cipher_mqtt = ccm3310_sm4_encrypt(sm4_id, origin_mqtt);
@@ -293,7 +293,7 @@ void mqtt_reset_thread(void *p)
 }
 
 #if defined(USING_RMC)
-char *build_msg_updata(char *device_id, gps_info_t info, int battry, int pulse_rate)
+char *build_msg_updata(char *device_id, gps_info_t info, int energyStatus, int correctlyWear)
 {
     cJSON *root, *body;
     char *out;
@@ -309,14 +309,14 @@ char *build_msg_updata(char *device_id, gps_info_t info, int battry, int pulse_r
     cJSON_AddNumberToObject(body, "routePointLat", info->coord.location.latitude.value);
     // cJSON_AddNumberToObject(body, "routePointEle", strtod(info->longitude, NULL));
     cJSON_AddNumberToObject(body, "routePointEle", 0);
-    cJSON_AddNumberToObject(body, "batteryLevel", battry);
-    cJSON_AddNumberToObject(body, "pulseRate", pulse_rate);
+    cJSON_AddNumberToObject(body, "energyStatus", energyStatus);
+    cJSON_AddNumberToObject(body, "correctlyWear", correctlyWear);
     out = cJSON_Print(root);
     cJSON_Delete(root);
     return out;
 }
 #elif defined(USING_LOC)
-char *build_msg_updata(char *device_id, struct LOC_GNSS *info, int battry, int pulse_rate)
+char *build_msg_updata(char *device_id, struct LOC_GNSS *info, int energyStatus, int correctlyWear)
 {
     cJSON *root, *body;
     char *out;
@@ -332,8 +332,8 @@ char *build_msg_updata(char *device_id, struct LOC_GNSS *info, int battry, int p
     cJSON_AddNumberToObject(body, "routePointLat", strtod(info->latitude, NULL));
     // cJSON_AddNumberToObject(body, "routePointEle", strtod(info->longitude, NULL));
     cJSON_AddNumberToObject(body, "routePointEle", 0);
-    cJSON_AddNumberToObject(body, "batteryLevel", battry);
-    cJSON_AddNumberToObject(body, "pulseRate", pulse_rate);
+    cJSON_AddNumberToObject(body, "energyStatus", energyStatus);
+    cJSON_AddNumberToObject(body, "correctlyWear", correctlyWear);
     out = cJSON_Print(root);
     cJSON_Delete(root);
     return out;

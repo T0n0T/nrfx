@@ -10,18 +10,18 @@
  */
 #include "rtthread.h"
 #include "nrf_pwr_mgmt.h"
-// ÒıÓÃµÄC¿âÍ·ÎÄ¼ş
+// å¼•ç”¨çš„Cåº“å¤´æ–‡ä»¶
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-// LogĞèÒªÒıÓÃµÄÍ·ÎÄ¼ş
+// Logéœ€è¦å¼•ç”¨çš„å¤´æ–‡ä»¶
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
 
 #include "ble_common.h"
 
-// DFUĞèÒªÒıÓÃµÄÍ·ÎÄ¼ş
+// DFUéœ€è¦å¼•ç”¨çš„å¤´æ–‡ä»¶
 #include "nrf_dfu_ble_svci_bond_sharing.h"
 #include "nrf_svci_async_function.h"
 #include "nrf_svci_async_handler.h"
@@ -32,7 +32,7 @@
 /**
  * @brief dfu func
  */
-// ¹Ø»ú×¼±¸´¦Àí³ÌĞò¡£ÔÚ¹Ø±Õ¹ı³ÌÖĞ£¬½«ÒÔ1ÃëµÄ¼ä¸ôµ÷ÓÃ´Ëº¯Êı£¬Ö±µ½º¯Êı·µ»Øtrue¡£µ±º¯Êı·µ»ØtrueÊ±£¬±íÊ¾Ó¦ÓÃ³ÌĞòÒÑ×¼±¸ºÃ¸´Î»ÎªDFUÄ£Ê½
+// å…³æœºå‡†å¤‡å¤„ç†ç¨‹åºã€‚åœ¨å…³é—­è¿‡ç¨‹ä¸­ï¼Œå°†ä»¥1ç§’çš„é—´éš”è°ƒç”¨æ­¤å‡½æ•°ï¼Œç›´åˆ°å‡½æ•°è¿”å›trueã€‚å½“å‡½æ•°è¿”å›trueæ—¶ï¼Œè¡¨ç¤ºåº”ç”¨ç¨‹åºå·²å‡†å¤‡å¥½å¤ä½ä¸ºDFUæ¨¡å¼
 static bool app_shutdown_handler(nrf_pwr_mgmt_evt_t event)
 {
     switch (event) {
@@ -73,27 +73,27 @@ static bool app_shutdown_handler(nrf_pwr_mgmt_evt_t event)
     return true;
 }
 
-// ×¢²áÓÅÏÈ¼¶Îª0µÄÓ¦ÓÃ³ÌĞò¹Ø±Õ´¦Àí³ÌĞò
+// æ³¨å†Œä¼˜å…ˆçº§ä¸º0çš„åº”ç”¨ç¨‹åºå…³é—­å¤„ç†ç¨‹åº
 NRF_PWR_MGMT_HANDLER_REGISTER(app_shutdown_handler, 0);
 
-// SoftDevice×´Ì¬¼àÊÓÕßÊÂ¼ş´¦Àíº¯Êı
+// SoftDeviceçŠ¶æ€ç›‘è§†è€…äº‹ä»¶å¤„ç†å‡½æ•°
 static void buttonless_dfu_sdh_state_observer(nrf_sdh_state_evt_t state, void *p_context)
 {
     if (state == NRF_SDH_EVT_STATE_DISABLED) {
-        // ±íÃ÷SoftdeviceÔÚ¸´Î»Ö®Ç°ÒÑ¾­½ûÓÃ£¬¸æÖ®bootloaderÆô¶¯Ê±Ó¦Ìø¹ıCRC
+        // è¡¨æ˜Softdeviceåœ¨å¤ä½ä¹‹å‰å·²ç»ç¦ç”¨ï¼Œå‘Šä¹‹bootloaderå¯åŠ¨æ—¶åº”è·³è¿‡CRC
         nrf_power_gpregret2_set(BOOTLOADER_DFU_SKIP_CRC);
 
-        // ½øÈësystem offÄ£Ê½
+        // è¿›å…¥system offæ¨¡å¼
         nrf_pwr_mgmt_shutdown(NRF_PWR_MGMT_SHUTDOWN_GOTO_SYSOFF);
     }
 }
 
-// ×¢²áSoftDevice×´Ì¬¼àÊÓÕß£¬ÓÃÓÚSoftDevice×´Ì¬¸Ä±ä»òÕß¼´½«¸Ä±äÊ±½ÓÊÕSoftDeviceÊÂ¼ş
+// æ³¨å†ŒSoftDeviceçŠ¶æ€ç›‘è§†è€…ï¼Œç”¨äºSoftDeviceçŠ¶æ€æ”¹å˜æˆ–è€…å³å°†æ”¹å˜æ—¶æ¥æ”¶SoftDeviceäº‹ä»¶
 NRF_SDH_STATE_OBSERVER(m_buttonless_dfu_state_obs, 0) =
     {
         .handler = buttonless_dfu_sdh_state_observer};
 
-// »ñÈ¡¹ã²¥Ä£Ê½¡¢¼ä¸ôºÍ³¬Ê±Ê±¼ä
+// è·å–å¹¿æ’­æ¨¡å¼ã€é—´éš”å’Œè¶…æ—¶æ—¶é—´
 static void advertising_config_get(ble_adv_modes_config_t *p_config)
 {
     memset(p_config, 0, sizeof(ble_adv_modes_config_t));
@@ -103,11 +103,11 @@ static void advertising_config_get(ble_adv_modes_config_t *p_config)
     p_config->ble_adv_fast_timeout  = APP_ADV_DURATION;
 }
 
-// ¶Ï¿ªµ±Ç°Á¬½Ó£¬Éè±¸×¼±¸½øÈëbootloaderÖ®Ç°£¬ĞèÒªÏÈ¶Ï¿ªÁ¬½Ó
+// æ–­å¼€å½“å‰è¿æ¥ï¼Œè®¾å¤‡å‡†å¤‡è¿›å…¥bootloaderä¹‹å‰ï¼Œéœ€è¦å…ˆæ–­å¼€è¿æ¥
 static void disconnect(uint16_t conn_handle, void *p_context)
 {
     UNUSED_PARAMETER(p_context);
-    // ¶Ï¿ªµ±Ç°Á¬½Ó
+    // æ–­å¼€å½“å‰è¿æ¥
     ret_code_t err_code = sd_ble_gap_disconnect(conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
     if (err_code != NRF_SUCCESS) {
         NRF_LOG_WARNING("Failed to disconnect connection. Connection handle: %d Error: %d", conn_handle, err_code);
@@ -116,41 +116,41 @@ static void disconnect(uint16_t conn_handle, void *p_context)
     }
 }
 
-// DFUÊÂ¼ş´¦Àíº¯Êı¡£Èç¹ûĞèÒªÔÚDFUÊÂ¼şÖĞÖ´ĞĞ²Ù×÷£¬¿ÉÒÔÔÚÏàÓ¦µÄÊÂ¼şÀïÃæ¼ÓÈë´¦Àí´úÂë
+// DFUäº‹ä»¶å¤„ç†å‡½æ•°ã€‚å¦‚æœéœ€è¦åœ¨DFUäº‹ä»¶ä¸­æ‰§è¡Œæ“ä½œï¼Œå¯ä»¥åœ¨ç›¸åº”çš„äº‹ä»¶é‡Œé¢åŠ å…¥å¤„ç†ä»£ç 
 static void ble_dfu_evt_handler(ble_dfu_buttonless_evt_type_t event)
 {
     switch (event) {
-        case BLE_DFU_EVT_BOOTLOADER_ENTER_PREPARE: // ¸ÃÊÂ¼şÖ¸Ê¾Éè±¸ÕıÔÚ×¼±¸½øÈëbootloader
+        case BLE_DFU_EVT_BOOTLOADER_ENTER_PREPARE: // è¯¥äº‹ä»¶æŒ‡ç¤ºè®¾å¤‡æ­£åœ¨å‡†å¤‡è¿›å…¥bootloader
         {
             NRF_LOG_INFO("Device is preparing to enter bootloader mode.");
 
-            // ×èÖ¹Éè±¸ÔÚ¶Ï¿ªÁ¬½ÓÊ±¹ã²¥
+            // é˜»æ­¢è®¾å¤‡åœ¨æ–­å¼€è¿æ¥æ—¶å¹¿æ’­
             ble_adv_modes_config_t config;
             advertising_config_get(&config);
-            // Á¬½Ó¶Ï¿ªºóÉè±¸²»×Ô¶¯½øĞĞ¹ã²¥
+            // è¿æ¥æ–­å¼€åè®¾å¤‡ä¸è‡ªåŠ¨è¿›è¡Œå¹¿æ’­
             config.ble_adv_on_disconnect_disabled = true;
-            // ĞŞ¸Ä¹ã²¥ÅäÖÃ
+            // ä¿®æ”¹å¹¿æ’­é…ç½®
             ble_advertising_modes_config_set(&m_advertising, &config);
 
-            // ¶Ï¿ªµ±Ç°ÒÑ¾­Á¬½ÓµÄËùÓĞÆäËû°ó¶¨Éè±¸¡£ÔÚÉè±¸¹Ì¼ş¸üĞÂ³É¹¦£¨»òÖĞÖ¹£©ºó£¬ĞèÒªÔÚÆô¶¯Ê±½ÓÊÕ·şÎñ¸ü¸ÄÖ¸Ê¾
+            // æ–­å¼€å½“å‰å·²ç»è¿æ¥çš„æ‰€æœ‰å…¶ä»–ç»‘å®šè®¾å¤‡ã€‚åœ¨è®¾å¤‡å›ºä»¶æ›´æ–°æˆåŠŸï¼ˆæˆ–ä¸­æ­¢ï¼‰åï¼Œéœ€è¦åœ¨å¯åŠ¨æ—¶æ¥æ”¶æœåŠ¡æ›´æ”¹æŒ‡ç¤º
             uint32_t conn_count = ble_conn_state_for_each_connected(disconnect, NULL);
             NRF_LOG_INFO("Disconnected %d links.", conn_count);
             break;
         }
 
-        case BLE_DFU_EVT_BOOTLOADER_ENTER: // ¸ÃÊÂ¼şÖ¸Ê¾º¯Êı·µ»ØºóÉè±¸¼´½øÈëbootloader
-            // Èç¹ûÓ¦ÓÃ³ÌĞòÓĞÊı¾İĞèÒª±£´æµ½Flash£¬Í¨¹ıapp_shutdown_handler·µ»ØflaseÒÔÑÓ³Ù¸´Î»£¬´Ó¶ø±£Ö¤Êı¾İÕıÈ·Ğ´Èëµ½Flash
+        case BLE_DFU_EVT_BOOTLOADER_ENTER: // è¯¥äº‹ä»¶æŒ‡ç¤ºå‡½æ•°è¿”å›åè®¾å¤‡å³è¿›å…¥bootloader
+            // å¦‚æœåº”ç”¨ç¨‹åºæœ‰æ•°æ®éœ€è¦ä¿å­˜åˆ°Flashï¼Œé€šè¿‡app_shutdown_handlerè¿”å›flaseä»¥å»¶è¿Ÿå¤ä½ï¼Œä»è€Œä¿è¯æ•°æ®æ­£ç¡®å†™å…¥åˆ°Flash
             NRF_LOG_INFO("Device will enter bootloader mode.");
             break;
 
-        case BLE_DFU_EVT_BOOTLOADER_ENTER_FAILED: // ¸ÃÊÂ¼şÖ¸Ê¾½øÈëbootloaderÊ§°Ü
+        case BLE_DFU_EVT_BOOTLOADER_ENTER_FAILED: // è¯¥äº‹ä»¶æŒ‡ç¤ºè¿›å…¥bootloaderå¤±è´¥
             NRF_LOG_ERROR("Request to enter bootloader mode failed asynchroneously.");
-            // ½øÈëbootloaderÊ§°Ü£¬Ó¦ÓÃ³ÌĞòĞèÒª²ÉÈ¡¾ÀÕı´ëÊ©À´´¦ÀíÎÊÌâ£¬ÈçÊ¹ÓÃAPP_ERROR_CHECK¸´Î»Éè±¸
+            // è¿›å…¥bootloaderå¤±è´¥ï¼Œåº”ç”¨ç¨‹åºéœ€è¦é‡‡å–çº æ­£æªæ–½æ¥å¤„ç†é—®é¢˜ï¼Œå¦‚ä½¿ç”¨APP_ERROR_CHECKå¤ä½è®¾å¤‡
             break;
 
-        case BLE_DFU_EVT_RESPONSE_SEND_ERROR: // ¸ÃÊÂ¼şÖ¸Ê¾·¢ËÍÏìÓ¦Ê§°Ü
+        case BLE_DFU_EVT_RESPONSE_SEND_ERROR: // è¯¥äº‹ä»¶æŒ‡ç¤ºå‘é€å“åº”å¤±è´¥
             NRF_LOG_ERROR("Request to send a response to client failed.");
-            // ·¢ËÍÏìÓ¦Ê§°Ü£¬Ó¦ÓÃ³ÌĞòĞèÒª²ÉÈ¡¾ÀÕı´ëÊ©À´´¦ÀíÎÊÌâ£¬ÈçÊ¹ÓÃAPP_ERROR_CHECK¸´Î»Éè±¸
+            // å‘é€å“åº”å¤±è´¥ï¼Œåº”ç”¨ç¨‹åºéœ€è¦é‡‡å–çº æ­£æªæ–½æ¥å¤„ç†é—®é¢˜ï¼Œå¦‚ä½¿ç”¨APP_ERROR_CHECKå¤ä½è®¾å¤‡
             APP_ERROR_CHECK(false);
             break;
 
@@ -160,15 +160,10 @@ static void ble_dfu_evt_handler(ble_dfu_buttonless_evt_type_t event)
     }
 }
 
-static void services_init(void)
+static void service_init(void)
 {
     ble_dfu_buttonless_init_t dfus_init = {0};
     dfus_init.evt_handler               = ble_dfu_evt_handler;
     APP_ERROR_CHECK(ble_dfu_buttonless_init(&dfus_init));
 }
-
-struct ble_service ble_app_dfu = {
-    .ble_uuid.uuid      = 0,
-    .ble_uuid.type      = 0,
-    .ble_serv_init_func = services_init,
-}
+ble_serv_init_fn ble_app_dfu_init = service_init;

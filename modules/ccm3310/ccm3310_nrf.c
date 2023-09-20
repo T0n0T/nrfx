@@ -30,7 +30,7 @@ struct rt_spi_device ccm;
 nrfx_spim_t instance = NRFX_SPIM_INSTANCE(1);
 uint8_t recv_buf[1024];
 
-void ccm3310_init(void)
+int ccm3310_init(void)
 {
     rt_pin_mode(POR, PIN_MODE_OUTPUT);
     rt_pin_mode(GINT0, PIN_MODE_OUTPUT);
@@ -48,6 +48,7 @@ void ccm3310_init(void)
     rt_pin_write(POR, PIN_LOW);
     rt_thread_mdelay(20);
     rt_pin_write(POR, PIN_HIGH);
+    return 0;
 }
 INIT_APP_EXPORT(ccm3310_init);
 

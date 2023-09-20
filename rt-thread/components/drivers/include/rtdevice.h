@@ -26,8 +26,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#define RT_DEVICE(device)            ((rt_device_t)device)
+extern rt_device_t jlink_dev;
+#define RT_DEVICE(device) ((rt_device_t)device)
 
 #ifdef RT_USING_RTC
 #include "drivers/rtc.h"
@@ -83,7 +83,6 @@ extern "C" {
 #include "drivers/sd.h"
 #include "drivers/sdio.h"
 #endif /* RT_USING_SDIO */
-
 
 #ifdef RT_USING_WDT
 #include "drivers/watchdog.h"

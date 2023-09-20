@@ -9,8 +9,9 @@
  *
  */
 #include "sdk_common.h"
-
 #include "ble_common.h"
+#include "rtthread.h"
+#include "rtdevice.h"
 #if NRF_MODULE_ENABLED(BLE_LOG)
 #include "ble_app_log.h"
 
@@ -21,122 +22,97 @@
 #include "ble_srv_common.h"
 #include "nrf_log.h"
 
-#define UART_TX_BUF_SIZE        256                        // ´®¿Ú·¢ËÍ»º´æ´óĞ¡£¨×Ö½ÚÊı£©
-#define UART_RX_BUF_SIZE        256                        // ´®¿Ú½ÓÊÕ»º´æ´óĞ¡£¨×Ö½ÚÊı£©
-#define UARTS_SERVICE_UUID_TYPE BLE_UUID_TYPE_VENDOR_BEGIN // ´®¿ÚÍ¸´«·şÎñUUIDÀàĞÍ£º³§ÉÌ×Ô¶¨ÒåUUID
+#define UART_TX_BUF_SIZE      256                        // æ—¥å¿—å‘é€ç¼“å­˜å¤§å°ï¼ˆå­—èŠ‚æ•°ï¼‰
+#define UART_RX_BUF_SIZE      256                        // æ¥æ”¶ç¼“å­˜å¤§å°ï¼ˆå­—èŠ‚æ•°ï¼‰
+#define LOG_SERVICE_UUID_TYPE BLE_UUID_TYPE_VENDOR_BEGIN // æ—¥å¿—é€ä¼ æœåŠ¡UUIDç±»å‹ï¼šå‚å•†è‡ªå®šä¹‰UUID
 
-BLE_UARTS_DEF(m_uarts, NRF_SDH_BLE_TOTAL_LINK_COUNT); // ¶¨ÒåÃû³ÆÎªm_uartsµÄ´®¿ÚÍ¸´«·şÎñÊµÀı
+BLE_LOG_DEF(m_log, NRF_SDH_BLE_TOTAL_LINK_COUNT); // å®šä¹‰åç§°ä¸ºm_logçš„æ—¥å¿—é€ä¼ æœåŠ¡å®ä¾‹
 
-// ·¢ËÍµÄ×î´óÊı¾İ³¤¶È
-static uint16_t m_ble_uarts_max_data_len = BLE_GATT_ATT_MTU_DEFAULT - 3;
-static bool uart_enabled                 = false;
-// ¶¨Òå´®¿ÚÍ¸´«·şÎñUUIDÁĞ±í
-static ble_uuid_t m_adv_uuids[] =
-    {
-        {BLE_UUID_UARTS_SERVICE, UARTS_SERVICE_UUID_TYPE}};
+// è“ç‰™æ—¥å¿—åˆå§‹åŒ–æƒ…å†µ
+static bool log_enabled = false;
+static struct rt_ringbuffer log_ringbuffer;
+static char log_buf[UART_TX_BUF_SIZE * 2];
 
-// ´®¿ÚÊÂ¼ş»Øµ÷º¯Êı£¬´®¿Ú³õÊ¼»¯Ê±×¢²á£¬¸Ãº¯ÊıÖĞÅĞ¶ÏÊÂ¼şÀàĞÍ²¢½øĞĞ´¦Àí
-// µ±½ÓÊÕµÄÊı¾İ³¤¶È´ïµ½Éè¶¨µÄ×î´óÖµ»òÕß½ÓÊÕµ½»»ĞĞ·ûºó£¬ÔòÈÏÎªÒ»°üÊı¾İ½ÓÊÕÍê³É£¬Ö®ºó½«½ÓÊÕµÄÊı¾İ·¢ËÍ¸øÖ÷»ú
-void uart_event_handle(app_uart_evt_t *p_event)
+void rt_hw_console_output(const char *str)
 {
-    static uint8_t data_array[BLE_UARTS_MAX_DATA_LEN];
-    static uint8_t index = 0;
-    uint32_t err_code;
-    // ÅĞ¶ÏÊÂ¼şÀàĞÍ
-    switch (p_event->evt_type) {
-        case APP_UART_DATA_READY: // ´®¿Ú½ÓÊÕÊÂ¼ş
-            UNUSED_VARIABLE(app_uart_get(&data_array[index]));
-            index++;
-            // ½ÓÊÕ´®¿ÚÊı¾İ£¬µ±½ÓÊÕµÄÊı¾İ³¤¶È´ïµ½m_ble_uarts_max_data_len»òÕß½ÓÊÕµ½»»ĞĞ·ûºóÈÏÎªÒ»°üÊı¾İ½ÓÊÕÍê³É
-            if ((data_array[index - 1] == '\n') ||
-                (data_array[index - 1] == '\r') ||
-                (index >= m_ble_uarts_max_data_len)) {
-                if (index > 1) {
-                    NRF_LOG_DEBUG("Ready to send data over BLE NUS");
-                    NRF_LOG_HEXDUMP_DEBUG(data_array, index);
-                    // ´®¿Ú½ÓÊÕµÄÊı¾İÊ¹ÓÃnotify·¢ËÍ¸øBLEÖ÷»ú
-                    do {
-                        uint16_t length = (uint16_t)index;
-                        err_code        = ble_uarts_data_send(&m_uarts, data_array, &length, m_conn_handle);
-                        if ((err_code != NRF_ERROR_INVALID_STATE) &&
-                            (err_code != NRF_ERROR_RESOURCES) &&
-                            (err_code != NRF_ERROR_NOT_FOUND)) {
-                            APP_ERROR_CHECK(err_code);
-                        }
-                    } while (err_code == NRF_ERROR_RESOURCES);
-                }
+    rt_ringbuffer_put_force(&log_ringbuffer, str, rt_strlen(str)); // å¾ªç¯æ›´æ–°æ—¥å¿—buff
+}
 
-                index = 0;
+void ble_log_flush_process(void)
+{
+    uint32_t err_code;
+    static uint8_t data_array[UART_TX_BUF_SIZE];
+    uint16_t data_len = 0;
+    uint8_t *index    = 0;
+    // åˆ¤æ–­æ—¥å¿—ä½¿èƒ½
+    if (log_enabled) {
+        // è·å–æ—¥å¿—æ•°æ®
+        data_len = rt_ringbuffer_get(&log_ringbuffer, data_array, UART_TX_BUF_SIZE); // è·å–æ—¥å¿—æ•°æ®
+        index    = &data_array[0];
+        // æ¥æ”¶æ—¥å¿—æ•°æ®ï¼Œå½“æ¥æ”¶çš„æ•°æ®é•¿åº¦è¾¾åˆ°max_data_lenæˆ–è€…æ¥æ”¶åˆ°æ¢è¡Œç¬¦åè®¤ä¸ºä¸€åŒ…æ•°æ®æ¥æ”¶å®Œæˆ
+        while (data_len > 0) {
+            if (data_len >= max_data_len) {
+                NRF_LOG_DEBUG("Ready to send data len %d over BLE LOG", max_data_len);
+                // æ—¥å¿—æ¥æ”¶çš„æ•°æ®ä½¿ç”¨notifyå‘é€ç»™BLEä¸»æœº
+                do {
+                    err_code = ble_log_data_send(&m_log, index, &max_data_len, m_conn_handle);
+                    if ((err_code != NRF_ERROR_INVALID_STATE) &&
+                        (err_code != NRF_ERROR_RESOURCES) &&
+                        (err_code != NRF_ERROR_NOT_FOUND)) {
+                        APP_ERROR_CHECK(err_code);
+                    }
+                } while (err_code == NRF_ERROR_RESOURCES);
+                index += max_data_len;
+                data_len -= max_data_len;
+            } else {
+                NRF_LOG_DEBUG("Ready to send data len %d over BLE LOG", data_len);
+                // æ—¥å¿—æ¥æ”¶çš„æ•°æ®ä½¿ç”¨notifyå‘é€ç»™BLEä¸»æœº
+                do {
+                    err_code = ble_log_data_send(&m_log, index, &data_len, m_conn_handle);
+                    if ((err_code != NRF_ERROR_INVALID_STATE) &&
+                        (err_code != NRF_ERROR_RESOURCES) &&
+                        (err_code != NRF_ERROR_NOT_FOUND)) {
+                        APP_ERROR_CHECK(err_code);
+                    }
+                } while (err_code == NRF_ERROR_RESOURCES);
+                break;
             }
-            break;
-        // Í¨Ñ¶´íÎóÊÂ¼ş£¬½øÈë´íÎó´¦Àí
-        case APP_UART_COMMUNICATION_ERROR:
-            APP_ERROR_HANDLER(p_event->data.error_communication);
-            break;
-        // FIFO´íÎóÊÂ¼ş£¬½øÈë´íÎó´¦Àí
-        case APP_UART_FIFO_ERROR:
-            APP_ERROR_HANDLER(p_event->data.error_code);
-            break;
-
-        default:
-            break;
+        }
     }
 }
 
-// ´®¿ÚÅäÖÃ
-void uart_config(void)
+// æ—¥å¿—é€ä¼ äº‹ä»¶å›è°ƒå‡½æ•°ï¼Œæ—¥å¿—åˆå§‹åŒ–æ—¶æ³¨å†Œ
+static void log_data_handler(ble_log_evt_t *p_evt)
 {
-    uint32_t err_code;
-    APP_ERROR_CHECK(err_code);
-}
-
-// ´®¿ÚÍ¸´«ÊÂ¼ş»Øµ÷º¯Êı£¬´®¿ÚÍ¸³ö·şÎñ³õÊ¼»¯Ê±×¢²á
-static void uarts_data_handler(ble_uarts_evt_t *p_evt)
-{
-    // Í¨ÖªÊ¹ÄÜºó²Å³õÊ¼»¯´®¿Ú
+    // é€šçŸ¥ä½¿èƒ½åæ‰åˆå§‹åŒ–æ—¥å¿—
     if (p_evt->type == BLE_NUS_EVT_COMM_STARTED) {
-        uart_reconfig();
+        log_enabled = true;
     }
-    // Í¨Öª¹Ø±Õºó£¬¹Ø±Õ´®¿Ú
+    // é€šçŸ¥å…³é—­åï¼Œå…³é—­æ—¥å¿—
     else if (p_evt->type == BLE_NUS_EVT_COMM_STOPPED) {
-        uart_reconfig();
+        log_enabled = false;
     }
-    // ÅĞ¶ÏÊÂ¼şÀàĞÍ:½ÓÊÕµ½ĞÂÊı¾İÊÂ¼ş
-    if ((p_evt->type == BLE_UARTS_EVT_RX_DATA) && (uart_enabled == true)) {
-        uint32_t err_code;
-        // ´®¿Ú´òÓ¡³ö½ÓÊÕµÄÊı¾İ
-        for (uint32_t i = 0; i < p_evt->params.rx_data.length; i++) {
-            do {
-                err_code = app_uart_put(p_evt->params.rx_data.p_data[i]);
-                if ((err_code != NRF_SUCCESS) && (err_code != NRF_ERROR_BUSY)) {
-                    NRF_LOG_ERROR("Failed receiving NUS message. Error 0x%x. ", err_code);
-                    APP_ERROR_CHECK(err_code);
-                }
-            } while (err_code == NRF_ERROR_BUSY);
-        }
-        if (p_evt->params.rx_data.p_data[p_evt->params.rx_data.length - 1] == '\r') {
-            while (app_uart_put('\n') == NRF_ERROR_BUSY)
-                ;
-        }
+    // åˆ¤æ–­äº‹ä»¶ç±»å‹:æ¥æ”¶åˆ°æ–°æ•°æ®äº‹ä»¶
+    if ((p_evt->type == BLE_LOG_EVT_RX_DATA) && (log_enabled == true)) {
+        // å¤„ç†æ¥æ”¶çš„æ•°æ®
     }
-    // ÅĞ¶ÏÊÂ¼şÀàĞÍ:·¢ËÍ¾ÍĞ÷ÊÂ¼ş£¬¸ÃÊÂ¼şÔÚºóÃæµÄÊÔÑé»áÓÃµ½£¬µ±Ç°ÎÒÃÇÔÚ¸ÃÊÂ¼şÖĞ·­×ªÖ¸Ê¾µÆD4µÄ×´Ì¬£¬Ö¸Ê¾¸ÃÊÂ¼şµÄ²úÉú
-    if (p_evt->type == BLE_UARTS_EVT_TX_RDY) {
-        nrf_gpio_pin_toggle(LED_4);
+    // åˆ¤æ–­äº‹ä»¶ç±»å‹:å‘é€å°±ç»ªäº‹ä»¶ï¼Œè¯¥äº‹ä»¶åœ¨åé¢çš„è¯•éªŒä¼šç”¨åˆ°ï¼Œå½“å‰æˆ‘ä»¬åœ¨è¯¥äº‹ä»¶ä¸­ç¿»è½¬æŒ‡ç¤ºç¯D4çš„çŠ¶æ€ï¼ŒæŒ‡ç¤ºè¯¥äº‹ä»¶çš„äº§ç”Ÿ
+    if (p_evt->type == BLE_LOG_EVT_TX_RDY) {
     }
 }
 
-#define BLE_UARTS_MAX_RX_CHAR_LEN BLE_UARTS_MAX_DATA_LEN // RXÌØÕ÷×î´ó³¤¶È£¨×Ö½ÚÊı£©
-#define BLE_UARTS_MAX_TX_CHAR_LEN BLE_UARTS_MAX_DATA_LEN // TXÌØÕ÷×î´ó³¤¶È£¨×Ö½ÚÊı£©
+#define BLE_LOG_MAX_RX_CHAR_LEN BLE_LOG_MAX_DATA_LEN // RXç‰¹å¾æœ€å¤§é•¿åº¦ï¼ˆå­—èŠ‚æ•°ï¼‰
+#define BLE_LOG_MAX_TX_CHAR_LEN BLE_LOG_MAX_DATA_LEN // TXç‰¹å¾æœ€å¤§é•¿åº¦ï¼ˆå­—èŠ‚æ•°ï¼‰
 
-static void on_connect(ble_uarts_t *p_uarts, ble_evt_t const *p_ble_evt)
+static void on_connect(ble_log_t *p_log, ble_evt_t const *p_ble_evt)
 {
     ret_code_t err_code;
-    ble_uarts_evt_t evt;
+    ble_log_evt_t evt;
     ble_gatts_value_t gatts_val;
     uint8_t cccd_value[2];
-    ble_uarts_client_context_t *p_client = NULL;
+    ble_log_client_context_t *p_client = NULL;
 
-    err_code = blcm_link_ctx_get(p_uarts->p_link_ctx_storage,
+    err_code = blcm_link_ctx_get(p_log->p_link_ctx_storage,
                                  p_ble_evt->evt.gap_evt.conn_handle,
                                  (void *)&p_client);
     if (err_code != NRF_SUCCESS) {
@@ -151,37 +127,37 @@ static void on_connect(ble_uarts_t *p_uarts, ble_evt_t const *p_ble_evt)
     gatts_val.offset  = 0;
 
     err_code = sd_ble_gatts_value_get(p_ble_evt->evt.gap_evt.conn_handle,
-                                      p_uarts->rx_handles.cccd_handle,
+                                      p_log->rx_handles.cccd_handle,
                                       &gatts_val);
 
     if ((err_code == NRF_SUCCESS) &&
-        (p_uarts->data_handler != NULL) &&
+        (p_log->data_handler != NULL) &&
         ble_srv_is_notification_enabled(gatts_val.p_value)) {
         if (p_client != NULL) {
             p_client->is_notification_enabled = true;
         }
 
-        memset(&evt, 0, sizeof(ble_uarts_evt_t));
+        memset(&evt, 0, sizeof(ble_log_evt_t));
         evt.type        = BLE_NUS_EVT_COMM_STARTED;
-        evt.p_uarts     = p_uarts;
+        evt.p_log       = p_log;
         evt.conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
         evt.p_link_ctx  = p_client;
 
-        p_uarts->data_handler(&evt);
+        p_log->data_handler(&evt);
     }
 }
 
-// SoftDeviceÌá½»µÄ"write"ÊÂ¼ş´¦Àíº¯Êı
-static void on_write(ble_uarts_t *p_uarts, ble_evt_t const *p_ble_evt)
+// SoftDeviceæäº¤çš„ä¸»æœº"write"äº‹ä»¶å¤„ç†å‡½æ•°
+static void on_write(ble_log_t *p_log, ble_evt_t const *p_ble_evt)
 {
     ret_code_t err_code;
-    // ¶¨ÒåÒ»¸ö´®¿ÚÍ¸´«ÊÂ¼ş½á¹¹Ìå±äÁ¿£¬ÓÃÓÚÖ´ĞĞ»Øµ÷Ê±´«µİ²ÎÊı
-    ble_uarts_evt_t evt;
-    ble_uarts_client_context_t *p_client;
-    // ¶¨ÒåwriteÊÂ¼ş½á¹¹ÌåÖ¸Õë²¢Ö¸ÏòGATTÊÂ¼şÖĞµÄwirite
+    // å®šä¹‰ä¸€ä¸ªæ—¥å¿—é€ä¼ äº‹ä»¶ç»“æ„ä½“å˜é‡ï¼Œç”¨äºæ‰§è¡Œå›è°ƒæ—¶ä¼ é€’å‚æ•°
+    ble_log_evt_t evt;
+    ble_log_client_context_t *p_client;
+    // å®šä¹‰writeäº‹ä»¶ç»“æ„ä½“æŒ‡é’ˆå¹¶æŒ‡å‘GATTäº‹ä»¶ä¸­çš„wirite
     ble_gatts_evt_write_t const *p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
 
-    err_code = blcm_link_ctx_get(p_uarts->p_link_ctx_storage,
+    err_code = blcm_link_ctx_get(p_log->p_link_ctx_storage,
                                  p_ble_evt->evt.gatts_evt.conn_handle,
                                  (void *)&p_client);
     if (err_code != NRF_SUCCESS) {
@@ -189,17 +165,18 @@ static void on_write(ble_uarts_t *p_uarts, ble_evt_t const *p_ble_evt)
                       p_ble_evt->evt.gatts_evt.conn_handle);
     }
 
-    // ÇåÁãevt
-    memset(&evt, 0, sizeof(ble_uarts_evt_t));
-    // Ö¸Ïò´®¿ÚÍ¸´«·şÎñÊµÀı
-    evt.p_uarts = p_uarts;
-    // ÉèÖÃÁ¬½Ó¾ä±ú
+    // æ¸…é›¶evt
+    memset(&evt, 0, sizeof(ble_log_evt_t));
+    // æŒ‡å‘æ—¥å¿—é€ä¼ æœåŠ¡å®ä¾‹
+    evt.p_log = p_log;
+    // è®¾ç½®è¿æ¥å¥æŸ„
     evt.conn_handle = p_ble_evt->evt.gatts_evt.conn_handle;
     evt.p_link_ctx  = p_client;
-    // Ğ´CCCD£¬²¢ÇÒ³¤¶ÈµÈÓÚ2
-    if ((p_evt_write->handle == p_uarts->tx_handles.cccd_handle) &&
+    // æ˜¯å¦æ˜¯å†™ç”¨æˆ·é…ç½®
+    if ((p_evt_write->handle == p_log->tx_handles.cccd_handle) &&
         (p_evt_write->len == 2)) {
         if (p_client != NULL) {
+            // åˆ¤æ–­ä¸»æœºæ˜¯å¦å·²ç»å¯¹ CCCD æè¿°ç¬¦è¿›è¡Œäº†ä½¿èƒ½, å¹¶ä¸”é•¿åº¦ç­‰äº2ï¼Œæ˜¯åˆ™éœ€è¦é…ç½®å®¢æˆ·ç«¯ç”¨æˆ·é…ç½®
             if (ble_srv_is_notification_enabled(p_evt_write->data)) {
                 p_client->is_notification_enabled = true;
                 evt.type                          = BLE_NUS_EVT_COMM_STARTED;
@@ -208,37 +185,37 @@ static void on_write(ble_uarts_t *p_uarts, ble_evt_t const *p_ble_evt)
                 evt.type                          = BLE_NUS_EVT_COMM_STOPPED;
             }
 
-            if (p_uarts->data_handler != NULL) {
-                p_uarts->data_handler(&evt);
+            if (p_log->data_handler != NULL) {
+                p_log->data_handler(&evt);
             }
         }
     }
-    // Ğ´RXÌØÕ÷Öµ
-    else if ((p_evt_write->handle == p_uarts->rx_handles.value_handle) &&
-             (p_uarts->data_handler != NULL)) {
-        // ÉèÖÃÊÂ¼şÀàĞÍ
-        evt.type = BLE_UARTS_EVT_RX_DATA;
-        // ÉèÖÃÊı¾İ³¤¶È
+    // åˆ¤æ–­æ˜¯ä¸»æœºå†™å¥æŸ„ï¼Œå†™RXç‰¹å¾å€¼
+    else if ((p_evt_write->handle == p_log->rx_handles.value_handle) &&
+             (p_log->data_handler != NULL)) {
+        // è®¾ç½®äº‹ä»¶ç±»å‹
+        evt.type = BLE_LOG_EVT_RX_DATA;
+        // è®¾ç½®æ•°æ®é•¿åº¦
         evt.params.rx_data.p_data = p_evt_write->data;
-        // ÉèÖÃÊı¾İ³¤¶È
+        // è®¾ç½®æ•°æ®é•¿åº¦
         evt.params.rx_data.length = p_evt_write->len;
-        // Ö´ĞĞ»Øµ÷
-        p_uarts->data_handler(&evt);
+        // æ‰§è¡Œå›è°ƒ
+        p_log->data_handler(&evt);
     } else {
-        // ¸ÃÊÂ¼şºÍ´®¿ÚÍ¸´«·şÎñÎŞ¹Ø£¬ºöÂÔ
+        // è¯¥äº‹ä»¶å’Œæ—¥å¿—é€ä¼ æœåŠ¡æ— å…³ï¼Œå¿½ç•¥
     }
 }
 
-// SoftDeviceÌá½»µÄ"BLE_GATTS_EVT_HVN_TX_COMPLETE"ÊÂ¼ş´¦Àíº¯Êı
-static void on_hvx_tx_complete(ble_uarts_t *p_uarts, ble_evt_t const *p_ble_evt)
+// SoftDeviceæäº¤çš„"BLE_GATTS_EVT_HVN_TX_COMPLETE"äº‹ä»¶å¤„ç†å‡½æ•°ï¼Œè¡¨ç¤ºå·²ç»å‘é€æ•°æ®
+static void on_hvx_tx_complete(ble_log_t *p_log, ble_evt_t const *p_ble_evt)
 {
     ret_code_t err_code;
-    // ¶¨ÒåÒ»¸ö´®¿ÚÍ¸´«ÊÂ¼ş½á¹¹Ìå±äÁ¿evt£¬ÓÃÓÚÖ´ĞĞ»Øµ÷Ê±´«µİ²ÎÊı
-    ble_uarts_evt_t evt;
+    // å®šä¹‰ä¸€ä¸ªæ—¥å¿—é€ä¼ äº‹ä»¶ç»“æ„ä½“å˜é‡evtï¼Œç”¨äºæ‰§è¡Œå›è°ƒæ—¶ä¼ é€’å‚æ•°
+    ble_log_evt_t evt;
 
-    ble_uarts_client_context_t *p_client;
+    ble_log_client_context_t *p_client;
 
-    err_code = blcm_link_ctx_get(p_uarts->p_link_ctx_storage,
+    err_code = blcm_link_ctx_get(p_log->p_link_ctx_storage,
                                  p_ble_evt->evt.gatts_evt.conn_handle,
                                  (void *)&p_client);
     if (err_code != NRF_SUCCESS) {
@@ -246,46 +223,46 @@ static void on_hvx_tx_complete(ble_uarts_t *p_uarts, ble_evt_t const *p_ble_evt)
                       p_ble_evt->evt.gatts_evt.conn_handle);
     }
 
-    // Í¨ÖªÊ¹ÄÜµÄÇé¿öÏÂ²Å»áÖ´ĞĞ»Øµ÷
+    // é€šçŸ¥ä½¿èƒ½çš„æƒ…å†µä¸‹æ‰ä¼šæ‰§è¡Œå›è°ƒ
     if (p_client->is_notification_enabled) {
-        // ÇåÁãevt
-        memset(&evt, 0, sizeof(ble_uarts_evt_t));
-        // ÉèÖÃÊÂ¼şÀàĞÍ
-        evt.type = BLE_UARTS_EVT_TX_RDY;
-        // Ö¸Ïò´®¿ÚÍ¸´«·şÎñÊµÀı
-        evt.p_uarts = p_uarts;
-        // ÉèÖÃÁ¬½Ó¾ä±ú
+        // æ¸…é›¶evt
+        memset(&evt, 0, sizeof(ble_log_evt_t));
+        // è®¾ç½®äº‹ä»¶ç±»å‹
+        evt.type = BLE_LOG_EVT_TX_RDY;
+        // æŒ‡å‘æ—¥å¿—é€ä¼ æœåŠ¡å®ä¾‹
+        evt.p_log = p_log;
+        // è®¾ç½®è¿æ¥å¥æŸ„
         evt.conn_handle = p_ble_evt->evt.gatts_evt.conn_handle;
-        // Ö¸Ïòlink context
+        // æŒ‡å‘link context
         evt.p_link_ctx = p_client;
-        // Ö´ĞĞ»Øµ÷
-        p_uarts->data_handler(&evt);
+        // æ‰§è¡Œå›è°ƒ
+        p_log->data_handler(&evt);
     }
 }
 
-// ´®¿ÚÍ¸´«·şÎñBLEÊÂ¼ş¼àÊÓÕßµÄÊÂ¼ş»Øµ÷º¯Êı
-void ble_uarts_on_ble_evt(ble_evt_t const *p_ble_evt, void *p_context)
+// æ—¥å¿—é€ä¼ æœåŠ¡BLEäº‹ä»¶ç›‘è§†è€…çš„äº‹ä»¶å›è°ƒå‡½æ•°
+void ble_log_on_ble_evt(ble_evt_t const *p_ble_evt, void *p_context)
 {
-    // ¼ì²é²ÎÊıÊÇ·ñÓĞĞ§
+    // æ£€æŸ¥å‚æ•°æ˜¯å¦æœ‰æ•ˆ
     if ((p_context == NULL) || (p_ble_evt == NULL)) {
         return;
     }
-    // ¶¨ÒåÒ»¸ö´®¿ÚÍ¸´«½á¹¹ÌåÖ¸Õë²¢Ö¸Ïò´®¿ÚÍ¸´«½á¹¹Ìå
-    ble_uarts_t *p_uarts = (ble_uarts_t *)p_context;
-    // ÅĞ¶ÏÊÂ¼şÀàĞÍ
+    // å®šä¹‰ä¸€ä¸ªæ—¥å¿—é€ä¼ ç»“æ„ä½“æŒ‡é’ˆå¹¶æŒ‡å‘æ—¥å¿—é€ä¼ ç»“æ„ä½“
+    ble_log_t *p_log = (ble_log_t *)p_context;
+    // åˆ¤æ–­äº‹ä»¶ç±»å‹
     switch (p_ble_evt->header.evt_id) {
-        case BLE_GAP_EVT_CONNECTED: // Á¬½Ó½¨Á¢ÊÂ¼ş
-            on_connect(p_uarts, p_ble_evt);
+        case BLE_GAP_EVT_CONNECTED: // è¿æ¥å»ºç«‹äº‹ä»¶
+            on_connect(p_log, p_ble_evt);
             break;
 
-        case BLE_GATTS_EVT_WRITE: // Ğ´ÊÂ¼ş
-                                  // ´¦ÀíĞ´ÊÂ¼ş
-            on_write(p_uarts, p_ble_evt);
+        case BLE_GATTS_EVT_WRITE: // å†™äº‹ä»¶
+                                  // å¤„ç†å†™äº‹ä»¶
+            on_write(p_log, p_ble_evt);
             break;
 
-        case BLE_GATTS_EVT_HVN_TX_COMPLETE: // TX¾ÍĞ÷ÊÂ¼ş
-                                            // ´¦ÀíTX¾ÍĞ÷ÊÂ¼ş
-            on_hvx_tx_complete(p_uarts, p_ble_evt);
+        case BLE_GATTS_EVT_HVN_TX_COMPLETE: // softdeviceçš„TXå°±ç»ª
+                                            // å¤„ç†TXé˜Ÿåˆ—ä¸­çš„ä¿¡æ¯
+            on_hvx_tx_complete(p_log, p_ble_evt);
             break;
 
         default:
@@ -293,139 +270,142 @@ void ble_uarts_on_ble_evt(ble_evt_t const *p_ble_evt, void *p_context)
     }
 }
 
-// ³õÊ¼»¯´®¿ÚÍ¸´«·şÎñ
-uint32_t ble_uarts_init(ble_uarts_t *p_uarts, ble_uarts_init_t const *p_uarts_init)
+// åˆå§‹åŒ–æ—¥å¿—é€ä¼ æœåŠ¡
+uint32_t ble_log_init(ble_log_t *p_log, ble_log_init_t const *p_log_init)
 {
     ret_code_t err_code;
-    // ¶¨Òå16Î»UUID½á¹¹Ìå±äÁ¿
+    // å®šä¹‰16ä½UUIDç»“æ„ä½“å˜é‡
     ble_uuid_t ble_uuid;
-    // ¶¨Òå128Î»UUID½á¹¹Ìå±äÁ¿£¬²¢³õÊ¼»¯Îª´®¿ÚÍ¸´«·şÎñUUID»ùÊı
-    ble_uuid128_t nus_base_uuid = UARTS_BASE_UUID;
-    // ¶¨ÒåÌØÕ÷²ÎÊı½á¹¹Ìå±äÁ¿
+    // å®šä¹‰128ä½UUIDç»“æ„ä½“å˜é‡ï¼Œå¹¶åˆå§‹åŒ–ä¸ºæ—¥å¿—é€ä¼ æœåŠ¡UUIDåŸºæ•°
+    ble_uuid128_t nus_base_uuid = LOG_BASE_UUID;
+    // å®šä¹‰ç‰¹å¾å‚æ•°ç»“æ„ä½“å˜é‡
     ble_add_char_params_t add_char_params;
-    // ¼ì²éÖ¸ÕëÊÇ·ñÎªNULL
-    VERIFY_PARAM_NOT_NULL(p_uarts);
-    VERIFY_PARAM_NOT_NULL(p_uarts_init);
+    // æ£€æŸ¥æŒ‡é’ˆæ˜¯å¦ä¸ºNULL
+    VERIFY_PARAM_NOT_NULL(p_log);
+    VERIFY_PARAM_NOT_NULL(p_log_init);
 
-    // ¿½±´´®¿ÚÍ¸´«·şÎñ³õÊ¼»¯½á¹¹ÌåÖĞµÄÊÂ¼ş¾ä±ú
-    p_uarts->data_handler = p_uarts_init->data_handler;
+    // æ‹·è´æ—¥å¿—é€ä¼ æœåŠ¡åˆå§‹åŒ–ç»“æ„ä½“ä¸­çš„äº‹ä»¶å¥æŸ„
+    p_log->data_handler = p_log_init->data_handler;
 
-    // ½«×Ô¶¨ÒåUUID»ùÊıÌí¼Óµ½SoftDevice
-    err_code = sd_ble_uuid_vs_add(&nus_base_uuid, &p_uarts->uuid_type);
+    // å°†è‡ªå®šä¹‰UUIDåŸºæ•°æ·»åŠ åˆ°SoftDeviceï¼Œå¹¶è·å–uuid_type
+    err_code = sd_ble_uuid_vs_add(&nus_base_uuid, &p_log->uuid_type);
     VERIFY_SUCCESS(err_code);
-    // UUIDÀàĞÍºÍÊıÖµ¸³Öµ¸øble_uuid±äÁ¿
-    ble_uuid.type = p_uarts->uuid_type;
-    ble_uuid.uuid = BLE_UUID_UARTS_SERVICE;
+    // UUIDç±»å‹å’Œæ•°å€¼èµ‹å€¼ç»™ble_uuidå˜é‡
+    ble_uuid.type = p_log->uuid_type;
+    ble_uuid.uuid = BLE_UUID_LOG_SERVICE;
 
-    // Ìí¼Ó´®¿ÚÍ¸´«·şÎñ
+    // æ·»åŠ æ—¥å¿—é€ä¼ æœåŠ¡, è·å¾—å¥æŸ„
     err_code = sd_ble_gatts_service_add(BLE_GATTS_SRVC_TYPE_PRIMARY,
                                         &ble_uuid,
-                                        &p_uarts->service_handle);
+                                        &p_log->service_handle);
     VERIFY_SUCCESS(err_code);
-    /*---------------------ÒÔÏÂ´úÂëÌí¼ÓRXÌØÕ÷--------------------*/
-    // Ìí¼ÓRXÌØÕ÷
-    // ÅäÖÃ²ÎÊıÖ®Ç°ÏÈÇåÁãadd_char_params
+    /*---------------------ä»¥ä¸‹ä»£ç æ·»åŠ RXç‰¹å¾--------------------*/
+    // æ·»åŠ RXç‰¹å¾
+    // é…ç½®å‚æ•°ä¹‹å‰å…ˆæ¸…é›¶add_char_params
     memset(&add_char_params, 0, sizeof(add_char_params));
-    // RXÌØÕ÷µÄUUID
-    add_char_params.uuid = BLE_UUID_UARTS_RX_CHARACTERISTIC;
-    // RXÌØÕ÷µÄUUIDÀàĞÍ
-    add_char_params.uuid_type = p_uarts->uuid_type;
-    // ÉèÖÃRXÌØÕ÷ÖµµÄ×î´ó³¤¶È
-    add_char_params.max_len = BLE_UARTS_MAX_RX_CHAR_LEN;
-    // ÉèÖÃRXÌØÕ÷ÖµµÄ³õÊ¼³¤¶È
+    // RXç‰¹å¾çš„UUID
+    add_char_params.uuid = BLE_UUID_LOG_RX_CHARACTERISTIC;
+    // RXç‰¹å¾çš„UUIDç±»å‹
+    add_char_params.uuid_type = p_log->uuid_type;
+    // è®¾ç½®RXç‰¹å¾å€¼çš„æœ€å¤§é•¿åº¦
+    add_char_params.max_len = BLE_LOG_MAX_RX_CHAR_LEN;
+    // è®¾ç½®RXç‰¹å¾å€¼çš„åˆå§‹é•¿åº¦
     add_char_params.init_len = sizeof(uint8_t);
-    // ÉèÖÃRXµÄÌØÕ÷Öµ³¤¶ÈÎª¿É±ä³¤¶È
+    // è®¾ç½®RXçš„ç‰¹å¾å€¼é•¿åº¦ä¸ºå¯å˜é•¿åº¦
     add_char_params.is_var_len = true;
-    // ÉèÖÃRXÌØÕ÷µÄĞÔÖÊÖ§³ÖĞ´
+    // è®¾ç½®RXç‰¹å¾çš„æ€§è´¨æ”¯æŒå†™
     add_char_params.char_props.write = 1;
-    // ÉèÖÃRXÌØÕ÷µÄĞÔÖÊÖ§³ÖÎŞÏìÓ¦Ğ´
+    // è®¾ç½®RXç‰¹å¾çš„æ€§è´¨æ”¯æŒæ— å“åº”å†™
     add_char_params.char_props.write_wo_resp = 1;
-    // ÉèÖÃ¶Á/Ğ´RXÌØÕ÷ÖµµÄ°²È«ĞèÇó£ºÎŞ°²È«ĞÔ
+    // è®¾ç½®è¯»/å†™RXç‰¹å¾å€¼çš„å®‰å…¨éœ€æ±‚ï¼šæ— å®‰å…¨æ€§
     add_char_params.read_access  = SEC_OPEN;
     add_char_params.write_access = SEC_OPEN;
-    // Îª´®¿ÚÍ¸´«·şÎñÌí¼ÓRXÌØÕ÷
-    err_code = characteristic_add(p_uarts->service_handle, &add_char_params, &p_uarts->rx_handles);
-    // ¼ì²é·µ»ØµÄ´íÎó´úÂë
+    // ä¸ºæ—¥å¿—é€ä¼ æœåŠ¡æ·»åŠ RXç‰¹å¾
+    err_code = characteristic_add(p_log->service_handle, &add_char_params, &p_log->rx_handles);
+    // æ£€æŸ¥è¿”å›çš„é”™è¯¯ä»£ç 
     if (err_code != NRF_SUCCESS) {
         return err_code;
     }
-    /*---------------------Ìí¼ÓRXÌØÕ÷-END------------------------*/
+    /*---------------------æ·»åŠ RXç‰¹å¾-END------------------------*/
 
-    /*---------------------ÒÔÏÂ´úÂëÌí¼ÓTXÌØÕ÷--------------------*/
-    // Ìí¼ÓTXÌØÕ÷
-    // ÅäÖÃ²ÎÊıÖ®Ç°ÏÈÇåÁãadd_char_params
+    /*---------------------ä»¥ä¸‹ä»£ç æ·»åŠ TXç‰¹å¾--------------------*/
+    // æ·»åŠ TXç‰¹å¾
+    // é…ç½®å‚æ•°ä¹‹å‰å…ˆæ¸…é›¶add_char_params
     memset(&add_char_params, 0, sizeof(add_char_params));
-    // TXÌØÕ÷µÄUUID
-    add_char_params.uuid = BLE_UUID_UARTS_TX_CHARACTERISTIC;
-    // TXÌØÕ÷µÄUUIDÀàĞÍ
-    add_char_params.uuid_type = p_uarts->uuid_type;
-    // ÉèÖÃTXÌØÕ÷ÖµµÄ×î´ó³¤¶È
-    add_char_params.max_len = BLE_UARTS_MAX_TX_CHAR_LEN;
-    // ÉèÖÃTXÌØÕ÷ÖµµÄ³õÊ¼³¤¶È
+    // TXç‰¹å¾çš„UUID
+    add_char_params.uuid = BLE_UUID_LOG_TX_CHARACTERISTIC;
+    // TXç‰¹å¾çš„UUIDç±»å‹
+    add_char_params.uuid_type = p_log->uuid_type;
+    // è®¾ç½®TXç‰¹å¾å€¼çš„æœ€å¤§é•¿åº¦
+    add_char_params.max_len = BLE_LOG_MAX_TX_CHAR_LEN;
+    // è®¾ç½®TXç‰¹å¾å€¼çš„åˆå§‹é•¿åº¦
     add_char_params.init_len = sizeof(uint8_t);
-    // ÉèÖÃTXµÄÌØÕ÷Öµ³¤¶ÈÎª¿É±ä³¤¶È
+    // è®¾ç½®TXçš„ç‰¹å¾å€¼é•¿åº¦ä¸ºå¯å˜é•¿åº¦
     add_char_params.is_var_len = true;
-    // ÉèÖÃTXÌØÕ÷µÄĞÔÖÊ£ºÖ§³ÖÍ¨Öª
+    // è®¾ç½®TXç‰¹å¾çš„æ€§è´¨ï¼šæ”¯æŒé€šçŸ¥
     add_char_params.char_props.notify = 1;
-    // ÉèÖÃ¶Á/Ğ´RXÌØÕ÷ÖµµÄ°²È«ĞèÇó£ºÎŞ°²È«ĞÔ
+    // è®¾ç½®è¯»/å†™RXç‰¹å¾å€¼çš„å®‰å…¨éœ€æ±‚ï¼šæ— å®‰å…¨æ€§
     add_char_params.read_access       = SEC_OPEN;
     add_char_params.write_access      = SEC_OPEN;
     add_char_params.cccd_write_access = SEC_OPEN;
-    // Îª´®¿ÚÍ¸´«·şÎñÌí¼ÓTXÌØÕ÷
-    return characteristic_add(p_uarts->service_handle, &add_char_params, &p_uarts->tx_handles);
-    /*---------------------Ìí¼ÓTXÌØÕ÷-END------------------------*/
+    // ä¸ºæ—¥å¿—é€ä¼ æœåŠ¡æ·»åŠ TXç‰¹å¾
+    return characteristic_add(p_log->service_handle, &add_char_params, &p_log->tx_handles);
+    /*---------------------æ·»åŠ TXç‰¹å¾-END------------------------*/
 }
 
-uint32_t ble_uarts_data_send(ble_uarts_t *p_uarts,
-                             uint8_t *p_data,
-                             uint16_t *p_length,
-                             uint16_t conn_handle)
+uint32_t ble_log_data_send(ble_log_t *p_log,
+                           uint8_t *p_data,
+                           uint16_t *p_length,
+                           uint16_t conn_handle)
 {
     ret_code_t err_code;
     ble_gatts_hvx_params_t hvx_params;
-    ble_uarts_client_context_t *p_client;
-    // ÑéÖ¤p_uartsÃ»ÓĞÖ¸ÏòNULL
-    VERIFY_PARAM_NOT_NULL(p_uarts);
+    ble_log_client_context_t *p_client;
+    // éªŒè¯p_logæ²¡æœ‰æŒ‡å‘NULL
+    VERIFY_PARAM_NOT_NULL(p_log);
 
-    err_code = blcm_link_ctx_get(p_uarts->p_link_ctx_storage, conn_handle, (void *)&p_client);
+    err_code = blcm_link_ctx_get(p_log->p_link_ctx_storage, conn_handle, (void *)&p_client);
     VERIFY_SUCCESS(err_code);
 
-    // Èç¹ûÁ¬½Ó¾ä±úÎŞĞ§£¬±íÊ¾Ã»ÓĞºÍÖ÷»ú½¨Á¢Á¬½Ó£¬·µ»ØNRF_ERROR_NOT_FOUND
+    // å¦‚æœè¿æ¥å¥æŸ„æ— æ•ˆï¼Œè¡¨ç¤ºæ²¡æœ‰å’Œä¸»æœºå»ºç«‹è¿æ¥ï¼Œè¿”å›NRF_ERROR_NOT_FOUND
     if ((conn_handle == BLE_CONN_HANDLE_INVALID) || (p_client == NULL)) {
         return NRF_ERROR_NOT_FOUND;
     }
-    // Èç¹ûÍ¨ÖªÃ»ÓĞÊ¹ÄÜ£¬·µ»Ø×´Ì¬ÎŞĞ§µÄ´íÎó´úÂë
+    // å¦‚æœé€šçŸ¥æ²¡æœ‰ä½¿èƒ½ï¼Œè¿”å›çŠ¶æ€æ— æ•ˆçš„é”™è¯¯ä»£ç 
     if (!p_client->is_notification_enabled) {
         return NRF_ERROR_INVALID_STATE;
     }
-    // Èç¹ûÊı¾İ³¤¶È³¬ÏŞ£¬·µ»Ø²ÎÊıÎŞĞ§µÄ´íÎó´úÂë
-    if (*p_length > BLE_UARTS_MAX_DATA_LEN) {
+    // å¦‚æœæ•°æ®é•¿åº¦è¶…é™ï¼Œè¿”å›å‚æ•°æ— æ•ˆçš„é”™è¯¯ä»£ç 
+    if (*p_length > BLE_LOG_MAX_DATA_LEN) {
         return NRF_ERROR_INVALID_PARAM;
     }
-    // ÉèÖÃÖ®Ç°ÏÈÇåÁãhvx_params
+    // è®¾ç½®ä¹‹å‰å…ˆæ¸…é›¶hvx_params
     memset(&hvx_params, 0, sizeof(hvx_params));
-    // TXÌØÕ÷Öµ¾ä±ú
-    hvx_params.handle = p_uarts->tx_handles.value_handle;
-    // ·¢ËÍµÄÊı¾İ
+    // TXç‰¹å¾å€¼å¥æŸ„
+    hvx_params.handle = p_log->tx_handles.value_handle;
+    // å‘é€çš„æ•°æ®
     hvx_params.p_data = p_data;
-    // ·¢ËÍµÄÊı¾İ³¤¶È
+    // å‘é€çš„æ•°æ®é•¿åº¦
     hvx_params.p_len = p_length;
-    // ÀàĞÍÎªÍ¨Öª
+    // ç±»å‹ä¸ºé€šçŸ¥
     hvx_params.type = BLE_GATT_HVX_NOTIFICATION;
-    // ·¢ËÍTXÌØÕ÷ÖµÍ¨Öª
+    // å‘é€TXç‰¹å¾å€¼é€šçŸ¥
     return sd_ble_gatts_hvx(conn_handle, &hvx_params);
 }
 
-static void services_init(void)
+static const void service_init(void)
 {
-    ble_uarts_init_t uarts_init = {0};
-    uarts_init.data_handler     = uarts_data_handler;
-    APP_ERROR_CHECK(ble_uarts_init(&m_uarts, &uarts_init));
+    rt_ringbuffer_init(&log_ringbuffer, log_buf, sizeof(log_buf));
+
+    ble_log_init_t log_init = {0};
+    log_init.data_handler   = log_data_handler;
+    APP_ERROR_CHECK(ble_log_init(&m_log, &log_init));
 }
 
-ble_uuid_t ble_app_log = {
-    .uuid = BLE_UUID_UARTS_SERVICE,
-    .type = UARTS_SERVICE_UUID_TYPE,
-}
+ble_serv_init_fn ble_app_log_init = service_init;
+ble_uuid_t ble_app_log            = {
+               .uuid = BLE_UUID_LOG_SERVICE,
+               .type = LOG_SERVICE_UUID_TYPE,
+};
 
-#endif // NRF_MODULE_ENABLED(BLE_DIS)
+#endif

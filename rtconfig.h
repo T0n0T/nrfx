@@ -74,7 +74,8 @@
 #define MSH_USING_BUILT_IN_COMMANDS
 #define FINSH_USING_DESCRIPTION
 #define FINSH_ARG_MAX 20
-
+// #define RT_USING_ULOG
+// #define ULOG_USING_COLOR
 /* DFS: device virtual file system */
 
 #define RT_USING_DFS

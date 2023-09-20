@@ -25,6 +25,9 @@
             "path": "applications/mnt.c"
           },
           {
+            "path": "applications/rt_kprintf.c"
+          },
+          {
             "path": "nrf_sdk/external/cJSON/cJSON.c"
           }
         ],
@@ -766,16 +769,10 @@
         "name": "nrf_services",
         "files": [
           {
-            "path": "nrf_sdk/rtthread_adapter/ble_app_hrs.c"
-          },
-          {
             "path": "services/ble_common/ble_common.c"
           },
           {
             "path": "services/ble_dfu/ble_app_dfu.c"
-          },
-          {
-            "path": "services/ble_dfu/dfu.c"
           },
           {
             "path": "services/ble_log/ble_app_log.c"
@@ -857,6 +854,9 @@
         "files": [
           {
             "path": "rt-thread/components/utilities/resource/resource_id.c"
+          },
+          {
+            "path": "rt-thread/components/utilities/ulog/ulog.c"
           }
         ],
         "folders": []
@@ -885,7 +885,9 @@
         "<virtual_root>/nrf_ble/ble_conn_params_rtt.c",
         "<virtual_root>/max30102",
         "<virtual_root>/nrf_services/dfu.c",
-        "<virtual_root>/Fal"
+        "<virtual_root>/Fal",
+        "<virtual_root>/nrf_services",
+        "<virtual_root>/Utilities/ulog.c"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -1011,7 +1013,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": ""
+        "otherCmds": "ip 192.168.1.2"
       },
       "uploadConfigMap": {},
       "custom_dep": {
@@ -1113,7 +1115,9 @@
           "nrf_sdk/components/libraries/timer",
           "services/ble_log",
           "services/ble_common",
-          "nrf_sdk/components/ble/ble_link_ctx_manager"
+          "nrf_sdk/components/ble/ble_link_ctx_manager",
+          "rt-thread/components/utilities/ulog",
+          "rt-thread/components/utilities/ulog/syslog"
         ],
         "libList": [],
         "sourceDirList": [],
