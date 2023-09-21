@@ -1,7 +1,14 @@
 {
     "version": 4,
     "beforeBuildTasks": [],
-    "afterBuildTasks": [],
+    "afterBuildTasks": [
+        {
+            "name": "cp hex & make dfu-setting",
+            "disable": false,
+            "abortAfterFailed": false,
+            "command": "cd ${workspaceFolder}/dfu_package && cp ${OutDir}/${ProjectName}.hex ${workspaceFolder}/dfu_package && ${workspaceFolder}/dfu_package/make-setting.bat"
+        }
+    ],
     "global": {
         "use-microLIB": true,
         "output-debug-info": "enable"
@@ -17,7 +24,6 @@
     "asm-compiler": {},
     "linker": {
         "output-format": "elf",
-        "xo-base": "",
         "ro-base": "0x00000000",
         "rw-base": "0x20000000"
     }
