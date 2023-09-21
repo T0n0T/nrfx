@@ -886,7 +886,6 @@
         "<virtual_root>/nrf_dfu/ble_dfu_bonded.c",
         "<virtual_root>/nrf_services/ble_app_hrs.c",
         "<virtual_root>/nrf_ble/ble_conn_params_rtt.c",
-        "<virtual_root>/max30102",
         "<virtual_root>/nrf_services/dfu.c",
         "<virtual_root>/Fal",
         "<virtual_root>/Utilities/ulog.c"
@@ -933,8 +932,8 @@
               "tag": "IRAM",
               "id": 1,
               "mem": {
-                "startAddr": "0x20003000",
-                "size": "0xd000"
+                "startAddr": "0x20002b00",
+                "size": "0xd500"
               },
               "isChecked": true,
               "noInit": false
@@ -1015,7 +1014,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": ""
+        "otherCmds": "ip 192.168.1.2"
       },
       "uploadConfigMap": {},
       "custom_dep": {
@@ -1305,7 +1304,35 @@
         "<virtual_root>/Drivers/drv_spi.c",
         "<virtual_root>/Fal",
         "<virtual_root>/Applications/mnt.c",
-        "<virtual_root>/littlefs"
+        "<virtual_root>/littlefs",
+        "<virtual_root>/Utilities",
+        "<virtual_root>/SEGGER_RTT",
+        "<virtual_root>/SAL",
+        "<virtual_root>/POSIX",
+        "<virtual_root>/nrf_softdev",
+        "<virtual_root>/nrf_services",
+        "<virtual_root>/nrf_lib",
+        "<virtual_root>/nrf_hal",
+        "<virtual_root>/nrf_dfu",
+        "<virtual_root>/nrf_ble",
+        "<virtual_root>/max30102",
+        "<virtual_root>/Legacy",
+        "<virtual_root>/Kernel",
+        "<virtual_root>/kawaii_mqtt",
+        "<virtual_root>/gps_rmc",
+        "<virtual_root>/Finsh",
+        "<virtual_root>/Filesystem",
+        "<virtual_root>/ec800x",
+        "<virtual_root>/Drivers",
+        "<virtual_root>/DeviceDrivers",
+        "<virtual_root>/CPU",
+        "<virtual_root>/Compiler",
+        "<virtual_root>/cm_backtrace",
+        "<virtual_root>/ccm3310",
+        "<virtual_root>/button",
+        "<virtual_root>/at_device",
+        "<virtual_root>/AT",
+        "<virtual_root>/Applications"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -1423,7 +1450,7 @@
       },
       "uploader": "JLink",
       "uploadConfig": {
-        "bin": "${ExecutableName}.hex",
+        "bin": "nrf_sdk\\examples\\dfu\\secure_bootloader\\pca10040_s132_ble\\arm5_no_packs\\_build\\nrf52832_xxaa_s132.hex",
         "baseAddr": "0x26000",
         "cpuInfo": {
           "vendor": "Nordic Semi",

@@ -21,6 +21,7 @@
 #define MQTT_TOPIC_REPLY "/iot/CYGC_001111/BR/device/reply"
 #define MQTT_TOPIC_DATA  "/iot/CYGC_001111/BR/device/data"
 
+#if NRF_LOG_ENABLED
 typedef struct {
     NRF_LOG_INSTANCE_PTR_DECLARE(p_log)
 } app_t;
@@ -33,7 +34,7 @@ typedef struct {
                               COMPILED_LOG_LEVEL);   \
     static app_t _name = {                           \
         NRF_LOG_INSTANCE_PTR_INIT(p_log, app, _name)};
-
+#endif
 extern uint8_t mission_status;
 extern uint8_t sm4_flag;
 void mission_init(void);

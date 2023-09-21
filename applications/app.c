@@ -21,9 +21,6 @@
 #define DBG_TAG "app"
 #include <rtdbg.h>
 
-APP_LOG_DEF(mqtt);
-APP_LOG_DEF(sm4);
-
 #define MQTT_DELAY_MS  10000
 #define FLASH_CFG_ADDR 0x60000
 struct mqtt_cfg {

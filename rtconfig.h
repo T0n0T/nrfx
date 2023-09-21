@@ -27,7 +27,7 @@
 #define RT_USING_DEBUG
 #define RT_DEBUGING_COLOR
 #define RT_DEBUGING_CONTEXT
-#define RT_DEBUGING_INIT
+// #define RT_DEBUGING_INIT
 
 /* Inter-Thread communication */
 
@@ -88,7 +88,7 @@
 #define RT_USING_DFS_DEVFS
 #define RT_USING_FAL
 #define FAL_DEBUG_CONFIG
-#define FAL_DEBUG 1
+// #define FAL_DEBUG 1
 #define FAL_PART_HAS_TABLE_CFG
 
 /* Device Drivers */
@@ -269,24 +269,6 @@
 /* sensors drivers */
 
 /* touch drivers */
-
-#define PKG_USING_NRF5X_SDK
-#define NRFX_RTC_ENABLED                                      1
-#define NRFX_RTC1_ENABLED                                     1
-#define NRF_CLOCK_ENABLED                                     1
-#define NRF_SDH_BLE_ENABLED                                   1
-#define NRF_SDH_ENABLED                                       1
-#define NRF_SDH_SOC_ENABLED                                   1
-#define NRF_SDH_BLE_PERIPHERAL_LINK_COUNT                     1
-#define BLE_ADVERTISING_ENABLED                               1
-#define NRF_BLE_QWR_ENABLED                                   1
-#define NRF_SDH_BLE_VS_UUID_COUNT                             1
-#define NRF_BLE_CONN_PARAMS_ENABLED                           1
-#define NRF_BLE_CONN_PARAMS_MAX_SLAVE_LATENCY_DEVIATION       499
-#define NRF_BLE_CONN_PARAMS_MAX_SUPERVISION_TIMEOUT_DEVIATION 65535
-#define NRF_BLE_GATT_ENABLED                                  1
-#define SD_BLE_APP_BEACON
-#define PKG_USING_NRF5X_SDK_V1610
 
 /* Kendryte SDK */
 

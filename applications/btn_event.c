@@ -14,11 +14,9 @@
 #include <button.h>
 #include "nrfx_pwm.h"
 
-#define DBG_LVL DBG_LOG
+#define DBG_LVL DBG_INFO
 #define DBG_TAG "btn"
 #include <rtdbg.h>
-
-APP_LOG_DEF(btn);
 
 /* button */
 Button_t SW_BUTTON;

@@ -365,9 +365,25 @@ int ble_app_init(void)
     // 连接参数协商初始化
     conn_params_init();
 
-    NRF_LOG_INFO("BLE Template example started.");
+    // 连接参数协商初始化
+    conn_params_init();
+
+    NRF_LOG_INFO("BLE APP started.");
     // 启动广播
-    advertising_start();
+    APP_ERROR_CHECK(ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST));
 }
-// INIT_APP_EXPORT(ble_dfu_init);
-MSH_CMD_EXPORT(ble_app_init, ble app init);
+
+static int ble_start(void)
+{
+    rt_thread_t ble_thread = rt_thread_create("softdev", ble_app_init, RT_NULL, 1024, 21, 50);
+    rt_thread_startup(ble_thread);
+    return 0;
+}
+INIT_APP_EXPORT(ble_start);
+
+// static void ble_stop(void)
+// {
+//     APP_ERROR_CHECK(ble_advertising_start(&m_advertising, BLE_ADV_MODE_IDLE));
+// }
+
+// MSH_CMD_EXPORT(ble_start, ble app start);
