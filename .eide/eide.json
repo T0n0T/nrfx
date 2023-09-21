@@ -1141,6 +1141,40 @@
       }
     },
     "softdevice": {
+      "excludeList": [
+        "<virtual_root>/Applications",
+        "<virtual_root>/AT",
+        "<virtual_root>/at_device",
+        "<virtual_root>/button",
+        "<virtual_root>/ccm3310",
+        "<virtual_root>/cm_backtrace",
+        "<virtual_root>/Compiler",
+        "<virtual_root>/CPU",
+        "<virtual_root>/DeviceDrivers",
+        "<virtual_root>/Drivers",
+        "<virtual_root>/ec800x",
+        "<virtual_root>/Fal",
+        "<virtual_root>/Filesystem",
+        "<virtual_root>/Finsh",
+        "<virtual_root>/gps_rmc",
+        "<virtual_root>/kawaii_mqtt",
+        "<virtual_root>/Kernel",
+        "<virtual_root>/Legacy",
+        "<virtual_root>/littlefs",
+        "<virtual_root>/max30102",
+        "<virtual_root>/nrf_ble",
+        "<virtual_root>/nrf_dfu",
+        "<virtual_root>/nrf_hal",
+        "<virtual_root>/nrf_log",
+        "<virtual_root>/nrf_lib",
+        "<virtual_root>/nrf_services",
+        "<virtual_root>/nrf_softdev",
+        "<virtual_root>/POSIX",
+        "<virtual_root>/SAL",
+        "<virtual_root>/SEGGER_RTT",
+        "<virtual_root>/Utilities"
+      ],
+      "toolchain": "AC5",
       "compileConfig": {
         "cpuType": "Cortex-M4",
         "floatingPointHardware": "single",
@@ -1256,7 +1290,7 @@
       },
       "uploader": "JLink",
       "uploadConfig": {
-        "bin": "${ExecutableName}.hex",
+        "bin": "nrf_sdk\\components\\softdevice\\s132\\hex\\s132_nrf52_7.2.0_softdevice.hex",
         "baseAddr": "0x26000",
         "cpuInfo": {
           "vendor": "Nordic Semi",
@@ -1267,14 +1301,13 @@
         "otherCmds": "ip 192.168.1.2"
       },
       "uploadConfigMap": {},
-      "toolchain": "AC5",
       "custom_dep": {
         "name": "default",
-        "sourceDirList": [],
-        "libList": [],
         "incList": [
           "RTE/_softdevice"
         ],
+        "libList": [],
+        "sourceDirList": [],
         "defineList": [
           "NRF52832_XXAA",
           "USE_APP_CONFIG",
@@ -1291,8 +1324,7 @@
           "__HEAP_SIZE=8192",
           "__STACK_SIZE=8192"
         ]
-      },
-      "excludeList": []
+      }
     },
     "bootloader": {
       "excludeList": [

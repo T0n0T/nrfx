@@ -108,14 +108,11 @@ static void services_init(void)
     nrf_ble_qwr_init_t qwr_init = {0};
     qwr_init.error_handler      = nrf_qwr_error_handler;
     APP_ERROR_CHECK(nrf_ble_qwr_init(&m_qwr, &qwr_init));
-    ble_app_dfu_init();
-    ble_app_log_init();
-    // ble_serv_init_fn func = 0;
-    // for (size_t i = 0; i < sizeof(serv_table) / sizeof(serv_table[0]); i++) {
-    //     func = *serv_table[i];
-    //     NRF_LOG_INFO("%d.", i);
-    //     func();
-    // }
+    ble_serv_init_fn func = 0;
+    for (size_t i = 0; i < sizeof(serv_table) / sizeof(serv_table[0]); i++) {
+        func = *serv_table[i];
+        func();
+    }
 }
 
 /** @brief 连接参数协商模块事件处理函数 */
@@ -343,8 +340,8 @@ int ble_app_init(void)
     ret_code_t err_code;
 
     // 使能中断之前，初始化异步SVCI接口到Bootloader
-    // err_code = ble_dfu_buttonless_async_svci_init();
-    // APP_ERROR_CHECK(err_code);
+    err_code = ble_dfu_buttonless_async_svci_init();
+    APP_ERROR_CHECK(err_code);
 
     // 初始化APP定时器
     timers_init();
@@ -361,9 +358,6 @@ int ble_app_init(void)
 
     // 初始化广播
     advertising_init();
-
-    // 连接参数协商初始化
-    conn_params_init();
 
     // 连接参数协商初始化
     conn_params_init();

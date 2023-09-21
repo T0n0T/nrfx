@@ -20,21 +20,20 @@
 #include "app_error.h"
 #include "ble_gatts.h"
 #include "ble_srv_common.h"
-
+#include "app_timer.h"
 #include "nrf_log.h"
 #define NRF_LOG_FILTER        4
 
 #define UART_TX_BUF_SIZE      256                        // 日志发送缓存大小（字节数）
 #define UART_RX_BUF_SIZE      256                        // 接收缓存大小（字节数）
 #define LOG_SERVICE_UUID_TYPE BLE_UUID_TYPE_VENDOR_BEGIN // 日志透传服务UUID类型：厂商自定义UUID
-
-BLE_LOG_DEF(m_log, NRF_SDH_BLE_TOTAL_LINK_COUNT); // 定义名称为m_log的日志透传服务实例
+APP_TIMER_DEF(log_timer);                                // 日志定时器ID
+BLE_LOG_DEF(m_log, NRF_SDH_BLE_TOTAL_LINK_COUNT);        // 定义名称为m_log的日志透传服务实例
 
 // 蓝牙日志初始化情况
 static bool log_enabled = false;
 static struct rt_ringbuffer log_ringbuffer;
 static char log_buf[UART_TX_BUF_SIZE * 2];
-static app_timer_t log_timer = {0};
 
 void rt_hw_console_output(const char *str)
 {
@@ -91,12 +90,12 @@ static void log_data_handler(ble_log_evt_t *p_evt)
 {
     // 通知使能后才初始化日志
     if (p_evt->type == BLE_NUS_EVT_COMM_STARTED) {
-        app_timer_start(&log_timer, 500, NULL);
+        app_timer_start(log_timer, 500, NULL);
         log_enabled = true;
     }
     // 通知关闭后，关闭日志
     else if (p_evt->type == BLE_NUS_EVT_COMM_STOPPED) {
-        app_timer_stop(&log_timer);
+        app_timer_stop(log_timer);
         log_enabled = false;
     }
     // 判断事件类型:接收到新数据事件
@@ -293,21 +292,18 @@ uint32_t ble_log_init(ble_log_t *p_log, ble_log_init_t const *p_log_init)
 
     // 拷贝日志透传服务初始化结构体中的事件句柄
     p_log->data_handler = p_log_init->data_handler;
-    NRF_LOG_INFO("0.");
     // 将自定义UUID基数添加到SoftDevice，并获取uuid_type
     err_code = sd_ble_uuid_vs_add(&nus_base_uuid, &p_log->uuid_type);
     VERIFY_SUCCESS(err_code);
     // UUID类型和数值赋值给ble_uuid变量
     ble_uuid.type = p_log->uuid_type;
     ble_uuid.uuid = BLE_UUID_LOG_SERVICE;
-    NRF_LOG_INFO("1.");
     // 添加日志透传服务, 获得句柄
     err_code = sd_ble_gatts_service_add(BLE_GATTS_SRVC_TYPE_PRIMARY,
                                         &ble_uuid,
                                         &p_log->service_handle);
     VERIFY_SUCCESS(err_code);
     /*---------------------以下代码添加RX特征--------------------*/
-    NRF_LOG_INFO("2.");
     // 添加RX特征
     // 配置参数之前先清零add_char_params
     memset(&add_char_params, 0, sizeof(add_char_params));
@@ -328,7 +324,6 @@ uint32_t ble_log_init(ble_log_t *p_log, ble_log_init_t const *p_log_init)
     // 设置读/写RX特征值的安全需求：无安全性
     add_char_params.read_access  = SEC_OPEN;
     add_char_params.write_access = SEC_OPEN;
-    NRF_LOG_INFO("3.");
     // 为日志透传服务添加RX特征
     err_code = characteristic_add(p_log->service_handle, &add_char_params, &p_log->rx_handles);
     // 检查返回的错误代码
@@ -358,7 +353,6 @@ uint32_t ble_log_init(ble_log_t *p_log, ble_log_init_t const *p_log_init)
     add_char_params.write_access      = SEC_OPEN;
     add_char_params.cccd_write_access = SEC_OPEN;
     // 为日志透传服务添加TX特征
-    NRF_LOG_INFO("4.");
     return characteristic_add(p_log->service_handle, &add_char_params, &p_log->tx_handles);
     /*---------------------添加TX特征-END------------------------*/
 }
@@ -402,14 +396,15 @@ uint32_t ble_log_data_send(ble_log_t *p_log,
     // 发送TX特征值通知
     return sd_ble_gatts_hvx(conn_handle, &hvx_params);
 }
-ble_log_init_t log_init = {0};
+
 static const void service_init(void)
 {
+    ble_log_init_t log_init = {0};
     rt_ringbuffer_init(&log_ringbuffer, log_buf, sizeof(log_buf));
-
-    
-    log_init.data_handler   = log_data_handler;
+    log_init.data_handler = log_data_handler;
     APP_ERROR_CHECK(ble_log_init(&m_log, &log_init));
+    
+    app_timer_create(&log_timer, APP_TIMER_MODE_REPEATED, ble_log_flush_process);
 }
 
 ble_serv_init_fn ble_app_log_init = service_init;
