@@ -1329,7 +1329,6 @@ RTM_EXPORT(rt_console_set_device);
 rt_weak void rt_hw_console_output(const char *str)
 {
     /* empty console output */
-    rt_kprintf("weak test\n");
 }
 RTM_EXPORT(rt_hw_console_output);
 

@@ -888,7 +888,9 @@
         "<virtual_root>/nrf_ble/ble_conn_params_rtt.c",
         "<virtual_root>/nrf_services/dfu.c",
         "<virtual_root>/Fal",
-        "<virtual_root>/Utilities/ulog.c"
+        "<virtual_root>/Utilities/ulog.c",
+        "<virtual_root>/nrf_services",
+        "<virtual_root>/nrf_dfu"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -1014,7 +1016,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": ""
+        "otherCmds": "ip 192.168.1.2"
       },
       "uploadConfigMap": {},
       "custom_dep": {

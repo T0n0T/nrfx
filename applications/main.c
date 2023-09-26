@@ -30,7 +30,7 @@ int main(void)
     log_init();
     APP_ERROR_CHECK(nrf_pwr_mgmt_init());
     rt_pin_mode(DK_BOARD_LED_1, PIN_MODE_OUTPUT);
-    // mission_init();
+    mission_init();
     while (1) {
         if (NRF_LOG_PROCESS() == false) {
             nrf_pwr_mgmt_run();

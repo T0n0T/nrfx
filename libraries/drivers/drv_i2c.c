@@ -17,7 +17,7 @@
 #include <hal/nrf_gpio.h>
 
 #define LOG_TAG "drv.i2c"
-#define DBG_LVL DBG_LOG
+#define DBG_LVL DBG_INFO
 #include <rtdbg.h>
 
 #if defined(BSP_USING_I2C0) || defined(BSP_USING_I2C1) || defined(BSP_USING_I2C2) || defined(BSP_USING_I2C3)
@@ -159,14 +159,14 @@ static rt_ssize_t _master_xfer(struct rt_i2c_bus_device *bus,
                 no_stop_flag = NRFX_TWIM_FLAG_TX_NO_STOP;
             }
         }
-
+        while (nrfx_twim_is_busy(p_instance))
+            ;
         ret = nrfx_twim_xfer(p_instance, &xfer, no_stop_flag);
         if (ret != NRFX_SUCCESS) {
-            printf("i2c transfer fail:err[%d]", ret);
+            // printf("i2c transfer fail:err[%d]", ret);
             goto out;
         }
     }
-    
 
 out:
     return i;

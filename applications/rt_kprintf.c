@@ -77,7 +77,7 @@ void rt_kprintf(const char *fmt, ...)
         rt_uint16_t old_flag = console_dev->open_flag;
 
         console_dev->open_flag |= RT_DEVICE_FLAG_STREAM;
-        rt_hw_console_output(rt_console_buf);
+        // rt_hw_console_output(rt_console_buf);
         // SEGGER_RTT_printf(0, "%s", rt_console_buf);
         rt_device_write(console_dev, 0, rt_console_buf, length);
         console_dev->open_flag = old_flag;
