@@ -1,5 +1,6 @@
 #include "blood.h"
 #include "max30102.h"
+#include "algorithm_v1.h"
 #include <rtthread.h>
 #include <rtdevice.h>
 #include <stdio.h>
@@ -9,8 +10,7 @@
 #include <rtdbg.h>
 
 HRM_Mode current_mode;
-int checkout_spo2_flag, checkout_prox_flag, translate_flag;
-// rt_tick_t init_tick, cur_tick;
+int checkout_spo2_flag, checkout_prox_flag;
 
 uint16_t g_fft_index = 0; // fft输入输出下标
 uint16_t fifo_red;
@@ -27,8 +27,6 @@ struct
 } g_BloodWave; // 血液波形数据
 
 BloodData g_blooddata = {0}; // 血液数据存储
-
-#define CORRECTED_VALUE 47 // 标定血液氧气含量
 
 /*funcation start ------------------------------------------------------------*/
 void max30102_read_fifo(void)
@@ -170,25 +168,23 @@ MODE_ENTRY:
 
         while (g_fft_index < FFT_N) {
             // 将数据写入fft输入并清除输出
-            retry = 16;
             while (rt_pin_read(cfg.irq_pin.pin) == 0) {
-                while (retry--) {
-                    max30102_read_fifo(); // read from MAX30102 FIFO2
-                    // LOG_D("date get num[%d]:  fifo_ir: %06d fifo_red: %06d", g_fft_index, fifo_ir, fifo_red);
-                    if (fifo_red < 10000) {
-                        fifo_red = 0;
-                    }
-                    if (fifo_ir < 10000) {
-                        fifo_ir = 0;
-                    }
-                    s1[g_fft_index].real = fifo_red;
-                    s1[g_fft_index].imag = 0;
-                    s2[g_fft_index].real = fifo_ir;
-                    s2[g_fft_index].imag = 0;
-                    g_fft_index++;
-                    if (g_fft_index >= FFT_N) {
-                        return;
-                    }
+
+                max30102_read_fifo(); // read from MAX30102 FIFO2
+                // LOG_D("date get num[%d]:  fifo_ir: %06d fifo_red: %06d", g_fft_index, fifo_ir, fifo_red);
+                if (fifo_red < 10000) {
+                    fifo_red = 0;
+                }
+                if (fifo_ir < 10000) {
+                    fifo_ir = 0;
+                }
+                s1[g_fft_index].real = fifo_red;
+                s1[g_fft_index].imag = 0;
+                s2[g_fft_index].real = fifo_ir;
+                s2[g_fft_index].imag = 0;
+                g_fft_index++;
+                if (g_fft_index >= FFT_N) {
+                    return;
                 }
             }
         }
@@ -258,22 +254,22 @@ void blood_data_translate(void)
         ac_red += s1[i].real;
         ac_ir += s2[i].real;
     }
+    printf("\nfft: red=>\n");
+    for (i = 0; i < 40; i++) {
+        printf("%6.2f ", s1[i].real);
+    }
+    printf("\nfft: ir =>\n");
+    for (i = 0; i < 40; i++) {
+        printf("%6.2f ", s2[i].real);
+    }
 
-    // for (i = 0; i < FFT_N / 2; i++) {
-    //     printf("%f", s1[i].real);
-    // }
-    // printf("\n");
-    // for (i = 0; i < FFT_N / 2; i++) {
-    //     printf("%f", s2[i].real);
-    // }
-
-    // printf("\nfft end**************************************************************************************\n");
-    int s1_max_index = find_max_num_index(s1, 30);
-    int s2_max_index = find_max_num_index(s2, 30);
-    printf("%d\n", s1_max_index);
-    printf("%d\n", s2_max_index);
-    float Heart_Rate = 60.00 * ((50.0 * (s1_max_index + s2_max_index)) / 512.00) + 20;
-
+    printf("\nfft end**************************************************************************************\n");
+    int s1_max_index = find_max_num_index(s1, 40);
+    // int s2_max_index = find_max_num_index(s2, 40);
+    float Heart_Rate = 60.00 * ((100.0 * s1_max_index) / 512.00);
+    if (s1_max_index == -1) {
+        Heart_Rate = -1;
+    }
     g_blooddata.heart = Heart_Rate;
 
     float R          = (ac_ir * dc_red) / (ac_red * dc_ir);
@@ -291,13 +287,8 @@ void blood_Loop(void)
         blood_data_translate();
         // 显示血液状态信息
         g_blooddata.SpO2 = (g_blooddata.SpO2 > 99.99) ? 99.99 : g_blooddata.SpO2;
-        printf("heart rate:\t%3d\n", g_blooddata.heart);
+        printf("heart rate:\t%0.2d\n", g_blooddata.heart);
         printf("spO2:\t\t%0.2f\n", g_blooddata.SpO2);
-        // } else {
-        //     cur_tick = rt_tick_get();
-        //     if (cur_tick - init_tick - rt_tick_from_millisecond(5000) < RT_TICK_MAX / 2) {
-        //         translate_flag = 1;
-        //     }
     }
 }
 
@@ -305,13 +296,13 @@ void max30102_thread_entry(void *args)
 {
     checkout_spo2_flag = 0;
     checkout_prox_flag = 0;
-    translate_flag     = 0;
     current_mode       = PROX;
 
     rt_pin_mode(cfg.irq_pin.pin, PIN_MODE_INPUT_PULLUP);
     while (1) {
+        // max30102_read_fifo();
         blood_Loop();
-        LOG_D("-------------------------------------------");
-        rt_thread_mdelay(1);
+        // LOG_D("-------------------------------------------");
+        rt_thread_mdelay(500);
     }
 }

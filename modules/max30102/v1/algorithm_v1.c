@@ -1,5 +1,5 @@
 /*--Include-start-------------------------------------------------------------*/
-#include "algorithm.h"
+#include "algorithm_v1.h"
 #include <stdint.h>
 /*base value define-----------------------------------------------------------*/
 #define XPI    (3.1415926535897932384626433832795)

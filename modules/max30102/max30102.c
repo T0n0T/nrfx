@@ -43,7 +43,7 @@ rt_bool_t maxim_max30102_write_reg(uint8_t uch_addr, uint8_t uch_data)
     msg.flags = RT_I2C_WR;
     msg.buf   = buf;
     msg.len   = ARRAY_SIZE(buf);
-    
+
     if ((err = rt_i2c_transfer(i2c_bus, &msg, 1)) != 1) {
         LOG_E("I2c write failed (err: %d).", err);
         return RT_FALSE;
@@ -145,7 +145,7 @@ static rt_bool_t maxim_max30102_init_proximity_mode()
         return RT_FALSE;
     if (!maxim_max30102_write_reg(REG_MULTI_LED_CTRL2, 0x00))
         return RT_FALSE;
-    if (!maxim_max30102_write_reg(REG_INTR_ENABLE_1, 0x40)) // INTR setting: PPG int
+    if (!maxim_max30102_write_reg(REG_INTR_ENABLE_1, 0xc0)) // INTR setting: PPG int
         return RT_FALSE;
     if (!maxim_max30102_write_reg(REG_INTR_ENABLE_2, 0x00))
         return RT_FALSE;
@@ -154,15 +154,17 @@ static rt_bool_t maxim_max30102_init_proximity_mode()
 
 rt_bool_t max30102_checkout_HRM_SPO2_mode()
 {
-    if (!maxim_max30102_write_reg(REG_FIFO_CONFIG, 0x0f)) // sample avg = 1, fifo rollover=1, 16 unread samlpes,8 gourps
-        return RT_FALSE;
     if (!maxim_max30102_write_reg(REG_LED1_PA, 0x24)) // LED1: 7mA
         return RT_FALSE;
     if (!maxim_max30102_write_reg(REG_LED2_PA, 0x24)) // LED2: 7mA
         return RT_FALSE;
+    if (!maxim_max30102_write_reg(REG_FIFO_CONFIG, 0x0f)) // sample avg = 1, fifo rollover=false, fifo almost full = 17
+        return RT_FALSE;
     if (!maxim_max30102_write_reg(REG_SPO2_CONFIG, 0x27)) // adc rang 4096; sample rate 100hz; led_width 400us = 2.5khz
         return RT_FALSE;
-    if (!maxim_max30102_write_reg(REG_FIFO_CONFIG, 0x0f)) // sample avg = 4, fifo rollover=RT_FALSE, fifo almost full = 32
+    if (!maxim_max30102_write_reg(REG_MODE_CONFIG, 0x03))
+        return RT_FALSE;
+    if (!maxim_max30102_write_reg(REG_PILOT_PA, 0x7f))
         return RT_FALSE;
     return RT_TRUE;
 }

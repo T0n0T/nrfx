@@ -499,19 +499,38 @@
         "name": "max30102",
         "files": [
           {
-            "path": "modules/max30102/algorithm.c"
-          },
-          {
-            "path": "modules/max30102/blood.c"
-          },
-          {
             "path": "modules/max30102/max30102.c"
           },
           {
             "path": "modules/max30102/port.c"
           }
         ],
-        "folders": []
+        "folders": [
+          {
+            "name": "v1",
+            "files": [
+              {
+                "path": "modules/max30102/v1/algorithm_v1.c"
+              },
+              {
+                "path": "modules/max30102/v1/blood_v1.c"
+              }
+            ],
+            "folders": []
+          },
+          {
+            "name": "v2",
+            "files": [
+              {
+                "path": "modules/max30102/v2/algorithm_v2.c"
+              },
+              {
+                "path": "modules/max30102/v2/blood_v2.c"
+              }
+            ],
+            "folders": []
+          }
+        ]
       },
       {
         "name": "nrf_ble",
@@ -889,9 +908,10 @@
         "<virtual_root>/nrf_services/dfu.c",
         "<virtual_root>/Fal",
         "<virtual_root>/Utilities/ulog.c",
+        "<virtual_root>/max30102/blood.c",
         "<virtual_root>/nrf_services",
-        "<virtual_root>/nrf_dfu",
-        "<virtual_root>/SEGGER_RTT"
+        "<virtual_root>/max30102/algorithm.c",
+        "<virtual_root>/max30102/v1"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -1017,7 +1037,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": "ip 192.168.230.1"
+        "otherCmds": ""
       },
       "uploadConfigMap": {},
       "custom_dep": {
@@ -1121,7 +1141,9 @@
           "services/ble_common",
           "nrf_sdk/components/ble/ble_link_ctx_manager",
           "rt-thread/components/utilities/ulog",
-          "rt-thread/components/utilities/ulog/syslog"
+          "rt-thread/components/utilities/ulog/syslog",
+          "modules/max30102/v2",
+          "modules/max30102/v1"
         ],
         "libList": [],
         "sourceDirList": [],

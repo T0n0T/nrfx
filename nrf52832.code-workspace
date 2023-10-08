@@ -82,7 +82,8 @@
             "nrf_pwr_mgmt.h": "c",
             "nrfx_twi_twim.h": "c",
             "platform_memory.h": "c",
-            "app_util.h": "c"
+            "app_util.h": "c",
+            "algorithm.h": "c"
         },
         "cortex-debug.variableUseNaturalFormat": true
     },

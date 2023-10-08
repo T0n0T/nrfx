@@ -1,7 +1,6 @@
 #ifndef _BLOOD_H
 #define _BLOOD_H
 
-#include "algorithm.h"
 #include "math.h"
 
 typedef enum {
