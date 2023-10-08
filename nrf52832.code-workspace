@@ -79,8 +79,12 @@
             "nrfx_uarte.h": "c",
             "nrf_uarte.h": "c",
             "nrf_log_instance.h": "c",
-            "nrf_pwr_mgmt.h": "c"
-        }
+            "nrf_pwr_mgmt.h": "c",
+            "nrfx_twi_twim.h": "c",
+            "platform_memory.h": "c",
+            "app_util.h": "c"
+        },
+        "cortex-debug.variableUseNaturalFormat": true
     },
     "extensions": {}
 }

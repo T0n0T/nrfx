@@ -15,7 +15,10 @@
 extern "C" {
 #endif
 
-#define I2C_RECOVER 1
+enum twim_status {
+    I2C_RECOVER = 1,
+    I2C_DISABLE
+};
 
 #ifdef __cplusplus
 }
