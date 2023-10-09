@@ -70,9 +70,9 @@ void mqtt_reset_thread(void *p);
 void publish_handle(void)
 {
     rt_pin_write(LED2, PIN_LOW);
-    mqtt_error_t err = KAWAII_MQTT_SUCCESS_ERROR;
-    // char *publish_data = build_msg_updata(DEVICE_ID, ec800x_get_gnss(), 99, g_blooddata.heart);
-    char *publish_data = build_msg_updata(DEVICE_ID, ec800x_get_gnss(), 1, 1);
+    mqtt_error_t err   = KAWAII_MQTT_SUCCESS_ERROR;
+    char *publish_data = build_msg_updata(DEVICE_ID, ec800x_get_gnss(), 1, ecg_status);
+    // char *publish_data = build_msg_updata(DEVICE_ID, ec800x_get_gnss(), 1, 1);
     if (sm4_flag) {
         pdata origin_mqtt      = {rt_strlen(publish_data), (uint8_t *)publish_data};
         ciphertext cipher_mqtt = ccm3310_sm4_encrypt(sm4_id, origin_mqtt);

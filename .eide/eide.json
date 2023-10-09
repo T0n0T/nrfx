@@ -507,6 +507,11 @@
         ],
         "folders": [
           {
+            "name": "ecg_status",
+            "files": [],
+            "folders": []
+          },
+          {
             "name": "v1",
             "files": [
               {
@@ -909,9 +914,11 @@
         "<virtual_root>/Fal",
         "<virtual_root>/Utilities/ulog.c",
         "<virtual_root>/max30102/blood.c",
-        "<virtual_root>/nrf_services",
         "<virtual_root>/max30102/algorithm.c",
-        "<virtual_root>/max30102/v1"
+        "<virtual_root>/max30102/v1/algorithm_v1.c",
+        "<virtual_root>/max30102/v1",
+        "<virtual_root>/nrf_log",
+        "<virtual_root>/nrf_services"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -1037,7 +1044,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": ""
+        "otherCmds": "ip 192.168.230.1"
       },
       "uploadConfigMap": {},
       "custom_dep": {

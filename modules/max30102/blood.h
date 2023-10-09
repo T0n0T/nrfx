@@ -2,7 +2,7 @@
 #define _BLOOD_H
 
 #include "math.h"
-
+#include "stdint.h"
 typedef enum {
     HRM_SPO2 = 1,
     PROX,
@@ -15,6 +15,7 @@ typedef struct
 } BloodData;
 
 extern BloodData g_blooddata;
+extern uint8_t ecg_status;
 void blood_data_translate(void);
 void blood_data_update(void);
 void blood_Loop(void);

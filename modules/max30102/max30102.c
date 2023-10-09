@@ -123,7 +123,7 @@ static rt_bool_t maxim_max30102_init()
     return RT_TRUE;
 }
 
-static rt_bool_t maxim_max30102_init_proximity_mode()
+rt_bool_t maxim_max30102_init_proximity_mode()
 {
     if (!maxim_max30102_write_reg(REG_FIFO_WR_PTR, 0x00)) // FIFO_WR_PTR[4:0]
         return RT_FALSE;
@@ -163,8 +163,6 @@ rt_bool_t max30102_checkout_HRM_SPO2_mode()
     if (!maxim_max30102_write_reg(REG_SPO2_CONFIG, 0x27)) // adc rang 4096; sample rate 100hz; led_width 400us = 2.5khz
         return RT_FALSE;
     if (!maxim_max30102_write_reg(REG_MODE_CONFIG, 0x03))
-        return RT_FALSE;
-    if (!maxim_max30102_write_reg(REG_PILOT_PA, 0x7f))
         return RT_FALSE;
     return RT_TRUE;
 }

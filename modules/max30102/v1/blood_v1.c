@@ -1,6 +1,7 @@
 #include "blood.h"
 #include "max30102.h"
 #include "algorithm_v1.h"
+#include "algorithm_v2.h"
 #include <rtthread.h>
 #include <rtdevice.h>
 #include <stdio.h>
@@ -18,6 +19,14 @@ uint16_t fifo_ir;
 uint8_t ach_i2c_data[6];
 struct compx s1[FFT_N + 16]; // FFT输入和输出：从S[1]开始存放，根据大小自己定义
 struct compx s2[FFT_N + 16]; // FFT输入和输出：从S[1]开始存放，根据大小自己定义
+
+uint32_t aun_ir_buffer[FFT_N];  // IR LED sensor data
+int32_t n_ir_buffer_length;     // data length
+uint32_t aun_red_buffer[FFT_N]; // Red LED sensor data
+int32_t n_sp02;                 // SPO2 value
+int8_t ch_spo2_valid;           // indicator to show if the SP02 calculation is valid
+int32_t n_heart_rate;           // heart rate value
+int8_t ch_hr_valid;             // indicator to show if the heart rate calculation is valid
 
 struct
 {
@@ -85,40 +94,36 @@ void blood_data_update(void)
     g_fft_index  = 0;
     current_mode = HRM_SPO2;
 
-    while (g_fft_index < FFT_N) {
-        while (rt_pin_read(cfg.irq_pin.pin) == 0) {
-            // 读取FIFO
-            max30102_read_fifo(); // read from MAX30102 FIFO2
-            LOG_D("date get num[%d]:  fifo_ir: %06d fifo_red: %06d", g_fft_index, fifo_ir, fifo_red);
-            // 将数据写入fft输入并清除输出
-            if (g_fft_index < FFT_N) {
-                // 将数据写入fft输入并清除输出
-                s1[g_fft_index].real = fifo_red;
-                s1[g_fft_index].imag = 0;
-                s2[g_fft_index].real = fifo_ir;
-                s2[g_fft_index].imag = 0;
-                g_fft_index++;
-            }
-        }
-    }
     // while (g_fft_index < FFT_N) {
-    //     // 将数据写入fft输入并清除输出
-    //     retry = 16;
     //     while (rt_pin_read(cfg.irq_pin.pin) == 0) {
-    //         while (retry--) {
-    //             max30102_read_fifo(); // read from MAX30102 FIFO2
-    //             // LOG_D("date get num[%d]:  fifo_ir: %06d fifo_red: %06d", g_fft_index, fifo_ir, fifo_red);
+    //         // 读取FIFO
+    //         max30102_read_fifo(); // read from MAX30102 FIFO2
+    //         LOG_D("date get num[%d]:  fifo_ir: %06d fifo_red: %06d", g_fft_index, fifo_ir, fifo_red);
+    //         // 将数据写入fft输入并清除输出
+    //         if (g_fft_index < FFT_N) {
+    //             // 将数据写入fft输入并清除输出
     //             s1[g_fft_index].real = fifo_red;
     //             s1[g_fft_index].imag = 0;
     //             s2[g_fft_index].real = fifo_ir;
     //             s2[g_fft_index].imag = 0;
     //             g_fft_index++;
-    //             if (g_fft_index >= FFT_N) {
-    //                 return;
-    //             }
     //         }
     //     }
     // }
+    while (g_fft_index < FFT_N) {
+        while (rt_pin_read(cfg.irq_pin.pin) == 0) {
+            // 读取FIFO
+            max30102_read_fifo(); // read from MAX30102 FIFO2
+            // LOG_D("date get num[%d]:  fifo_ir: %06d fifo_red: %06d", g_fft_index, fifo_ir, fifo_red);
+            // 将数据写入fft输入并清除输出
+            if (g_fft_index < FFT_N) {
+                // 将数据写入fft输入并清除输出
+                aun_red_buffer[g_fft_index] = fifo_red;
+                aun_ir_buffer[g_fft_index]  = fifo_ir;
+                g_fft_index++;
+            }
+        }
+    }
 }
 
 void blood_data_update_proximity(void)
@@ -283,6 +288,7 @@ void blood_Loop(void)
     blood_data_update_proximity();
 
     if (current_mode == HRM_SPO2) {
+        maxim_heart_rate_and_oxygen_saturation(aun_ir_buffer, 512, aun_red_buffer, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid);
         // 血液信息转换
         blood_data_translate();
         // 显示血液状态信息

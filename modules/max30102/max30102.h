@@ -66,6 +66,7 @@ extern void max30102_thread_entry(void *args);
 int rt_hw_max30102_init(struct rt_sensor_config *cfg);
 rt_bool_t max30102_checkout_HRM_SPO2_mode();
 rt_bool_t max30102_checkout_proximity_mode();
+rt_bool_t maxim_max30102_init_proximity_mode();
 rt_bool_t maxim_max30102_write_reg(uint8_t uch_addr, uint8_t uch_data);
 rt_bool_t maxim_max30102_read_reg(uint8_t uch_addr, uint8_t *data, uint16_t len);
 #endif /*  MAX30102_H_ */

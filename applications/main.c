@@ -21,6 +21,7 @@
 
 #include "ble_app_log.h"
 
+#include "SEGGER_RTT.h"
 static int log_init(void);
 
 #define DK_BOARD_LED_1 LED1
@@ -35,6 +36,7 @@ int main(void)
         if (NRF_LOG_PROCESS() == false) {
             nrf_pwr_mgmt_run();
         }
+        // SEGGER_RTT_printf(0, "Hello s-Thread!\r\n");
         rt_pin_write(DK_BOARD_LED_1, PIN_HIGH);
         rt_thread_mdelay(500);
         rt_pin_write(DK_BOARD_LED_1, PIN_LOW);

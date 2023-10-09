@@ -177,10 +177,10 @@ static rt_ssize_t _master_xfer(struct rt_i2c_bus_device *bus,
     uint32_t no_stop_flag         = 0;
     rt_int32_t i                  = 0;
     if (((drv_i2c_cfg_t *)bus->priv)->need_recover) {
-        rt_enter_critical();
+        rt_interrupt_enter();
         _i2c_bus_control(bus, I2C_DISABLE, 0);
         twi_master_init(bus);
-        rt_exit_critical();
+        rt_interrupt_leave();
     }
 
     for (i = 0; i < num; i++) {
