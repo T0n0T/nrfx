@@ -249,7 +249,7 @@ void blood_Loop(void)
     if (current_mode == HRM_SPO2) {
         max30102_ecg_init();
         max30102_data_handle(&n_heart_rate, &n_sp02);
-        printf("heart:%d, sp02:%d\r\n", n_heart_rate, n_sp02);
+        // printf("heart:%d, sp02:%d\r\n", n_heart_rate, n_sp02);
         g_blooddata.heart = n_heart_rate;
         g_blooddata.SpO2  = n_sp02;
     }
@@ -268,8 +268,5 @@ void max30102_thread_entry(void *args)
 
     while (1) {
         blood_Loop();
-        // max30102_data_handle(&n_heart_rate, &n_sp02);
-        // printf("heart:%d, sp02:%d\r\n", n_heart_rate, n_sp02);
-        rt_thread_mdelay(500);
     }
 }

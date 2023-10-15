@@ -27,7 +27,8 @@
 #include <rtdbg.h>
 
 struct rt_spi_device ccm;
-nrfx_spim_t instance = NRFX_SPIM_INSTANCE(1);
+nrfx_spim_t instance           = NRFX_SPIM_INSTANCE(1);
+nrfx_spim_config_t config_spim = NRFX_SPIM_DEFAULT_CONFIG;
 uint8_t recv_buf[1024];
 
 int ccm3310_init(void)
@@ -36,14 +37,14 @@ int ccm3310_init(void)
     rt_pin_mode(GINT0, PIN_MODE_OUTPUT);
     // rt_pin_mode(15, PIN_MODE_OUTPUT);
     rt_pin_mode(GINT1, PIN_MODE_INPUT);
-    nrfx_spim_config_t config_spim = NRFX_SPIM_DEFAULT_CONFIG;
-    config_spim.sck_pin            = PIN_SCK;
-    config_spim.mosi_pin           = PIN_MOSI;
-    config_spim.miso_pin           = PIN_MISO;
-    config_spim.ss_pin             = PIN_SS;
-    config_spim.frequency          = NRF_SPIM_FREQ_1M;
-    config_spim.mode               = NRF_SPIM_MODE_3;
-    nrfx_spim_init(&instance, &config_spim, 0, (void *)instance.drv_inst_idx);
+
+    config_spim.sck_pin   = PIN_SCK;
+    config_spim.mosi_pin  = PIN_MOSI;
+    config_spim.miso_pin  = PIN_MISO;
+    config_spim.ss_pin    = PIN_SS;
+    config_spim.frequency = NRF_SPIM_FREQ_1M;
+    config_spim.mode      = NRF_SPIM_MODE_3;
+    // nrfx_spim_init(&instance, &config_spim, 0, (void *)instance.drv_inst_idx);
 
     rt_pin_write(POR, PIN_LOW);
     rt_thread_mdelay(20);
@@ -59,10 +60,10 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
     nrfx_err_t result = NRFX_SUCCESS;
 
     rt_memset(recv_buf, 0xff, sizeof(recv_buf));
+    nrfx_spim_init(&instance, &config_spim, 0, (void *)instance.drv_inst_idx);
     rt_pin_write(GINT0, PIN_LOW);
     while (status == PIN_HIGH) {
         status = rt_pin_read(GINT1);
-        printf("status: %d\n", status);
     }
 
     nrfx_spim_xfer_desc_t spim_xfer_desc =
@@ -97,6 +98,7 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
     spim_xfer_desc.rx_length   = recv_len;
 
     result = nrfx_spim_xfer(&instance, &spim_xfer_desc, 0);
+    nrfx_spim_uninit(&instance);
 #if defined(CCM3310_RAW_PRINTF)
     printf("\n========= print receive =========\n");
     for (size_t i = 0; i < recv_len; i++) {

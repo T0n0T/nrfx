@@ -9,6 +9,7 @@
  *
  */
 #include <rtthread.h>
+#include <rtdevice.h>
 #include <rthw.h>
 #include <nrfx_systick.h>
 
@@ -33,24 +34,32 @@ void SysTick_Handler(void)
     // rt_kprintf("systick event!\n");
 }
 
-void RTC1_IRQ(void)
+const nrfx_rtc_t rtc_instance = NRFX_RTC_INSTANCE(1);
+#define LF_CLK_HZ     (32768UL)
+#define RTC_PRESCALER ((uint32_t)(NRFX_ROUNDED_DIV(LF_CLK_HZ, RT_TICK_PER_SECOND) - 1))
+
+void rtc1_schedule_handle(nrfx_rtc_int_type_t int_type)
 {
     rt_interrupt_enter();
-
-    rt_tick_increase();
-
-    /* leave interrupt */
+    switch (int_type) {
+        case NRFX_RTC_INT_TICK:
+            rt_tick_increase();
+            break;
+        case NRFX_RTC_INT_COMPARE0:
+            nrfx_rtc_counter_clear(&rtc_instance);
+            rt_pin_write(LED2, PIN_HIGH);
+        default:
+            break;
+    }
     rt_interrupt_leave();
     // rt_kprintf("clk_event!\n");
 }
 
 void RTC_tick_configure(void)
 {
-#define LF_CLK_HZ     (32768UL)
-#define RTC_PRESCALER ((uint32_t)(NRFX_ROUNDED_DIV(LF_CLK_HZ, RT_TICK_PER_SECOND) - 1))
+
     NVIC_SetPriority(RTC1_IRQn, 5);
 
-    const nrfx_rtc_t rtc_instance = NRFX_RTC_INSTANCE(1);
     nrf_clock_lf_src_set((nrf_clock_lfclk_t)NRFX_CLOCK_CONFIG_LF_SRC);
     nrfx_clock_lfclk_start();
 
@@ -58,7 +67,7 @@ void RTC_tick_configure(void)
     nrfx_rtc_config_t config = NRFX_RTC_DEFAULT_CONFIG;
     config.prescaler         = RTC_PRESCALER;
 
-    nrfx_rtc_init(&rtc_instance, &config, RTC1_IRQ);
+    nrfx_rtc_init(&rtc_instance, &config, rtc1_schedule_handle);
 
     nrfx_rtc_tick_enable(&rtc_instance, true);
 
@@ -118,9 +127,9 @@ void rt_hw_board_init(void)
     /* Activate deep sleep mode */
     SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
 
-    SysTick_Configuration();
+    // SysTick_Configuration();
 
-    // RTC_tick_configure();
+    RTC_tick_configure();
 
 #if defined(RT_USING_HEAP)
     rt_system_heap_init((void *)HEAP_BEGIN, (void *)HEAP_END);
@@ -131,8 +140,8 @@ void rt_hw_board_init(void)
 #endif
 
 #if defined(RT_USING_CONSOLE) && defined(RT_USING_DEVICE)
-    rt_hw_jlink_console_init();
-    // rt_console_set_device(RT_CONSOLE_DEVICE_NAME);
+    // rt_hw_jlink_console_init();
+    rt_console_set_device(RT_CONSOLE_DEVICE_NAME);
 #endif
 
 #ifdef RT_USING_COMPONENTS_INIT

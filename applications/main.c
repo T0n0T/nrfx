@@ -18,11 +18,12 @@
 
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
-
+#include "nrfx_rtc.h"
 #include "ble_app_log.h"
 
 #include "SEGGER_RTT.h"
 static int log_init(void);
+static void pwr_mgmt_handle(void);
 
 #define DK_BOARD_LED_1 LED1
 
@@ -32,17 +33,34 @@ int main(void)
     APP_ERROR_CHECK(nrf_pwr_mgmt_init());
     rt_pin_mode(DK_BOARD_LED_1, PIN_MODE_OUTPUT);
     mission_init();
+    rt_thread_idle_sethook(pwr_mgmt_handle);
     while (1) {
-        if (NRF_LOG_PROCESS() == false) {
-            nrf_pwr_mgmt_run();
-        }
         // SEGGER_RTT_printf(0, "Hello s-Thread!\r\n");
-        rt_pin_write(DK_BOARD_LED_1, PIN_HIGH);
-        rt_thread_mdelay(500);
-        rt_pin_write(DK_BOARD_LED_1, PIN_LOW);
-        rt_thread_mdelay(500);
+        // rt_pin_write(DK_BOARD_LED_1, PIN_HIGH);
+        // rt_thread_mdelay(1000);
+        // rt_pin_write(DK_BOARD_LED_1, PIN_LOW);
+        rt_thread_mdelay(1000);
     }
     return RT_EOK;
+}
+
+static void pwr_mgmt_handle(void)
+{
+    static int cnt                = 0;
+    const nrfx_rtc_t rtc_instance = NRFX_RTC_INSTANCE(1);
+    if (NRF_LOG_PROCESS() == false) {
+        cnt++;
+        if (cnt % 2 == 0) {
+            rt_pin_write(LED2, PIN_LOW);
+        } else {
+            rt_pin_write(LED2, PIN_HIGH);
+        }
+        // nrfx_rtc_disable(&rtc_instance);
+        nrfx_rtc_tick_disable(&rtc_instance);
+        nrfx_rtc_cc_set(&rtc_instance, 0, 5000, true);
+        nrfx_rtc_enable(&rtc_instance);
+        nrf_pwr_mgmt_run();
+    }
 }
 
 static int log_init(void)

@@ -11,10 +11,11 @@
 #include <rtdevice.h>
 #include <stdio.h>
 #include <app.h>
+
 #include <button.h>
 #include "nrfx_pwm.h"
-
-#define DBG_LVL DBG_INFO
+#include "nrf_gpio.h"
+#define DBG_LVL DBG_LOG
 #define DBG_TAG "btn"
 #include <rtdbg.h>
 
@@ -71,6 +72,7 @@ static void beep_off(void)
 
 rt_uint8_t read_sw_btn(void)
 {
+    // return nrf_gpio_pin_read(SW);
     return rt_pin_read(SW);
 }
 
@@ -119,7 +121,10 @@ static void btn_entry(void *p)
     rt_pin_mode(POWER_KEEP, PIN_MODE_OUTPUT);
     rt_pin_mode(LED2, PIN_MODE_OUTPUT);
     rt_pin_mode(LED3, PIN_MODE_OUTPUT);
-    rt_pin_mode(SW, PIN_MODE_INPUT);
+    rt_pin_mode(SW, PIN_MODE_INPUT_PULLUP);
+
+    // nrf_gpio_cfg_input(SW, NRF_GPIO_PIN_PULLUP);
+
     rt_pin_write(LED2, PIN_HIGH);
     rt_pin_write(LED3, PIN_HIGH);
     beep_init();
@@ -131,15 +136,17 @@ static void btn_entry(void *p)
     Button_Attach(&SW_BUTTON, BUTTON_DOWM, btn_click);
     Button_Attach(&SW_BUTTON, BUTTON_DOUBLE, btn_double);
     Button_Attach(&SW_BUTTON, BUTTON_LONG_FREE, btn_long_free);
+
+    uint32_t s;
     while (1) {
-        Button_Process();
-        rt_thread_mdelay(40);
+        Button_Cycle_Process(&SW_BUTTON);
+        rt_thread_mdelay(30);
     }
 }
 
 int btn_init(void)
 {
-    if (rt_thread_init(&btn_thread, "btn", btn_entry, 0, btn_stack, sizeof(btn_stack), 13, 15) != RT_EOK) {
+    if (rt_thread_init(&btn_thread, "btn", btn_entry, 0, btn_stack, sizeof(btn_stack), 10, 5) != RT_EOK) {
         LOG_E("btn thread init fail!\n");
         return -1;
     }

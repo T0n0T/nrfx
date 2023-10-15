@@ -21,7 +21,6 @@
 #define DBG_TAG "app"
 #include <rtdbg.h>
 
-#define MQTT_DELAY_MS  10000
 #define FLASH_CFG_ADDR 0x60000
 struct mqtt_cfg {
     char host[30];
@@ -70,32 +69,19 @@ void mqtt_reset_thread(void *p);
 void publish_handle(void)
 {
     rt_pin_write(LED2, PIN_LOW);
-    mqtt_error_t err   = KAWAII_MQTT_SUCCESS_ERROR;
+    mqtt_error_t err = KAWAII_MQTT_SUCCESS_ERROR;
+
     char *publish_data = build_msg_updata(DEVICE_ID, ec800x_get_gnss(), 1, ecg_status);
     // char *publish_data = build_msg_updata(DEVICE_ID, ec800x_get_gnss(), 1, 1);
     if (sm4_flag) {
         pdata origin_mqtt      = {rt_strlen(publish_data), (uint8_t *)publish_data};
         ciphertext cipher_mqtt = ccm3310_sm4_encrypt(sm4_id, origin_mqtt);
-
         if (cipher_mqtt.len > 0) {
             memset(&publish_msg, 0, sizeof(publish_msg));
             publish_msg.qos        = QOS0;
             publish_msg.payloadlen = cipher_mqtt.len;
             publish_msg.payload    = cipher_mqtt.data;
-            err                    = mqtt_publish(client, MQTT_TOPIC_DATA, &publish_msg);
-            if (err != KAWAII_MQTT_SUCCESS_ERROR) {
-                LOG_E("publish msg fail, err[%d]", err);
-                static int flag = 0;
 
-                if (flag++ == 10) {
-                    flag = 0;
-                    rt_thread_init(&check_thread, "mqtt_reset", mqtt_reset_thread, RT_NULL, check_stack, sizeof(check_stack), 25, 15);
-                    rt_thread_startup(&check_thread);
-                    rt_thread_mdelay(2000);
-                }
-            } else {
-                LOG_D("publish msg success!!!!!!!!");
-            }
         } else {
             LOG_E("publish msg sm4 encrypt fail.");
         }
@@ -104,12 +90,20 @@ void publish_handle(void)
         publish_msg.qos        = QOS0;
         publish_msg.payloadlen = rt_strlen(publish_data);
         publish_msg.payload    = publish_data;
-        err                    = mqtt_publish(client, MQTT_TOPIC_DATA, &publish_msg);
-        if (err != KAWAII_MQTT_SUCCESS_ERROR) {
-            LOG_E("publish msg fail, err[%d]", err);
-        } else {
-            LOG_D("publish msg success!!!!!!!!");
+    }
+
+    err = mqtt_publish(client, MQTT_TOPIC_DATA, &publish_msg);
+    if (err != KAWAII_MQTT_SUCCESS_ERROR) {
+        LOG_E("publish msg fail, err[%d]", err);
+        static int flag = 0;
+        if (flag++ == 10) {
+            flag = 0;
+            rt_thread_init(&check_thread, "mqtt_reset", mqtt_reset_thread, RT_NULL, check_stack, sizeof(check_stack), 25, 15);
+            rt_thread_startup(&check_thread);
+            rt_thread_mdelay(2000);
         }
+    } else {
+        LOG_D("publish msg success!!!!!!!!");
     }
     rt_pin_write(LED2, PIN_HIGH);
 
@@ -253,8 +247,9 @@ static void mqtt_entry(void *p)
     rt_pin_write(LED3, PIN_HIGH);
 
     while (1) {
+        ec800x_open_with_check();
         publish_handle();
-        rt_thread_mdelay(MQTT_DELAY_MS);
+        ec800x_close_with_check();
     }
 }
 

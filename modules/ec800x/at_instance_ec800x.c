@@ -36,7 +36,7 @@ static int ec800x_device_register(void)
                               AT_DEVICE_CLASS_EC800X,
                               (void *)ec800x);
 }
-INIT_APP_EXPORT(ec800x_device_register);
+// INIT_APP_EXPORT(ec800x_device_register);
 
 rt_bool_t ec800x_isinit(void)
 {
@@ -69,3 +69,37 @@ struct LOC_GNSS *ec800x_get_gnss(void)
     return &gnssmsg;
 }
 #endif
+
+/**
+ * @brief 唤醒模块并获取gnss信息
+ */
+void ec800x_open_with_check(void)
+{
+    struct at_device_ec800x *ec800x = &_dev;
+    struct at_device *device        = &ec800x->device;
+    rt_bool_t is_link_up;
+    rt_err_t result = RT_EOK;
+
+    at_device_control(device, AT_DEVICE_CTRL_WAKEUP, RT_NULL);
+    result = ec800x_read_gnss(device);
+    if (result != RT_EOK) {
+        if (result == 2) {
+            LOG_E("ec800x read gnss failed");
+        } else if (result == 1) {
+            LOG_W("ec800x gnss valid");
+        }
+    }
+
+    is_link_up = (ec800x_check_link_status(device) == RT_EOK);
+    netdev_low_level_set_link_status(device->netdev, is_link_up);
+}
+
+/**
+ * @brief 使模块休眠
+ */
+void ec800x_close_with_check(void)
+{
+    struct at_device_ec800x *ec800x = &_dev;
+    struct at_device *device        = &ec800x->device;
+    at_device_control(device, AT_DEVICE_CTRL_SLEEP, RT_NULL);
+}

@@ -199,6 +199,12 @@
             "path": "rt-thread/components/drivers/mtd/mtd_nor.c"
           },
           {
+            "path": "rt-thread/components/drivers/pm/lptimer.c"
+          },
+          {
+            "path": "rt-thread/components/drivers/pm/pm.c"
+          },
+          {
             "path": "rt-thread/components/drivers/rtc/rtc.c"
           },
           {
@@ -254,6 +260,9 @@
           },
           {
             "path": "nrf_sdk/components/libraries/fstorage/nrf_fstorage.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/timer/app_timer2.c"
           }
         ],
         "folders": []
@@ -918,7 +927,10 @@
         "<virtual_root>/max30102/v1/algorithm_v1.c",
         "<virtual_root>/max30102/v1",
         "<virtual_root>/nrf_log",
-        "<virtual_root>/nrf_services"
+        "<virtual_root>/nrf_services",
+        "<virtual_root>/DeviceDrivers/lptimer.c",
+        "<virtual_root>/DeviceDrivers/pm.c",
+        "<virtual_root>/Drivers/app_timer2.c"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -1044,7 +1056,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": "ip 192.168.230.1"
+        "otherCmds": ""
       },
       "uploadConfigMap": {},
       "custom_dep": {
@@ -1150,7 +1162,8 @@
           "rt-thread/components/utilities/ulog",
           "rt-thread/components/utilities/ulog/syslog",
           "modules/max30102/v2",
-          "modules/max30102/v1"
+          "modules/max30102/v1",
+          "nrf_sdk/components/libraries/button"
         ],
         "libList": [],
         "sourceDirList": [],

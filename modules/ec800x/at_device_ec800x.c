@@ -57,7 +57,7 @@ static int ec800x_power_off(struct at_device *device)
 
 static int ec800x_sleep(struct at_device *device)
 {
-    // at_response_t resp = RT_NULL;
+    at_response_t resp              = RT_NULL;
     struct at_device_ec800x *ec800x = RT_NULL;
 
     ec800x = (struct at_device_ec800x *)device->user_data;
@@ -74,24 +74,22 @@ static int ec800x_sleep(struct at_device *device)
         LOG_E("no config wakeup pin, can not entry into sleep mode.");
         return (-RT_ERROR);
     }
-    /*
+
     resp = at_create_resp(64, 0, rt_tick_from_millisecond(300));
-    if (resp == RT_NULL)
-    {
+    if (resp == RT_NULL) {
         LOG_D("no memory for resp create.");
-        return(-RT_ERROR);
+        return (-RT_ERROR);
     }
 
-    if (at_obj_exec_cmd(device->client, resp, "AT+QSCLK=1") != RT_EOK)//enable sleep mode
+    if (at_obj_exec_cmd(device->client, resp, "AT+QSCLK=1") != RT_EOK) // enable sleep mode
 
     {
         LOG_D("enable sleep fail.\"AT+QSCLK=1\" execute fail.");
         at_delete_resp(resp);
-        return(-RT_ERROR);
+        return (-RT_ERROR);
     }
 
     at_delete_resp(resp);
-    */
 
     rt_pin_write(ec800x->wakeup_pin, PIN_HIGH);
 
@@ -102,7 +100,7 @@ static int ec800x_sleep(struct at_device *device)
 
 static int ec800x_wakeup(struct at_device *device)
 {
-    // at_response_t resp = RT_NULL;
+    at_response_t resp              = RT_NULL;
     struct at_device_ec800x *ec800x = RT_NULL;
 
     ec800x = (struct at_device_ec800x *)device->user_data;
@@ -119,28 +117,25 @@ static int ec800x_wakeup(struct at_device *device)
     rt_pin_write(ec800x->wakeup_pin, PIN_LOW);
     rt_thread_mdelay(200);
 
-    /*
     resp = at_create_resp(64, 0, rt_tick_from_millisecond(300));
-    if (resp == RT_NULL)
-    {
+    if (resp == RT_NULL) {
         LOG_D("no memory for resp create.");
-        return(-RT_ERROR);
+        return (-RT_ERROR);
     }
-    if (at_obj_exec_cmd(device->client, resp, "AT+QSCLK=0") != RT_EOK)//disable sleep mode
+    if (at_obj_exec_cmd(device->client, resp, "AT+QSCLK=0") != RT_EOK) // disable sleep mode
     {
         LOG_D("wake up fail. \"AT+QSCLK=0\" execute fail.");
         at_delete_resp(resp);
-        return(-RT_ERROR);
+        return (-RT_ERROR);
     }
     at_delete_resp(resp);
-    */
 
     ec800x->sleep_status = RT_FALSE;
 
     return (RT_EOK);
 }
 
-static int ec800x_check_link_status(struct at_device *device)
+int ec800x_check_link_status(struct at_device *device)
 {
     at_response_t resp              = RT_NULL;
     struct at_device_ec800x *ec800x = RT_NULL;
@@ -212,7 +207,7 @@ static int ec800x_read_rssi(struct at_device *device)
     return (result);
 }
 
-static int ec800x_read_gnss(struct at_device *device)
+int ec800x_read_gnss(struct at_device *device)
 {
     int result         = 0;
     at_response_t resp = at_create_resp(128, 0, rt_tick_from_millisecond(300));
@@ -456,6 +451,8 @@ static void ec800x_check_link_status_entry(void *parameter)
     }
 
     while (1) {
+        rt_thread_delay(EC800X_LINK_DELAY_TIME);
+
         result = ec800x_read_rssi(device);
         if (result != RT_EOK) {
             LOG_E("ec800x read rssi failed");
@@ -470,15 +467,12 @@ static void ec800x_check_link_status_entry(void *parameter)
             }
         }
 
-        rt_thread_delay(EC800X_LINK_DELAY_TIME);
-
         is_link_up = (ec800x_check_link_status(device) == RT_EOK);
-
         netdev_low_level_set_link_status(netdev, is_link_up);
     }
 }
 
-static int ec800x_netdev_check_link_status(struct netdev *netdev)
+int ec800x_netdev_check_link_status(struct netdev *netdev)
 {
 #define EC800X_LINK_THREAD_TICK       20
 #define EC800X_LINK_THREAD_STACK_SIZE (1024)
@@ -989,10 +983,12 @@ void ec800x_init_thread_entry(void *parameter)
         if (device->is_init == RT_FALSE) {
             /* set network interface device status and address information */
             ec800x_netdev_set_info(device->netdev);
-            /* check and create link staus sync thread  */
+/* check and create link staus sync thread  */
+#if USING_CHECK_LINK
             if (rt_thread_find(device->netdev->name) == RT_NULL) {
                 ec800x_netdev_check_link_status(device->netdev);
             }
+#endif
         }
 
         LOG_I("%s device network initialize success.", device->name);
@@ -1031,7 +1027,7 @@ static int ec800x_init(struct at_device *device)
     ec800x               = (struct at_device_ec800x *)device->user_data;
     ec800x->power_status = RT_FALSE; // default power is off.
     ec800x->sleep_status = RT_FALSE; // default sleep is disabled.
-
+    ec800x->gnss_status  = RT_FALSE;
     /* initialize AT client */
     at_client_init(ec800x->client_name, ec800x->recv_line_num);
 

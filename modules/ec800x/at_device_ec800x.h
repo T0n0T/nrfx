@@ -19,6 +19,8 @@ extern "C" {
 #include "gps_rmc.h"
 #include <at_device.h>
 
+// #define USING_CHECK_LINK       1
+
 #define AT_DEVICE_CLASS_EC800X 0X17U
 /* The maximum number of sockets supported by the ec800x device */
 #define AT_DEVICE_EC800X_SOCKETS_NUM 5
@@ -29,7 +31,8 @@ extern "C" {
 #define AT_DEVICE_EC800X_INIT_ASYN
 #define EC800X_SAMPLE_POWER_PIN     EC800_PIN_PWR
 #define EC800X_SAMPLE_RESET_PIN     EC800_PIN_RESET
-#define EC800X_SAMPLE_WAKEUP_PIN    -1
+#define EC800X_SAMPLE_WAKEUP_PIN    EC800_PIN_DTR
+#define EC800X_SAMPLE_RI_PIN        EC800_PIN_RI
 #define EC800X_SAMPLE_CLIENT_NAME   "uart0"
 #define EC800X_SAMPLE_RECV_BUFF_LEN 512
 
@@ -82,6 +85,11 @@ struct at_device_ec800x {
 
 int ec800x_get_rssi(void);
 rt_bool_t ec800x_isinit(void);
+int ec800x_read_gnss(struct at_device *device);
+int ec800x_netdev_check_link_status(struct netdev *netdev);
+int ec800x_check_link_status(struct at_device *device);
+void ec800x_open_with_check(void);
+void ec800x_close_with_check(void);
 #ifdef AT_USING_SOCKET
 
 /* ec800x device socket initialize */
