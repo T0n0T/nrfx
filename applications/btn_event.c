@@ -83,9 +83,13 @@ rt_uint8_t read_sw_btn(void)
 
 static void sw_irq_handler(void *args)
 {
+    nrfx_rtc_disable(&rtc_instance);
+    nrfx_rtc_cc_disable(&rtc_instance, 0);
     nrfx_rtc_tick_enable(&rtc_instance, true);
     nrfx_rtc_enable(&rtc_instance);
-    rt_device_control(dev, RT_DEVICE_WAKEUP, RT_NULL);
+    
+    // rt_device_control(dev, RT_DEVICE_WAKEUP, RT_NULL);
+    NVIC_EnableIRQ(UARTE0_UART0_IRQn);
     rt_pin_write(LED2, PIN_HIGH);
     // LOG_D("exit pwr!");
 }
@@ -99,13 +103,16 @@ void btn_click(void)
     // if (mission_status) {
     //     publish_handle();
     // }
-    // LOG_D("enter pwr!");
-    // nrfx_rtc_disable(&rtc_instance);
-    // nrfx_rtc_tick_disable(&rtc_instance);
+    LOG_D("enter pwr!");
+    nrfx_rtc_disable(&rtc_instance);
+    nrfx_rtc_tick_disable(&rtc_instance);
+    nrfx_rtc_cc_set(&rtc_instance, 0, 5000, true);
+    nrfx_rtc_enable(&rtc_instance);
     // dev = rt_console_get_device();
     // rt_device_control(dev, RT_DEVICE_POWERSAVE, RT_NULL);
-    // nrf_pwr_mgmt_run();
-    // rt_pin_write(LED2, PIN_LOW);
+    NVIC_DisableIRQ(UARTE0_UART0_IRQn);
+    nrf_pwr_mgmt_run();
+    rt_pin_write(LED2, PIN_LOW);
 }
 
 void btn_double(void)

@@ -96,7 +96,9 @@
             "nrf_rtc.h": "c",
             "nrfx_errors.h": "c",
             "nrfx_irqs.h": "c",
-            "nrfx_irqs_nrf52832.h": "c"
+            "nrfx_irqs_nrf52832.h": "c",
+            "drv_uart.h": "c",
+            "nrf_systick.h": "c"
         },
         "cortex-debug.variableUseNaturalFormat": true
     },

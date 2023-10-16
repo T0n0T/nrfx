@@ -44,6 +44,12 @@ void rtc1_schedule_handle(nrfx_rtc_int_type_t int_type)
             break;
         case NRFX_RTC_INT_COMPARE0:
             nrfx_rtc_counter_clear(&rtc_instance);
+            nrfx_rtc_disable(&rtc_instance);
+            nrfx_rtc_cc_disable(&rtc_instance, 0);
+            nrfx_rtc_tick_enable(&rtc_instance, true);
+            nrfx_rtc_enable(&rtc_instance);
+            NVIC_EnableIRQ(UARTE0_UART0_IRQn);
+            rt_pin_write(LED2, PIN_HIGH);
         default:
             break;
     }
@@ -66,7 +72,7 @@ void RTC_tick_configure(void)
     nrfx_rtc_init(&rtc_instance, &config, rtc1_schedule_handle);
 
     nrfx_rtc_tick_enable(&rtc_instance, true);
-
+    nrfx_rtc_cc_set(&rtc_instance, 0, 5000, true);
     // Power on RTC instance
     nrfx_rtc_enable(&rtc_instance);
 }

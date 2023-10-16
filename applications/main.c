@@ -16,6 +16,7 @@
 #include <app.h>
 #include "app_error.h"
 #include "nrf_pwr_mgmt.h"
+#include "nrfx_rtc.h"
 
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
@@ -37,6 +38,7 @@ int main(void)
     // rt_thread_idle_sethook(pwr_mgmt_handle);
     while (1) {
         // SEGGER_RTT_printf(0, "Hello s-Thread!\r\n");
+        // printf("%d\n", nrfx_rtc_counter_get(&rtc_instance));
         rt_pin_write(DK_BOARD_LED_1, PIN_HIGH);
         rt_thread_mdelay(1000);
         rt_pin_write(DK_BOARD_LED_1, PIN_LOW);
@@ -76,15 +78,24 @@ static int log_init(void)
     // NRF_LOG_ERROR("Test Error!!!!!!!!!");
 }
 
-static void clock_status(void)
+static void irq_status(void)
 {
-    printf("clock tick int is %d\n", nrf_rtc_int_is_enabled(rtc_instance.p_reg, NRF_RTC_INT_TICK_MASK));
+    printf("irq int is: ");
+    for (size_t i = 0; i < 38; i++) {
+        uint32_t irq = NVIC_GetEnableIRQ(i);
+        if (irq) {
+            printf("%d ", i);
+        }
+    }
+    printf("\n");
 }
-MSH_CMD_EXPORT(clock_status, clock status);
+MSH_CMD_EXPORT(irq_status, irq status);
 
-static void clock_int_enable(void)
+static void irq_enable(void)
 {
     nrfx_rtc_tick_enable(&rtc_instance, true);
     nrfx_rtc_enable(&rtc_instance);
+
+    NVIC_EnableIRQ(UARTE0_UART0_IRQn);
 }
-MSH_CMD_EXPORT(clock_int_enable, clock_int_enable);
+MSH_CMD_EXPORT(irq_enable, clock_int_enable);
