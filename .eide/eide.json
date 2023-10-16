@@ -253,6 +253,9 @@
             "path": "libraries/drivers/drv_spi.c"
           },
           {
+            "path": "libraries/drivers/drv_uart.c"
+          },
+          {
             "path": "libraries/drivers/drv_uarte.c"
           },
           {
@@ -930,7 +933,8 @@
         "<virtual_root>/nrf_services",
         "<virtual_root>/DeviceDrivers/lptimer.c",
         "<virtual_root>/DeviceDrivers/pm.c",
-        "<virtual_root>/Drivers/app_timer2.c"
+        "<virtual_root>/Drivers/app_timer2.c",
+        "<virtual_root>/Drivers/drv_uarte.c"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -1056,7 +1060,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": ""
+        "otherCmds": "ip 192.168.230.1"
       },
       "uploadConfigMap": {},
       "custom_dep": {

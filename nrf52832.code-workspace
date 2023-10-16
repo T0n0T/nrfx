@@ -91,7 +91,9 @@
             "nrf_assert.h": "c",
             "app_button.h": "c",
             "nrfx_rtc.h": "c",
-            "nrfx_gpiote.h": "c"
+            "nrfx_gpiote.h": "c",
+            "nrfx_systick.h": "c",
+            "nrf_rtc.h": "c"
         },
         "cortex-debug.variableUseNaturalFormat": true
     },

@@ -9,6 +9,7 @@
  *
  */
 #include <rtdevice.h>
+#include <board.h>
 #include <stdio.h>
 #include <app.h>
 
@@ -76,15 +77,29 @@ rt_uint8_t read_sw_btn(void)
     return rt_pin_read(SW);
 }
 
+static void sw_irq_handler(void *args)
+{
+    LOG_D("exit pwr!");
+
+    nrfx_rtc_tick_enable(&rtc_instance, true);
+    nrfx_rtc_enable(&rtc_instance);
+}
+
 void btn_click(void)
 {
     LOG_D("single click!");
-    beep_on();
-    rt_thread_mdelay(50);
-    beep_off();
+    // beep_on();
+    // rt_thread_mdelay(50);
+    // beep_off();
     // if (mission_status) {
     //     publish_handle();
     // }
+    LOG_D("enter pwr!");
+    nrfx_rtc_disable(&rtc_instance);
+    nrfx_rtc_tick_disable(&rtc_instance);
+
+    nrf_pwr_mgmt_run();
+    LOG_D("go on!");
 }
 
 void btn_double(void)
@@ -122,7 +137,8 @@ static void btn_entry(void *p)
     rt_pin_mode(LED2, PIN_MODE_OUTPUT);
     rt_pin_mode(LED3, PIN_MODE_OUTPUT);
     rt_pin_mode(SW, PIN_MODE_INPUT_PULLUP);
-
+    rt_pin_attach_irq(14, PIN_IRQ_MODE_FALLING, sw_irq_handler, RT_NULL);
+    rt_pin_irq_enable(14, PIN_IRQ_ENABLE);
     // nrf_gpio_cfg_input(SW, NRF_GPIO_PIN_PULLUP);
 
     rt_pin_write(LED2, PIN_HIGH);

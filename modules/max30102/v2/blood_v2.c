@@ -4,12 +4,12 @@
 #include <rtdevice.h>
 #include <stdio.h>
 
-#define DBG_LEVEL DBG_LOG
+#define DBG_LEVEL DBG_INFO
 #define LOG_TAG   "blood.cal"
 #include <rtdbg.h>
 /**
   ******************************************************************************
-  * 使用实例:
+  * 浣跨敤瀹炰緥:
              int32_t n_heart_rate = 0;
              int32_t n_sp02 = 0;
 
@@ -35,7 +35,7 @@ int8_t ch_spo2_valid;         // indicator to show if the SP02 calculation is va
 int32_t n_heart_rate;         // heart rate value
 int8_t ch_hr_valid;           // indicator to show if the heart rate calculation is valid
 uint8_t uch_dummy;
-
+uint8_t change_flag;
 uint8_t ecg_status;
 int heart = 0;
 
@@ -139,7 +139,7 @@ void max30102_data_handle(int32_t *heart_rate, int32_t *sp02)
             }
 
             max30102_read_fifo(&aun_red_buffer[i], &aun_ir_buffer[i]);
-            // printf("[%d]: aun_red_buffer = %d, aun_ir_buffer = %d\n", i, aun_red_buffer[i], aun_ir_buffer[i]);
+            LOG_D("[%d]: aun_red_buffer = %d, aun_ir_buffer = %d", i, aun_red_buffer[i], aun_ir_buffer[i]);
             if (aun_red_buffer[i] > un_prev_data) {
                 f_temp = aun_red_buffer[i] - un_prev_data;
                 f_temp /= (un_max - un_min);
@@ -172,17 +172,28 @@ void max30102_data_handle(int32_t *heart_rate, int32_t *sp02)
         // rt_exit_critical();
 
         maxim_heart_rate_and_oxygen_saturation(aun_ir_buffer, n_ir_buffer_length, aun_red_buffer, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid);
+        n_heart_rate = n_heart_rate / 6;
         if ((ch_hr_valid == 1) && (ch_spo2_valid == 1) && (n_heart_rate > 50) && (n_heart_rate < 120) && (n_sp02 < 101) && (n_sp02 > 80)) //**/ ch_hr_valid == 1 && ch_spo2_valid ==1 && n_heart_rate<120 && n_sp02<101
         {
             *heart_rate = n_heart_rate;
             *sp02       = n_sp02;
-            ecg_status  = 1;
-            // 心率和血氧浓度初始数据打印
+            change_flag++;
             //            printf("HR=%d, spo2:%d\r\n", n_heart_rate, n_sp02);
+            if (change_flag > 3) {
+                change_flag = 3;
+                ecg_status  = 1;
+                printf("ecg_status change: %d", ecg_status);
+            }
+
             break;
         } else if (!retry) {
+            change_flag--;
+            if (change_flag < 0) {
+                change_flag = 0;
+                ecg_status  = 0;
+                printf("ecg_status change: %d", ecg_status);
+            }
 
-            ecg_status = 0;
             break;
         } else {
             retry--;
@@ -192,11 +203,10 @@ void max30102_data_handle(int32_t *heart_rate, int32_t *sp02)
 
 HRM_Mode current_mode;
 int checkout_spo2_flag, checkout_prox_flag;
-BloodData g_blooddata = {0}; // 血液数据存储
+BloodData g_blooddata = {0};
 
 void blood_data_update_proximity(void)
 {
-    // 模式切换
     int retry         = 8;
     uint8_t reg       = 0;
     uint8_t read_ptr  = 0;
@@ -205,8 +215,8 @@ void blood_data_update_proximity(void)
     while (rt_pin_read(cfg.irq_pin.pin) == 0) {
         while (retry--) {
             max30102_read_fifo(0, &fifo_ir); // read from MAX30102 FIFO2
-            // LOG_D("mode get data[%d]:  fifo_ir: %06d fifo_red: %06d", 8 - retry, fifo_ir, fifo_red);
-            if (fifo_ir > 10000 && current_mode == PROX) {
+            LOG_D("mode get data[%d]:  fifo_ir: %06d", 8 - retry, fifo_ir);
+            if (fifo_ir > 5000 && current_mode == PROX) {
                 if (checkout_spo2_flag > 3) {
                     checkout_spo2_flag = 0;
                     // max30102_checkout_HRM_SPO2_mode();
@@ -235,7 +245,6 @@ void blood_data_update_proximity(void)
     }
 
 MODE_ENTRY:
-    // 数据写入
     if (current_mode == HRM_SPO2) {
         LOG_D("HRM_SPO2_MODE!!!!!!!!!!!!!!!!!!!");
     }
@@ -243,13 +252,12 @@ MODE_ENTRY:
 
 void blood_Loop(void)
 {
-    // 血液信息获取
     blood_data_update_proximity();
 
     if (current_mode == HRM_SPO2) {
         max30102_ecg_init();
         max30102_data_handle(&n_heart_rate, &n_sp02);
-        // printf("heart:%d, sp02:%d\r\n", n_heart_rate, n_sp02);
+        printf("heart:%d, sp02:%d\r\n", n_heart_rate, n_sp02);
         g_blooddata.heart = n_heart_rate;
         g_blooddata.SpO2  = n_sp02;
     }
@@ -268,5 +276,8 @@ void max30102_thread_entry(void *args)
 
     while (1) {
         blood_Loop();
+        // max30102_data_handle(&n_heart_rate, &n_sp02);
+        // printf("heart:%d, sp02:%d\r\n", n_heart_rate, n_sp02);
+        rt_thread_mdelay(500);
     }
 }

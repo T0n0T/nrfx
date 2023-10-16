@@ -11,11 +11,10 @@
 #include <rtthread.h>
 #include <rtdevice.h>
 #include <rthw.h>
-#include <nrfx_systick.h>
 
 #include "board.h"
 #include "drv_uart.h"
-#include <nrfx_rtc.h>
+#include <nrfx_systick.h>
 #include <nrf_drv_clock.h>
 
 /*
@@ -35,8 +34,6 @@ void SysTick_Handler(void)
 }
 
 const nrfx_rtc_t rtc_instance = NRFX_RTC_INSTANCE(1);
-#define LF_CLK_HZ     (32768UL)
-#define RTC_PRESCALER ((uint32_t)(NRFX_ROUNDED_DIV(LF_CLK_HZ, RT_TICK_PER_SECOND) - 1))
 
 void rtc1_schedule_handle(nrfx_rtc_int_type_t int_type)
 {
@@ -47,7 +44,6 @@ void rtc1_schedule_handle(nrfx_rtc_int_type_t int_type)
             break;
         case NRFX_RTC_INT_COMPARE0:
             nrfx_rtc_counter_clear(&rtc_instance);
-            rt_pin_write(LED2, PIN_HIGH);
         default:
             break;
     }

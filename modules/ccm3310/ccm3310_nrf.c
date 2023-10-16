@@ -51,7 +51,7 @@ int ccm3310_init(void)
     rt_pin_write(POR, PIN_HIGH);
     return 0;
 }
-INIT_APP_EXPORT(ccm3310_init);
+// INIT_APP_EXPORT(ccm3310_init);
 
 int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int recv_len)
 {
