@@ -930,11 +930,10 @@
         "<virtual_root>/max30102/v1/algorithm_v1.c",
         "<virtual_root>/max30102/v1",
         "<virtual_root>/nrf_log",
-        "<virtual_root>/nrf_services",
         "<virtual_root>/DeviceDrivers/lptimer.c",
         "<virtual_root>/DeviceDrivers/pm.c",
         "<virtual_root>/Drivers/app_timer2.c",
-        "<virtual_root>/Drivers/drv_uarte.c"
+        "<virtual_root>/Drivers/drv_uart.c"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -1184,8 +1183,7 @@
           "NRFX_CLOCK_ENABLED",
           "LFS_CONFIG=lfs_config.h",
           "CONFIG_GPIO_AS_PINRESET",
-          "USE_APP_CONFIG",
-          "DEBUG"
+          "USE_APP_CONFIG"
         ]
       }
     },

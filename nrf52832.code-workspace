@@ -93,7 +93,10 @@
             "nrfx_rtc.h": "c",
             "nrfx_gpiote.h": "c",
             "nrfx_systick.h": "c",
-            "nrf_rtc.h": "c"
+            "nrf_rtc.h": "c",
+            "nrfx_errors.h": "c",
+            "nrfx_irqs.h": "c",
+            "nrfx_irqs_nrf52832.h": "c"
         },
         "cortex-debug.variableUseNaturalFormat": true
     },

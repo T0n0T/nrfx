@@ -22,6 +22,7 @@
 #include "ble_common.h"
 
 // DFU需要引用的头文件
+#include "nrfx_gpiote.h"
 #include "nrf_dfu_ble_svci_bond_sharing.h"
 #include "nrf_svci_async_function.h"
 #include "nrf_svci_async_handler.h"
@@ -38,6 +39,7 @@ static bool app_shutdown_handler(nrf_pwr_mgmt_evt_t event)
     switch (event) {
         case NRF_PWR_MGMT_EVT_PREPARE_DFU:
             NRF_LOG_INFO("Power management wants to reset to DFU mode.");
+            NRF_LOG_INFO("Power management allowed to reset to DFU mode.");
             // YOUR_JOB: Get ready to reset into DFU mode
             //
             // If you aren't finished with any ongoing tasks, return "false" to
@@ -60,7 +62,16 @@ static bool app_shutdown_handler(nrf_pwr_mgmt_evt_t event)
             //    APP_ERROR_CHECK(err_code);
             //}
             break;
-
+        case NRF_PWR_MGMT_EVT_PREPARE_SYSOFF:
+            break;
+        case NRF_PWR_MGMT_EVT_PREPARE_WAKEUP:
+            nrf_gpio_cfg_input(14, NRF_GPIO_PIN_PULLUP); // 将要唤醒的脚配置为输入
+            /* 设置为上升沿检出，这个一定不要配置错了 */
+            nrf_gpio_pin_sense_t sense = NRF_GPIO_PIN_SENSE_HIGH;
+            nrf_gpio_cfg_sense_set(14, sense);
+            break;
+        case NRF_PWR_MGMT_EVT_PREPARE_RESET:
+            break;
         default:
             // YOUR_JOB: Implement any of the other events available from the power management module:
             //      -NRF_PWR_MGMT_EVT_PREPARE_SYSOFF
@@ -69,7 +80,6 @@ static bool app_shutdown_handler(nrf_pwr_mgmt_evt_t event)
             return true;
     }
 
-    NRF_LOG_INFO("Power management allowed to reset to DFU mode.");
     return true;
 }
 
@@ -162,8 +172,8 @@ static void ble_dfu_evt_handler(ble_dfu_buttonless_evt_type_t event)
 
 static void service_init(void)
 {
-    ble_dfu_buttonless_init_t dfus_init = {0};
-    dfus_init.evt_handler               = ble_dfu_evt_handler;
-    APP_ERROR_CHECK(ble_dfu_buttonless_init(&dfus_init));
+    // ble_dfu_buttonless_init_t dfus_init = {0};
+    // dfus_init.evt_handler               = ble_dfu_evt_handler;
+    // APP_ERROR_CHECK(ble_dfu_buttonless_init(&dfus_init));
 }
 ble_serv_init_fn ble_app_dfu_init = service_init;

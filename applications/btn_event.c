@@ -16,10 +16,14 @@
 #include <button.h>
 #include "nrfx_pwm.h"
 #include "nrf_gpio.h"
+#include "drv_uarte.h"
+#include "nrf_pwr_mgmt.h"
+
 #define DBG_LVL DBG_LOG
 #define DBG_TAG "btn"
 #include <rtdbg.h>
 
+rt_device_t dev;
 /* button */
 Button_t SW_BUTTON;
 static struct rt_thread btn_thread;
@@ -79,10 +83,11 @@ rt_uint8_t read_sw_btn(void)
 
 static void sw_irq_handler(void *args)
 {
-    LOG_D("exit pwr!");
-
     nrfx_rtc_tick_enable(&rtc_instance, true);
     nrfx_rtc_enable(&rtc_instance);
+    rt_device_control(dev, RT_DEVICE_WAKEUP, RT_NULL);
+    rt_pin_write(LED2, PIN_HIGH);
+    // LOG_D("exit pwr!");
 }
 
 void btn_click(void)
@@ -94,12 +99,13 @@ void btn_click(void)
     // if (mission_status) {
     //     publish_handle();
     // }
-    LOG_D("enter pwr!");
-    nrfx_rtc_disable(&rtc_instance);
-    nrfx_rtc_tick_disable(&rtc_instance);
-
-    nrf_pwr_mgmt_run();
-    LOG_D("go on!");
+    // LOG_D("enter pwr!");
+    // nrfx_rtc_disable(&rtc_instance);
+    // nrfx_rtc_tick_disable(&rtc_instance);
+    // dev = rt_console_get_device();
+    // rt_device_control(dev, RT_DEVICE_POWERSAVE, RT_NULL);
+    // nrf_pwr_mgmt_run();
+    // rt_pin_write(LED2, PIN_LOW);
 }
 
 void btn_double(void)
@@ -128,7 +134,8 @@ void btn_long_free(void)
     LOG_D("long click!");
     beep_on();
     rt_thread_mdelay(500);
-    rt_hw_cpu_reset();
+    // rt_hw_cpu_reset();
+    nrf_pwr_mgmt_shutdown(NRF_PWR_MGMT_SHUTDOWN_GOTO_SYSOFF);
 }
 
 static void btn_entry(void *p)

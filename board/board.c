@@ -119,7 +119,7 @@ void rt_hw_us_delay(rt_uint32_t us)
 void rt_hw_board_init(void)
 {
     rt_hw_interrupt_enable(0);
-    // sd_power_dcdc_mode_set(NRF_POWER_DCDC_ENABLE);
+    sd_power_dcdc_mode_set(NRF_POWER_DCDC_ENABLE);
     /* Activate deep sleep mode */
     SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
 

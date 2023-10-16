@@ -340,8 +340,8 @@ int ble_app_init(void)
     ret_code_t err_code;
 
     // 使能中断之前，初始化异步SVCI接口到Bootloader
-    err_code = ble_dfu_buttonless_async_svci_init();
-    APP_ERROR_CHECK(err_code);
+    // err_code = ble_dfu_buttonless_async_svci_init();
+    // APP_ERROR_CHECK(err_code);
 
     // 初始化APP定时器
     timers_init();
