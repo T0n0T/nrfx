@@ -98,7 +98,11 @@
             "nrfx_irqs.h": "c",
             "nrfx_irqs_nrf52832.h": "c",
             "drv_uart.h": "c",
-            "nrf_systick.h": "c"
+            "nrf_systick.h": "c",
+            "drv_uarte.h": "c",
+            "nrf_drv_clock.h": "c",
+            "bsp.h": "c",
+            "nrfx_clock.h": "c"
         },
         "cortex-debug.variableUseNaturalFormat": true
     },

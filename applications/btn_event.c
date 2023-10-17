@@ -14,8 +14,7 @@
 #include <app.h>
 
 #include <button.h>
-#include "nrfx_pwm.h"
-#include "nrf_gpio.h"
+#include "bsp.h"
 #include "drv_uarte.h"
 #include "nrf_pwr_mgmt.h"
 
@@ -29,69 +28,9 @@ Button_t SW_BUTTON;
 static struct rt_thread btn_thread;
 static char btn_stack[1024];
 
-/* pwm beep */
-static nrfx_pwm_t m_pwm0                     = NRFX_PWM_INSTANCE(0);
-static nrf_pwm_values_common_t seq0_values[] = {125};
-
-static void beep_init(void)
-{
-    // 定义PWM初始化配置结构体并初始化参数
-    nrfx_pwm_config_t const config0 =
-        {
-            .output_pins =
-                {
-                    BEEP,                  // channel 0 -> pin beep
-                    NRFX_PWM_PIN_NOT_USED, // channel 1
-                    NRFX_PWM_PIN_NOT_USED, // channel 2
-                    NRFX_PWM_PIN_NOT_USED  // channel 3
-                },
-            .irq_priority = APP_IRQ_PRIORITY_LOWEST,
-            .base_clock   = NRF_PWM_CLK_1MHz, // 1mhz -> 1us; 4khz -> 250us = 250 * 1us
-            .count_mode   = NRF_PWM_MODE_UP,
-            .top_value    = 250,                 // max period num
-            .load_mode    = NRF_PWM_LOAD_COMMON, // common load seq
-            .step_mode    = NRF_PWM_STEP_AUTO,
-        };
-
-    if (nrfx_pwm_init(&m_pwm0, &config0, NULL) != NRFX_SUCCESS) {
-        printf("pwm init failed\n");
-    }
-}
-
-static void beep_on(void)
-{
-    static nrf_pwm_sequence_t const seq0 =
-        {
-            .values.p_common = seq0_values,
-            .length          = NRF_PWM_VALUES_LENGTH(seq0_values),
-            .repeats         = 0,
-            .end_delay       = 0,
-        };
-    (void)nrfx_pwm_simple_playback(&m_pwm0, &seq0, 2000, NRFX_PWM_FLAG_STOP);
-}
-
-static void beep_off(void)
-{
-    nrfx_pwm_stop(&m_pwm0, 1);
-}
-
 rt_uint8_t read_sw_btn(void)
 {
-    // return nrf_gpio_pin_read(SW);
-    return rt_pin_read(SW);
-}
-
-static void sw_irq_handler(void *args)
-{
-    nrfx_rtc_disable(&rtc_instance);
-    nrfx_rtc_cc_disable(&rtc_instance, 0);
-    nrfx_rtc_tick_enable(&rtc_instance, true);
-    nrfx_rtc_enable(&rtc_instance);
-    
-    // rt_device_control(dev, RT_DEVICE_WAKEUP, RT_NULL);
-    NVIC_EnableIRQ(UARTE0_UART0_IRQn);
-    rt_pin_write(LED2, PIN_HIGH);
-    // LOG_D("exit pwr!");
+    return nrf_gpio_pin_read(SW);
 }
 
 void btn_click(void)
@@ -104,15 +43,16 @@ void btn_click(void)
     //     publish_handle();
     // }
     LOG_D("enter pwr!");
-    nrfx_rtc_disable(&rtc_instance);
+    // nrfx_rtc_disable(&rtc_instance);
     nrfx_rtc_tick_disable(&rtc_instance);
-    nrfx_rtc_cc_set(&rtc_instance, 0, 5000, true);
-    nrfx_rtc_enable(&rtc_instance);
-    // dev = rt_console_get_device();
-    // rt_device_control(dev, RT_DEVICE_POWERSAVE, RT_NULL);
+    // nrfx_rtc_cc_set(&rtc_instance, 0, 5000, true);
+    // nrfx_rtc_enable(&rtc_instance);
+    dev = rt_console_get_device();
+    rt_device_control(dev, RT_DEVICE_POWERSAVE, RT_NULL);
+    bsp_uninit();
+    set_sleep_exit_pin();
     NVIC_DisableIRQ(UARTE0_UART0_IRQn);
     nrf_pwr_mgmt_run();
-    rt_pin_write(LED2, PIN_LOW);
 }
 
 void btn_double(void)
@@ -140,24 +80,24 @@ void btn_long_free(void)
 {
     LOG_D("long click!");
     beep_on();
+    dev = rt_console_get_device();
+    rt_device_control(dev, RT_DEVICE_POWERSAVE, RT_NULL);
+    bsp_uninit();
+    // nrf_gpio_cfg_input(14, NRF_GPIO_PIN_PULLUP); // 将要唤醒的脚配置为输入
+    // /* 设置为上升沿检出，这个一定不要配置错了 */
+    // nrf_gpio_pin_sense_t sense = NRF_GPIO_PIN_SENSE_HIGH;
+    // nrf_gpio_cfg_sense_set(14, sense);
     rt_thread_mdelay(500);
     // rt_hw_cpu_reset();
-    nrf_pwr_mgmt_shutdown(NRF_PWR_MGMT_SHUTDOWN_GOTO_SYSOFF);
+
+    nrf_pwr_mgmt_shutdown(NRF_PWR_MGMT_SHUTDOWN_STAY_IN_SYSOFF);
 }
 
 static void btn_entry(void *p)
 {
-    rt_pin_mode(POWER_KEEP, PIN_MODE_OUTPUT);
-    rt_pin_mode(LED2, PIN_MODE_OUTPUT);
-    rt_pin_mode(LED3, PIN_MODE_OUTPUT);
-    rt_pin_mode(SW, PIN_MODE_INPUT_PULLUP);
-    rt_pin_attach_irq(14, PIN_IRQ_MODE_FALLING, sw_irq_handler, RT_NULL);
-    rt_pin_irq_enable(14, PIN_IRQ_ENABLE);
-    // nrf_gpio_cfg_input(SW, NRF_GPIO_PIN_PULLUP);
-
-    rt_pin_write(LED2, PIN_HIGH);
-    rt_pin_write(LED3, PIN_HIGH);
-    beep_init();
+    nrf_gpio_pin_write(LED2, 1);
+    nrf_gpio_pin_write(LED3, 1);
+    bsp_init();
     Button_Create(
         "SW",
         &SW_BUTTON,

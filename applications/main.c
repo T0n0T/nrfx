@@ -13,11 +13,11 @@
 #include <rtdevice.h>
 #include <board.h>
 #include <stdio.h>
-#include <app.h>
+#include "app.h"
 #include "app_error.h"
-#include "nrf_pwr_mgmt.h"
-#include "nrfx_rtc.h"
+#include "bsp.h"
 
+#include "nrf_pwr_mgmt.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
 #include "nrfx_rtc.h"
@@ -33,15 +33,14 @@ int main(void)
 {
     log_init();
     APP_ERROR_CHECK(nrf_pwr_mgmt_init());
-    rt_pin_mode(DK_BOARD_LED_1, PIN_MODE_OUTPUT);
     // mission_init();
     // rt_thread_idle_sethook(pwr_mgmt_handle);
     while (1) {
         // SEGGER_RTT_printf(0, "Hello s-Thread!\r\n");
         // printf("%d\n", nrfx_rtc_counter_get(&rtc_instance));
-        rt_pin_write(DK_BOARD_LED_1, PIN_HIGH);
+        nrf_gpio_pin_write(LED1, 0);
         rt_thread_mdelay(1000);
-        rt_pin_write(DK_BOARD_LED_1, PIN_LOW);
+        nrf_gpio_pin_write(LED1, 1);
         rt_thread_mdelay(1000);
     }
     return RT_EOK;

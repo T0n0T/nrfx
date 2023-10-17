@@ -364,7 +364,7 @@ int ble_app_init(void)
 
     NRF_LOG_INFO("BLE APP started.");
     // 启动广播
-    APP_ERROR_CHECK(ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST));
+    APP_ERROR_CHECK(ble_advertising_start(&m_advertising, BLE_ADV_MODE_IDLE));
 }
 
 static int ble_start(void)
