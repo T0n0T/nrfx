@@ -33,10 +33,10 @@ uint8_t recv_buf[1024];
 
 int ccm3310_init(void)
 {
-    rt_pin_mode(POR, PIN_MODE_OUTPUT);
-    rt_pin_mode(GINT0, PIN_MODE_OUTPUT);
-    // rt_pin_mode(15, PIN_MODE_OUTPUT);
-    rt_pin_mode(GINT1, PIN_MODE_INPUT);
+    nrf_gpio_cfg_output(POR);
+    nrf_gpio_cfg_output(GINT0);
+    // nrf_gpio_cfg_output(15);
+    nrf_gpio_cfg_input(GINT1, NRF_GPIO_PIN_NOPULL);
 
     config_spim.sck_pin   = PIN_SCK;
     config_spim.mosi_pin  = PIN_MOSI;
@@ -46,9 +46,9 @@ int ccm3310_init(void)
     config_spim.mode      = NRF_SPIM_MODE_3;
     // nrfx_spim_init(&instance, &config_spim, 0, (void *)instance.drv_inst_idx);
 
-    rt_pin_write(POR, PIN_LOW);
+    nrf_gpio_pin_write(POR, 0);
     rt_thread_mdelay(20);
-    rt_pin_write(POR, PIN_HIGH);
+    nrf_gpio_pin_write(POR, 1);
     return 0;
 }
 // INIT_APP_EXPORT(ccm3310_init);
@@ -61,9 +61,9 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
 
     rt_memset(recv_buf, 0xff, sizeof(recv_buf));
     nrfx_spim_init(&instance, &config_spim, 0, (void *)instance.drv_inst_idx);
-    rt_pin_write(GINT0, PIN_LOW);
-    while (status == PIN_HIGH) {
-        status = rt_pin_read(GINT1);
+    nrf_gpio_pin_write(GINT0, 0);
+    while (status == 1) {
+        status = nrf_gpio_pin_read(GINT1);
     }
 
     nrfx_spim_xfer_desc_t spim_xfer_desc =
@@ -88,8 +88,8 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
 #endif
     status = PIN_HIGH;
     // rt_pin_write(GINT0, PIN_LOW);
-    while (status == PIN_HIGH) {
-        status = rt_pin_read(GINT1);
+    while (status == 1) {
+        status = nrf_gpio_pin_read(GINT1);
     }
 
     spim_xfer_desc.p_tx_buffer = 0;

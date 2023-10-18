@@ -13,7 +13,7 @@
 #include <rtdevice.h>
 #include <board.h>
 #include <stdio.h>
-#include <app.h>
+#include "app.h"
 #include "app_error.h"
 #include "nrf_pwr_mgmt.h"
 #include <nrfx_systick.h>
@@ -21,6 +21,7 @@
 #include "nrfx_gpiote.h"
 #include "drv_uart.h"
 
+#include "nrf_pwr_mgmt.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
 

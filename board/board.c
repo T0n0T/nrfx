@@ -12,11 +12,11 @@
 #include <rtdevice.h>
 #include <rthw.h>
 
+#include "bsp.h"
 #include "board.h"
 #include "drv_uart.h"
 #include "nrf_gpio.h"
 #include <nrfx_systick.h>
-#include <nrf_drv_clock.h>
 
 /*
  * This is the timer interrupt service routine.
@@ -65,15 +65,10 @@ void RTC_tick_configure(void)
 
 void SysTick_Configuration(void)
 {
-    // nrf_drv_clock_init();
-    // nrfx_clock_init(clk_event_handler);
-    // nrfx_clock_enable();
-    // // nrfx_clock_lfclk_start();
-    // nrfx_clock_hfclk_start();
-    // /* Set interrupt priority */
+    /* Set interrupt priority */
     NVIC_SetPriority(SysTick_IRQn, 0xf);
 
-    // /* Configure SysTick to interrupt at the requested rate. */
+    /* Configure SysTick to interrupt at the requested rate. */
     nrf_systick_load_set(SystemCoreClock / RT_TICK_PER_SECOND);
     nrf_systick_val_clear();
     nrf_systick_csr_set(NRF_SYSTICK_CSR_CLKSOURCE_REF | NRF_SYSTICK_CSR_TICKINT_ENABLE | NRF_SYSTICK_CSR_ENABLE);
@@ -92,13 +87,13 @@ void rt_hw_us_delay(uint32_t us)
 void rt_hw_board_init(void)
 {
     rt_hw_interrupt_enable(0);
-    sd_power_dcdc_mode_set(NRF_POWER_DCDC_ENABLE);
+    // sd_power_dcdc_mode_set(NRF_POWER_DCDC_ENABLE);
     /* Activate deep sleep mode */
     SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
 
     SysTick_Configuration();
 
-    RTC_tick_configure();
+    rtc_tick_configure();
 
 #if defined(RT_USING_HEAP)
     rt_system_heap_init((void *)HEAP_BEGIN, (void *)HEAP_END);
