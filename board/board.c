@@ -14,6 +14,7 @@
 
 #include "board.h"
 #include "drv_uart.h"
+#include "nrf_gpio.h"
 #include <nrfx_systick.h>
 #include <nrf_drv_clock.h>
 
@@ -40,40 +41,25 @@ void rtc1_schedule_handle(nrfx_rtc_int_type_t int_type)
     rt_interrupt_enter();
     switch (int_type) {
         case NRFX_RTC_INT_TICK:
+
             rt_tick_increase();
             break;
         case NRFX_RTC_INT_COMPARE0:
-            nrfx_rtc_counter_clear(&rtc_instance);
-            nrfx_rtc_disable(&rtc_instance);
-            nrfx_rtc_cc_disable(&rtc_instance, 0);
-            nrfx_rtc_tick_enable(&rtc_instance, true);
-            nrfx_rtc_enable(&rtc_instance);
-            NVIC_EnableIRQ(UARTE0_UART0_IRQn);
-            rt_pin_write(LED2, PIN_HIGH);
+            nrf_gpio_pin_toggle(LED1);
         default:
             break;
     }
     rt_interrupt_leave();
-    // rt_kprintf("clk_event!\n");
 }
 
 void RTC_tick_configure(void)
 {
-
-    NVIC_SetPriority(RTC1_IRQn, 5);
-
-    nrf_clock_lf_src_set((nrf_clock_lfclk_t)NRFX_CLOCK_CONFIG_LF_SRC);
-    nrfx_clock_lfclk_start();
-
-    // Initialize RTC instance
+    nrf_drv_clock_init();
+    nrf_drv_clock_lfclk_request(NULL);
     nrfx_rtc_config_t config = NRFX_RTC_DEFAULT_CONFIG;
-    config.prescaler         = RTC_PRESCALER;
-
+    config.prescaler         = 4095;
     nrfx_rtc_init(&rtc_instance, &config, rtc1_schedule_handle);
-
-    nrfx_rtc_tick_enable(&rtc_instance, true);
-    nrfx_rtc_cc_set(&rtc_instance, 0, 5000, true);
-    // Power on RTC instance
+    nrfx_rtc_cc_set(&rtc_instance, 0, 16, true);
     nrfx_rtc_enable(&rtc_instance);
 }
 
@@ -98,28 +84,9 @@ void SysTick_Configuration(void)
  *
  * @param microseconds.
  */
-void rt_hw_us_delay(rt_uint32_t us)
+void rt_hw_us_delay(uint32_t us)
 {
-    rt_uint32_t ticks;
-    rt_uint32_t told, tnow, tcnt = 0;
-    rt_uint32_t reload = SysTick->LOAD;
-
-    ticks = us * reload / (1000000 / RT_TICK_PER_SECOND);
-    told  = SysTick->VAL;
-    while (1) {
-        tnow = SysTick->VAL;
-        if (tnow != told) {
-            if (tnow < told) {
-                tcnt += told - tnow;
-            } else {
-                tcnt += reload - tnow + told;
-            }
-            told = tnow;
-            if (tcnt >= ticks) {
-                break;
-            }
-        }
-    }
+    nrfx_systick_delay_us(us);
 }
 
 void rt_hw_board_init(void)
@@ -129,7 +96,7 @@ void rt_hw_board_init(void)
     /* Activate deep sleep mode */
     SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
 
-    // SysTick_Configuration();
+    SysTick_Configuration();
 
     RTC_tick_configure();
 
@@ -142,7 +109,7 @@ void rt_hw_board_init(void)
 #endif
 
 #if defined(RT_USING_CONSOLE) && defined(RT_USING_DEVICE)
-    // rt_hw_jlink_console_init();
+    rt_hw_jlink_console_init();
     rt_console_set_device(RT_CONSOLE_DEVICE_NAME);
 #endif
 

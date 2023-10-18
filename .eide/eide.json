@@ -208,6 +208,9 @@
             "path": "rt-thread/components/drivers/rtc/rtc.c"
           },
           {
+            "path": "rt-thread/components/drivers/rtc/soft_rtc.c"
+          },
+          {
             "path": "rt-thread/components/drivers/sensor/v1/sensor_cmd.c"
           },
           {
@@ -238,19 +241,7 @@
             "path": "board/sdk_config.h"
           },
           {
-            "path": "libraries/drivers/drv_gpio.c"
-          },
-          {
-            "path": "libraries/drivers/drv_hwtimer.c"
-          },
-          {
             "path": "libraries/drivers/drv_i2c.c"
-          },
-          {
-            "path": "libraries/drivers/drv_rtc.c"
-          },
-          {
-            "path": "libraries/drivers/drv_spi.c"
           },
           {
             "path": "libraries/drivers/drv_uart.c"
@@ -263,9 +254,6 @@
           },
           {
             "path": "nrf_sdk/components/libraries/fstorage/nrf_fstorage.c"
-          },
-          {
-            "path": "nrf_sdk/components/libraries/timer/app_timer2.c"
           }
         ],
         "folders": []
@@ -929,11 +917,14 @@
         "<virtual_root>/max30102/algorithm.c",
         "<virtual_root>/max30102/v1/algorithm_v1.c",
         "<virtual_root>/max30102/v1",
-        "<virtual_root>/nrf_log",
         "<virtual_root>/DeviceDrivers/lptimer.c",
         "<virtual_root>/DeviceDrivers/pm.c",
         "<virtual_root>/Drivers/app_timer2.c",
-        "<virtual_root>/Drivers/drv_uart.c"
+        "<virtual_root>/Drivers/drv_uarte.c",
+        "<virtual_root>/Applications/app.c",
+        "<virtual_root>/nrf_log",
+        "<virtual_root>/Applications/btn_event.c",
+        "<virtual_root>/nrf_services"
       ],
       "toolchain": "AC5",
       "compileConfig": {

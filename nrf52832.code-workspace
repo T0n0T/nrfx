@@ -98,7 +98,9 @@
             "nrfx_irqs.h": "c",
             "nrfx_irqs_nrf52832.h": "c",
             "drv_uart.h": "c",
-            "nrf_systick.h": "c"
+            "nrf_systick.h": "c",
+            "nrfx_uart.h": "c",
+            "nrf_log_backend_rtt.h": "c"
         },
         "cortex-debug.variableUseNaturalFormat": true
     },
