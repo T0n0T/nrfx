@@ -44,14 +44,24 @@ int ccm3310_init(void)
     config_spim.ss_pin    = PIN_SS;
     config_spim.frequency = NRF_SPIM_FREQ_1M;
     config_spim.mode      = NRF_SPIM_MODE_3;
-    // nrfx_spim_init(&instance, &config_spim, 0, (void *)instance.drv_inst_idx);
+    nrfx_spim_init(&instance, &config_spim, 0, (void *)instance.drv_inst_idx);
 
     nrf_gpio_pin_write(POR, 0);
-    rt_thread_mdelay(20);
+    NRFX_DELAY_US(50000);
     nrf_gpio_pin_write(POR, 1);
     return 0;
 }
 // INIT_APP_EXPORT(ccm3310_init);
+
+void ccm3310_uninit(void)
+{
+    nrf_gpio_cfg_default(POR);
+    nrf_gpio_cfg_default(GINT0);
+    // nrf_gpio_cfg_output(15);
+    nrf_gpio_cfg_default(GINT1);
+
+    nrfx_spim_uninit(&instance);
+}
 
 int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int recv_len)
 {
@@ -60,7 +70,7 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
     nrfx_err_t result = NRFX_SUCCESS;
 
     rt_memset(recv_buf, 0xff, sizeof(recv_buf));
-    nrfx_spim_init(&instance, &config_spim, 0, (void *)instance.drv_inst_idx);
+    // nrfx_spim_init(&instance, &config_spim, 0, (void *)instance.drv_inst_idx);
     nrf_gpio_pin_write(GINT0, 0);
     while (status == 1) {
         status = nrf_gpio_pin_read(GINT1);
@@ -98,7 +108,7 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
     spim_xfer_desc.rx_length   = recv_len;
 
     result = nrfx_spim_xfer(&instance, &spim_xfer_desc, 0);
-    nrfx_spim_uninit(&instance);
+    // nrfx_spim_uninit(&instance);
 #if defined(CCM3310_RAW_PRINTF)
     printf("\n========= print receive =========\n");
     for (size_t i = 0; i < recv_len; i++) {

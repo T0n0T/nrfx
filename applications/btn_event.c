@@ -14,10 +14,8 @@
 #include <app.h>
 
 #include <button.h>
-#include "nrfx_pwm.h"
+#include "bsp.h"
 #include "nrfx_gpiote.h"
-#include <nrfx_systick.h>
-#include "drv_uart.h"
 #include "nrf_pwr_mgmt.h"
 
 #define DBG_LVL DBG_LOG
@@ -37,15 +35,6 @@ rt_uint8_t read_sw_btn(void)
 
 static void sw_irq_handler(void *args)
 {
-    nrfx_rtc_disable(&rtc_instance);
-    nrfx_rtc_cc_disable(&rtc_instance, 0);
-    nrfx_rtc_tick_enable(&rtc_instance, true);
-    nrfx_rtc_enable(&rtc_instance);
-
-    // rt_device_control(dev, RT_DEVICE_WAKEUP, RT_NULL);
-    NVIC_EnableIRQ(UARTE0_UART0_IRQn);
-    rt_pin_write(LED2, PIN_HIGH);
-    // LOG_D("exit pwr!");
 }
 
 void btn_click(void)
@@ -84,13 +73,6 @@ void btn_long_free(void)
 {
     LOG_D("long click!");
     beep_on();
-
-    nrf_systick_csr_set(NRF_SYSTICK_CSR_CLKSOURCE_REF | NRF_SYSTICK_CSR_TICKINT_DISABLE | NRF_SYSTICK_CSR_DISABLE);
-    nrfx_uart_uninit(&uart0);
-    nrfx_gpiote_init();
-    nrfx_gpiote_in_config_t cfg = NRFX_GPIOTE_CONFIG_IN_SENSE_HITOLO(0);
-    nrfx_gpiote_in_init(14, &cfg, sw_irq_handler);
-    nrfx_gpiote_in_event_enable(14, true);
     rt_thread_mdelay(500);
     // rt_hw_cpu_reset();
 
@@ -99,8 +81,7 @@ void btn_long_free(void)
 
 static void btn_entry(void *p)
 {
-    beep_init();
-    nrf_gpio_cfg_input(SW, NRF_GPIO_PIN_PULLUP);
+
     Button_Create(
         "SW",
         &SW_BUTTON,

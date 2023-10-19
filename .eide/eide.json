@@ -821,6 +821,9 @@
           },
           {
             "path": "nrf_sdk/components/softdevice/common/nrf_sdh.c"
+          },
+          {
+            "path": "nrf_sdk/rtthread_adapter/nrf_sdh_rtthread.c"
           }
         ],
         "folders": []
@@ -920,14 +923,10 @@
         "<virtual_root>/max30102/algorithm.c",
         "<virtual_root>/max30102/v1/algorithm_v1.c",
         "<virtual_root>/max30102/v1",
-        "<virtual_root>/DeviceDrivers/lptimer.c",
-        "<virtual_root>/DeviceDrivers/pm.c",
         "<virtual_root>/Drivers/app_timer2.c",
-        "<virtual_root>/Drivers/drv_uarte.c",
         "<virtual_root>/Applications/app.c",
         "<virtual_root>/nrf_log",
-        "<virtual_root>/Applications/btn_event.c",
-        "<virtual_root>/nrf_services"
+        "<virtual_root>/Drivers/drv_uarte.c"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -1160,7 +1159,8 @@
           "rt-thread/components/utilities/ulog/syslog",
           "modules/max30102/v2",
           "modules/max30102/v1",
-          "nrf_sdk/components/libraries/button"
+          "nrf_sdk/components/libraries/button",
+          "nrf_sdk/rtthread_adapter"
         ],
         "libList": [],
         "sourceDirList": [],

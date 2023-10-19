@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "ble_common.h"
+#include "nrf_sdh_rtthread.h"
 
 // 用于stack dump的错误代码，可以用于栈回退时确定堆栈位置
 #define DEAD_BEEF 0xDEADBEEF
@@ -322,7 +323,7 @@ static void timers_init(void)
 /**
  * @brief  启动广播，该函数所用的模式必须和广播初始化中设置的广播模式一样
  */
-static void advertising_start(void)
+static void advertising_start(void *p)
 {
     // 使用广播初始化中设置的广播模式启动广播
     ret_code_t err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
@@ -364,24 +365,20 @@ int ble_app_init(void)
 
     NRF_LOG_INFO("BLE APP started.");
     // 启动广播
-    APP_ERROR_CHECK(ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST));
-    while (1) {
-        nrf_sdh_evts_poll();
-        rt_thread_mdelay(1000);
-    }
+    nrf_sdh_rtthread_init(advertising_start, 0);
 }
 
 static int ble_start(void)
 {
-    rt_thread_t ble_thread = rt_thread_create("softdev", ble_app_init, RT_NULL, 1024, 21, 50);
+    rt_thread_t ble_thread = rt_thread_create("softdev", ble_app_init, RT_NULL, 1024, 15, 50);
     rt_thread_startup(ble_thread);
     return 0;
 }
-INIT_APP_EXPORT(ble_start);
+// INIT_APP_EXPORT(ble_start);
 
 // static void ble_stop(void)
 // {
 //     APP_ERROR_CHECK(ble_advertising_start(&m_advertising, BLE_ADV_MODE_IDLE));
 // }
 
-// MSH_CMD_EXPORT(ble_start, ble app start);
+MSH_CMD_EXPORT(ble_app_init, ble app start);

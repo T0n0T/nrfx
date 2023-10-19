@@ -22,7 +22,7 @@
 #define PIN_SS   CCM_PIN_SS
 
 extern int ccm3310_init(void);
-extern void ccm3310_thread_start(void);
+extern void ccm3310_uninit(void);
 
 int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int recv_len);
 

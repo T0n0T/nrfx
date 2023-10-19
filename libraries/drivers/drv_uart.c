@@ -26,7 +26,6 @@ static uint8_t uart0_buf[RT_SERIAL_RB_BUFSZ];
     result = 0;                              \
     while (expression) {                     \
         retry--;                             \
-        rt_hw_us_delay(50);                  \
         if (retry == 0) {                    \
             result = 1;                      \
             break;                           \
@@ -91,7 +90,7 @@ static rt_err_t _uart_ctrl(struct rt_serial_device *serial, int cmd, void *arg)
 
 static int _uart_putc(struct rt_serial_device *serial, char c)
 {
-    int rtn = 1;
+    int rtn   = 1;
     int retry = UART_RETRY_TIME;
     RT_ASSERT(serial != RT_NULL);
 

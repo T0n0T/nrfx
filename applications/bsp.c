@@ -12,6 +12,11 @@
 #include <board.h>
 #include <stdio.h>
 
+#include "ccm3310.h"
+#include "drv_uart.h"
+#include "drv_i2c.h"
+#include <nrfx_systick.h>
+
 /** gpio */
 static void sw_handle(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action);
 void gpio_init(void)
@@ -22,24 +27,33 @@ void gpio_init(void)
 
     nrf_gpio_cfg_output(POWER_KEEP);
     nrf_gpio_cfg_input(SW, NRF_GPIO_PIN_PULLUP);
+
+    nrf_gpio_pin_write(LED2, 1);
+    nrf_gpio_pin_write(LED3, 1);
 }
 
 void set_sleep_exit_pin(void)
 {
+    nrfx_gpiote_init();
     nrfx_gpiote_in_config_t sw_cfg = NRFX_GPIOTE_CONFIG_IN_SENSE_HITOLO(1);
     nrfx_gpiote_in_init(14, &sw_cfg, sw_handle);
+    nrfx_gpiote_in_event_enable(14, true);
 }
 
 void release_sleep_exit_pin(void)
 {
     nrfx_gpiote_in_uninit(14);
+    nrfx_gpiote_uninit();
 }
 
 void gpio_uninit(void)
 {
-    for (size_t i = 0; i < NUMBER_OF_PINS; i++) {
-        nrf_gpio_cfg_default(i);
-    }
+    // nrf_gpio_cfg_default(LED1);
+    nrf_gpio_cfg_default(LED2);
+    nrf_gpio_cfg_default(LED3);
+
+    nrf_gpio_cfg_default(POWER_KEEP);
+    nrf_gpio_cfg_default(SW);
 }
 
 static void sw_handle(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
@@ -101,9 +115,9 @@ void beep_off(void)
 }
 
 /** rtc1 -> tick */
-const nrfx_rtc_t rtc_instance = NRFX_RTC_INSTANCE(1);
-
-static void rtc1_schedule_handle(nrfx_rtc_int_type_t int_type)
+const nrfx_rtc_t rtc = NRFX_RTC_INSTANCE(1);
+static int flag      = 0;
+void rtc1_schedule_handle(nrfx_rtc_int_type_t int_type)
 {
     rt_interrupt_enter();
     switch (int_type) {
@@ -111,12 +125,8 @@ static void rtc1_schedule_handle(nrfx_rtc_int_type_t int_type)
             rt_tick_increase();
             break;
         case NRFX_RTC_INT_COMPARE0:
-            // nrfx_rtc_counter_clear(&rtc_instance);
-            // nrfx_rtc_disable(&rtc_instance);
-            // nrfx_rtc_cc_disable(&rtc_instance, 0);
-            // nrfx_rtc_tick_enable(&rtc_instance, true);
-            // nrfx_rtc_enable(&rtc_instance);
-            // NVIC_EnableIRQ(UARTE0_UART0_IRQn);
+            flag = 1;
+            break;
         default:
             break;
     }
@@ -125,21 +135,13 @@ static void rtc1_schedule_handle(nrfx_rtc_int_type_t int_type)
 
 void rtc_tick_configure(void)
 {
-
-    NVIC_SetPriority(RTC1_IRQn, 0xf);
-
-    nrf_clock_lf_src_set((nrf_clock_lfclk_t)NRFX_CLOCK_CONFIG_LF_SRC);
-    nrfx_clock_lfclk_start();
-
-    // Initialize RTC instance
+    nrf_drv_clock_init();
+    nrf_drv_clock_lfclk_request(NULL);
     nrfx_rtc_config_t config = NRFX_RTC_DEFAULT_CONFIG;
     config.prescaler         = RTC_PRESCALER;
-
-    nrfx_rtc_init(&rtc_instance, &config, rtc1_schedule_handle);
-
-    nrfx_rtc_tick_enable(&rtc_instance, true);
-    // Power on RTC instance
-    nrfx_rtc_enable(&rtc_instance);
+    nrfx_rtc_init(&rtc, &config, rtc1_schedule_handle);
+    nrfx_rtc_tick_enable(&rtc, true);
+    nrfx_rtc_enable(&rtc);
 }
 
 void bsp_init(void)
@@ -147,11 +149,50 @@ void bsp_init(void)
     nrfx_clock_hfclk_start();
     gpio_init();
     beep_init();
+    ccm3310_init();
+    i2c0_init();
+
+    // nrfx_uart_init(&uart0, &uart0_config, uart0_event_hander);
 }
+MSH_CMD_EXPORT(bsp_init, uninit);
 
 void bsp_uninit(void)
 {
     gpio_uninit();
     beep_uninit();
+    ccm3310_uninit();
+    i2c0_uninit();
+    // nrfx_uart_uninit(&uart0);
     nrfx_clock_hfclk_stop();
 }
+
+void bsp_test(void)
+{
+    rt_interrupt_enter();
+    // bsp_uninit();
+
+    nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
+    nrf_rtc_int_disable(NRF_RTC1, NRF_RTC_INT_TICK_MASK);
+
+    /* Configure CTC interrupt */
+    nrf_rtc_cc_set(NRF_RTC1, 0, 3000);
+    nrfx_rtc_counter_clear(&rtc);
+    nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
+    nrf_rtc_int_enable(NRF_RTC1, NRF_RTC_INT_COMPARE0_MASK);
+    flag = 0;
+    __DSB();
+    do {
+        __WFE();
+    } while (0 == flag);
+
+    nrf_rtc_int_disable(rtc.p_reg, NRF_RTC_INT_COMPARE0_MASK);
+    nrf_rtc_event_clear(rtc.p_reg, NRF_RTC_EVENT_COMPARE_0);
+
+    nrf_rtc_event_clear(rtc.p_reg, NRF_RTC_EVENT_TICK);
+    nrf_rtc_int_enable(rtc.p_reg, NRF_RTC_INT_TICK_MASK);
+    // bsp_init();
+
+    NVIC_ClearPendingIRQ(RTC1_IRQn);
+    rt_interrupt_leave();
+}
+MSH_CMD_EXPORT(bsp_test, uninit);

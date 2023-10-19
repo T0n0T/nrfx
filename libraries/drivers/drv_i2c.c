@@ -11,8 +11,7 @@
  */
 
 #include <rtdevice.h>
-#include <nrfx_twi_twim.h>
-#include <nrfx_twim.h>
+
 #include <drv_i2c.h>
 #include <hal/nrf_gpio.h>
 
@@ -27,7 +26,6 @@
     result = 0;                                        \
     while (expression) {                               \
         retry--;                                       \
-        rt_hw_us_delay(50);                            \
         if (retry == 0) {                              \
             result = 1;                                \
             LOG_E("twim transfer timeout,  at: %s:%d", \
@@ -42,15 +40,6 @@
                                                   NRF_GPIO_PIN_PULLUP,        \
                                                   NRF_GPIO_PIN_S0D1,          \
                                                   NRF_GPIO_PIN_NOSENSE)
-typedef struct
-{
-    nrf_twim_frequency_t freq;
-    uint32_t scl_pin;
-    uint32_t sda_pin;
-    nrfx_twim_t twi_instance;
-    uint8_t transfer_status;
-    uint8_t need_recover;
-} drv_i2c_cfg_t;
 
 #ifdef BSP_USING_I2C0
 static drv_i2c_cfg_t drv_i2c_0 =
@@ -61,6 +50,9 @@ static drv_i2c_cfg_t drv_i2c_0 =
         .twi_instance    = NRFX_TWIM_INSTANCE(0),
         .transfer_status = false};
 static struct rt_i2c_bus_device i2c0_bus;
+nrfx_twim_t i2c0            = NRFX_TWIM_INSTANCE(0);
+nrfx_twim_config_t i2c0_cfg = NRFX_TWIM_DEFAULT_CONFIG;
+
 #endif
 #ifdef BSP_USING_I2C1
 static drv_i2c_cfg_t drv_i2c_1 =
@@ -110,11 +102,9 @@ void i2c_handle(nrfx_twim_evt_t const *p_event, void *p_context)
             LOG_E("i2c meet wrong of NACK received after sending a data byte");
             break;
         case NRFX_TWIM_EVT_OVERRUN: ///< Error event: The unread data is replaced by new data.
-            p_cfg->need_recover = true;
             LOG_E("i2c meet wrong of The unread data is replaced by new data");
             break;
         case NRFX_TWIM_EVT_BUS_ERROR: ///< Error event: An unexpected transition occurred on the bus.
-            p_cfg->need_recover = true;
             LOG_E("i2c meet wrong of An unexpected transition occurred on the bus");
             break;
         default:
@@ -125,38 +115,38 @@ void i2c_handle(nrfx_twim_evt_t const *p_event, void *p_context)
 static int twi_master_init(struct rt_i2c_bus_device *bus)
 {
     nrfx_err_t rtn;
-    nrfx_twim_config_t config     = NRFX_TWIM_DEFAULT_CONFIG;
+
     drv_i2c_cfg_t *p_cfg          = bus->priv;
     nrfx_twim_t const *p_instance = &p_cfg->twi_instance;
 
-    config.frequency = p_cfg->freq;
-    config.scl       = p_cfg->scl_pin;
-    config.sda       = p_cfg->sda_pin;
+    i2c0_cfg.frequency = p_cfg->freq;
+    i2c0_cfg.scl       = p_cfg->scl_pin;
+    i2c0_cfg.sda       = p_cfg->sda_pin;
 
-    nrf_gpio_pin_set(config.scl);
-    nrf_gpio_pin_set(config.sda);
+    nrf_gpio_pin_set(i2c0_cfg.scl);
+    nrf_gpio_pin_set(i2c0_cfg.sda);
 
-    TWI_TWIM_PIN_CONFIGURE(config.scl);
-    TWI_TWIM_PIN_CONFIGURE(config.sda);
+    TWI_TWIM_PIN_CONFIGURE(i2c0_cfg.scl);
+    TWI_TWIM_PIN_CONFIGURE(i2c0_cfg.sda);
     NRFX_DELAY_US(4);
 
     for (uint8_t i = 0; i < 9; i++) {
-        if (nrf_gpio_pin_read(config.sda)) {
+        if (nrf_gpio_pin_read(i2c0_cfg.sda)) {
             break;
         } else {
             // Pulse CLOCK signal
-            nrf_gpio_pin_clear(config.scl);
+            nrf_gpio_pin_clear(i2c0_cfg.scl);
             NRFX_DELAY_US(4);
-            nrf_gpio_pin_set(config.scl);
+            nrf_gpio_pin_set(i2c0_cfg.scl);
             NRFX_DELAY_US(4);
         }
     }
-    if (!nrf_gpio_pin_read(config.sda)) {
+    if (!nrf_gpio_pin_read(i2c0_cfg.sda)) {
         return NRFX_ERROR_INTERNAL;
     }
 
-    rtn = nrfx_twim_init(p_instance, &config, i2c_handle, p_cfg);
-    // rtn = nrfx_twim_init(p_instance, &config, NULL, p_cfg);
+    rtn = nrfx_twim_init(p_instance, &i2c0_cfg, i2c_handle, p_cfg);
+    // rtn = nrfx_twim_init(p_instance, &i2c0_cfg, NULL, p_cfg);
     if (rtn != NRFX_SUCCESS) {
         return rtn;
     }
@@ -176,12 +166,6 @@ static rt_ssize_t _master_xfer(struct rt_i2c_bus_device *bus,
     nrfx_err_t ret                = NRFX_SUCCESS;
     uint32_t no_stop_flag         = 0;
     rt_int32_t i                  = 0;
-    if (((drv_i2c_cfg_t *)bus->priv)->need_recover) {
-        rt_interrupt_enter();
-        _i2c_bus_control(bus, I2C_DISABLE, 0);
-        twi_master_init(bus);
-        rt_interrupt_leave();
-    }
 
     for (i = 0; i < num; i++) {
         msg                        = &msgs[i];
@@ -200,7 +184,7 @@ static rt_ssize_t _master_xfer(struct rt_i2c_bus_device *bus,
         retry = TWI_TWIN_RETRY_TIME;
         TWI_TWIM_WAIT(nrfx_twim_is_busy(p_instance), retry, result);
         if (result) {
-            ((drv_i2c_cfg_t *)bus->priv)->need_recover = true;
+            nrf_twim_errorsrc_get_and_clear(p_instance->p_twim);
             goto out;
         }
 
@@ -209,7 +193,7 @@ static rt_ssize_t _master_xfer(struct rt_i2c_bus_device *bus,
         retry = TWI_TWIN_RETRY_TIME;
         TWI_TWIM_WAIT(*status == false, retry, result);
         if (result) {
-            ((drv_i2c_cfg_t *)bus->priv)->need_recover = true;
+            nrf_twim_errorsrc_get_and_clear(p_instance->p_twim);
             goto out;
         }
 
@@ -232,7 +216,6 @@ rt_err_t _i2c_bus_control(struct rt_i2c_bus_device *bus, int cmd, void *args)
             nrfx_twi_twim_bus_recover(cfg->scl_pin, cfg->sda_pin);
             break;
         case I2C_DISABLE:
-            nrfx_twim_disable(p_instance);
             nrfx_twim_uninit(p_instance);
             break;
         default:
@@ -246,6 +229,16 @@ static const struct rt_i2c_bus_device_ops _i2c_ops =
         NULL,
         _i2c_bus_control,
 };
+
+void i2c0_init(void)
+{
+    twi_master_init(&i2c0_bus);
+}
+
+void i2c0_uninit(void)
+{
+    nrfx_twim_uninit(&i2c0);
+}
 
 int rt_hw_i2c_init(void)
 {
@@ -281,5 +274,5 @@ int rt_hw_i2c_init(void)
     return 0;
 }
 
-// INIT_BOARD_EXPORT(rt_hw_i2c_init);
+INIT_BOARD_EXPORT(rt_hw_i2c_init);
 #endif /* defined(BSP_USING_I2C0) || defined(BSP_USING_I2C1) */

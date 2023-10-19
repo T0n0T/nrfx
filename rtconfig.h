@@ -17,7 +17,7 @@
 #define RT_HOOK_USING_FUNC_PTR
 #define RT_USING_IDLE_HOOK
 #define RT_IDLE_HOOK_LIST_SIZE 4
-#define IDLE_THREAD_STACK_SIZE 256
+#define IDLE_THREAD_STACK_SIZE 1024
 #define RT_USING_TIMER_SOFT
 #define RT_TIMER_THREAD_PRIO       4
 #define RT_TIMER_THREAD_STACK_SIZE 512
@@ -76,6 +76,8 @@
 #define FINSH_ARG_MAX 20
 // #define RT_USING_ULOG
 // #define ULOG_USING_COLOR
+#define RT_USING_PM
+
 /* DFS: device virtual file system */
 
 #define RT_USING_DFS
