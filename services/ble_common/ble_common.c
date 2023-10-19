@@ -365,7 +365,8 @@ int ble_app_init(void)
 
     NRF_LOG_INFO("BLE APP started.");
     // 启动广播
-    nrf_sdh_rtthread_init(advertising_start, 0);
+    // nrf_sdh_rtthread_init(advertising_start, 0);
+    ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
 }
 
 static int ble_start(void)
@@ -374,7 +375,7 @@ static int ble_start(void)
     rt_thread_startup(ble_thread);
     return 0;
 }
-// INIT_APP_EXPORT(ble_start);
+INIT_APP_EXPORT(ble_start);
 
 // static void ble_stop(void)
 // {

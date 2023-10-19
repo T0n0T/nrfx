@@ -926,7 +926,8 @@
         "<virtual_root>/Drivers/app_timer2.c",
         "<virtual_root>/Applications/app.c",
         "<virtual_root>/nrf_log",
-        "<virtual_root>/Drivers/drv_uarte.c"
+        "<virtual_root>/Drivers/drv_uarte.c",
+        "<virtual_root>/nrf_softdev/nrf_sdh_rtthread.c"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -1052,7 +1053,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": "ip 192.168.230.1"
+        "otherCmds": ""
       },
       "uploadConfigMap": {},
       "custom_dep": {

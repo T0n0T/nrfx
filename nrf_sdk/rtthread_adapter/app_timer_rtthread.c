@@ -125,7 +125,10 @@ uint32_t app_timer_create(app_timer_id_t const *p_timer_id,
         timer_mode         = (mode == APP_TIMER_MODE_SINGLE_SHOT) ? RT_TIMER_FLAG_ONE_SHOT : RT_TIMER_FLAG_PERIODIC;
         pinfo->single_shot = (mode == APP_TIMER_MODE_SINGLE_SHOT);
         pinfo->func        = timeout_handler;
-        pinfo->osHandle    = rt_timer_create(" ", app_timer_callback, (void *)pinfo, 1000, timer_mode);
+        pinfo->osHandle    = rt_timer_create(" ", app_timer_callback,
+                                             (void *)pinfo,
+                                             1000,
+                                             timer_mode | RT_TIMER_FLAG_SOFT_TIMER);
 
         if (pinfo->osHandle == NULL)
             err_code = NRF_ERROR_NULL;

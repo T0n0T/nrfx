@@ -25,10 +25,15 @@ static struct rt_thread softdevice_thread;  //!< Reference to SoftDevice FreeRTO
 static nrf_sdh_rtthread_hook_t m_task_hook; //!< A hook function run by the SoftDevice task before entering its loop.
 static struct rt_completion m_completion;
 
+// void SD_EVT_IRQHandler(void)
+// {
+//     rt_completion_done(&m_completion);
+//     rt_thread_yield();
+// }
+
 void SD_EVT_IRQHandler(void)
 {
-    rt_completion_done(&m_completion);
-    rt_thread_yield();
+    nrf_sdh_evts_poll();
 }
 
 /* This function gets events from the SoftDevice and processes them. */
