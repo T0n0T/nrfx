@@ -112,7 +112,9 @@
             "nrf_soc.h": "c",
             "nrf_sdh_rtthread.h": "c",
             "nrf_log_backend_rt_device.h": "c",
-            "sdk_errors.h": "c"
+            "sdk_errors.h": "c",
+            "nrfx_power.h": "c",
+            "drv_pm.h": "c"
         },
         "cortex-debug.variableUseNaturalFormat": true
     },

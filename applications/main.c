@@ -27,6 +27,7 @@ static void pwr_mgmt_handle(void);
 
 int main(void)
 {
+    printf("nrf52832_helloworld\n");
     log_init();
     bsp_init();
     APP_ERROR_CHECK(nrf_pwr_mgmt_init());

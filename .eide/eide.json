@@ -247,6 +247,9 @@
             "path": "libraries/drivers/drv_i2c.c"
           },
           {
+            "path": "libraries/drivers/drv_pm.c"
+          },
+          {
             "path": "libraries/drivers/drv_uart.c"
           },
           {
@@ -1053,7 +1056,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": ""
+        "otherCmds": "ip 192.168.230.1"
       },
       "uploadConfigMap": {},
       "custom_dep": {
@@ -1161,7 +1164,8 @@
           "modules/max30102/v2",
           "modules/max30102/v1",
           "nrf_sdk/components/libraries/button",
-          "nrf_sdk/rtthread_adapter"
+          "nrf_sdk/rtthread_adapter",
+          "rt-thread/components/drivers/pm"
         ],
         "libList": [],
         "sourceDirList": [],

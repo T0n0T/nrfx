@@ -15,6 +15,7 @@
 #include "ccm3310.h"
 #include "drv_uart.h"
 #include "drv_i2c.h"
+#include <nrfx_power.h>
 #include <nrfx_systick.h>
 
 /** gpio */
@@ -34,33 +35,29 @@ void gpio_init(void)
 
 void set_sleep_exit_pin(void)
 {
-    nrfx_gpiote_init();
-    nrfx_gpiote_in_config_t sw_cfg = NRFX_GPIOTE_CONFIG_IN_SENSE_HITOLO(1);
-    nrfx_gpiote_in_init(14, &sw_cfg, sw_handle);
-    nrfx_gpiote_in_event_enable(14, true);
+    nrf_gpio_cfg_input(13, NRF_GPIO_PIN_PULLUP);
+    nrf_gpio_pin_sense_t sense = NRF_GPIO_PIN_SENSE_LOW;
+    nrf_gpio_cfg_sense_set(13, sense);
 }
 
-void release_sleep_exit_pin(void)
+void show_pin(void)
 {
-    nrfx_gpiote_in_uninit(14);
-    nrfx_gpiote_uninit();
+    printf("SW sense is: %d\n", nrf_gpio_pin_sense_get(SW));
+    printf("SW dir   is: %d\n", nrf_gpio_pin_dir_get(SW));
+    printf("SW pull  is: %d\n", nrf_gpio_pin_pull_get(SW));
+    printf("SW input is: %d\n", nrf_gpio_pin_input_get(SW));
+    printf("SW level is: %d\n", nrf_gpio_pin_read(SW));
 }
+MSH_CMD_EXPORT(show_pin, show pin);
 
 void gpio_uninit(void)
 {
-    // nrf_gpio_cfg_default(LED1);
+    nrf_gpio_cfg_default(LED1);
     nrf_gpio_cfg_default(LED2);
     nrf_gpio_cfg_default(LED3);
 
     nrf_gpio_cfg_default(POWER_KEEP);
     nrf_gpio_cfg_default(SW);
-}
-
-static void sw_handle(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
-{
-    if (pin == SW && action == GPIOTE_CONFIG_POLARITY_HiToLo) {
-        /* code */
-    }
 }
 
 /** pwm beep */
@@ -116,7 +113,7 @@ void beep_off(void)
 
 /** rtc1 -> tick */
 const nrfx_rtc_t rtc = NRFX_RTC_INSTANCE(1);
-static int flag      = 0;
+int flag             = 0;
 void rtc1_schedule_handle(nrfx_rtc_int_type_t int_type)
 {
     rt_interrupt_enter();
@@ -146,7 +143,7 @@ void rtc_tick_configure(void)
 
 void bsp_init(void)
 {
-    nrfx_clock_hfclk_start();
+    // nrfx_clock_hfclk_start();
     gpio_init();
     beep_init();
     ccm3310_init();
@@ -154,7 +151,6 @@ void bsp_init(void)
 
     // nrfx_uart_init(&uart0, &uart0_config, uart0_event_hander);
 }
-MSH_CMD_EXPORT(bsp_init, uninit);
 
 void bsp_uninit(void)
 {
@@ -163,36 +159,35 @@ void bsp_uninit(void)
     ccm3310_uninit();
     i2c0_uninit();
     // nrfx_uart_uninit(&uart0);
-    nrfx_clock_hfclk_stop();
+    // nrfx_clock_hfclk_stop();
 }
 
-void bsp_test(void)
-{
-    rt_interrupt_enter();
-    // bsp_uninit();
+// void bsp_sleep(void)
+// {
+//     rt_interrupt_enter();
+//     flag = 0;
+//     bsp_uninit();
 
-    nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
-    nrf_rtc_int_disable(NRF_RTC1, NRF_RTC_INT_TICK_MASK);
+//     nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
+//     nrf_rtc_int_disable(NRF_RTC1, NRF_RTC_INT_TICK_MASK);
 
-    /* Configure CTC interrupt */
-    nrf_rtc_cc_set(NRF_RTC1, 0, 3000);
-    nrfx_rtc_counter_clear(&rtc);
-    nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
-    nrf_rtc_int_enable(NRF_RTC1, NRF_RTC_INT_COMPARE0_MASK);
-    flag = 0;
-    __DSB();
-    do {
-        __WFE();
-    } while (0 == flag);
+//     /* Configure CTC interrupt */
+//     nrf_rtc_cc_set(NRF_RTC1, 0, 3000);
+//     nrfx_rtc_counter_clear(&rtc);
+//     nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
+//     nrf_rtc_int_enable(NRF_RTC1, NRF_RTC_INT_COMPARE0_MASK);
 
-    nrf_rtc_int_disable(rtc.p_reg, NRF_RTC_INT_COMPARE0_MASK);
-    nrf_rtc_event_clear(rtc.p_reg, NRF_RTC_EVENT_COMPARE_0);
+//     __DSB();
+//     do {
+//         __WFE();
+//     } while (0 == flag);
 
-    nrf_rtc_event_clear(rtc.p_reg, NRF_RTC_EVENT_TICK);
-    nrf_rtc_int_enable(rtc.p_reg, NRF_RTC_INT_TICK_MASK);
-    // bsp_init();
+//     nrf_rtc_int_disable(rtc.p_reg, NRF_RTC_INT_COMPARE0_MASK);
+//     nrf_rtc_event_clear(rtc.p_reg, NRF_RTC_EVENT_COMPARE_0);
+//     bsp_init();
+//     nrf_rtc_event_clear(rtc.p_reg, NRF_RTC_EVENT_TICK);
+//     nrf_rtc_int_enable(rtc.p_reg, NRF_RTC_INT_TICK_MASK);
 
-    NVIC_ClearPendingIRQ(RTC1_IRQn);
-    rt_interrupt_leave();
-}
-MSH_CMD_EXPORT(bsp_test, uninit);
+//     NVIC_ClearPendingIRQ(RTC1_IRQn);
+//     rt_interrupt_leave();
+// }

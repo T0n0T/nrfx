@@ -197,7 +197,7 @@ void Button_Cycle_Process(Button_t *btn)
         // free button
         else if (btn->Button_State == BUTTON_DOWM) {
             btn->Button_State = BUTTON_UP;
-            // LOG_D("button release");
+            // LOG_D("button release\n");
             TRIGGER_CB(BUTTON_UP);
         }
     }

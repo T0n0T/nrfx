@@ -74,14 +74,14 @@ void btn_long_free(void)
     LOG_D("long click!");
     beep_on();
     rt_thread_mdelay(500);
-    // rt_hw_cpu_reset();
-
+    bsp_uninit();
+    set_sleep_exit_pin();
     nrf_pwr_mgmt_shutdown(NRF_PWR_MGMT_SHUTDOWN_STAY_IN_SYSOFF);
 }
 
 static void btn_entry(void *p)
 {
-
+    rt_thread_mdelay(200);
     Button_Create(
         "SW",
         &SW_BUTTON,

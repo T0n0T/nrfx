@@ -65,10 +65,10 @@ static bool app_shutdown_handler(nrf_pwr_mgmt_evt_t event)
         case NRF_PWR_MGMT_EVT_PREPARE_SYSOFF:
             break;
         case NRF_PWR_MGMT_EVT_PREPARE_WAKEUP:
-            nrf_gpio_cfg_input(14, NRF_GPIO_PIN_PULLUP); // 将要唤醒的脚配置为输入
-            /* 设置为上升沿检出，这个一定不要配置错了 */
-            nrf_gpio_pin_sense_t sense = NRF_GPIO_PIN_SENSE_HIGH;
-            nrf_gpio_cfg_sense_set(14, sense);
+            // nrf_gpio_cfg_input(14, NRF_GPIO_PIN_PULLUP); // 将要唤醒的脚配置为输入
+            // /* 设置为上升沿检出，这个一定不要配置错了 */
+            // nrf_gpio_pin_sense_t sense = NRF_GPIO_PIN_SENSE_LOW;
+            // nrf_gpio_cfg_sense_set(14, sense);
             break;
         case NRF_PWR_MGMT_EVT_PREPARE_RESET:
             break;

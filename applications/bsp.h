@@ -13,6 +13,7 @@
 #include "nrf_drv_clock.h"
 #include "nrfx_rtc.h"
 
+extern int flag;
 extern const nrfx_rtc_t rtc_instance;
 
 #define LF_CLK_HZ     (32768UL)
@@ -31,3 +32,4 @@ void rtc_tick_configure(void);
 
 void bsp_init(void);
 void bsp_uninit(void);
+void bsp_sleep(void);
