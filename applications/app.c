@@ -68,7 +68,7 @@ void mqtt_reset_thread(void *p);
 
 void publish_handle(void)
 {
-    rt_pin_write(LED2, PIN_LOW);
+    nrf_gpio_pin_write(LED2, PIN_LOW);
     mqtt_error_t err = KAWAII_MQTT_SUCCESS_ERROR;
 
     char *publish_data = build_msg_updata(DEVICE_ID, ec800x_get_gnss(), 1, ecg_status);
@@ -105,14 +105,14 @@ void publish_handle(void)
     } else {
         LOG_D("publish msg success!!!!!!!!");
     }
-    rt_pin_write(LED2, PIN_HIGH);
+    nrf_gpio_pin_write(LED2, PIN_HIGH);
 
     free(publish_data);
 }
 
 static void sub_handle(void *client, message_data_t *msg)
 {
-    rt_pin_write(LED3, PIN_LOW);
+    nrf_gpio_pin_write(LED3, PIN_LOW);
     (void)client;
     LOG_I("-----------------------------------------------------------------------------------");
     if (sm4_flag) {
@@ -132,7 +132,7 @@ static void sub_handle(void *client, message_data_t *msg)
     }
 
     LOG_I("-----------------------------------------------------------------------------------");
-    rt_pin_write(LED3, PIN_LOW);
+    nrf_gpio_pin_write(LED3, PIN_LOW);
 }
 
 int logisinit = 0;
@@ -226,11 +226,11 @@ static void mqtt_entry(void *p)
         rt_thread_mdelay(3000);
     }
     rt_thread_mdelay(1000);
-    rt_pin_write(LED2, PIN_LOW);
-    rt_pin_write(LED3, PIN_LOW);
+    nrf_gpio_pin_write(LED2, PIN_LOW);
+    nrf_gpio_pin_write(LED3, PIN_LOW);
     rt_thread_mdelay(1000);
-    rt_pin_write(LED2, PIN_HIGH);
-    rt_pin_write(LED3, PIN_HIGH);
+    nrf_gpio_pin_write(LED2, PIN_HIGH);
+    nrf_gpio_pin_write(LED3, PIN_HIGH);
 
     if (mqtt_mission_init() != 0) {
         rt_thread_init(&check_thread, "mqtt_reset", mqtt_reset_thread, RT_NULL, check_stack, sizeof(check_stack), 25, 15);
@@ -240,16 +240,18 @@ static void mqtt_entry(void *p)
     }
 
     rt_thread_mdelay(1000);
-    rt_pin_write(LED2, PIN_LOW);
-    rt_pin_write(LED3, PIN_LOW);
+    nrf_gpio_pin_write(LED2, PIN_LOW);
+    nrf_gpio_pin_write(LED3, PIN_LOW);
     rt_thread_mdelay(1000);
-    rt_pin_write(LED2, PIN_HIGH);
-    rt_pin_write(LED3, PIN_HIGH);
+    nrf_gpio_pin_write(LED2, PIN_HIGH);
+    nrf_gpio_pin_write(LED3, PIN_HIGH);
 
     while (1) {
+        rt_pm_request(PM_SLEEP_MODE_NONE);
         ec800x_open_with_check();
         publish_handle();
         ec800x_close_with_check();
+        rt_pm_release(PM_SLEEP_MODE_NONE);
     }
 }
 

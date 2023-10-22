@@ -49,33 +49,33 @@
 #else
 
 // ccm3310s-t
-#define CCM_POR      -1
-#define CCM_GINT0    28
-#define CCM_GINT1    3
-#define CCM_PIN_SCK  13
-#define CCM_PIN_MOSI 15
-#define CCM_PIN_MISO 16
-#define CCM_PIN_SS   14
+#define CCM_POR         -1
+#define CCM_GINT0       28
+#define CCM_GINT1       3
+#define CCM_PIN_SCK     13
+#define CCM_PIN_MOSI    15
+#define CCM_PIN_MISO    16
+#define CCM_PIN_SS      14
 
 // max30102
-#define MAX_PIN_INT 4
-#define MAX_PIN_SCL 5
-#define MAX_PIN_SDA 7
+#define MAX_PIN_INT     4
+#define MAX_PIN_SCL     5
+#define MAX_PIN_SDA     7
 
 // hal
-#define BEEP       12
-#define SW         13
-#define LED1       17
-#define LED2       18
-#define LED3       19
-#define POWER_KEEP -1
+#define BEEP            12
+#define SW              13
+#define LED1            17
+#define LED2            18
+#define LED3            19
+#define POWER_KEEP      -1
 
 // ec800m
 #define UART_PIN_RX     8
 #define UART_PIN_TX     6
 #define EC800_PIN_RESET -1
 #define EC800_PIN_PWR   -1
-#define EC800_PIN_DTR   -1
+#define EC800_PIN_DTR   4
 #define EC800_PIN_RI    -1
 #endif
 

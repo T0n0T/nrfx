@@ -1,5 +1,5 @@
 /**
- * @file btn_event.c
+ * @file btn.c
  * @author your name (you@domain.com)
  * @brief
  * @version 0.1
@@ -106,4 +106,4 @@ int btn_init(void)
     }
     return rt_thread_startup(&btn_thread);
 }
-INIT_APP_EXPORT(btn_init);
+// INIT_APP_EXPORT(btn_init);

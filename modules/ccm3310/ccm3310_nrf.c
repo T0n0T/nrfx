@@ -33,11 +33,6 @@ uint8_t recv_buf[1024];
 
 int ccm3310_init(void)
 {
-    nrf_gpio_cfg_output(POR);
-    nrf_gpio_cfg_output(GINT0);
-    // nrf_gpio_cfg_output(15);
-    nrf_gpio_cfg_input(GINT1, NRF_GPIO_PIN_NOPULL);
-
     config_spim.sck_pin   = PIN_SCK;
     config_spim.mosi_pin  = PIN_MOSI;
     config_spim.miso_pin  = PIN_MISO;
@@ -55,10 +50,6 @@ int ccm3310_init(void)
 
 void ccm3310_uninit(void)
 {
-    nrf_gpio_cfg_default(POR);
-    nrf_gpio_cfg_default(GINT0);
-    // nrf_gpio_cfg_output(15);
-    nrf_gpio_cfg_default(GINT1);
 
     nrfx_spim_uninit(&instance);
 }

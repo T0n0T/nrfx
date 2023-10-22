@@ -17,6 +17,7 @@ extern "C" {
 
 #include <stdlib.h>
 #include "gps_rmc.h"
+#include "bsp.h"
 #include <at_device.h>
 
 // #define USING_CHECK_LINK       1

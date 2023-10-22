@@ -91,7 +91,7 @@ static int ec800x_sleep(struct at_device *device)
 
     at_delete_resp(resp);
 
-    rt_pin_write(ec800x->wakeup_pin, PIN_HIGH);
+    nrf_gpio_pin_write(ec800x->wakeup_pin, PIN_HIGH);
 
     ec800x->sleep_status = RT_TRUE;
 
@@ -114,7 +114,7 @@ static int ec800x_wakeup(struct at_device *device)
         return (RT_EOK);
     }
 
-    rt_pin_write(ec800x->wakeup_pin, PIN_LOW);
+    nrf_gpio_pin_write(ec800x->wakeup_pin, PIN_LOW);
     rt_thread_mdelay(200);
 
     resp = at_create_resp(64, 0, rt_tick_from_millisecond(300));
@@ -149,7 +149,7 @@ int ec800x_check_link_status(struct at_device *device)
     }
     if (ec800x->sleep_status) // is sleep status
     {
-        rt_pin_write(ec800x->wakeup_pin, PIN_LOW);
+        nrf_gpio_pin_write(ec800x->wakeup_pin, PIN_LOW);
         rt_thread_mdelay(200);
     }
 
@@ -173,7 +173,7 @@ int ec800x_check_link_status(struct at_device *device)
 
     if (ec800x->sleep_status) // is sleep status
     {
-        rt_pin_write(ec800x->wakeup_pin, PIN_HIGH);
+        nrf_gpio_pin_write(ec800x->wakeup_pin, PIN_HIGH);
     }
 
     return (result);
@@ -1052,20 +1052,20 @@ static int ec800x_init(struct at_device *device)
     /* initialize ec800x pin configuration */
 
     if (ec800x->reset_pin != -1) {
-        rt_pin_mode(ec800x->reset_pin, PIN_MODE_OUTPUT);
-        rt_pin_write(ec800x->reset_pin, PIN_HIGH);
+        nrf_gpio_cfg_output(ec800x->reset_pin);
+        nrf_gpio_pin_write(ec800x->reset_pin, PIN_HIGH);
         rt_thread_mdelay(700);
-        rt_pin_write(ec800x->reset_pin, PIN_LOW);
+        nrf_gpio_pin_write(ec800x->reset_pin, PIN_LOW);
     }
     if (ec800x->power_pin != -1) {
-        rt_pin_mode(ec800x->power_pin, PIN_MODE_OUTPUT);
-        rt_pin_write(ec800x->power_pin, PIN_HIGH);
+        nrf_gpio_cfg_output(ec800x->power_pin);
+        nrf_gpio_pin_write(ec800x->power_pin, PIN_HIGH);
         rt_thread_mdelay(700);
-        rt_pin_write(ec800x->power_pin, PIN_LOW);
+        nrf_gpio_pin_write(ec800x->power_pin, PIN_LOW);
     }
     if (ec800x->wakeup_pin != -1) {
-        rt_pin_write(ec800x->wakeup_pin, PIN_LOW);
-        rt_pin_mode(ec800x->wakeup_pin, PIN_MODE_OUTPUT);
+        nrf_gpio_cfg_output(ec800x->wakeup_pin);
+        nrf_gpio_pin_write(ec800x->wakeup_pin, PIN_LOW);
     }
 
     /* initialize ec800x device network */

@@ -29,28 +29,18 @@ int main(void)
 {
     printf("nrf52832_helloworld\n");
     log_init();
+    gpio_init();
     bsp_init();
     APP_ERROR_CHECK(nrf_pwr_mgmt_init());
+    rt_pm_release_all(PM_SLEEP_MODE_NONE);
+    rt_pm_sleep_request(PM_BOARD_ID, PM_SLEEP_MODE_LIGHT);
     // mission_init();
-    // rt_thread_idle_sethook(pwr_mgmt_handle);
     while (1) {
         nrf_gpio_pin_toggle(LED1);
-        rt_thread_mdelay(1000);
+        rt_thread_mdelay(2000);
     }
     return RT_EOK;
 }
-
-static void pwr_mgmt_handle(void)
-{
-    const nrfx_rtc_t rtc_instance = NRFX_RTC_INSTANCE(1);
-
-    if (NRF_LOG_PROCESS() == false) {
-        bsp_uninit();
-        nrf_pwr_mgmt_run();
-        bsp_init();
-    }
-}
-MSH_CMD_EXPORT(pwr_mgmt_handle, power management handle);
 
 static int log_init(void)
 {

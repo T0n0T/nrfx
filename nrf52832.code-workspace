@@ -114,7 +114,8 @@
             "nrf_log_backend_rt_device.h": "c",
             "sdk_errors.h": "c",
             "nrfx_power.h": "c",
-            "drv_pm.h": "c"
+            "drv_pm.h": "c",
+            "nrf_drv_clock.h": "c"
         },
         "cortex-debug.variableUseNaturalFormat": true
     },

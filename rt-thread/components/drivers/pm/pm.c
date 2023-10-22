@@ -21,7 +21,7 @@
 
 /* tickless threshold time */
 #ifndef PM_TICKLESS_THRESHOLD_TIME
-#define PM_TICKLESS_THRESHOLD_TIME 2
+#define PM_TICKLESS_THRESHOLD_TIME 20
 #endif
 
 /* tickless threshold : sleep mode */
@@ -64,14 +64,15 @@ static rt_uint8_t _pm_default_deepsleep = RT_PM_DEFAULT_DEEPSLEEP_MODE;
 static struct rt_pm_notify _pm_notify;
 static rt_uint8_t _pm_init_flag = 0;
 
-rt_weak rt_uint32_t rt_pm_enter_critical(rt_uint8_t sleep_mode)
+__weak rt_uint32_t rt_pm_enter_critical(rt_uint8_t sleep_mode)
 {
-    return rt_hw_interrupt_disable();
+    // rt_interrupt_enter();
+    return 0;
 }
 
-rt_weak void rt_pm_exit_critical(rt_uint32_t ctx, rt_uint8_t sleep_mode)
+__weak void rt_pm_exit_critical(rt_uint32_t ctx, rt_uint8_t sleep_mode)
 {
-    rt_hw_interrupt_enable(ctx);
+    // rt_interrupt_leave();
 }
 
 /* lptimer start */
@@ -274,7 +275,7 @@ static rt_bool_t _pm_device_check_idle(void)
     return RT_TRUE;
 }
 
-rt_weak rt_tick_t pm_timer_next_timeout_tick(rt_uint8_t mode)
+__weak rt_tick_t pm_timer_next_timeout_tick(rt_uint8_t mode)
 {
     switch (mode) {
         case PM_SLEEP_MODE_LIGHT:
@@ -295,7 +296,7 @@ rt_weak rt_tick_t pm_timer_next_timeout_tick(rt_uint8_t mode)
  *
  * @return none
  */
-rt_weak rt_uint8_t pm_get_sleep_threshold_mode(rt_uint8_t cur_mode, rt_tick_t timeout_tick)
+__weak rt_uint8_t pm_get_sleep_threshold_mode(rt_uint8_t cur_mode, rt_tick_t timeout_tick)
 {
     rt_uint8_t sleep_mode = cur_mode;
 
@@ -408,7 +409,7 @@ static void _pm_change_sleep_mode(struct rt_pm *pm)
         if (pm->timer_mask & (0x01 << pm->sleep_mode)) {
             delta_tick = pm_lptimer_get_timeout(pm);
             pm_lptimer_stop(pm);
-            printf("delta tick is %d\n", delta_tick);
+            // printf("delta tick is %d\n", delta_tick);
             if (delta_tick) {
                 rt_tick_set(rt_tick_get() + delta_tick);
             }

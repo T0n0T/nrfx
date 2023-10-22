@@ -31,6 +31,10 @@ void gpio_init(void)
 
     nrf_gpio_pin_write(LED2, 1);
     nrf_gpio_pin_write(LED3, 1);
+
+    nrf_gpio_cfg_output(POR);
+    nrf_gpio_cfg_output(GINT0);
+    nrf_gpio_cfg_input(GINT1, NRF_GPIO_PIN_NOPULL);
 }
 
 void set_sleep_exit_pin(void)
@@ -58,6 +62,10 @@ void gpio_uninit(void)
 
     nrf_gpio_cfg_default(POWER_KEEP);
     nrf_gpio_cfg_default(SW);
+
+    nrf_gpio_cfg_default(POR);
+    nrf_gpio_cfg_default(GINT0);    
+    nrf_gpio_cfg_default(GINT1);
 }
 
 /** pwm beep */
@@ -144,9 +152,9 @@ void rtc_tick_configure(void)
 void bsp_init(void)
 {
     // nrfx_clock_hfclk_start();
-    gpio_init();
+    // gpio_init();
     beep_init();
-    ccm3310_init();
+    // ccm3310_init();
     i2c0_init();
 
     // nrfx_uart_init(&uart0, &uart0_config, uart0_event_hander);
@@ -154,40 +162,48 @@ void bsp_init(void)
 
 void bsp_uninit(void)
 {
-    gpio_uninit();
+    // gpio_uninit();
     beep_uninit();
-    ccm3310_uninit();
+    // ccm3310_uninit();
     i2c0_uninit();
     // nrfx_uart_uninit(&uart0);
     // nrfx_clock_hfclk_stop();
 }
 
-// void bsp_sleep(void)
-// {
-//     rt_interrupt_enter();
-//     flag = 0;
-//     bsp_uninit();
+void bsp_sleep(int argc, char **argv)
+{
+    uint32_t timeout = 0;
+    if (argc >= 2) {
+        timeout = atoi(argv[1]);
+    }
 
-//     nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
-//     nrf_rtc_int_disable(NRF_RTC1, NRF_RTC_INT_TICK_MASK);
+    rt_interrupt_enter();
+    flag = 0;
+    bsp_uninit();
 
-//     /* Configure CTC interrupt */
-//     nrf_rtc_cc_set(NRF_RTC1, 0, 3000);
-//     nrfx_rtc_counter_clear(&rtc);
-//     nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
-//     nrf_rtc_int_enable(NRF_RTC1, NRF_RTC_INT_COMPARE0_MASK);
+    nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
+    nrf_rtc_int_disable(NRF_RTC1, NRF_RTC_INT_TICK_MASK);
 
-//     __DSB();
-//     do {
-//         __WFE();
-//     } while (0 == flag);
+    /* Configure CTC interrupt */
+    nrf_rtc_cc_set(NRF_RTC1, 0, timeout);
+    // nrfx_rtc_counter_clear(&rtc);
+    nrf_rtc_task_trigger(NRF_RTC1, NRF_RTC_TASK_CLEAR);
+    nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
+    nrf_rtc_int_enable(NRF_RTC1, NRF_RTC_INT_COMPARE0_MASK);
 
-//     nrf_rtc_int_disable(rtc.p_reg, NRF_RTC_INT_COMPARE0_MASK);
-//     nrf_rtc_event_clear(rtc.p_reg, NRF_RTC_EVENT_COMPARE_0);
-//     bsp_init();
-//     nrf_rtc_event_clear(rtc.p_reg, NRF_RTC_EVENT_TICK);
-//     nrf_rtc_int_enable(rtc.p_reg, NRF_RTC_INT_TICK_MASK);
+    __DSB();
+    do {
+        __WFE();
+    } while (0 == flag);
 
-//     NVIC_ClearPendingIRQ(RTC1_IRQn);
-//     rt_interrupt_leave();
-// }
+    nrf_rtc_int_disable(NRF_RTC1, NRF_RTC_INT_COMPARE0_MASK);
+    nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
+    bsp_init();
+    printf("counter: %d\n", nrf_rtc_counter_get(NRF_RTC1));
+    nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_TICK);
+    nrf_rtc_int_enable(NRF_RTC1, NRF_RTC_INT_TICK_MASK);
+
+    NVIC_ClearPendingIRQ(RTC1_IRQn);
+    rt_interrupt_leave();
+}
+MSH_CMD_EXPORT(bsp_sleep, bsp sleep);

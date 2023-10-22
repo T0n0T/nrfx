@@ -32,4 +32,3 @@ void rtc_tick_configure(void);
 
 void bsp_init(void);
 void bsp_uninit(void);
-void bsp_sleep(void);

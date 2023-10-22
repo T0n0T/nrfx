@@ -1,5 +1,6 @@
 #include "blood.h"
 #include "max30102.h"
+#include "bsp.h"
 #include <rtthread.h>
 #include <rtdevice.h>
 #include <stdio.h>
@@ -26,7 +27,7 @@
   */
 
 #define MAX_BRIGHTNESS 255
-
+#define SAMPLE_NUM     5
 uint32_t aun_ir_buffer[500];  // IR LED sensor data
 int32_t n_ir_buffer_length;   // data length
 uint32_t aun_red_buffer[500]; // Red LED sensor data
@@ -64,7 +65,7 @@ void max30102_ecg_init(void)
     n_ir_buffer_length = 500; // buffer length of 100 stores 5 seconds of samples running at 100sps
 
     for (i = 0; i < n_ir_buffer_length; i++) {
-        while (rt_pin_read(cfg.irq_pin.pin) == 1)
+        while (nrf_gpio_pin_read(cfg.irq_pin.pin) == 1)
             ; // wait until the interrupt pin asserts
         max30102_read_fifo(&aun_red_buffer[i], &aun_ir_buffer[i]);
 
@@ -107,11 +108,12 @@ static void max30102_read_fifo(uint32_t *pun_red_led, uint32_t *pun_ir_led)
     }
 }
 
-void max30102_data_handle(int32_t *heart_rate, int32_t *sp02)
+int max30102_data_handle(int32_t *heart_rate, int32_t *sp02)
 {
     // variables to calculate the on-board LED brightness that reflects the heartbeats
     uint32_t un_min, un_max, un_prev_data;
     int i;
+    int s_ecg_status;
     int retry = 10;
     uint8_t temp[6];
     float f_temp;
@@ -135,7 +137,7 @@ void max30102_data_handle(int32_t *heart_rate, int32_t *sp02)
         // rt_enter_critical();
         for (i = 400; i < 500; i++) {
             un_prev_data = aun_red_buffer[i - 1];
-            while (rt_pin_read(cfg.irq_pin.pin)) {
+            while (nrf_gpio_pin_read(cfg.irq_pin.pin)) {
             }
 
             max30102_read_fifo(&aun_red_buffer[i], &aun_ir_buffer[i]);
@@ -180,8 +182,8 @@ void max30102_data_handle(int32_t *heart_rate, int32_t *sp02)
             change_flag++;
             //            printf("HR=%d, spo2:%d\r\n", n_heart_rate, n_sp02);
             if (change_flag > 3) {
-                change_flag = 3;
-                ecg_status  = 1;
+                change_flag  = 3;
+                s_ecg_status = 1;
                 printf("ecg_status change: %d", ecg_status);
             }
 
@@ -189,8 +191,8 @@ void max30102_data_handle(int32_t *heart_rate, int32_t *sp02)
         } else if (!retry) {
             change_flag--;
             if (change_flag < 0) {
-                change_flag = 0;
-                ecg_status  = 0;
+                change_flag  = 0;
+                s_ecg_status = 0;
                 printf("ecg_status change: %d", ecg_status);
             }
 
@@ -199,11 +201,11 @@ void max30102_data_handle(int32_t *heart_rate, int32_t *sp02)
             retry--;
         }
     }
+    return s_ecg_status;
 }
 
 HRM_Mode current_mode;
 int checkout_spo2_flag, checkout_prox_flag;
-BloodData g_blooddata = {0};
 
 void blood_data_update_proximity(void)
 {
@@ -212,7 +214,7 @@ void blood_data_update_proximity(void)
     uint8_t read_ptr  = 0;
     uint8_t write_ptr = 0;
     uint32_t fifo_ir;
-    while (rt_pin_read(cfg.irq_pin.pin) == 0) {
+    while (nrf_gpio_pin_read(cfg.irq_pin.pin) == 0) {
         while (retry--) {
             max30102_read_fifo(0, &fifo_ir); // read from MAX30102 FIFO2
             LOG_D("mode get data[%d]:  fifo_ir: %06d", 8 - retry, fifo_ir);
@@ -253,13 +255,13 @@ MODE_ENTRY:
 void blood_Loop(void)
 {
     blood_data_update_proximity();
-
+    ecg_status = 0;
     if (current_mode == HRM_SPO2) {
         max30102_ecg_init();
-        max30102_data_handle(&n_heart_rate, &n_sp02);
-        printf("heart:%d, sp02:%d\r\n", n_heart_rate, n_sp02);
-        g_blooddata.heart = n_heart_rate;
-        g_blooddata.SpO2  = n_sp02;
+        for (size_t i = 0; i < SAMPLE_NUM; i++) {
+            ecg_status += max30102_data_handle(&n_heart_rate, &n_sp02);
+        }
+        ecg_status = ecg_status > 3 ? 1 : 0;
     }
 }
 
@@ -276,8 +278,6 @@ void max30102_thread_entry(void *args)
 
     while (1) {
         blood_Loop();
-        // max30102_data_handle(&n_heart_rate, &n_sp02);
-        // printf("heart:%d, sp02:%d\r\n", n_heart_rate, n_sp02);
-        rt_thread_mdelay(500);
+        rt_thread_mdelay(60000);
     }
 }

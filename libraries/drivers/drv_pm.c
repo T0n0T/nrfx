@@ -13,6 +13,13 @@
 #include "nrf_pwr_mgmt.h"
 #include <board.h>
 
+#ifdef SOFTDEVICE_PRESENT
+#include "nrf_soc.h"
+#include "nrf_sdh.h"
+#include "app_error.h"
+#include "app_util_platform.h"
+#endif
+
 static void sleep(struct rt_pm *pm, uint8_t mode)
 {
     switch (mode) {
@@ -20,16 +27,29 @@ static void sleep(struct rt_pm *pm, uint8_t mode)
             break;
 
         case PM_SLEEP_MODE_IDLE:
-            __WFE();
+            // __WFE();
             break;
 
         case PM_SLEEP_MODE_LIGHT:
-            do {
-                __WFE();
-            } while (0 == flag);
+            nrf_rtc_int_enable(NRF_RTC1, NRF_RTC_INT_COMPARE0_MASK);
+            __DSB();
+            // #ifdef SOFTDEVICE_PRESENT
+            //             if (nrf_sdh_is_enabled()) {
+            //                 sd_nvic_ClearPendingIRQ(NRF_RTC1_IRQn);
+            //                 uint32_t err_code = sd_app_evt_wait();
+            //                 printf("%d\n", err_code);
+            //             } else
+            // #endif
+            {
+                do {
+                    __WFE();
+                } while (0 == flag);
+            }
+
             break;
 
         case PM_SLEEP_MODE_DEEP:
+
             do {
                 __WFE();
             } while (0 == flag);
@@ -84,11 +104,11 @@ static void run(struct rt_pm *pm, uint8_t mode)
  */
 static void pm_timer_start(struct rt_pm *pm, rt_uint32_t timeout)
 {
-    RT_ASSERT(pm != RT_NULL);
     RT_ASSERT(timeout > 0);
 
     if (timeout != RT_TICK_MAX) {
         flag = 0;
+        // rt_interrupt_enter();
         bsp_uninit();
         nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
         nrf_rtc_int_disable(NRF_RTC1, NRF_RTC_INT_TICK_MASK);
@@ -98,9 +118,8 @@ static void pm_timer_start(struct rt_pm *pm, rt_uint32_t timeout)
         }
         // OS tick is same as rtc tick
         nrf_rtc_cc_set(NRF_RTC1, 0, timeout * 1);
-        nrf_rtc_task_trigger(NRF_RTC1, NRF_RTC_TASK_CLEAR);
         nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
-        nrf_rtc_int_enable(NRF_RTC1, NRF_RTC_INT_COMPARE0_MASK);
+        nrf_rtc_task_trigger(NRF_RTC1, NRF_RTC_TASK_CLEAR);
         __DSB();
     }
 }
@@ -112,13 +131,13 @@ static void pm_timer_start(struct rt_pm *pm, rt_uint32_t timeout)
  */
 static void pm_timer_stop(struct rt_pm *pm)
 {
-    RT_ASSERT(pm != RT_NULL);
     nrf_rtc_int_disable(NRF_RTC1, NRF_RTC_INT_COMPARE0_MASK);
     nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
     bsp_init();
     nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_TICK);
     nrf_rtc_int_enable(NRF_RTC1, NRF_RTC_INT_TICK_MASK);
     NVIC_ClearPendingIRQ(RTC1_IRQn);
+    // rt_interrupt_leave();
 }
 
 /**
@@ -162,3 +181,19 @@ int drv_pm_hw_init(void)
 }
 
 INIT_BOARD_EXPORT(drv_pm_hw_init);
+
+void sleep_test(int argc, char **argv)
+{
+    uint32_t timeout = 0;
+    if (argc >= 2) {
+        timeout = atoi(argv[1]);
+    }
+
+    rt_interrupt_enter();
+    pm_timer_start(0, timeout);
+    sleep(0, 2);
+    printf("counter: %d\n", nrf_rtc_counter_get(NRF_RTC1));
+    pm_timer_stop(0);
+    rt_interrupt_leave();
+}
+MSH_CMD_EXPORT(sleep_test, bsp sleep);
