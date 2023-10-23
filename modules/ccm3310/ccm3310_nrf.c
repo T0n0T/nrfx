@@ -9,24 +9,8 @@
  *
  */
 
-#include <rtthread.h>
-#include <rtdevice.h>
-#include <board.h>
 #include <ccm3310.h>
-#include "nrfx_spim.h"
 
-// #define CCM3310_DEBUG
-#if defined(CCM3310_DEBUG)
-#define CCM3310_RAW_PRINTF
-#define DBG_LVL DBG_LOG
-#else
-#define DBG_LVL DBG_INFO
-#endif
-
-#define DBG_TAG "ccm3310.dev"
-#include <rtdbg.h>
-
-struct rt_spi_device ccm;
 nrfx_spim_t instance           = NRFX_SPIM_INSTANCE(1);
 nrfx_spim_config_t config_spim = NRFX_SPIM_DEFAULT_CONFIG;
 uint8_t recv_buf[1024];
@@ -46,18 +30,16 @@ int ccm3310_init(void)
     nrf_gpio_pin_write(POR, 1);
     return 0;
 }
-// INIT_APP_EXPORT(ccm3310_init);
 
 void ccm3310_uninit(void)
 {
-
     nrfx_spim_uninit(&instance);
 }
 
 int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int recv_len)
 {
     int len           = 0;
-    rt_int8_t status  = PIN_HIGH;
+    rt_int8_t status  = 1;
     nrfx_err_t result = NRFX_SUCCESS;
 
     rt_memset(recv_buf, 0xff, sizeof(recv_buf));
@@ -87,7 +69,7 @@ int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int
 #else
 
 #endif
-    status = PIN_HIGH;
+    status = 1;
     // rt_pin_write(GINT0, PIN_LOW);
     while (status == 1) {
         status = nrf_gpio_pin_read(GINT1);

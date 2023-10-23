@@ -8,8 +8,7 @@
  * @copyright Copyright (c) 2023
  *
  */
-#include "drv_gpio.h"
-#include "drv_spi.h"
+#include "nrfx_spim.h"
 #include <ccm3310_sm4.h>
 
 #define POR      CCM_POR

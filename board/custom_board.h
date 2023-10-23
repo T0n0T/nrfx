@@ -13,11 +13,11 @@
 
 #define LEDS_NUMBER       3
 
-#define LED_START         25
 #define LED_1             25
 #define LED_2             26
 #define LED_3             27
-#define LED_STOP          27
+
+#define BUTTON_1          19
 
 #define LEDS_ACTIVE_STATE 0
 
@@ -34,9 +34,6 @@
 
 #define BUTTONS_NUMBER       1
 
-#define BUTTON_START         19
-#define BUTTON_1             19
-#define BUTTON_STOP          19
 #define BUTTON_PULL          NRF_GPIO_PIN_PULLUP
 
 #define BUTTONS_ACTIVE_STATE 0

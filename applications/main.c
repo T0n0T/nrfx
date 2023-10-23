@@ -30,7 +30,6 @@
 #include "app_timer.h"
 #include "peer_manager.h"
 #include "peer_manager_handler.h"
-#include "bsp_btn_ble.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "timers.h"
@@ -104,7 +103,6 @@ static ble_uuid_t m_adv_uuids[] = /**< Universally unique service identifiers. *
 
 static TimerHandle_t m_battery_timer;        /**< Definition of battery timer. */
 static TimerHandle_t m_heart_rate_timer;     /**< Definition of heart rate timer. */
-static TimerHandle_t m_rr_interval_timer;    /**< Definition of RR interval timer. */
 static TimerHandle_t m_sensor_contact_timer; /**< Definition of sensor contact detected timer. */
 
 #if NRF_LOG_ENABLED
@@ -258,7 +256,7 @@ static void timers_init(void)
                                           sensor_contact_detected_timeout_handler);
 
     /* Error checking */
-    if ((NULL == m_battery_timer) || (NULL == m_heart_rate_timer) || (NULL == m_rr_interval_timer) || (NULL == m_sensor_contact_timer)) {
+    if ((NULL == m_battery_timer) || (NULL == m_heart_rate_timer) || (NULL == m_sensor_contact_timer)) {
         APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
     }
 }
@@ -388,9 +386,6 @@ static void application_timers_start(void)
     if (pdPASS != xTimerStart(m_heart_rate_timer, OSTIMER_WAIT_FOR_QUEUE)) {
         APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
     }
-    if (pdPASS != xTimerStart(m_rr_interval_timer, OSTIMER_WAIT_FOR_QUEUE)) {
-        APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
-    }
     if (pdPASS != xTimerStart(m_sensor_contact_timer, OSTIMER_WAIT_FOR_QUEUE)) {
         APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
     }
@@ -454,11 +449,8 @@ static void sleep_mode_enter(void)
 {
     ret_code_t err_code;
 
-    err_code = bsp_indication_set(BSP_INDICATE_IDLE);
-    APP_ERROR_CHECK(err_code);
-
     // Prepare wakeup buttons.
-    err_code = bsp_btn_ble_sleep_mode_prepare();
+
     APP_ERROR_CHECK(err_code);
 
     // Go to system-off mode (this function will not return; wakeup will cause a reset).
@@ -479,12 +471,10 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
     switch (ble_adv_evt) {
         case BLE_ADV_EVT_FAST:
             NRF_LOG_INFO("Fast advertising.");
-            err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
-            APP_ERROR_CHECK(err_code);
             break;
 
         case BLE_ADV_EVT_IDLE:
-            sleep_mode_enter();
+            // sleep_mode_enter();
             break;
 
         default:
@@ -504,7 +494,6 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context)
     switch (p_ble_evt->header.evt_id) {
         case BLE_GAP_EVT_CONNECTED:
             NRF_LOG_INFO("Connected");
-            err_code = bsp_indication_set(BSP_INDICATE_CONNECTED);
             APP_ERROR_CHECK(err_code);
             m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
             err_code      = nrf_ble_qwr_conn_handle_assign(&m_qwr, m_conn_handle);
@@ -688,24 +677,6 @@ static void log_init(void)
     NRF_LOG_DEFAULT_BACKENDS_INIT();
 }
 
-/**@brief Function for initializing buttons and leds.
- *
- * @param[out] p_erase_bonds  Will be true if the clear bonding button was pressed to wake the application up.
- */
-static void buttons_leds_init(bool *p_erase_bonds)
-{
-    ret_code_t err_code;
-    bsp_event_t startup_event;
-
-    err_code = bsp_init(BSP_INIT_LEDS | BSP_INIT_BUTTONS, bsp_event_handler);
-    APP_ERROR_CHECK(err_code);
-
-    err_code = bsp_btn_ble_init(NULL, &startup_event);
-    APP_ERROR_CHECK(err_code);
-
-    *p_erase_bonds = (startup_event == BSP_EVENT_CLEAR_BONDING_DATA);
-}
-
 /**@brief Function for starting advertising. */
 static void advertising_start(void *p_erase_bonds)
 {
@@ -795,7 +766,6 @@ int main(void)
 
     // Initialize modules.
     timers_init();
-    buttons_leds_init(&erase_bonds);
     gap_params_init();
     gatt_init();
     advertising_init();

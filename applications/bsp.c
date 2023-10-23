@@ -9,12 +9,9 @@
  *
  */
 #include <bsp.h>
-#include <board.h>
 #include <stdio.h>
 
 #include "ccm3310.h"
-#include "drv_uart.h"
-#include "drv_i2c.h"
 #include <nrfx_power.h>
 #include <nrfx_systick.h>
 
@@ -44,16 +41,6 @@ void set_sleep_exit_pin(void)
     nrf_gpio_cfg_sense_set(13, sense);
 }
 
-void show_pin(void)
-{
-    printf("SW sense is: %d\n", nrf_gpio_pin_sense_get(SW));
-    printf("SW dir   is: %d\n", nrf_gpio_pin_dir_get(SW));
-    printf("SW pull  is: %d\n", nrf_gpio_pin_pull_get(SW));
-    printf("SW input is: %d\n", nrf_gpio_pin_input_get(SW));
-    printf("SW level is: %d\n", nrf_gpio_pin_read(SW));
-}
-MSH_CMD_EXPORT(show_pin, show pin);
-
 void gpio_uninit(void)
 {
     nrf_gpio_cfg_default(LED1);
@@ -64,7 +51,7 @@ void gpio_uninit(void)
     nrf_gpio_cfg_default(SW);
 
     nrf_gpio_cfg_default(POR);
-    nrf_gpio_cfg_default(GINT0);    
+    nrf_gpio_cfg_default(GINT0);
     nrf_gpio_cfg_default(GINT1);
 }
 
@@ -119,43 +106,13 @@ void beep_off(void)
     nrfx_pwm_stop(&m_pwm0, 1);
 }
 
-/** rtc1 -> tick */
-const nrfx_rtc_t rtc = NRFX_RTC_INSTANCE(1);
-int flag             = 0;
-void rtc1_schedule_handle(nrfx_rtc_int_type_t int_type)
-{
-    rt_interrupt_enter();
-    switch (int_type) {
-        case NRFX_RTC_INT_TICK:
-            rt_tick_increase();
-            break;
-        case NRFX_RTC_INT_COMPARE0:
-            flag = 1;
-            break;
-        default:
-            break;
-    }
-    rt_interrupt_leave();
-}
-
-void rtc_tick_configure(void)
-{
-    nrf_drv_clock_init();
-    nrf_drv_clock_lfclk_request(NULL);
-    nrfx_rtc_config_t config = NRFX_RTC_DEFAULT_CONFIG;
-    config.prescaler         = RTC_PRESCALER;
-    nrfx_rtc_init(&rtc, &config, rtc1_schedule_handle);
-    nrfx_rtc_tick_enable(&rtc, true);
-    nrfx_rtc_enable(&rtc);
-}
-
 void bsp_init(void)
 {
     // nrfx_clock_hfclk_start();
     // gpio_init();
-    beep_init();
+    // beep_init();
     // ccm3310_init();
-    i2c0_init();
+    // i2c0_init();
 
     // nrfx_uart_init(&uart0, &uart0_config, uart0_event_hander);
 }
@@ -165,7 +122,7 @@ void bsp_uninit(void)
     // gpio_uninit();
     beep_uninit();
     // ccm3310_uninit();
-    i2c0_uninit();
+    // i2c0_uninit();
     // nrfx_uart_uninit(&uart0);
     // nrfx_clock_hfclk_stop();
 }
@@ -206,4 +163,3 @@ void bsp_sleep(int argc, char **argv)
     NVIC_ClearPendingIRQ(RTC1_IRQn);
     rt_interrupt_leave();
 }
-MSH_CMD_EXPORT(bsp_sleep, bsp sleep);

@@ -26,34 +26,40 @@
             "path": "applications/main.c"
           },
           {
-            "path": "nrf_sdk/examples/ble_peripheral/ble_app_hrs_freertos/pca10040/s132/config/sdk_config.h"
+            "path": "board/sdk_config.h"
           }
         ],
         "folders": []
       },
       {
-        "name": "Board Definition",
+        "name": "Board",
         "files": [
           {
-            "path": "nrf_sdk/components/boards/boards.c"
-          }
-        ],
-        "folders": []
-      },
-      {
-        "name": "Board Support",
-        "files": [
-          {
-            "path": "nrf_sdk/components/libraries/bsp/bsp_btn_ble.c"
-          },
-          {
-            "path": "nrf_sdk/components/libraries/bsp/bsp.c"
+            "path": "applications/bsp.c"
           },
           {
             "path": "nrf_sdk/modules/nrfx/mdk/arm_startup_nrf52.s"
           },
           {
             "path": "nrf_sdk/modules/nrfx/mdk/system_nrf52.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "Modules",
+        "files": [
+          {
+            "path": "modules/ccm3310/ccm3310_nrf.c"
+          },
+          {
+            "path": "modules/ccm3310/ccm3310_sm4.c"
+          },
+          {
+            "path": "modules/ccm3310/crc32.c"
+          },
+          {
+            "path": "modules/ccm3310/decode.c"
           }
         ],
         "folders": []
@@ -146,22 +152,43 @@
             "path": "nrf_sdk/integration/nrfx/legacy/nrf_drv_uart.c"
           },
           {
-            "path": "nrf_sdk/modules/nrfx/soc/nrfx_atomic.c"
-          },
-          {
             "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_clock.c"
           },
           {
             "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_gpiote.c"
           },
           {
-            "path": "nrf_sdk/modules/nrfx/drivers/src/prs/nrfx_prs.c"
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_pwm.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_spi.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_spim.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_swi.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_twi_twim.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_twi.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_twim.c"
           },
           {
             "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_uart.c"
           },
           {
             "path": "nrf_sdk/modules/nrfx/drivers/src/nrfx_uarte.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/drivers/src/prs/nrfx_prs.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/soc/nrfx_atomic.c"
           }
         ],
         "folders": []
@@ -287,9 +314,6 @@
         "name": "nRF_SoftDevice",
         "files": [
           {
-            "path": "nrf_sdk/components/softdevice/common/nrf_sdh.c"
-          },
-          {
             "path": "nrf_sdk/components/softdevice/common/nrf_sdh_ble.c"
           },
           {
@@ -297,6 +321,9 @@
           },
           {
             "path": "nrf_sdk/components/softdevice/common/nrf_sdh_soc.c"
+          },
+          {
+            "path": "nrf_sdk/components/softdevice/common/nrf_sdh.c"
           }
         ],
         "folders": []
@@ -305,25 +332,25 @@
         "name": "Third Parties",
         "files": [
           {
+            "path": "nrf_sdk/external/freertos/portable/ARM/nrf52/port.c"
+          },
+          {
+            "path": "nrf_sdk/external/freertos/portable/CMSIS/nrf52/port_cmsis_systick.c"
+          },
+          {
+            "path": "nrf_sdk/external/freertos/portable/CMSIS/nrf52/port_cmsis.c"
+          },
+          {
             "path": "nrf_sdk/external/freertos/source/croutine.c"
           },
           {
             "path": "nrf_sdk/external/freertos/source/event_groups.c"
           },
           {
-            "path": "nrf_sdk/external/freertos/source/portable/MemMang/heap_1.c"
-          },
-          {
             "path": "nrf_sdk/external/freertos/source/list.c"
           },
           {
-            "path": "nrf_sdk/external/freertos/portable/ARM/nrf52/port.c"
-          },
-          {
-            "path": "nrf_sdk/external/freertos/portable/CMSIS/nrf52/port_cmsis.c"
-          },
-          {
-            "path": "nrf_sdk/external/freertos/portable/CMSIS/nrf52/port_cmsis_systick.c"
+            "path": "nrf_sdk/external/freertos/source/portable/MemMang/heap_1.c"
           },
           {
             "path": "nrf_sdk/external/freertos/source/queue.c"
@@ -490,13 +517,12 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": "ip 192.168.230.1"
+        "otherCmds": ""
       },
       "uploadConfigMap": {},
       "custom_dep": {
         "name": "default",
         "incList": [
-          "nrf_sdk/examples/ble_peripheral/ble_app_hrs_freertos/config",
           "nrf_sdk/components",
           "nrf_sdk/components/ble/ble_advertising",
           "nrf_sdk/components/ble/ble_dtm",
@@ -528,13 +554,11 @@
           "nrf_sdk/components/ble/nrf_ble_gatt",
           "nrf_sdk/components/ble/nrf_ble_qwr",
           "nrf_sdk/components/ble/peer_manager",
-          "nrf_sdk/components/boards",
           "nrf_sdk/components/libraries/atomic",
           "nrf_sdk/components/libraries/atomic_fifo",
           "nrf_sdk/components/libraries/atomic_flags",
           "nrf_sdk/components/libraries/balloc",
           "nrf_sdk/components/libraries/bootloader/ble_dfu",
-          "nrf_sdk/components/libraries/bsp",
           "nrf_sdk/components/libraries/button",
           "nrf_sdk/components/libraries/cli",
           "nrf_sdk/components/libraries/crc16",
@@ -629,12 +653,13 @@
           "nrf_sdk/modules/nrfx",
           "nrf_sdk/modules/nrfx/drivers/include",
           "nrf_sdk/modules/nrfx/hal",
-          "nrf_sdk/examples/ble_peripheral/ble_app_hrs_freertos/pca10040/s132/config",
           ".cmsis/include",
-          "nrf_sdk/examples/ble_peripheral/ble_app_hrs_freertos/pca10040/s132/arm5_no_packs/RTE/_nrf52832_xxaa",
           ".eide/deps",
           "nrf_sdk/modules/nrfx/mdk",
-          "board"
+          "board",
+          "applications",
+          "modules/ccm3310",
+          "modules/button"
         ],
         "libList": [],
         "sourceDirList": [],
@@ -650,7 +675,9 @@
           "SOFTDEVICE_PRESENT",
           "__HEAP_SIZE=1024",
           "__STACK_SIZE=2048",
-          "BOARD_CUSTOM"
+          "BOARD_CUSTOM",
+          "DEBUG",
+          "USE_APP_CONFIG"
         ]
       }
     },
