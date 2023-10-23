@@ -922,7 +922,6 @@
         "<virtual_root>/max30102/v1/algorithm_v1.c",
         "<virtual_root>/max30102/v1",
         "<virtual_root>/Drivers/app_timer2.c",
-        "<virtual_root>/Applications/app.c",
         "<virtual_root>/nrf_log",
         "<virtual_root>/Drivers/drv_uarte.c",
         "<virtual_root>/nrf_softdev/nrf_sdh_rtthread.c"
@@ -1051,7 +1050,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": ""
+        "otherCmds": "ip 192.168.230.1"
       },
       "uploadConfigMap": {},
       "custom_dep": {

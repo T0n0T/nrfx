@@ -98,6 +98,7 @@ void publish_handle(void)
         static int flag = 0;
         if (flag++ == 10) {
             flag = 0;
+            LOG_E("publish msg has too many errors, thread will be restarted now");
             rt_thread_init(&check_thread, "mqtt_reset", mqtt_reset_thread, RT_NULL, check_stack, sizeof(check_stack), 25, 15);
             rt_thread_startup(&check_thread);
             rt_thread_mdelay(2000);
@@ -139,10 +140,11 @@ int logisinit = 0;
 
 static int mqtt_mission_init(void)
 {
-
+    return 0;
     mqtt_error_t err    = KAWAII_MQTT_SUCCESS_ERROR;
     ret_code_t rc       = NRF_SUCCESS;
     struct mqtt_cfg cfg = {0};
+
     if (nrf_fstorage_init(&fstorage, &nrf_fstorage_sd, NULL) == NRF_SUCCESS) {
         uint8_t tmp[30] = {0xff};
         if (nrf_fstorage_read(&fstorage, FLASH_CFG_ADDR, &cfg, sizeof(struct mqtt_cfg)) == NRF_SUCCESS) {
@@ -249,9 +251,10 @@ static void mqtt_entry(void *p)
     while (1) {
         rt_pm_request(PM_SLEEP_MODE_NONE);
         ec800x_open_with_check();
-        publish_handle();
+        // publish_handle();
         ec800x_close_with_check();
         rt_pm_release(PM_SLEEP_MODE_NONE);
+        rt_thread_mdelay(300000);
     }
 }
 

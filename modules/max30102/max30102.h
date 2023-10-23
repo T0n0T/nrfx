@@ -11,6 +11,7 @@
 #define PKG_MAX30102_H__
 
 #include <rtthread.h>
+#include "nrf_drv_twi.h"
 #include <drivers/sensor.h>
 
 #ifndef MAX30102_STACK_SIZE

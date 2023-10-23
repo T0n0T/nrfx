@@ -106,4 +106,4 @@ int btn_init(void)
     }
     return rt_thread_startup(&btn_thread);
 }
-// INIT_APP_EXPORT(btn_init);
+INIT_APP_EXPORT(btn_init);

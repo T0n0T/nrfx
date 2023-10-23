@@ -115,7 +115,9 @@
             "sdk_errors.h": "c",
             "nrfx_power.h": "c",
             "drv_pm.h": "c",
-            "nrf_drv_clock.h": "c"
+            "nrf_drv_clock.h": "c",
+            "nrf_drv_twi.h": "c",
+            "compiler_abstraction.h": "c"
         },
         "cortex-debug.variableUseNaturalFormat": true
     },

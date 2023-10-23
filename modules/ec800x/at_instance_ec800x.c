@@ -36,7 +36,7 @@ static int ec800x_device_register(void)
                               AT_DEVICE_CLASS_EC800X,
                               (void *)ec800x);
 }
-INIT_APP_EXPORT(ec800x_device_register);
+// INIT_APP_EXPORT(ec800x_device_register);
 
 rt_bool_t ec800x_isinit(void)
 {
@@ -103,3 +103,4 @@ void ec800x_close_with_check(void)
     struct at_device *device        = &ec800x->device;
     at_device_control(device, AT_DEVICE_CTRL_SLEEP, RT_NULL);
 }
+MSH_CMD_EXPORT_ALIAS(ec800x_close_with_check, ec800x_sleep, close ec800x module.)

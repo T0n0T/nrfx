@@ -61,10 +61,6 @@ static int ec800x_sleep(struct at_device *device)
     struct at_device_ec800x *ec800x = RT_NULL;
 
     ec800x = (struct at_device_ec800x *)device->user_data;
-    if (!ec800x->power_status) // power off
-    {
-        return (RT_EOK);
-    }
     if (ec800x->sleep_status) // is sleep status
     {
         return (RT_EOK);
@@ -104,17 +100,12 @@ static int ec800x_wakeup(struct at_device *device)
     struct at_device_ec800x *ec800x = RT_NULL;
 
     ec800x = (struct at_device_ec800x *)device->user_data;
-    if (!ec800x->power_status) // power off
-    {
-        LOG_E("the power is off and the wake-up cannot be performed");
-        return (-RT_ERROR);
-    }
     if (!ec800x->sleep_status) // no sleep status
     {
         return (RT_EOK);
     }
 
-    nrf_gpio_pin_write(ec800x->wakeup_pin, PIN_LOW);
+    nrf_gpio_pin_write(ec800x->wakeup_pin, 0);
     rt_thread_mdelay(200);
 
     resp = at_create_resp(64, 0, rt_tick_from_millisecond(300));
@@ -142,11 +133,6 @@ int ec800x_check_link_status(struct at_device *device)
     int result                      = -RT_ERROR;
 
     ec800x = (struct at_device_ec800x *)device->user_data;
-    if (!ec800x->power_status) // power off
-    {
-        LOG_D("the power is off.");
-        return (-RT_ERROR);
-    }
     if (ec800x->sleep_status) // is sleep status
     {
         nrf_gpio_pin_write(ec800x->wakeup_pin, PIN_LOW);

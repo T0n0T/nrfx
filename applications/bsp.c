@@ -35,6 +35,9 @@ void gpio_init(void)
     nrf_gpio_cfg_output(POR);
     nrf_gpio_cfg_output(GINT0);
     nrf_gpio_cfg_input(GINT1, NRF_GPIO_PIN_NOPULL);
+
+    nrf_gpio_cfg_output(EC800_PWR_EN);
+    nrf_gpio_pin_write(EC800_PWR_EN, 0);
 }
 
 void set_sleep_exit_pin(void)
@@ -64,7 +67,7 @@ void gpio_uninit(void)
     nrf_gpio_cfg_default(SW);
 
     nrf_gpio_cfg_default(POR);
-    nrf_gpio_cfg_default(GINT0);    
+    nrf_gpio_cfg_default(GINT0);
     nrf_gpio_cfg_default(GINT1);
 }
 
