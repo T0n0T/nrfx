@@ -8,6 +8,7 @@
  * @copyright Copyright (c) 2023
  *
  */
+#include "nrf_gpio.h"
 #include "nrfx_spim.h"
 #include <ccm3310_sm4.h>
 

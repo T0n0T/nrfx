@@ -1,9 +1,7 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
-#include <rthw.h>
-#include <rtthread.h>
-#include <rtdevice.h>
+#include <stdint.h>
 #include <string.h>
 
 #define BTN_NAME_MAX 32 // 名字最大为32字节
@@ -76,25 +74,25 @@ typedef enum {
 */
 typedef struct button {
     /* The following is a function pointer pointing to the function that determines whether the button is pressed or not. */
-    rt_uint8_t (*Read_Button_Level)(void); /* Read the button level function, you need to implement */
+    uint8_t (*Read_Button_Level)(void); /* Read the button level function, you need to implement */
 
     char Name[BTN_NAME_MAX];
 
-    rt_uint8_t Button_State : 4;         /* The current state of the button (pressed or bounced) */
-    rt_uint8_t Button_Last_State : 4;    /* The last button state used to determine the double click */
-    rt_uint8_t Button_Trigger_Level : 2; /* Button trigger level */
-    rt_uint8_t Button_Last_Level : 2;    /* Button current level */
+    uint8_t Button_State : 4;         /* The current state of the button (pressed or bounced) */
+    uint8_t Button_Last_State : 4;    /* The last button state used to determine the double click */
+    uint8_t Button_Trigger_Level : 2; /* Button trigger level */
+    uint8_t Button_Last_Level : 2;    /* Button current level */
 
-    rt_uint8_t Button_Trigger_Event; /* Button trigger event, click, double click, long press, etc. */
+    uint8_t Button_Trigger_Event; /* Button trigger event, click, double click, long press, etc. */
 
     Button_CallBack CallBack_Function[number_of_event];
 
-    rt_uint8_t Button_Cycle; /* Continuous button cycle */
+    uint8_t Button_Cycle; /* Continuous button cycle */
 
-    rt_uint8_t Timer_Count;   /* Timing */
-    rt_uint8_t Debounce_Time; /* Debounce time */
+    uint8_t Timer_Count;   /* Timing */
+    uint8_t Debounce_Time; /* Debounce time */
 
-    rt_uint8_t Long_Time; /* Button press duration */
+    uint8_t Long_Time; /* Button press duration */
 
     struct button *Next;
 
@@ -104,8 +102,8 @@ typedef struct button {
 
 void Button_Create(const char *name,
                    Button_t *btn,
-                   rt_uint8_t (*read_btn_level)(void),
-                   rt_uint8_t btn_trigger_level);
+                   uint8_t (*read_btn_level)(void),
+                   uint8_t btn_trigger_level);
 
 void Button_Attach(Button_t *btn, Button_Event btn_event, Button_CallBack btn_callback);
 
@@ -118,8 +116,8 @@ void Button_Delete(Button_t *btn);
 void Search_Button(void);
 
 void Get_Button_EventInfo(Button_t *btn);
-rt_uint8_t Get_Button_Event(Button_t *btn);
-rt_uint8_t Get_Button_State(Button_t *btn);
+uint8_t Get_Button_Event(Button_t *btn);
+uint8_t Get_Button_State(Button_t *btn);
 void Button_Process_CallBack(void *btn);
 
 #endif

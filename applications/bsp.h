@@ -16,9 +16,6 @@
 extern int flag;
 extern const nrfx_rtc_t rtc_instance;
 
-#define LF_CLK_HZ     (32768UL)
-#define RTC_PRESCALER ((uint32_t)(NRFX_ROUNDED_DIV(LF_CLK_HZ, RT_TICK_PER_SECOND) - 1))
-
 void gpio_init(void);
 void gpio_uninit(void);
 void set_sleep_exit_pin(void);
@@ -28,7 +25,7 @@ void beep_uninit(void);
 void beep_on(void);
 void beep_off(void);
 
-void rtc_tick_configure(void);
+void btn_init(void);
 
 void bsp_init(void);
 void bsp_uninit(void);

@@ -1,7 +1,7 @@
 /************************************************************
  * @brief   button_drive
- * @param   RT_NULL
- * @return  RT_NULL
+ * @param   NULL
+ * @return  NULL
  * @author  jiejie
  * @github  https://github.com/jiejieTop
  * @date    2018-xx-xx
@@ -11,21 +11,22 @@
 
 #include "button.h"
 
-#define DBG_LVL DBG_INFO
-#define DBG_TAG "button"
-#include <rtdbg.h>
+#define NRF_LOG_MODULE_NAME button
+#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_INFO
+#include "nrf_log.h"
+NRF_LOG_MODULE_REGISTER();
 
 #define SINGLE_AND_DOUBLE_TRIGGER
 /*******************************************************************
  *                          Variable Declaration
  *******************************************************************/
 
-static struct button *Head_Button = RT_NULL;
+static struct button *Head_Button = NULL;
 
 /*******************************************************************
  *                         Function Declaration
  *******************************************************************/
-static char *StrnCopy(char *dst, const char *src, rt_uint32_t n);
+static char *StrnCopy(char *dst, const char *src, uint32_t n);
 static void Print_Btn_Info(Button_t *btn);
 static void Add_Button(Button_t *btn);
 
@@ -34,22 +35,22 @@ static void Add_Button(Button_t *btn);
  * @param   name:button name
  * @param   btn:button structure
  * @param   read_btn_level:Button trigger level reading function,
- *                 Return the level of the rt_uint8_t type by yourself
+ *                 Return the level of the uint8_t type by yourself
  * @param   btn_trigger_level:Button trigger level
- * @return  RT_NULL
+ * @return  NULL
  * @author  jiejie
  * @github  https://github.com/jiejieTop
  * @date    2018-xx-xx
  * @version v1.0
- * @note    RT_NULL
+ * @note    NULL
  ***********************************************************/
 void Button_Create(const char *name,
                    Button_t *btn,
-                   rt_uint8_t (*read_btn_level)(void),
-                   rt_uint8_t btn_trigger_level)
+                   uint8_t (*read_btn_level)(void),
+                   uint8_t btn_trigger_level)
 {
-    if (btn == RT_NULL) {
-        LOG_E("struct button is RT_NULL!");
+    if (btn == NULL) {
+        NRF_LOG_ERROR("struct button is NULL!");
     }
 
     memset(btn, 0, sizeof(struct button)); // Clear structure information
@@ -64,7 +65,7 @@ void Button_Create(const char *name,
     btn->Button_Last_Level    = btn->Read_Button_Level(); // Button current level
     btn->Debounce_Time        = 0;
 
-    LOG_D("button create success!");
+    NRF_LOG_DEBUG("button create success!");
 
     Add_Button(btn); // Added to the singly linked list when button created
 
@@ -76,7 +77,7 @@ void Button_Create(const char *name,
  * @param   btn:button structure
  * @param   btn_event:button events
  * @param   btn_callback : Callback handler after the button is triggered.Need user implementation
- * @return  RT_NULL
+ * @return  NULL
  * @author  jiejie
  * @github  https://github.com/jiejieTop
  * @date    2018-xx-xx
@@ -84,12 +85,12 @@ void Button_Create(const char *name,
  ***********************************************************/
 void Button_Attach(Button_t *btn, Button_Event btn_event, Button_CallBack btn_callback)
 {
-    if (btn == RT_NULL) {
-        LOG_E("struct button is RT_NULL!");
+    if (btn == NULL) {
+        NRF_LOG_ERROR("struct button is NULL!");
     }
 
     if (BUTTON_ALL_RIGGER == btn_event) {
-        for (rt_uint8_t i = 0; i < number_of_event - 1; i++)
+        for (uint8_t i = 0; i < number_of_event - 1; i++)
             /*A callback function triggered by a button event ,Used to handle button events */
             btn->CallBack_Function[i] = btn_callback;
     } else {
@@ -99,13 +100,13 @@ void Button_Attach(Button_t *btn, Button_Event btn_event, Button_CallBack btn_ca
 
 /************************************************************
  * @brief   Delete an already created button
- * @param   RT_NULL
- * @return  RT_NULL
+ * @param   NULL
+ * @return  NULL
  * @author  jiejie
  * @github  https://github.com/jiejieTop
  * @date    2018-xx-xx
  * @version v1.0
- * @note    RT_NULL
+ * @note    NULL
  ***********************************************************/
 void Button_Delete(Button_t *btn)
 {
@@ -122,8 +123,8 @@ void Button_Delete(Button_t *btn)
 
 /************************************************************
  * @brief   Get Button Event Info
- * @param   RT_NULL
- * @return  RT_NULL
+ * @param   NULL
+ * @return  NULL
  * @author  jiejie
  * @github  https://github.com/jiejieTop
  * @date    2018-xx-xx
@@ -131,46 +132,46 @@ void Button_Delete(Button_t *btn)
  ***********************************************************/
 void Get_Button_EventInfo(Button_t *btn)
 {
-    for (rt_uint8_t i = 0; i < number_of_event - 1; i++) {
+    for (uint8_t i = 0; i < number_of_event - 1; i++) {
         if (btn->CallBack_Function[i] != 0) {
             /* print */
-            LOG_D("Button_Event:%d", i);
+            NRF_LOG_DEBUG("Button_Event:%d", i);
         }
     }
 }
 
 /************************************************************
  * @brief   Get Button Event
- * @param   RT_NULL
- * @return  RT_NULL
+ * @param   NULL
+ * @return  NULL
  * @author  jiejie
  * @github  https://github.com/jiejieTop
  * @date    2018-xx-xx
  * @version v1.0
  ***********************************************************/
-rt_uint8_t Get_Button_Event(Button_t *btn)
+uint8_t Get_Button_Event(Button_t *btn)
 {
-    return (rt_uint8_t)(btn->Button_Trigger_Event);
+    return (uint8_t)(btn->Button_Trigger_Event);
 }
 
 /************************************************************
  * @brief   Get Button State
- * @param   RT_NULL
- * @return  RT_NULL
+ * @param   NULL
+ * @return  NULL
  * @author  jiejie
  * @github  https://github.com/jiejieTop
  * @date    2018-xx-xx
  * @version v1.0
  ***********************************************************/
-rt_uint8_t Get_Button_State(Button_t *btn)
+uint8_t Get_Button_State(Button_t *btn)
 {
-    return (rt_uint8_t)(btn->Button_State);
+    return (uint8_t)(btn->Button_State);
 }
 
 /************************************************************
  * @brief   button cycle processing function
  * @param   btn:button structure
- * @return  RT_NULL
+ * @return  NULL
  * @author  jiejie
  * @github  https://github.com/jiejieTop
  * @date    2018-xx-xx
@@ -180,7 +181,7 @@ rt_uint8_t Get_Button_State(Button_t *btn)
 void Button_Cycle_Process(Button_t *btn)
 {
     /* Get the current button level */
-    rt_uint8_t current_level = (rt_uint8_t)btn->Read_Button_Level();
+    uint8_t current_level = (uint8_t)btn->Read_Button_Level();
 
     /* Button level changes, debounce */
     if ((current_level != btn->Button_Last_Level) && (++(btn->Debounce_Time) >= BUTTON_DEBOUNCE_TIME)) {
@@ -197,7 +198,7 @@ void Button_Cycle_Process(Button_t *btn)
         // free button
         else if (btn->Button_State == BUTTON_DOWM) {
             btn->Button_State = BUTTON_UP;
-            // LOG_D("button release\n");
+            // NRF_LOG_DEBUG("button release\n");
             TRIGGER_CB(BUTTON_UP);
         }
     }
@@ -214,7 +215,7 @@ void Button_Cycle_Process(Button_t *btn)
                     btn->Button_Trigger_Event = BUTTON_CONTINUOS;
                     /* continuous triggering */
                     TRIGGER_CB(BUTTON_CONTINUOS);
-                    LOG_D("continuous triggering");
+                    NRF_LOG_DEBUG("continuous triggering");
                 }
 
 #else
@@ -241,7 +242,7 @@ void Button_Cycle_Process(Button_t *btn)
                         btn->Long_Time = BUTTON_LONG_TIME;
                     }
                     /* long triggering */
-                    LOG_D("Long press");
+                    NRF_LOG_DEBUG("Long press");
                     TRIGGER_CB(BUTTON_LONG);
                 }
 
@@ -258,7 +259,7 @@ void Button_Cycle_Process(Button_t *btn)
                 /* double click */
                 if ((btn->Timer_Count <= BUTTON_DOUBLE_TIME) && (btn->Button_Last_State == BUTTON_DOUBLE)) {
                     btn->Button_Trigger_Event = BUTTON_DOUBLE;
-                    LOG_D("double click");
+                    NRF_LOG_DEBUG("double click");
                     TRIGGER_CB(BUTTON_DOUBLE);
 
                     btn->Button_State      = NONE_TRIGGER;
@@ -281,12 +282,12 @@ void Button_Cycle_Process(Button_t *btn)
             else if (btn->Button_Trigger_Event == BUTTON_LONG) {
 #ifdef LONG_FREE_TRIGGER
                 /* Long press */
-                LOG_D("Long press");
+                NRF_LOG_DEBUG("Long press");
                 TRIGGER_CB(BUTTON_LONG);
 #else
 
                 /* Long press free */
-                LOG_D("Long press free");
+                NRF_LOG_DEBUG("Long press free");
                 TRIGGER_CB(BUTTON_LONG_FREE);
 #endif
                 btn->Long_Time         = 0;
@@ -319,7 +320,7 @@ void Button_Cycle_Process(Button_t *btn)
 
             if ((btn->Timer_Count >= BUTTON_DOUBLE_TIME) && (btn->Button_Last_State != BUTTON_DOWM)) {
                 btn->Timer_Count = 0;
-                LOG_D("single click");
+                NRF_LOG_DEBUG("single click");
                 TRIGGER_CB(BUTTON_DOWM);
                 btn->Button_State      = NONE_TRIGGER;
                 btn->Button_Last_State = BUTTON_DOWM;
@@ -337,8 +338,8 @@ void Button_Cycle_Process(Button_t *btn)
 
 /************************************************************
  * @brief   Traversing the way to scan the button without losing each button
- * @param   RT_NULL
- * @return  RT_NULL
+ * @param   NULL
+ * @return  NULL
  * @author  jiejie
  * @github  https://github.com/jiejieTop
  * @date    2018-xx-xx
@@ -348,33 +349,33 @@ void Button_Cycle_Process(Button_t *btn)
 void Button_Process(void)
 {
     struct button *pass_btn;
-    for (pass_btn = Head_Button; pass_btn != RT_NULL; pass_btn = pass_btn->Next) {
+    for (pass_btn = Head_Button; pass_btn != NULL; pass_btn = pass_btn->Next) {
         Button_Cycle_Process(pass_btn);
     }
 }
 
 /************************************************************
  * @brief   Search Button
- * @param   RT_NULL
- * @return  RT_NULL
+ * @param   NULL
+ * @return  NULL
  * @author  jiejie
  * @github  https://github.com/jiejieTop
  * @date    2018-xx-xx
  * @version v1.0
- * @note    RT_NULL
+ * @note    NULL
  ***********************************************************/
 void Search_Button(void)
 {
     struct button *pass_btn;
-    for (pass_btn = Head_Button; pass_btn != RT_NULL; pass_btn = pass_btn->Next) {
-        LOG_D("button node have %s", pass_btn->Name);
+    for (pass_btn = Head_Button; pass_btn != NULL; pass_btn = pass_btn->Next) {
+        NRF_LOG_DEBUG("button node have %s", pass_btn->Name);
     }
 }
 
 /************************************************************
  * @brief   Handle all button callback functions
- * @param   RT_NULL
- * @return  RT_NULL
+ * @param   NULL
+ * @return  NULL
  * @author  jiejie
  * @github  https://github.com/jiejieTop
  * @date    2018-xx-xx
@@ -383,41 +384,41 @@ void Search_Button(void)
  ***********************************************************/
 void Button_Process_CallBack(void *btn)
 {
-    rt_uint8_t btn_event = Get_Button_Event(btn);
+    uint8_t btn_event = Get_Button_Event(btn);
 
     switch (btn_event) {
         case BUTTON_DOWM: {
-            LOG_D("Add processing logic for your press trigger");
+            NRF_LOG_DEBUG("Add processing logic for your press trigger");
             break;
         }
 
         case BUTTON_UP: {
-            LOG_D("Add processing logic for your trigger release");
+            NRF_LOG_DEBUG("Add processing logic for your trigger release");
             break;
         }
 
         case BUTTON_DOUBLE: {
-            LOG_D("Add processing logic for your double-click trigger");
+            NRF_LOG_DEBUG("Add processing logic for your double-click trigger");
             break;
         }
 
         case BUTTON_LONG: {
-            LOG_D("Add processing logic for your long press trigger");
+            NRF_LOG_DEBUG("Add processing logic for your long press trigger");
             break;
         }
 
         case BUTTON_LONG_FREE: {
-            LOG_D("Add processing logic for your long press trigger free");
+            NRF_LOG_DEBUG("Add processing logic for your long press trigger free");
             break;
         }
 
         case BUTTON_CONTINUOS: {
-            LOG_D("Add your continuous trigger processing logic");
+            NRF_LOG_DEBUG("Add your continuous trigger processing logic");
             break;
         }
 
         case BUTTON_CONTINUOS_FREE: {
-            LOG_D("Add processing logic for your continuous trigger release");
+            NRF_LOG_DEBUG("Add processing logic for your continuous trigger release");
             break;
         }
     }
@@ -427,15 +428,15 @@ void Button_Process_CallBack(void *btn)
 
 /************************************************************
  * @brief   Copy the specified length string
- * @param   RT_NULL
- * @return  RT_NULL
+ * @param   NULL
+ * @return  NULL
  * @author  jiejie
  * @github  https://github.com/jiejieTop
  * @date    2018-xx-xx
  * @version v1.0
- * @note    RT_NULL
+ * @note    NULL
  ***********************************************************/
-static char *StrnCopy(char *dst, const char *src, rt_uint32_t n)
+static char *StrnCopy(char *dst, const char *src, uint32_t n)
 {
     if (n != 0) {
         char *d       = dst;
@@ -453,40 +454,40 @@ static char *StrnCopy(char *dst, const char *src, rt_uint32_t n)
 
 /************************************************************
  * @brief   Print button related information
- * @param   RT_NULL
- * @return  RT_NULL
+ * @param   NULL
+ * @return  NULL
  * @author  jiejie
  * @github  https://github.com/jiejieTop
  * @date    2018-xx-xx
  * @version v1.0
- * @note    RT_NULL
+ * @note    NULL
  ***********************************************************/
 static void Print_Btn_Info(Button_t *btn)
 {
 
-    LOG_D("button struct information:\n\
+    NRF_LOG_DEBUG("button struct information:\n\
               btn->Name:%s \n\
               btn->Button_State:%d \n\
               btn->Button_Trigger_Event:%d \n\
               btn->Button_Trigger_Level:%d \n\
               btn->Button_Last_Level:%d \n\
               ",
-          btn->Name,
-          btn->Button_State,
-          btn->Button_Trigger_Event,
-          btn->Button_Trigger_Level,
-          btn->Button_Last_Level);
+                  btn->Name,
+                  btn->Button_State,
+                  btn->Button_Trigger_Event,
+                  btn->Button_Trigger_Level,
+                  btn->Button_Last_Level);
     Search_Button();
 }
 /************************************************************
  * @brief   Connect buttons with a single linked list
- * @param   RT_NULL
- * @return  RT_NULL
+ * @param   NULL
+ * @return  NULL
  * @author  jiejie
  * @github  https://github.com/jiejieTop
  * @date    2018-xx-xx
  * @version v1.0
- * @note    RT_NULL
+ * @note    NULL
  ***********************************************************/
 static void Add_Button(Button_t *btn)
 {

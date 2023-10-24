@@ -8,7 +8,8 @@
  * @copyright Copyright (c) 2023
  *
  */
-
+#include "stdio.h"
+#include <string.h>
 #include <ccm3310.h>
 
 nrfx_spim_t instance           = NRFX_SPIM_INSTANCE(1);
@@ -24,10 +25,6 @@ int ccm3310_init(void)
     config_spim.frequency = NRF_SPIM_FREQ_1M;
     config_spim.mode      = NRF_SPIM_MODE_3;
     nrfx_spim_init(&instance, &config_spim, 0, (void *)instance.drv_inst_idx);
-
-    nrf_gpio_pin_write(POR, 0);
-    NRFX_DELAY_US(50000);
-    nrf_gpio_pin_write(POR, 1);
     return 0;
 }
 
@@ -39,10 +36,10 @@ void ccm3310_uninit(void)
 int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int recv_len)
 {
     int len           = 0;
-    rt_int8_t status  = 1;
+    uint8_t status    = 1;
     nrfx_err_t result = NRFX_SUCCESS;
 
-    rt_memset(recv_buf, 0xff, sizeof(recv_buf));
+    memset(recv_buf, 0xff, sizeof(recv_buf));
     // nrfx_spim_init(&instance, &config_spim, 0, (void *)instance.drv_inst_idx);
     nrf_gpio_pin_write(GINT0, 0);
     while (status == 1) {

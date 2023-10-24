@@ -24,6 +24,12 @@
             "editor.insertSpaces": true,
             "editor.tabSize": 4,
             "editor.autoIndent": "advanced"
+        },
+        "search.exclude": {
+            "**/build": true,
+            "**/.vscode": true,
+            "*.d": true,
+            "*.dep": true,
         }
     },
     "extensions": {

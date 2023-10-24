@@ -3,7 +3,7 @@
 
 #define NRFX_SYSTICK_ENABLED  1
 #define NRFX_NVMC_ENABLED     1
-
+#define NRF_PWR_MGMT_ENABLED  1
 #define NRF_DFU_TRANSPORT_BLE 1
 #define BLE_BAS_ENABLED       1
 #define BLE_DIS_ENABLED       1

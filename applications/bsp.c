@@ -1,9 +1,9 @@
 /**
  * @file bsp.c
- * @author your name (you@domain.com)
+ * @author T0n0T (T0n0T@823478402@qq.com)
  * @brief
  * @version 0.1
- * @date 2023-10-17
+ * @date 2023-10-24
  *
  * @copyright Copyright (c) 2023
  *
@@ -12,11 +12,14 @@
 #include <stdio.h>
 
 #include "ccm3310.h"
+#include "button.h"
 #include <nrfx_power.h>
 #include <nrfx_systick.h>
 
+#include "FreeRTOS.h"
+#include "app_timer.h"
+
 /** gpio */
-static void sw_handle(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action);
 void gpio_init(void)
 {
     nrf_gpio_cfg_output(LED1);
@@ -24,7 +27,6 @@ void gpio_init(void)
     nrf_gpio_cfg_output(LED3);
 
     nrf_gpio_cfg_output(POWER_KEEP);
-    nrf_gpio_cfg_input(SW, NRF_GPIO_PIN_PULLUP);
 
     nrf_gpio_pin_write(LED2, 1);
     nrf_gpio_pin_write(LED3, 1);
@@ -32,6 +34,10 @@ void gpio_init(void)
     nrf_gpio_cfg_output(POR);
     nrf_gpio_cfg_output(GINT0);
     nrf_gpio_cfg_input(GINT1, NRF_GPIO_PIN_NOPULL);
+
+    // nrf_gpio_pin_write(POR, 0);
+    // NRFX_DELAY_US(50000);
+    // nrf_gpio_pin_write(POR, 1);
 }
 
 void set_sleep_exit_pin(void)
@@ -106,7 +112,7 @@ void beep_off(void)
     nrfx_pwm_stop(&m_pwm0, 1);
 }
 
-void bsp_init(void)
+void bsp_sleep(void)
 {
     // nrfx_clock_hfclk_start();
     // gpio_init();
@@ -127,39 +133,29 @@ void bsp_uninit(void)
     // nrfx_clock_hfclk_stop();
 }
 
-void bsp_sleep(int argc, char **argv)
+APP_TIMER_DEF(leds_tmr);
+
+/**
+ * @brief Handle events from leds timer.
+ *
+ * @note Timer handler does not support returning an error code.
+ * Errors from bsp_led_indication() are not propagated.
+ *
+ * @param[in]   p_context   parameter registered in timer start function.
+ */
+static void leds_timer_handler(void *p_context)
 {
-    uint32_t timeout = 0;
-    if (argc >= 2) {
-        timeout = atoi(argv[1]);
-    }
+    nrf_gpio_pin_toggle(LED1);
+}
 
-    rt_interrupt_enter();
-    flag = 0;
-    bsp_uninit();
+void bsp_init(void)
+{
+    ret_code_t err_code = NRF_SUCCESS;
+    gpio_init();
 
-    nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
-    nrf_rtc_int_disable(NRF_RTC1, NRF_RTC_INT_TICK_MASK);
+    // beep_init();
+    APP_ERROR_CHECK(app_timer_create(&leds_tmr, APP_TIMER_MODE_REPEATED, leds_timer_handler));
+    APP_ERROR_CHECK(app_timer_start(leds_tmr, APP_TIMER_TICKS(1000), NULL));
 
-    /* Configure CTC interrupt */
-    nrf_rtc_cc_set(NRF_RTC1, 0, timeout);
-    // nrfx_rtc_counter_clear(&rtc);
-    nrf_rtc_task_trigger(NRF_RTC1, NRF_RTC_TASK_CLEAR);
-    nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
-    nrf_rtc_int_enable(NRF_RTC1, NRF_RTC_INT_COMPARE0_MASK);
-
-    __DSB();
-    do {
-        __WFE();
-    } while (0 == flag);
-
-    nrf_rtc_int_disable(NRF_RTC1, NRF_RTC_INT_COMPARE0_MASK);
-    nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
-    bsp_init();
-    printf("counter: %d\n", nrf_rtc_counter_get(NRF_RTC1));
-    nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_TICK);
-    nrf_rtc_int_enable(NRF_RTC1, NRF_RTC_INT_TICK_MASK);
-
-    NVIC_ClearPendingIRQ(RTC1_IRQn);
-    rt_interrupt_leave();
+    btn_init();
 }
