@@ -14,7 +14,9 @@
 
 #include <stddef.h>
 #include "FreeRTOS.h"
-
+#include "task.h"
+#include "semphr.h"
+#include "nrfx_uart.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -109,11 +111,11 @@ struct at_client {
     size_t recv_line_len;
     /* The maximum supported receive data length */
     size_t recv_bufsz;
-    rt_sem_t rx_notice;
-    rt_mutex_t lock;
+    SemaphoreHandle_t rx_notice;
+    SemaphoreHandle_t lock;
 
     at_response_t resp;
-    rt_sem_t resp_notice;
+    SemaphoreHandle_t resp_notice;
     at_resp_status_t resp_status;
 
     struct at_urc_table *urc_table;

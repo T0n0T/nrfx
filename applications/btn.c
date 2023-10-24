@@ -20,7 +20,7 @@
 #include "nrf_pwr_mgmt.h"
 
 #define NRF_LOG_MODULE_NAME btn
-#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_DEBUG
+#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_NONE
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
@@ -28,7 +28,7 @@ NRF_LOG_MODULE_REGISTER();
 
 static Button_t SW_BUTTON;
 static TaskHandle_t m_btn_task;
-static uint8_t press_flag = 0;
+uint8_t press_flag = 0;
 
 static TimerHandle_t button_tmr;
 
@@ -84,10 +84,10 @@ static void btn_work_on(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
     }
 }
 
-static void btn_work_off(TimerHandle_t xTimer)
+#include "SEGGER_RTT.h"
+void btn_work_off(TimerHandle_t xTimer)
 {
     __disable_irq();
-    NRF_LOG_DEBUG("btn work off!");
     if (press_flag) {
         press_flag = 0;
     }
@@ -96,8 +96,9 @@ static void btn_work_off(TimerHandle_t xTimer)
 
 static void btn_task(void *pvParameter)
 {
+    static int i = 0;
     while (1) {
-        if (1) {
+        if (press_flag) {
             Button_Process();
         }
         vTaskDelay(30);
