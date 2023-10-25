@@ -32,7 +32,17 @@
             "path": "board/sdk_config.h"
           }
         ],
-        "folders": []
+        "folders": [
+          {
+            "name": "DFU",
+            "files": [
+              {
+                "path": "services/ble_dfu/ble_app_dfu.c"
+              }
+            ],
+            "folders": []
+          }
+        ]
       },
       {
         "name": "Board",
@@ -111,6 +121,15 @@
             "name": "max30102",
             "files": [],
             "folders": []
+          },
+          {
+            "name": "ringbuf",
+            "files": [
+              {
+                "path": "modules/ringbuf/ringbuf.c"
+              }
+            ],
+            "folders": []
           }
         ]
       },
@@ -188,6 +207,24 @@
           },
           {
             "path": "nrf_sdk/components/ble/ble_services/ble_hrs/ble_hrs.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "nRF_DFU",
+        "files": [
+          {
+            "path": "nrf_sdk/components/ble/ble_services/ble_dfu/ble_dfu_bonded.c"
+          },
+          {
+            "path": "nrf_sdk/components/ble/ble_services/ble_dfu/ble_dfu_unbonded.c"
+          },
+          {
+            "path": "nrf_sdk/components/ble/ble_services/ble_dfu/ble_dfu.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/dfu/nrf_dfu_svci.c"
           }
         ],
         "folders": []
@@ -445,7 +482,9 @@
   },
   "targets": {
     "nrf52832_xxaa": {
-      "excludeList": [],
+      "excludeList": [
+        "<virtual_root>/Modules/at"
+      ],
       "toolchain": "AC5",
       "compileConfig": {
         "cpuType": "Cortex-M4",
@@ -488,8 +527,8 @@
               "tag": "IRAM",
               "id": 1,
               "mem": {
-                "startAddr": "0x20005968",
-                "size": "0xa698"
+                "startAddr": "0x20002b00",
+                "size": "0xd500"
               },
               "isChecked": true,
               "noInit": false
@@ -570,7 +609,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": ""
+        "otherCmds": "ip 192.168.230.1"
       },
       "uploadConfigMap": {},
       "custom_dep": {
@@ -694,6 +733,8 @@
           "nrf_sdk/components/softdevice/common",
           "nrf_sdk/components/softdevice/s132/headers",
           "nrf_sdk/components/softdevice/s132/headers/nrf52",
+          "nrf_sdk/components/libraries/bootloader",
+          "nrf_sdk/components/libraries/bootloader/dfu",
           "nrf_sdk/external/fprintf",
           "nrf_sdk/external/freertos/portable/ARM/nrf52",
           "nrf_sdk/external/freertos/portable/CMSIS/nrf52",
@@ -712,7 +753,8 @@
           "applications",
           "modules/ccm3310",
           "modules/button",
-          "modules/at/include"
+          "modules/at/include",
+          "modules/ringbuf"
         ],
         "libList": [],
         "sourceDirList": [],

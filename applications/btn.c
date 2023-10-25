@@ -20,7 +20,7 @@
 #include "nrf_pwr_mgmt.h"
 
 #define NRF_LOG_MODULE_NAME btn
-#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_NONE
+#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_DEBUG
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
@@ -28,8 +28,6 @@ NRF_LOG_MODULE_REGISTER();
 
 static Button_t SW_BUTTON;
 static TaskHandle_t m_btn_task;
-uint8_t press_flag = 0;
-
 static TimerHandle_t button_tmr;
 
 uint8_t read_sw_btn(void)
@@ -79,8 +77,9 @@ void btn_create(Button_t *p)
 static void btn_work_on(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
     NRF_LOG_DEBUG("btn work on!");
+    BaseType_t xHigherPriorityTaskWoken;
     if (pin == SW) {
-        press_flag = 1;
+        xTaskResumeFromISR(m_btn_task);
     }
 }
 
@@ -88,19 +87,14 @@ static void btn_work_on(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 void btn_work_off(TimerHandle_t xTimer)
 {
     __disable_irq();
-    if (press_flag) {
-        press_flag = 0;
-    }
+    vTaskSuspend(m_btn_task);
     __enable_irq();
 }
 
 static void btn_task(void *pvParameter)
 {
-    static int i = 0;
     while (1) {
-        if (press_flag) {
-            Button_Process();
-        }
+        Button_Process();
         vTaskDelay(30);
     }
 }
@@ -131,4 +125,5 @@ void btn_init(void)
         NRF_LOG_ERROR("button task not created.");
         APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
     }
+    vTaskSuspend(m_btn_task);
 }

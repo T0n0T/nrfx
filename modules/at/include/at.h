@@ -17,10 +17,34 @@
 #include "task.h"
 #include "semphr.h"
 #include "nrfx_uart.h"
+#include "ringbuf.h"
+
+#define NRF_LOG_MODULE_NAME atclient
+#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_INFO
+#include "nrf_log.h"
+NRF_LOG_MODULE_REGISTER();
+
+#define EOK      0  /**< There is no error */
+#define ERROR    1  /**< A generic error happens */
+#define ETIMEOUT 2  /**< Timed out */
+#define EFULL    3  /**< The resource is full */
+#define EEMPTY   4  /**< The resource is empty */
+#define ENOMEM   5  /**< No memory */
+#define ENOSYS   6  /**< No system */
+#define EBUSY    7  /**< Busy */
+#define EIO      8  /**< IO error */
+#define EINTR    9  /**< Interrupted system call */
+#define EINVAL   10 /**< Invalid argument */
+#define ETRAP    11 /**< Trap event */
+#define ENOENT   12 /**< No entry */
+#define ENOSPC   13 /**< No space left */
+#define EPERM    14 /**< Operation not permitted */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#define NAME_MAX        8
 #define AT_SW_VERSION   "1.3.1"
 
 #define AT_CMD_NAME_LEN 16
@@ -100,7 +124,9 @@ struct at_urc_table {
 typedef struct at_urc *at_urc_table_t;
 
 struct at_client {
-    rt_device_t device;
+    nrfx_uart_t *device;
+    nrfx_uart_config_t cfg;
+    struct ringbuffer *rb;
 
     at_status_t status;
     char end_sign;
@@ -121,7 +147,7 @@ struct at_client {
     struct at_urc_table *urc_table;
     size_t urc_table_size;
 
-    rt_thread_t parser;
+    TaskHandle_t parser;
 };
 typedef struct at_client *at_client_t;
 #endif /* AT_USING_CLIENT */
@@ -138,7 +164,7 @@ at_client_t at_client_get(const char *dev_name);
 at_client_t at_client_get_first(void);
 
 /* AT client wait for connection to external devices. */
-int at_client_obj_wait_connect(at_client_t client, rt_uint32_t timeout);
+int at_client_obj_wait_connect(at_client_t client, uint32_t timeout);
 
 /* AT client send or receive data */
 size_t at_client_obj_send(at_client_t client, const char *buf, size_t size);

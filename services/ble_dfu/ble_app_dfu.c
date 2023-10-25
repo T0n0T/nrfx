@@ -8,18 +8,10 @@
  * @copyright Copyright (c) 2023
  *
  */
-#include "rtthread.h"
+
 #include "nrf_pwr_mgmt.h"
 // 引用的C库头文件
-#include <stdbool.h>
-#include <stdint.h>
-#include <string.h>
-// Log需要引用的头文件
-#include "nrf_log.h"
-#include "nrf_log_ctrl.h"
-#include "nrf_log_default_backends.h"
-
-#include "ble_common.h"
+#include "common.h"
 
 // DFU需要引用的头文件
 #include "nrfx_gpiote.h"
@@ -30,6 +22,12 @@
 #include "ble_dfu.h"
 #include "nrf_bootloader_info.h"
 
+#define APP_ADV_INTERVAL      320 // 广播间隔 (200ms)，单位0.625 ms
+#define APP_ADV_DURATION      0   // 广播持续时间，单位：10ms。设置为0表示不超时
+
+#define APP_BLE_OBSERVER_PRIO 3 // 应用程序BLE事件监视者优先级，应用程序不能修改该数值
+#define APP_BLE_CONN_CFG_TAG  1 // SoftDevice BLE配置标志
+
 /**
  * @brief dfu func
  */
@@ -39,28 +37,6 @@ static bool app_shutdown_handler(nrf_pwr_mgmt_evt_t event)
     switch (event) {
         case NRF_PWR_MGMT_EVT_PREPARE_DFU:
             NRF_LOG_INFO("Power management wants to reset to DFU mode.");
-            NRF_LOG_INFO("Power management allowed to reset to DFU mode.");
-            // YOUR_JOB: Get ready to reset into DFU mode
-            //
-            // If you aren't finished with any ongoing tasks, return "false" to
-            // signal to the system that reset is impossible at this stage.
-            //
-            // Here is an example using a variable to delay resetting the device.
-            //
-            // if (!m_ready_for_reset)
-            // {
-            //      return false;
-            // }
-            // else
-            //{
-            //
-            //    // Device ready to enter
-            //    uint32_t err_code;
-            //    err_code = sd_softdevice_disable();
-            //    APP_ERROR_CHECK(err_code);
-            //    err_code = app_timer_stop_all();
-            //    APP_ERROR_CHECK(err_code);
-            //}
             break;
         case NRF_PWR_MGMT_EVT_PREPARE_SYSOFF:
             break;
@@ -73,11 +49,7 @@ static bool app_shutdown_handler(nrf_pwr_mgmt_evt_t event)
         case NRF_PWR_MGMT_EVT_PREPARE_RESET:
             break;
         default:
-            // YOUR_JOB: Implement any of the other events available from the power management module:
-            //      -NRF_PWR_MGMT_EVT_PREPARE_SYSOFF
-            //      -NRF_PWR_MGMT_EVT_PREPARE_WAKEUP
-            //      -NRF_PWR_MGMT_EVT_PREPARE_RESET
-            return true;
+            break;
     }
 
     return true;
@@ -170,10 +142,9 @@ static void ble_dfu_evt_handler(ble_dfu_buttonless_evt_type_t event)
     }
 }
 
-static void service_init(void)
+void dfu_service_init(void)
 {
-    // ble_dfu_buttonless_init_t dfus_init = {0};
-    // dfus_init.evt_handler               = ble_dfu_evt_handler;
-    // APP_ERROR_CHECK(ble_dfu_buttonless_init(&dfus_init));
+    ble_dfu_buttonless_init_t dfus_init = {0};
+    dfus_init.evt_handler               = ble_dfu_evt_handler;
+    APP_ERROR_CHECK(ble_dfu_buttonless_init(&dfus_init));
 }
-ble_serv_init_fn ble_app_dfu_init = service_init;

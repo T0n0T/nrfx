@@ -14,7 +14,7 @@
 #include <stdio.h>
 
 static char send_buf[AT_CMD_MAX_LEN];
-static rt_size_t last_cmd_len = 0;
+static size_t last_cmd_len = 0;
 
 /**
  * dump hex format data to console device
@@ -23,50 +23,51 @@ static rt_size_t last_cmd_len = 0;
  * @param buf hex buffer
  * @param size buffer size
  */
-void at_print_raw_cmd(const char *name, const char *buf, rt_size_t size)
+void at_print_raw_cmd(const char *name, const char *buf, size_t size)
 {
 #define __is_print(ch) ((unsigned int)((ch) - ' ') < 127u - ' ')
 #define WIDTH_SIZE     32
 
-    rt_size_t i, j;
+    size_t i, j;
 
     for (i = 0; i < size; i += WIDTH_SIZE) {
-        rt_kprintf("[D/AT] %s: %04X-%04X: ", name, i, i + WIDTH_SIZE);
+        NRF_LOG_RAW_INFO("[D/AT] %s: %04X-%04X: ", name, i, i + WIDTH_SIZE);
         for (j = 0; j < WIDTH_SIZE; j++) {
             if (i + j < size) {
-                rt_kprintf("%02X ", (unsigned char)buf[i + j]);
+                NRF_LOG_RAW_INFO("%02X ", (unsigned char)buf[i + j]);
             } else {
-                rt_kprintf("   ");
+                NRF_LOG_RAW_INFO("   ");
             }
             if ((j + 1) % 8 == 0) {
-                rt_kprintf(" ");
+                NRF_LOG_RAW_INFO(" ");
             }
         }
-        rt_kprintf("  ");
+        NRF_LOG_RAW_INFO("  ");
         for (j = 0; j < WIDTH_SIZE; j++) {
             if (i + j < size) {
-                rt_kprintf("%c", __is_print(buf[i + j]) ? buf[i + j] : '.');
+                NRF_LOG_RAW_INFO("%c", __is_print(buf[i + j]) ? buf[i + j] : '.');
             }
         }
-        rt_kprintf("\n");
+        NRF_LOG_RAW_INFO("\n");
     }
 }
 
-const char *at_get_last_cmd(rt_size_t *cmd_size)
+const char *at_get_last_cmd(size_t *cmd_size)
 {
     *cmd_size = last_cmd_len;
     return send_buf;
 }
 
-rt_weak rt_size_t at_utils_send(rt_device_t dev,
-                                rt_off_t pos,
-                                const void *buffer,
-                                rt_size_t size)
+rt_weak size_t at_utils_send(uint32_t dev,
+                             rt_off_t pos,
+                             const void *buffer,
+                             size_t size)
 {
-    return rt_device_write(dev, pos, buffer, size);
+    nrf_uart_event_clear(NRF_UART_INSTANCE, NRF_UART_EVENT_TXDRDY);
+    return size;
 }
 
-rt_size_t at_vprintf(rt_device_t device, const char *format, va_list args)
+size_t at_vprintf(uint32_t device, const char *format, va_list args)
 {
     last_cmd_len = vsnprintf(send_buf, sizeof(send_buf), format, args);
     if (last_cmd_len > sizeof(send_buf))
@@ -79,9 +80,9 @@ rt_size_t at_vprintf(rt_device_t device, const char *format, va_list args)
     return at_utils_send(device, 0, send_buf, last_cmd_len);
 }
 
-rt_size_t at_vprintfln(rt_device_t device, const char *format, va_list args)
+size_t at_vprintfln(uint32_t device, const char *format, va_list args)
 {
-    rt_size_t len;
+    size_t len;
 
     last_cmd_len = vsnprintf(send_buf, sizeof(send_buf) - 2, format, args);
 

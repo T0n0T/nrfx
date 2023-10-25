@@ -22,6 +22,11 @@ void *malloc(size_t n)
     return pvPortMalloc(n);
 }
 
+void *realloc(void *rmem, size_t n)
+{
+    return pvPortRealloc(rmem, n);
+}
+
 void *calloc(size_t nelem, size_t elsize)
 {
     void *p;
