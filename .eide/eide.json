@@ -82,9 +82,6 @@
                 "path": "modules/at/src/at_client.c"
               },
               {
-                "path": "modules/at/src/at_server.c"
-              },
-              {
                 "path": "modules/at/src/at_utils.c"
               }
             ],
@@ -483,7 +480,7 @@
   "targets": {
     "nrf52832_xxaa": {
       "excludeList": [
-        "<virtual_root>/Modules/at"
+        "<virtual_root>/Modules/at/at_server.c"
       ],
       "toolchain": "AC5",
       "compileConfig": {

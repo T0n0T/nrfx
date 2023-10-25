@@ -28,11 +28,11 @@
 
 static struct at_client at_client_table[AT_CLIENT_NUM_MAX] = {0};
 
-extern size_t at_utils_send(uint32_t dev,
+extern size_t at_utils_send(void *dev,
                             uint32_t pos,
                             const void *buffer,
                             size_t size);
-extern size_t at_vprintfln(uint32_t device, const char *format, va_list args);
+extern size_t at_vprintfln(void *device, const char *format, va_list args);
 extern void at_print_raw_cmd(const char *type, const char *cmd, size_t size);
 extern const char *at_get_last_cmd(size_t *cmd_size);
 
@@ -307,7 +307,7 @@ int at_obj_exec_cmd(at_client_t client, at_response_t resp, const char *cmd_expr
     if (resp != NULL) {
         if (xSemaphoreTake(client->resp_notice, pdMS_TO_TICKS(resp->timeout)) != EOK) {
             cmd = at_get_last_cmd(&cmd_size);
-            LOG_W("execute command (%.*s) timeout (%d ticks)!", cmd_size, cmd, resp->timeout);
+            NRF_LOG_WARNING("execute command (%.*s) timeout (%d ticks)!", cmd_size, cmd, resp->timeout);
             client->resp_status = AT_RESP_TIMEOUT;
             result              = -ETIMEOUT;
             goto __exit;
@@ -343,38 +343,37 @@ int at_client_obj_wait_connect(at_client_t client, uint32_t timeout)
     uint32_t result     = EOK;
     at_response_t resp  = NULL;
     uint32_t start_time = 0;
-    char *client_name   = client->device->parent.name;
 
     if (client == NULL) {
         NRF_LOG_ERROR("input AT client object is NULL, please create or get AT Client object!");
         return -ERROR;
     }
 
-    resp = at_create_resp(64, 0, rt_tick_from_millisecond(300));
+    resp = at_create_resp(64, 0, 300);
     if (resp == NULL) {
-        NRF_LOG_ERROR("no memory for AT client(%s) response object.", client_name);
+        NRF_LOG_ERROR("no memory for AT client(%s) response object.");
         return -ENOMEM;
     }
 
     xSemaphoreTake(client->lock, portMAX_DELAY);
     client->resp = resp;
 
-    // start_time = rt_tick_get();
+    start_time = xTaskGetTickCount();
 
     while (1) {
         /* Check whether it is timeout */
-        // if (tick() - start_time > rt_tick_from_millisecond(timeout)) {
-        //     NRF_LOG_ERROR("wait AT client(%s) connect timeout(%d tick).", client_name, timeout);
-        //     result = -ETIMEOUT;
-        //     break;
-        // }
+        if (xTaskGetTickCount() - start_time > pdMS_TO_TICKS(timeout)) {
+            NRF_LOG_ERROR("wait AT client(%s) connect timeout(%d tick).", timeout);
+            result = -ETIMEOUT;
+            break;
+        }
 
         /* Check whether it is already connected */
         resp->buf_len     = 0;
         resp->line_counts = 0;
         at_utils_send(client->device, 0, "AT\r\n", 4);
 
-        if (xSemaphoreTake(client->resp_notice, resp->timeout) != EOK)
+        if (xSemaphoreTake(client->resp_notice, pdMS_TO_TICKS(resp->timeout)) != EOK)
             continue;
         else
             break;
@@ -426,10 +425,11 @@ static uint32_t at_client_getchar(at_client_t client, char *ch, int32_t timeout)
     uint32_t result = EOK;
 
     while (ringbuffer_getchar(client->rb, ch) != NRF_SUCCESS) {
-        result = xSemaphoreTake(client->rx_notice, timeout);
-        if (result != EOK) {
-            return result;
-        }
+        (void)ulTaskNotifyTake(pdTRUE, portTICK_RATE_MS(timeout));
+        // result = xSemaphoreTake(client->rx_notice, timeout);
+        // if (result != EOK) {
+        //     return result;
+        // }
     }
 
     return EOK;
@@ -450,7 +450,8 @@ static uint32_t at_client_getchar(at_client_t client, char *ch, int32_t timeout)
  */
 size_t at_client_obj_recv(at_client_t client, char *buf, size_t size, int32_t timeout)
 {
-    size_t len = 0;
+    char ch;
+    int read_idx = 0;
 
     ASSERT(buf);
 
@@ -460,22 +461,15 @@ size_t at_client_obj_recv(at_client_t client, char *buf, size_t size, int32_t ti
     }
 
     while (1) {
-        size_t read_len;
-
-        rt_sem_control(client->rx_notice, RT_IPC_CMD_RESET, NULL);
-
-        read_len = rt_device_read(client->device, 0, buf + len, size);
-        if (read_len > 0) {
-            len += read_len;
-            size -= read_len;
-            if (size == 0)
-                break;
-
-            continue;
-        }
-
-        if (xSemaphoreTake(client->rx_notice, pdMS_TO_TICKS(timeout)) != EOK)
+        if (read_idx < size) {
+            if (at_client_getchar(client, &ch, timeout) != EOK) {
+                NRF_LOG_ERROR("AT Client receive failed, uart device get data error(%d)", result);
+                return 0;
+            }
+            buf[read_idx++] = ch;
+        } else {
             break;
+        }
     }
 
 #ifdef AT_PRINT_RAW_CMD
@@ -693,7 +687,7 @@ static void client_parser(at_client_t client)
                 }
 
                 client->resp = NULL;
-                rt_sem_release(client->resp_notice);
+                xSemaphoreGive(client->resp_notice);
             } else {
                 // NRF_LOG_DEBUG("unrecognized line: %.*s", client->recv_line_len, client->recv_line_buf);
             }
@@ -710,7 +704,8 @@ static void at_client_rx_ind(nrfx_uart_event_t const *p_event, void *p_context)
         nrfx_uart_rx(client->device, &rx_ch, 1);
         rt_ringbuffer_put_force(client->rb, &rx_ch, 1);
         if (p_event->data.rxtx.bytes == 1) {
-            xSemaphoreGiveFromISR(at_client_table[0].rx_notice, &xHigherPriorityTaskWoken);
+            vTaskNotifyGiveFromISR(client->parser, &xHigherPriorityTaskWoken);
+            // xSemaphoreGiveFromISR(at_client_table[0].rx_notice, &xHigherPriorityTaskWoken);
         }
     }
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
@@ -747,12 +742,12 @@ static int at_client_para_init(at_client_t client)
         goto __exit;
     }
 
-    client->rx_notice = xSemaphoreCreateCounting(UINT_FAST16_MAX, 0);
-    if (client->rx_notice == NULL) {
-        NRF_LOG_ERROR("AT client initialize failed! at_client_notice semaphore create failed!");
-        result = -ENOMEM;
-        goto __exit;
-    }
+    // client->rx_notice = xSemaphoreCreateCounting(UINT_FAST16_MAX, 0);
+    // if (client->rx_notice == NULL) {
+    //     NRF_LOG_ERROR("AT client initialize failed! at_client_notice semaphore create failed!");
+    //     result = -ENOMEM;
+    //     goto __exit;
+    // }
 
     client->resp_notice = xSemaphoreCreateCounting(UINT_FAST16_MAX, 0);
     if (client->resp_notice == NULL) {
@@ -782,9 +777,9 @@ __exit:
             vSemaphoreDelete(client->lock);
         }
 
-        if (client->rx_notice) {
-            vSemaphoreDelete(client->rx_notice);
-        }
+        // if (client->rx_notice) {
+        //     vSemaphoreDelete(client->rx_notice);
+        // }
 
         if (client->resp_notice) {
             vSemaphoreDelete(client->resp_notice);

@@ -137,7 +137,7 @@ struct at_client {
     size_t recv_line_len;
     /* The maximum supported receive data length */
     size_t recv_bufsz;
-    SemaphoreHandle_t rx_notice;
+    // SemaphoreHandle_t rx_notice;
     SemaphoreHandle_t lock;
 
     at_response_t resp;

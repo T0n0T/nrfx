@@ -31,7 +31,7 @@ void at_print_raw_cmd(const char *name, const char *buf, size_t size)
     size_t i, j;
 
     for (i = 0; i < size; i += WIDTH_SIZE) {
-        NRF_LOG_RAW_INFO("[D/AT] %s: %04X-%04X: ", name, i, i + WIDTH_SIZE);
+        NRF_LOG_RAW_INFO("[AT] %s: %04X-%04X: ", name, i, i + WIDTH_SIZE);
         for (j = 0; j < WIDTH_SIZE; j++) {
             if (i + j < size) {
                 NRF_LOG_RAW_INFO("%02X ", (unsigned char)buf[i + j]);
@@ -58,16 +58,17 @@ const char *at_get_last_cmd(size_t *cmd_size)
     return send_buf;
 }
 
-rt_weak size_t at_utils_send(uint32_t dev,
+size_t at_utils_send(void *dev,
                              rt_off_t pos,
                              const void *buffer,
                              size_t size)
 {
-    nrf_uart_event_clear(NRF_UART_INSTANCE, NRF_UART_EVENT_TXDRDY);
+    if (nrfx_uart_tx((nrfx_uart_t *)dev, buffer, size) != NRFX_SUCCESS)
+        return 0;
     return size;
 }
 
-size_t at_vprintf(uint32_t device, const char *format, va_list args)
+size_t at_vprintf(void *device, const char *format, va_list args)
 {
     last_cmd_len = vsnprintf(send_buf, sizeof(send_buf), format, args);
     if (last_cmd_len > sizeof(send_buf))
