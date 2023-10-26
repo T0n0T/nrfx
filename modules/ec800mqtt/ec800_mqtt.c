@@ -12,30 +12,16 @@
  * 2023-03-28     kurisaW      support serial v2
  */
 #include <at.h>
+#include "ec800_mqtt.h"
 
 #define NRF_LOG_MODULE_NAME ec800mqtt
 #define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_DEBUG
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
-#define PKG_USING_EC800_MQTT_DEBUG
-
-#define DBG_TAG "pkg.ec800_mqtt"
-#ifdef PKG_USING_EC800_MQTT_DEBUG
-#define DBG_LVL DBG_LOG
-#else
-#define DBG_LVL DBG_ERROR
-#endif
-#include <rtdbg.h>
-
-#include "ec800_mqtt.h"
-
 #define EC800_ADC0_PIN             -1
-#define EC800_RESET_N_PIN          GET_PIN(C, 6)
+#define EC800_RESET_N_PIN          -1
 #define EC800_OP_BAND              8
-
-#define AT_CLIENT_DEV_NAME         "uart2"
-#define AT_CLIENT_BAUD_RATE        115200
 
 #define PRODUCT_KEY                ""
 #define DEVICE_NAME                ""
@@ -100,7 +86,7 @@ NRF_LOG_MODULE_REGISTER();
 #define EC800_AT_CMD_NEMA_RMC      "AT+QGPSGNMEA=\"RMC\""
 #define EC800_AT_CMD_QUERY_CSQ     "AT+CSQ"
 
-#define AT_CLIENT_RECV_BUFF_LEN    2048
+#define AT_CLIENT_RECV_BUFF_LEN    128
 #define AT_DEFAULT_TIMEOUT         300
 
 struct ec800_device ec800 = {
@@ -110,37 +96,12 @@ struct ec800_device ec800 = {
     .stat      = EC800_STAT_DISCONNECTED};
 
 static struct ec800_connect_obj ec800_connect = {
-    .ip   = "129.226.207.116",
+    .host = "129.226.207.116",
     .port = "1883"};
 
 static char buf[AT_CLIENT_RECV_BUFF_LEN];
 
 void ec800_subscribe_callback(const char *json);
-
-/**
- * This function will show response information.
- *
- * @param resp  the response
- *
- * @return void
- */
-static void show_resp_info(at_response_t resp)
-{
-    RT_ASSERT(resp);
-
-#ifdef PKG_USING_EC800_MQTT_DEBUG
-    /* Print response line buffer */
-    const char *line_buffer = RT_NULL;
-
-    for (rt_size_t line_num = 1; line_num <= resp->line_counts; line_num++) {
-        if ((line_buffer = at_resp_get_line(resp, line_num)) != RT_NULL)
-            LOG_I("line %d buffer : %s", line_num, line_buffer);
-        else
-            LOG_I("Parse line buffer error!");
-    }
-#endif
-    return;
-}
 
 /**
  * This function will send command and check the result.
@@ -151,43 +112,41 @@ static void show_resp_info(at_response_t resp)
  * @param lines     response lines
  * @param timeout   waiting time
  *
- * @return  RT_EOK       send success
- *         -RT_ERROR     send failed
- *         -RT_ETIMEOUT  response timeout
- *         -RT_ENOMEM    alloc memory failed
+ * @return  EOK       send success
+ *         -ERROR     send failed
+ *         -ETIMEOUT  response timeout
+ *         -ENOMEM    alloc memory failed
  */
 static int check_send_cmd(const char *cmd, const char *resp_expr,
-                          const rt_size_t lines, const rt_int32_t timeout)
+                          const size_t lines, const int32_t timeout)
 {
-    at_response_t resp            = RT_NULL;
+    at_response_t resp            = NULL;
     int result                    = 0;
     char resp_arg[AT_CMD_MAX_LEN] = {0};
 
-    resp = at_create_resp(AT_CLIENT_RECV_BUFF_LEN, lines, rt_tick_from_millisecond(timeout));
-    if (resp == RT_NULL) {
-        LOG_E("No memory for response structure!");
-        return -RT_ENOMEM;
+    resp = at_create_resp(AT_CLIENT_RECV_BUFF_LEN, lines, timeout);
+    if (resp == NULL) {
+        NRF_LOG_ERROR("No memory for response structure!");
+        return -ENOMEM;
     }
 
     result = at_obj_exec_cmd(ec800.client, resp, cmd);
     if (result < 0) {
-        LOG_E("AT client send commands failed or wait response timeout!");
+        NRF_LOG_ERROR("AT client send commands failed or wait response timeout!");
         goto __exit;
     }
 
-    show_resp_info(resp);
-
     if (resp_expr) {
         if (at_resp_parse_line_args_by_kw(resp, resp_expr, "%s", resp_arg) <= 0) {
-            LOG_D("# >_< Failed");
-            result = -RT_ERROR;
+            NRF_LOG_DEBUG("# >_< Failed");
+            result = -ERROR;
             goto __exit;
         } else {
-            LOG_D("# ^_^ successed");
+            NRF_LOG_DEBUG("# ^_^ successed");
         }
     }
 
-    result = RT_EOK;
+    result = EOK;
 
 __exit:
     if (resp) {
@@ -199,26 +158,26 @@ __exit:
 
 static char *ec800_get_imei(ec800_device_t device)
 {
-    at_response_t resp = RT_NULL;
+    at_response_t resp = NULL;
 
-    resp = at_create_resp(AT_CLIENT_RECV_BUFF_LEN, 0, rt_tick_from_millisecond(AT_DEFAULT_TIMEOUT));
-    if (resp == RT_NULL) {
-        LOG_E("No memory for response structure!");
-        return RT_NULL;
+    resp = at_create_resp(AT_CLIENT_RECV_BUFF_LEN, 0, 300);
+    if (resp == NULL) {
+        NRF_LOG_ERROR("No memory for response structure!");
+        return NULL;
     }
 
     /* send "AT+CGSN=1" commond to get device IMEI */
-    if (at_obj_exec_cmd(device->client, resp, AT_QUERY_IMEI) != RT_EOK) {
+    if (at_obj_exec_cmd(device->client, resp, AT_QUERY_IMEI) != EOK) {
         at_delete_resp(resp);
-        return RT_NULL;
+        return NULL;
     }
 
     if (at_resp_parse_line_args(resp, 2, "+CGSN:%s", device->imei) <= 0) {
-        LOG_E("device parse \"%s\" cmd error.", AT_QUERY_IMEI);
+        NRF_LOG_ERROR("device parse \"%s\" cmd error.", AT_QUERY_IMEI);
         at_delete_resp(resp);
-        return RT_NULL;
+        return NULL;
     }
-    LOG_D("IMEI code: %s", device->imei);
+    NRF_LOG_DEBUG("IMEI code: %s", device->imei);
 
     at_delete_resp(resp);
     return device->imei;
@@ -226,27 +185,27 @@ static char *ec800_get_imei(ec800_device_t device)
 
 static char *ec800_get_ipaddr(ec800_device_t device)
 {
-    at_response_t resp = RT_NULL;
+    at_response_t resp = NULL;
 
-    resp = at_create_resp(AT_CLIENT_RECV_BUFF_LEN, 0, rt_tick_from_millisecond(AT_DEFAULT_TIMEOUT));
-    if (resp == RT_NULL) {
-        LOG_E("No memory for response structure!");
-        return RT_NULL;
+    resp = at_create_resp(AT_CLIENT_RECV_BUFF_LEN, 0, 300);
+    if (resp == NULL) {
+        NRF_LOG_ERROR("No memory for response structure!");
+        return NULL;
     }
 
     /* send "AT+CGPADDR" commond to get IP address */
-    if (at_obj_exec_cmd(device->client, resp, AT_QUERY_IPADDR) != RT_EOK) {
+    if (at_obj_exec_cmd(device->client, resp, AT_QUERY_IPADDR) != EOK) {
         at_delete_resp(resp);
-        return RT_NULL;
+        return NULL;
     }
 
     /* parse response data "+CGPADDR: 0,<IP_address>" */
     if (at_resp_parse_line_args_by_kw(resp, "+CGPADDR:", "+CGPADDR:%*d,%s", device->ipaddr) <= 0) {
-        LOG_E("device parse \"%s\" cmd error.", AT_QUERY_IPADDR);
+        NRF_LOG_ERROR("device parse \"%s\" cmd error.", AT_QUERY_IPADDR);
         at_delete_resp(resp);
-        return RT_NULL;
+        return NULL;
     }
-    LOG_D("IP address: %s", device->ipaddr);
+    NRF_LOG_DEBUG("IP address: %s", device->ipaddr);
 
     at_delete_resp(resp);
     return device->ipaddr;
@@ -254,20 +213,20 @@ static char *ec800_get_ipaddr(ec800_device_t device)
 
 static int ec800_mqtt_set_alive(rt_uint32_t keepalive_time)
 {
-    LOG_D("MQTT set alive.");
+    NRF_LOG_DEBUG("MQTT set alive.");
 
     char cmd[AT_CMD_MAX_LEN] = {0};
-    rt_sprintf(cmd, AT_MQTT_ALIVE, keepalive_time);
+    sprintf(cmd, AT_MQTT_ALIVE, keepalive_time);
 
     return check_send_cmd(cmd, AT_OK, 0, 1000);
 }
 
 int ec800_mqtt_auth(void)
 {
-    LOG_D("MQTT set auth info.");
+    NRF_LOG_DEBUG("MQTT set auth info.");
 
     char cmd[AT_CMD_MAX_LEN] = {0};
-    rt_sprintf(cmd, AT_MQTT_AUTH, PRODUCT_KEY, DEVICE_NAME, DEVICE_SECRET);
+    sprintf(cmd, AT_MQTT_AUTH, PRODUCT_KEY, DEVICE_NAME, DEVICE_SECRET);
 
     return check_send_cmd(cmd, AT_OK, 0, AT_DEFAULT_TIMEOUT);
 }
@@ -280,20 +239,20 @@ int ec800_mqtt_auth(void)
  */
 int ec800_mqtt_open(void)
 {
-    LOG_D("MQTT open socket.");
+    NRF_LOG_DEBUG("MQTT open socket.");
 
     char cmd[AT_CMD_MAX_LEN] = {0};
     char *str                = NULL;
     char ip[16]              = {0};
     char port[8]             = {0};
 
-    str = read_config_from_file("config.txt", "ip");
-    str ? memcpy(ip, str, strlen(str)) : memcpy(ip, ec800_connect.ip, strlen(ec800_connect.ip));
+    // str = read_config_from_file("config.txt", "ip");
+    // str ? memcpy(ip, str, strlen(str)) : memcpy(ip, ec800_connect.ip, strlen(ec800_connect.ip));
 
-    str = read_config_from_file("config.txt", "port");
-    str ? memcpy(port, str, strlen(str)) : memcpy(port, ec800_connect.port, strlen(ec800_connect.port));
+    // str = read_config_from_file("config.txt", "port");
+    // str ? memcpy(port, str, strlen(str)) : memcpy(port, ec800_connect.port, strlen(ec800_connect.port));
 
-    rt_sprintf(cmd, AT_MQTT_OPEN, ip, port);
+    sprintf(cmd, AT_MQTT_OPEN, ip, port);
 
     return check_send_cmd(cmd, AT_MQTT_OPEN_SUCC, 4, 3000);
 }
@@ -306,7 +265,7 @@ int ec800_mqtt_open(void)
  */
 int ec800_mqtt_close(void)
 {
-    LOG_D("MQTT close socket.");
+    NRF_LOG_DEBUG("MQTT close socket.");
 
     return check_send_cmd(AT_MQTT_CLOSE, AT_OK, 0, 3000);
 }
@@ -319,20 +278,20 @@ int ec800_mqtt_close(void)
  */
 int ec800_mqtt_connect(void)
 {
-    LOG_D("MQTT connect...");
+    NRF_LOG_DEBUG("MQTT connect...");
 
     char cmd[AT_CMD_MAX_LEN] = {0};
-    // rt_sprintf(cmd, AT_MQTT_CONNECT, ec800.imei);
-    rt_sprintf(cmd, AT_MQTT_CONNECT, "1");
-    LOG_D("%s", cmd);
+    // sprintf(cmd, AT_MQTT_CONNECT, ec800.imei);
+    sprintf(cmd, AT_MQTT_CONNECT, "1");
+    NRF_LOG_DEBUG("%s", cmd);
 
     if (check_send_cmd(cmd, AT_MQTT_CONNECT_SUCC, 4, 10000) < 0) {
-        LOG_D("MQTT connect failed.");
-        return -RT_ERROR;
+        NRF_LOG_DEBUG("MQTT connect failed.");
+        return -ERROR;
     }
 
     ec800.stat = EC800_STAT_CONNECTED;
-    return RT_EOK;
+    return EOK;
 }
 
 /**
@@ -344,12 +303,12 @@ int ec800_mqtt_connect(void)
 int ec800_mqtt_disconnect(void)
 {
     if (check_send_cmd(AT_MQTT_DISCONNECT, AT_OK, 0, AT_DEFAULT_TIMEOUT) < 0) {
-        LOG_D("MQTT disconnect failed.");
-        return -RT_ERROR;
+        NRF_LOG_DEBUG("MQTT disconnect failed.");
+        return -ERROR;
     }
 
     ec800.stat = EC800_STAT_CONNECTED;
-    return RT_EOK;
+    return EOK;
 }
 
 /**
@@ -363,7 +322,7 @@ int ec800_mqtt_disconnect(void)
 int ec800_mqtt_subscribe(const char *topic)
 {
     char cmd[AT_CMD_MAX_LEN] = {0};
-    rt_sprintf(cmd, AT_MQTT_SUB, topic);
+    sprintf(cmd, AT_MQTT_SUB, topic);
 
     return check_send_cmd(cmd, AT_MQTT_SUB_SUCC, 4, AT_DEFAULT_TIMEOUT);
 }
@@ -379,7 +338,7 @@ int ec800_mqtt_subscribe(const char *topic)
 int ec800_mqtt_unsubscribe(const char *topic)
 {
     char cmd[AT_CMD_MAX_LEN] = {0};
-    rt_sprintf(cmd, AT_MQTT_UNSUB, topic);
+    sprintf(cmd, AT_MQTT_UNSUB, topic);
 
     return check_send_cmd(cmd, AT_OK, 0, AT_DEFAULT_TIMEOUT);
 }
@@ -396,21 +355,21 @@ int ec800_mqtt_unsubscribe(const char *topic)
 int ec800_mqtt_publish(const char *topic, const char *msg)
 {
     char cmd[AT_CMD_MAX_LEN] = {0};
-    // rt_sprintf(cmd, AT_MQTT_PUB, topic, strlen(msg));
-    rt_sprintf(cmd, AT_MQTT_PUBEX, topic, strlen(msg));
+    // sprintf(cmd, AT_MQTT_PUB, topic, strlen(msg));
+    sprintf(cmd, AT_MQTT_PUBEX, topic, strlen(msg));
 
     /* set AT client end sign to deal with '>' sign.*/
     at_set_end_sign('>');
 
     check_send_cmd(cmd, ">", 0, 1000);
-    LOG_D("publish...");
+    NRF_LOG_DEBUG("publish...");
 
     /* reset the end sign for data conflict */
     at_set_end_sign(0);
 
     check_send_cmd(msg, AT_MQTT_PUB_SUCC, 4, AT_DEFAULT_TIMEOUT);
     // at_obj_exec_cmd(ec800.client, NULL, AT_MQTT_PUB_SUCC);
-    return RT_EOK;
+    return EOK;
 }
 
 /**
@@ -424,7 +383,7 @@ int ec800_client_attach(void)
     int result               = 0;
     char cmd[AT_CMD_MAX_LEN] = {0};
 
-    while (RT_EOK != check_send_cmd("AT", AT_OK, 0, AT_DEFAULT_TIMEOUT)) {
+    while (EOK != check_send_cmd("AT", AT_OK, 0, AT_DEFAULT_TIMEOUT)) {
         rt_thread_mdelay(1000);
         rt_kprintf("AT no responend\r\n");
     }
@@ -436,16 +395,16 @@ int ec800_client_attach(void)
 
     /* 关闭电信自动注册功能 */
     result = check_send_cmd(AT_QREGSWT_2, AT_OK, 0, AT_DEFAULT_TIMEOUT);
-    if (result != RT_EOK) return result;
+    if (result != EOK) return result;
 
     /* 禁用自动连接网络 */
     result = check_send_cmd(AT_AUTOCONNECT_DISABLE, AT_OK, 0, AT_DEFAULT_TIMEOUT);
-    if (result != RT_EOK) return result;
+    if (result != EOK) return result;
 
     /* 重启模块 */
     check_send_cmd(AT_REBOOT, AT_OK, 0, 10000);
 
-    while (RT_EOK != check_send_cmd(AT_TEST, AT_OK, 0, AT_DEFAULT_TIMEOUT)) {
+    while (EOK != check_send_cmd(AT_TEST, AT_OK, 0, AT_DEFAULT_TIMEOUT)) {
         rt_thread_mdelay(1000);
         rt_kprintf("AT no responend\r\n");
     }
@@ -454,45 +413,45 @@ int ec800_client_attach(void)
 
     /* 查询IMEI号 */
     result = check_send_cmd(AT_QUERY_IMEI, AT_OK, 0, AT_DEFAULT_TIMEOUT);
-    if (result != RT_EOK) return result;
+    if (result != EOK) return result;
 
-    if (RT_NULL == ec800_get_imei(&ec800)) {
-        LOG_E("Get IMEI code failed.");
-        return -RT_ERROR;
+    if (NULL == ec800_get_imei(&ec800)) {
+        NRF_LOG_ERROR("Get IMEI code failed.");
+        return -ERROR;
     }
 
     /* 指定要搜索的频段 */
-    rt_sprintf(cmd, AT_NBAND, EC800_OP_BAND);
+    sprintf(cmd, AT_NBAND, EC800_OP_BAND);
     result = check_send_cmd(cmd, AT_OK, 0, AT_DEFAULT_TIMEOUT);
-    if (result != RT_EOK) return result;
+    if (result != EOK) return result;
 
     /* 打开模块的调试灯 */
     // result = check_send_cmd(AT_LED_ON, AT_OK, 0, AT_DEFAULT_TIMEOUT);
-    // if (result != RT_EOK) return result;
+    // if (result != EOK) return result;
 
     /* 将模块设置为全功能模式(开启射频功能) */
     result = check_send_cmd(AT_FUN_ON, AT_OK, 0, AT_DEFAULT_TIMEOUT);
-    if (result != RT_EOK) return result;
+    if (result != EOK) return result;
 
     /* 接收到TCP数据时，自动上报 */
     result = check_send_cmd(AT_RECV_AUTO, AT_OK, 0, AT_DEFAULT_TIMEOUT);
-    if (result != RT_EOK) return result;
+    if (result != EOK) return result;
 
     /* 关闭eDRX */
     result = check_send_cmd(AT_EDRX_OFF, AT_OK, 0, AT_DEFAULT_TIMEOUT);
-    if (result != RT_EOK) return result;
+    if (result != EOK) return result;
 
     /* 关闭PSM */
     result = check_send_cmd(AT_PSM_OFF, AT_OK, 0, AT_DEFAULT_TIMEOUT);
-    if (result != RT_EOK) return result;
+    if (result != EOK) return result;
 
     /* 查询卡的国际识别码(IMSI号)，用于确认SIM卡插入正常 */
     result = check_send_cmd(AT_QUERY_IMSI, AT_OK, 0, AT_DEFAULT_TIMEOUT);
-    if (result != RT_EOK) return result;
+    if (result != EOK) return result;
 
     /* 触发网络连接 */
     result = check_send_cmd(AT_UE_ATTACH, AT_OK, 0, AT_DEFAULT_TIMEOUT);
-    if (result != RT_EOK) return result;
+    if (result != EOK) return result;
 
     /* 查询模块状态 */
     // at_exec_cmd(resp, "AT+NUESTATS");
@@ -505,7 +464,7 @@ int ec800_client_attach(void)
 
     /* 查询网络是否被激活，通常需要等待30s */
     int count = 60;
-    while (count > 0 && RT_EOK != check_send_cmd(AT_QUERY_ATTACH, AT_UE_ATTACH_SUCC, 0, AT_DEFAULT_TIMEOUT)) {
+    while (count > 0 && EOK != check_send_cmd(AT_QUERY_ATTACH, AT_UE_ATTACH_SUCC, 0, AT_DEFAULT_TIMEOUT)) {
         rt_thread_mdelay(1000);
         count--;
     }
@@ -516,9 +475,9 @@ int ec800_client_attach(void)
 
     if (count > 0) {
         ec800.stat = EC800_STAT_ATTACH;
-        return RT_EOK;
+        return EOK;
     } else {
-        return -RT_ETIMEOUT;
+        return -ETIMEOUT;
     }
 }
 
@@ -532,12 +491,12 @@ int ec800_client_deattach(void)
 {
     int result = 0;
     result     = check_send_cmd(AT_UE_DEATTACH, AT_OK, 0, AT_DEFAULT_TIMEOUT);
-    if (RT_EOK != result) {
-        return -RT_ERROR;
+    if (EOK != result) {
+        return -ERROR;
     }
 
     ec800.stat = EC800_STAT_DEATTACH;
-    return RT_EOK;
+    return EOK;
 }
 
 /**
@@ -549,52 +508,27 @@ int ec800_client_deattach(void)
  */
 static int at_client_dev_init(void)
 {
-    int result = RT_EOK;
-
-    rt_device_t serial             = rt_device_find(AT_CLIENT_DEV_NAME);
-    struct serial_configure config = RT_SERIAL_CONFIG_DEFAULT;
-
-    config.baud_rate = AT_CLIENT_BAUD_RATE;
-    config.data_bits = DATA_BITS_8;
-    config.stop_bits = STOP_BITS_1;
-#ifdef RT_USING_SERIAL_V2
-    config.rx_bufsz = AT_CLIENT_RECV_BUFF_LEN;
-#else
-    config.bufsz = AT_CLIENT_RECV_BUFF_LEN;
-#endif
-    config.parity = PARITY_NONE;
-
-    rt_device_control(serial, RT_DEVICE_CTRL_CONFIG, &config);
-    rt_device_close(serial);
+    int result = EOK;
 
     /* initialize AT client */
-    result = at_client_init(AT_CLIENT_DEV_NAME, AT_CLIENT_RECV_BUFF_LEN);
+    result = at_client_init("ec800m", AT_CLIENT_RECV_BUFF_LEN);
     if (result < 0) {
-        LOG_E("at client (%s) init failed.", AT_CLIENT_DEV_NAME);
+        NRF_LOG_ERROR("at client ec800m init failed.");
         return result;
     }
 
     ec800.client = at_client_get(AT_CLIENT_DEV_NAME);
-    if (ec800.client == RT_NULL) {
-        LOG_E("get AT client (%s) failed.", AT_CLIENT_DEV_NAME);
-        return -RT_ERROR;
+    if (ec800.client == NULL) {
+        NRF_LOG_ERROR("get AT client ec800m failed.");
+        return -ERROR;
     }
 
-    return RT_EOK;
+    return EOK;
 }
 
 void ec800_reset(void)
 {
-    rt_pin_mode(EC800_RESET_N_PIN, PIN_MODE_OUTPUT);
-    rt_pin_write(EC800_RESET_N_PIN, PIN_HIGH);
-
-    rt_thread_mdelay(300);
-
-    rt_pin_write(EC800_RESET_N_PIN, PIN_LOW);
-
-    rt_thread_mdelay(1000);
 }
-MSH_CMD_EXPORT(ec800_reset, ec800_reset);
 
 int at_client_port_init(void);
 
@@ -606,17 +540,17 @@ int at_client_port_init(void);
  */
 int ec800_init(void)
 {
-    LOG_D("Init at client device.");
+    NRF_LOG_DEBUG("Init at client device.");
     at_client_dev_init();
     at_client_port_init();
 
-    LOG_D("Reset EC800 device.");
+    NRF_LOG_DEBUG("Reset EC800 device.");
     ec800_reset();
 
     ec800.stat = EC800_STAT_INIT;
     ec800_bind_parser(ec800_subscribe_callback);
 
-    return RT_EOK;
+    return EOK;
 }
 
 void ec800_bind_parser(void (*callback)(const char *json))
@@ -635,16 +569,16 @@ int ec800_build_mqtt_network(void)
     //    }
 
     if ((result = ec800_mqtt_open()) < 0) {
-        LOG_E("MQTT open failed.");
+        NRF_LOG_ERROR("MQTT open failed.");
         return result;
     }
 
     if ((result = ec800_mqtt_connect()) < 0) {
-        LOG_E("MQTT connect failed.");
+        NRF_LOG_ERROR("MQTT connect failed.");
         return result;
     }
 
-    return RT_EOK;
+    return EOK;
 }
 
 int ec800_rebuild_mqtt_network(void)
@@ -666,21 +600,21 @@ int ec800_rebuild_mqtt_network(void)
         return result;
     }
 
-    return RT_EOK;
+    return EOK;
 }
 
 static int ec800_deactivate_pdp(void)
 {
     /* AT+CGACT=<state>,<cid> */
 
-    return RT_EOK;
+    return EOK;
 }
 
-static void urc_mqtt_stat(struct at_client *client, const char *data, rt_size_t size)
+static void urc_mqtt_stat(struct at_client *client, const char *data, size_t size)
 {
     /* MQTT链路层的状态发生变化 */
-    LOG_D("The state of the MQTT link layer changes");
-    LOG_D("%s", data);
+    NRF_LOG_DEBUG("The state of the MQTT link layer changes");
+    NRF_LOG_DEBUG("%s", data);
 
     int tcp_conn_id = 0, err_code = 0;
     sscanf(data, "+QMTSTAT: %d,%d", &tcp_conn_id, &err_code);
@@ -710,23 +644,23 @@ static void urc_mqtt_stat(struct at_client *client, const char *data, rt_size_t 
 
         /* disconnect by client */
         case AT_QMTSTAT_DISCONNECT:
-            LOG_D("disconnect by client");
+            NRF_LOG_DEBUG("disconnect by client");
             break;
 
         /* network inactivated or server unavailable */
         case AT_QMTSTAT_INACTIVATED:
-            LOG_D("please check network");
+            NRF_LOG_DEBUG("please check network");
             break;
         default:
             break;
     }
 }
 
-static void urc_mqtt_recv(struct at_client *client, const char *data, rt_size_t size)
+static void urc_mqtt_recv(struct at_client *client, const char *data, size_t size)
 {
     /* 读取已从MQTT服务器接收的MQTT包数据 */
-    LOG_D("AT client receive %d bytes data from server", size);
-    LOG_D("%s", data);
+    NRF_LOG_DEBUG("AT client receive %d bytes data from server", size);
+    NRF_LOG_DEBUG("%s", data);
 
     sscanf(data, "+QMTRECV: %*d,%*d,\"%*[^\"]\",%s", buf);
     ec800.parser(buf);
@@ -734,7 +668,7 @@ static void urc_mqtt_recv(struct at_client *client, const char *data, rt_size_t 
 
 extern struct mqtt_data ec800_mqtt_data;
 extern struct _time ec800_time;
-static void urc_mqtt_gps(struct at_client *client, const char *data, rt_size_t size)
+static void urc_mqtt_gps(struct at_client *client, const char *data, size_t size)
 {
     /* +QGPSGNMEA: $GNRMC,062848.00,A,2222.67783,N,11332.39237,E,0.000,,090923,,,A,V*16.. */
     const char *str    = data;
@@ -776,31 +710,31 @@ static void urc_mqtt_gps(struct at_client *client, const char *data, rt_size_t s
                 sscanf(str, "%[^.]", time);
                 sscanf(time, "%2u%2u%2u", &ec800_time.hour, &ec800_time.minute, &ec800_time.second);
                 ec800_time.hour += 8; // 北京时间+8h
-                if (set_time(ec800_time.hour, ec800_time.minute, ec800_time.second) != RT_EOK)
-                    LOG_E("set time fail.");
+                if (set_time(ec800_time.hour, ec800_time.minute, ec800_time.second) != EOK)
+                    NRF_LOG_ERROR("set time fail.");
             }
             if (i == 8) {
                 sscanf(str, "%[^,]", date);
                 sscanf(date, "%2u%2u%2u", &ec800_time.day, &ec800_time.month, &ec800_time.year);
                 ec800_time.year += 2000;
-                if (set_date(ec800_time.year, ec800_time.month, ec800_time.day) != RT_EOK)
-                    LOG_E("set date fail.");
+                if (set_date(ec800_time.year, ec800_time.month, ec800_time.day) != EOK)
+                    NRF_LOG_ERROR("set date fail.");
                 rt_event_send(ec800.event, EVENT_GPS_TIME_UPDATED);
             }
         }
     }
 #if GPS_TEST_ON
-    rt_event_send(ec800.event, EVENT_TEST_REPORT_INFO);
+    rt_event_send(ec800.event, EVENT_TEST_REPOINFO);
 #endif
 }
 
-static void urc_report_state(struct at_client *client, const char *data, rt_size_t size)
+static void urc_report_state(struct at_client *client, const char *data, size_t size)
 {
     LOG_I("Publish success.");
     rt_event_send(ec800.event, EVENT_MQTT_PUBLISH);
 }
 
-static void urc_csq_state(struct at_client *client, const char *data, rt_size_t size)
+static void urc_csq_state(struct at_client *client, const char *data, size_t size)
 {
 #if GPS_TEST_ON
     extern int csq_rssi;
@@ -823,23 +757,8 @@ int at_client_port_init(void)
     /* 添加多种 URC 数据至 URC 列表中，当接收到同时匹配 URC 前缀和后缀的数据，执行 URC 函数  */
     at_set_urc_table(urc_table, sizeof(urc_table) / sizeof(urc_table[0]));
 
-    return RT_EOK;
+    return EOK;
 }
-
-#ifdef FINSH_USING_MSH
-MSH_CMD_EXPORT(ec800_mqtt_set_alive, AT client MQTT auth);
-MSH_CMD_EXPORT(ec800_mqtt_auth, AT client MQTT auth);
-MSH_CMD_EXPORT(ec800_mqtt_open, AT client MQTT open);
-MSH_CMD_EXPORT(ec800_mqtt_close, AT client MQTT close);
-MSH_CMD_EXPORT(ec800_mqtt_connect, AT client MQTT connect);
-MSH_CMD_EXPORT(ec800_mqtt_disconnect, AT client MQTT disconnect);
-MSH_CMD_EXPORT(ec800_mqtt_subscribe, AT client MQTT subscribe);
-MSH_CMD_EXPORT(ec800_mqtt_unsubscribe, AT client MQTT unsubscribe);
-MSH_CMD_EXPORT(ec800_mqtt_publish, AT client MQTT publish);
-
-MSH_CMD_EXPORT(ec800_client_attach, AT client attach to access network);
-MSH_CMD_EXPORT_ALIAS(at_client_dev_init, at_client_init, initialize AT client);
-#endif
 
 int is_moudle_power_on(void)
 {
@@ -847,11 +766,9 @@ int is_moudle_power_on(void)
     return check_send_cmd(AT_TEST, AT_OK, 0, AT_DEFAULT_TIMEOUT);
 }
 
-#define AT_CMD_ECHO_OFF "ATE0"
-
 int ec800_echo_off(void)
 {
-    return check_send_cmd(AT_CMD_ECHO_OFF, AT_OK, 1, AT_DEFAULT_TIMEOUT);
+    return check_send_cmd(AT_ECHO_OFF, AT_OK, 1, AT_DEFAULT_TIMEOUT);
 }
 
 int ec800_open_gps(void)
@@ -861,19 +778,19 @@ int ec800_open_gps(void)
 
 int ec800_gps_update(void)
 {
-    int result         = RT_EOK;
-    at_response_t resp = RT_NULL;
+    int result         = EOK;
+    at_response_t resp = NULL;
 
     //    result = is_moudle_power_on();
-    //    if (result != RT_EOK)
+    //    if (result != EOK)
     //        return result;
 
     // check_send_cmd(EC800_AT_CMD_OPEN_GNSS, AT_OK, 1, 2000);
 
     resp = at_create_resp(AT_CLIENT_RECV_BUFF_LEN, 1, rt_tick_from_millisecond(1000));
-    if (resp == RT_NULL) {
-        LOG_E("No memory for response structure!");
-        return -RT_ENOMEM;
+    if (resp == NULL) {
+        NRF_LOG_ERROR("No memory for response structure!");
+        return -ENOMEM;
     }
 
     ec800_open_gps();
@@ -882,7 +799,7 @@ int ec800_gps_update(void)
     resp->line_num = 2;
     result         = at_obj_exec_cmd(ec800.client, resp, "AT+QGPSGNMEA=\"GSA\"");
     if (result < 0) {
-        LOG_E("AT client send commands failed or wait response timeout!");
+        NRF_LOG_ERROR("AT client send commands failed or wait response timeout!");
         goto __exit;
     }
 #endif
@@ -890,7 +807,7 @@ int ec800_gps_update(void)
 
     result = at_obj_exec_cmd(ec800.client, resp, EC800_AT_CMD_GET_GPS_LOC);
     if (result < 0) {
-        LOG_E("AT client send commands failed or wait response timeout!");
+        NRF_LOG_ERROR("AT client send commands failed or wait response timeout!");
         goto __exit;
     }
 __exit:
