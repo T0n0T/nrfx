@@ -29,7 +29,6 @@ struct ec800_connect_obj
 
 struct ec800_device
 {
-    rt_bool_t       gps_state;
     rt_base_t       reset_pin;
     rt_base_t       adc_pin;
     ec800_stat_t    stat;
@@ -66,13 +65,15 @@ int  ec800_build_mqtt_network(void);
 int  ec800_rebuild_mqtt_network(void);
 
 int is_moudle_power_on(void);
-int is_moudle_ready(void);
+int ec800_echo_off(void);
 int ec800_subscribe_test(const char* topic);
 int ec800_publish_test(const char* topic, const char *msg);
 
 extern struct ec800_device ec800;
-int ec800_gps_update_info(void);
+int ec800_gps_update(void);
+int ec800_open_gps(void);
 int ec800_update_location(struct mqtt_data *mqtt_report_data);
+int mqtt_urc_app_init(void);
 
 #ifdef __cplusplus
 }

@@ -10,12 +10,12 @@
  */
 
 #include <at.h>
-#include <stdlib.h>
-#include <stdio.h>
+
+#include "nrf_log.h"
 
 static char send_buf[AT_CMD_MAX_LEN];
 static size_t last_cmd_len = 0;
-
+bool transfer_status;
 /**
  * dump hex format data to console device
  *
@@ -59,12 +59,19 @@ const char *at_get_last_cmd(size_t *cmd_size)
 }
 
 size_t at_utils_send(void *dev,
-                             rt_off_t pos,
-                             const void *buffer,
-                             size_t size)
+                     uint32_t pos,
+                     const void *buffer,
+                     size_t size)
 {
-    if (nrfx_uart_tx((nrfx_uart_t *)dev, buffer, size) != NRFX_SUCCESS)
-        return 0;
+    transfer_status = false;
+    uint16_t retry  = INT16_MAX;
+    nrfx_uart_tx((nrfx_uart_t *)dev, buffer, size);
+    while (transfer_status == false) {
+        retry--;
+        if (retry == 0) {
+            return 0;
+        }
+    }
     return size;
 }
 
@@ -81,7 +88,7 @@ size_t at_vprintf(void *device, const char *format, va_list args)
     return at_utils_send(device, 0, send_buf, last_cmd_len);
 }
 
-size_t at_vprintfln(uint32_t device, const char *format, va_list args)
+size_t at_vprintfln(void *device, const char *format, va_list args)
 {
     size_t len;
 
@@ -94,7 +101,7 @@ size_t at_vprintfln(uint32_t device, const char *format, va_list args)
     if (last_cmd_len > sizeof(send_buf) - 2) {
         last_cmd_len = sizeof(send_buf) - 2;
     }
-    rt_memcpy(send_buf + last_cmd_len, "\r\n", 2);
+    memcpy(send_buf + last_cmd_len, "\r\n", 2);
 
     len = last_cmd_len + 2;
 

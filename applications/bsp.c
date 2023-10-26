@@ -134,7 +134,7 @@ void bsp_uninit(void)
 }
 
 APP_TIMER_DEF(leds_tmr);
-
+#include "at.h"
 /**
  * @brief Handle events from leds timer.
  *
@@ -158,4 +158,5 @@ void bsp_init(void)
     APP_ERROR_CHECK(app_timer_start(leds_tmr, APP_TIMER_TICKS(1000), NULL));
 
     btn_init();
+    at_client_init("sss", 512);
 }

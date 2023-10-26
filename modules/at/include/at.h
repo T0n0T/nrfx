@@ -12,17 +12,21 @@
 #ifndef __AT_H__
 #define __AT_H__
 
+#include <stdarg.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <stddef.h>
+#include <stdint.h>
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
+#include "stream_buffer.h"
 #include "nrfx_uart.h"
-#include "ringbuf.h"
 
-#define NRF_LOG_MODULE_NAME atclient
-#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_INFO
-#include "nrf_log.h"
-NRF_LOG_MODULE_REGISTER();
+
+
+extern bool transfer_status;
 
 #define EOK      0  /**< There is no error */
 #define ERROR    1  /**< A generic error happens */
@@ -125,8 +129,8 @@ typedef struct at_urc *at_urc_table_t;
 
 struct at_client {
     nrfx_uart_t *device;
-    nrfx_uart_config_t cfg;
-    struct ringbuffer *rb;
+    nrfx_uart_config_t *cfg;
+    StreamBufferHandle_t rx_buf;
 
     at_status_t status;
     char end_sign;
@@ -139,6 +143,7 @@ struct at_client {
     size_t recv_bufsz;
     // SemaphoreHandle_t rx_notice;
     SemaphoreHandle_t lock;
+    SemaphoreHandle_t rx_notice;
 
     at_response_t resp;
     SemaphoreHandle_t resp_notice;

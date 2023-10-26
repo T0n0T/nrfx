@@ -13,10 +13,15 @@
  */
 
 #include <at.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
+#define NRF_LOG_MODULE_NAME atclient
+#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_DEBUG
+#include "nrf_log.h"
+NRF_LOG_MODULE_REGISTER();
+
+nrfx_uart_t p_instance    = NRFX_UART_INSTANCE(0);
+nrfx_uart_config_t config = NRFX_UART_DEFAULT_CONFIG;
+static char rx_ch;
 // #define AT_PRINT_RAW_CMD
 
 #ifdef AT_USING_CLIENT
@@ -420,18 +425,9 @@ size_t at_client_obj_send(at_client_t client, const char *buf, size_t size)
     return len;
 }
 
-static uint32_t at_client_getchar(at_client_t client, char *ch, int32_t timeout)
+static uint32_t at_client_getchar(at_client_t client, char *ch, TickType_t timeout)
 {
-    uint32_t result = EOK;
-
-    while (ringbuffer_getchar(client->rb, ch) != NRF_SUCCESS) {
-        (void)ulTaskNotifyTake(pdTRUE, portTICK_RATE_MS(timeout));
-        // result = xSemaphoreTake(client->rx_notice, timeout);
-        // if (result != EOK) {
-        //     return result;
-        // }
-    }
-
+    xStreamBufferReceive(client->rx_buf, ch, 1, timeout);
     return EOK;
 }
 
@@ -462,7 +458,8 @@ size_t at_client_obj_recv(at_client_t client, char *buf, size_t size, int32_t ti
 
     while (1) {
         if (read_idx < size) {
-            if (at_client_getchar(client, &ch, timeout) != EOK) {
+            uint32_t result = at_client_getchar(client, &ch, pdMS_TO_TICKS(timeout));
+            if (result != EOK) {
                 NRF_LOG_ERROR("AT Client receive failed, uart device get data error(%d)", result);
                 return 0;
             }
@@ -476,7 +473,7 @@ size_t at_client_obj_recv(at_client_t client, char *buf, size_t size, int32_t ti
     at_print_raw_cmd("urc_recv", buf, len);
 #endif
 
-    return len;
+    return read_idx;
 }
 
 /**
@@ -606,7 +603,7 @@ static int at_recv_readline(at_client_t client)
 {
     size_t read_len = 0;
     char ch = 0, last_ch = 0;
-    rt_bool_t is_full = 0;
+    bool is_full = 0;
 
     memset(client->recv_line_buf, 0x00, client->recv_bufsz);
     client->recv_line_len = 0;
@@ -617,6 +614,7 @@ static int at_recv_readline(at_client_t client)
         if (read_len < client->recv_bufsz) {
             client->recv_line_buf[read_len++] = ch;
             client->recv_line_len             = read_len;
+            // NRF_LOG_RAW_INFO("%c\n", ch);
         } else {
             is_full = 1;
         }
@@ -633,7 +631,7 @@ static int at_recv_readline(at_client_t client)
         }
         last_ch = ch;
     }
-
+    at_print_raw_cmd("recvline", client->recv_line_buf, read_len);
 #ifdef AT_PRINT_RAW_CMD
     at_print_raw_cmd("recvline", client->recv_line_buf, read_len);
 #endif
@@ -646,6 +644,7 @@ static void client_parser(at_client_t client)
     const struct at_urc *urc;
 
     while (1) {
+        NRF_LOG_DEBUG("client parser");
         if (at_recv_readline(client) > 0) {
             if ((urc = get_urc_obj(client)) != NULL) {
                 /* current receive is request, try to execute related operations */
@@ -689,7 +688,7 @@ static void client_parser(at_client_t client)
                 client->resp = NULL;
                 xSemaphoreGive(client->resp_notice);
             } else {
-                // NRF_LOG_DEBUG("unrecognized line: %.*s", client->recv_line_len, client->recv_line_buf);
+                NRF_LOG_DEBUG("unrecognized line: %.*s", client->recv_line_len, client->recv_line_buf);
             }
         }
     }
@@ -697,18 +696,17 @@ static void client_parser(at_client_t client)
 
 static void at_client_rx_ind(nrfx_uart_event_t const *p_event, void *p_context)
 {
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    at_client_t client                  = (at_client_t)p_context;
-    static uint8_t rx_ch;
+    at_client_t client = (at_client_t)p_context;
     if (p_event->type == NRFX_UART_EVT_RX_DONE) {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         nrfx_uart_rx(client->device, &rx_ch, 1);
-        rt_ringbuffer_put_force(client->rb, &rx_ch, 1);
-        if (p_event->data.rxtx.bytes == 1) {
-            vTaskNotifyGiveFromISR(client->parser, &xHigherPriorityTaskWoken);
-            // xSemaphoreGiveFromISR(at_client_table[0].rx_notice, &xHigherPriorityTaskWoken);
-        }
+        xStreamBufferSendFromISR(client->rx_buf, &rx_ch, 1, &xHigherPriorityTaskWoken);
+        // xSemaphoreGiveFromISR(at_client_table[0].rx_notice, &xHigherPriorityTaskWoken);
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }
-    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    if (p_event->type == NRFX_UART_EVT_TX_DONE) {
+        transfer_status = true;
+    }
 }
 
 /* initialize the client object parameters */
@@ -733,7 +731,12 @@ static int at_client_para_init(at_client_t client)
         goto __exit;
     }
 
-    client->rb = ringbuffer_create(256);
+    client->rx_buf = xStreamBufferCreate(64, 1);
+    if (client->rx_buf == NULL) {
+        NRF_LOG_ERROR("AT client initialize failed! at_client_rx_buf create failed!");
+        result = -ENOMEM;
+        goto __exit;
+    }
 
     client->lock = xSemaphoreCreateMutex();
     if (client->lock == NULL) {
@@ -742,12 +745,12 @@ static int at_client_para_init(at_client_t client)
         goto __exit;
     }
 
-    // client->rx_notice = xSemaphoreCreateCounting(UINT_FAST16_MAX, 0);
-    // if (client->rx_notice == NULL) {
-    //     NRF_LOG_ERROR("AT client initialize failed! at_client_notice semaphore create failed!");
-    //     result = -ENOMEM;
-    //     goto __exit;
-    // }
+    client->rx_notice = xSemaphoreCreateCounting(UINT_FAST16_MAX, 0);
+    if (client->rx_notice == NULL) {
+        NRF_LOG_ERROR("AT client initialize failed! at_client_notice semaphore create failed!");
+        result = -ENOMEM;
+        goto __exit;
+    }
 
     client->resp_notice = xSemaphoreCreateCounting(UINT_FAST16_MAX, 0);
     if (client->resp_notice == NULL) {
@@ -766,10 +769,6 @@ static int at_client_para_init(at_client_t client)
                 client,
                 tskIDLE_PRIORITY + 3,
                 client->parser);
-    if (client->parser == NULL) {
-        result = -ENOMEM;
-        goto __exit;
-    }
 
 __exit:
     if (result != EOK) {
@@ -777,9 +776,13 @@ __exit:
             vSemaphoreDelete(client->lock);
         }
 
-        // if (client->rx_notice) {
-        //     vSemaphoreDelete(client->rx_notice);
-        // }
+        if (client->rx_buf) {
+            vStreamBufferDelete(client->rx_buf);
+        }
+
+        if (client->rx_notice) {
+            vSemaphoreDelete(client->rx_notice);
+        }
 
         if (client->resp_notice) {
             vSemaphoreDelete(client->resp_notice);
@@ -825,16 +828,25 @@ int at_client_init(const char *dev_name, size_t recv_bufsz)
 
     result = at_client_para_init(client);
     if (result != EOK) {
+        NRF_LOG_ERROR("AT client initialize para failed(%d).", result);
         goto __exit;
     }
 
     /* find and open command device */
-    client->device        = NRFX_UART_INSTANCE(0);
-    client->cfg           = NRFX_UART_DEFAULT_CONFIG;
-    client->cfg.pseltxd   = UART_PIN_TX;
-    client->cfg.pselrxd   = UART_PIN_RX;
-    client->cfg.p_context = (void *)client;
-    err_code              = nrfx_uart_init(client->device, &client->cfg, at_client_rx_ind);
+
+    config.pseltxd   = UART_PIN_TX;
+    config.pselrxd   = UART_PIN_RX;
+    config.p_context = (void *)client;
+
+    client->device = &p_instance;
+    client->cfg    = &config;
+
+    err_code = nrfx_uart_init(client->device, client->cfg, at_client_rx_ind);
+    nrfx_uart_rx(client->device, &rx_ch, 1);
+    if (err_code != NRF_SUCCESS) {
+        NRF_LOG_ERROR("AT client initialize uart failed(%d).", err_code);
+        goto __exit;
+    }
 
 __exit:
     if (result == EOK) {

@@ -115,6 +115,15 @@
             "folders": []
           },
           {
+            "name": "ec800m",
+            "files": [
+              {
+                "path": "modules/ec800mqtt/ec800_mqtt.c"
+              }
+            ],
+            "folders": []
+          },
+          {
             "name": "max30102",
             "files": [],
             "folders": []
@@ -480,7 +489,9 @@
   "targets": {
     "nrf52832_xxaa": {
       "excludeList": [
-        "<virtual_root>/Modules/at/at_server.c"
+        "<virtual_root>/Modules/at/at_server.c",
+        "<virtual_root>/Modules/ringbuf",
+        "<virtual_root>/Modules/ec800m"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -751,7 +762,8 @@
           "modules/ccm3310",
           "modules/button",
           "modules/at/include",
-          "modules/ringbuf"
+          "modules/ringbuf",
+          "modules/ec800mqtt"
         ],
         "libList": [],
         "sourceDirList": [],

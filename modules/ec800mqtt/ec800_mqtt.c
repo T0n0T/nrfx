@@ -11,15 +11,14 @@
  * 2020-08-16     luhuadong    support bind recv parser
  * 2023-03-28     kurisaW      support serial v2
  */
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <rtthread.h>
-#include <rtdevice.h>
-#include <board.h>
 #include <at.h>
+
+#define NRF_LOG_MODULE_NAME ec800mqtt
+#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_DEBUG
+#include "nrf_log.h"
+NRF_LOG_MODULE_REGISTER();
+
+#define PKG_USING_EC800_MQTT_DEBUG
 
 #define DBG_TAG "pkg.ec800_mqtt"
 #ifdef PKG_USING_EC800_MQTT_DEBUG
@@ -32,10 +31,10 @@
 #include "ec800_mqtt.h"
 
 #define EC800_ADC0_PIN             -1
-#define EC800_RESET_N_PIN          -1
+#define EC800_RESET_N_PIN          GET_PIN(C, 6)
 #define EC800_OP_BAND              8
 
-#define AT_CLIENT_DEV_NAME         "uart0"
+#define AT_CLIENT_DEV_NAME         "uart2"
 #define AT_CLIENT_BAUD_RATE        115200
 
 #define PRODUCT_KEY                ""
@@ -99,13 +98,13 @@
 #define EC800_AT_CMD_GET_GPS_LOC   "AT+QGPSLOC=2"
 #define EC800_AT_CMD_NEMA_GGA      "AT+QGPSGNMEA=\"GGA\""
 #define EC800_AT_CMD_NEMA_RMC      "AT+QGPSGNMEA=\"RMC\""
+#define EC800_AT_CMD_QUERY_CSQ     "AT+CSQ"
 
-#define AT_CLIENT_RECV_BUFF_LEN    512
+#define AT_CLIENT_RECV_BUFF_LEN    2048
 #define AT_DEFAULT_TIMEOUT         300
 
 struct ec800_device ec800 = {
     .event     = NULL,
-    .gps_state = 0,
     .reset_pin = EC800_RESET_N_PIN,
     .adc_pin   = EC800_ADC0_PIN,
     .stat      = EC800_STAT_DISCONNECTED};
@@ -403,14 +402,15 @@ int ec800_mqtt_publish(const char *topic, const char *msg)
     /* set AT client end sign to deal with '>' sign.*/
     at_set_end_sign('>');
 
-    check_send_cmd(cmd, ">", 2, 1000);
-    // check_send_cmd(cmd, ">", 0, AT_DEFAULT_TIMEOUT);
+    check_send_cmd(cmd, ">", 0, 1000);
     LOG_D("publish...");
 
     /* reset the end sign for data conflict */
-    // at_set_end_sign(0);
+    at_set_end_sign(0);
 
-    return check_send_cmd(msg, AT_MQTT_PUB_SUCC, 4, 5000);
+    check_send_cmd(msg, AT_MQTT_PUB_SUCC, 4, AT_DEFAULT_TIMEOUT);
+    // at_obj_exec_cmd(ec800.client, NULL, AT_MQTT_PUB_SUCC);
+    return RT_EOK;
 }
 
 /**
@@ -597,7 +597,6 @@ void ec800_reset(void)
 MSH_CMD_EXPORT(ec800_reset, ec800_reset);
 
 int at_client_port_init(void);
-static void thread_mqtt_urc_handle(void *parameter);
 
 /**
  * EC800 device initialize.
@@ -612,7 +611,7 @@ int ec800_init(void)
     at_client_port_init();
 
     LOG_D("Reset EC800 device.");
-    // ec800_reset();
+    ec800_reset();
 
     ec800.stat = EC800_STAT_INIT;
     ec800_bind_parser(ec800_subscribe_callback);
@@ -747,59 +746,67 @@ static void urc_mqtt_gps(struct at_client *client, const char *data, rt_size_t s
     if (strstr(data, "+QGPSLOC:")) {
         for (i = 0; i < 2; i++) {
             str = strstr(str, ",") + 1;
+            if (*str == ',')
+                continue;
             if (i == 0) {
-                if (*str == ',')
-                    continue;
                 sscanf(str, "%[^,]", latitude);
                 sscanf(latitude, "%lf", &ec800_mqtt_data.latitude);
             };
             if (i == 1) {
-                if (*str == ',')
-                    continue;
                 sscanf(str, "%[^,]", longitude);
                 sscanf(longitude, "%lf", &ec800_mqtt_data.longitude);
+                rt_event_send(ec800.event, EVENT_GPS_LOC_UPDATED);
             };
         }
-
-#if !GPS_TEST_ON
-        // rt_event_send(ec800.event, EVENT_GPS_UPDATE_INFO);
-#endif
     }
+#if GPS_TEST_ON
+    if (strstr(data, "GSA")) {
+        rt_device_t dev = rt_device_find("uart3");
+        // memcpy(_buff_, data, strlen(data));
+        if (dev)
+            rt_device_write(dev, 0, data, strlen(data));
+    }
+#endif
     if (strstr(data, "$GNRMC")) {
         for (i = 0; i < 9; i++) {
             str = strstr(str, ",") + 1;
+            if (*str == ',')
+                continue;
             if (i == 0) {
-                if (*str == ',')
-                    continue;
                 sscanf(str, "%[^.]", time);
                 sscanf(time, "%2u%2u%2u", &ec800_time.hour, &ec800_time.minute, &ec800_time.second);
                 ec800_time.hour += 8; // 北京时间+8h
-                set_time(ec800_time.hour, ec800_time.minute, ec800_time.second);
+                if (set_time(ec800_time.hour, ec800_time.minute, ec800_time.second) != RT_EOK)
+                    LOG_E("set time fail.");
             }
             if (i == 8) {
-                if (*str == ',')
-                    continue;
                 sscanf(str, "%[^,]", date);
                 sscanf(date, "%2u%2u%2u", &ec800_time.day, &ec800_time.month, &ec800_time.year);
                 ec800_time.year += 2000;
-                set_date(ec800_time.year, ec800_time.month, ec800_time.day);
+                if (set_date(ec800_time.year, ec800_time.month, ec800_time.day) != RT_EOK)
+                    LOG_E("set date fail.");
+                rt_event_send(ec800.event, EVENT_GPS_TIME_UPDATED);
             }
         }
-#if !GPS_TEST_ON
-        // rt_event_send(ec800.event, EVENT_GPS_UPDATE_INFO);
-#endif
     }
-#if !GPS_TEST_ON
-    // rt_event_send(ec800.event, EVENT_GPS_UPDATE_INFO);
-#endif
 #if GPS_TEST_ON
-    rt_event_send(ec800.event, EVENT_TEST_GPS_TIME);
+    rt_event_send(ec800.event, EVENT_TEST_REPORT_INFO);
 #endif
 }
 
-static void urc_gps_state(struct at_client *client, const char *data, rt_size_t size)
+static void urc_report_state(struct at_client *client, const char *data, rt_size_t size)
 {
-    sscanf(data, "+QGPS: %d", &ec800.gps_state);
+    LOG_I("Publish success.");
+    rt_event_send(ec800.event, EVENT_MQTT_PUBLISH);
+}
+
+static void urc_csq_state(struct at_client *client, const char *data, rt_size_t size)
+{
+#if GPS_TEST_ON
+    extern int csq_rssi;
+    extern int csq_ber;
+    sscanf(data, "+CSQ: %d,%d", &csq_rssi, &csq_ber);
+#endif
 }
 
 static const struct at_urc urc_table[] = {
@@ -807,7 +814,8 @@ static const struct at_urc urc_table[] = {
     {"+QMTRECV:", "\r\n", urc_mqtt_recv},
     {"+QGPSGNMEA:", "\r\n", urc_mqtt_gps},
     {"+QGPSLOC:", "\r\n", urc_mqtt_gps},
-    {"+QGPS: ", "\r\n", urc_gps_state},
+    {"+QMTPUBEX: 0,0,0", "\r\n", urc_report_state},
+    {"+CSQ", "\r\n", urc_csq_state},
 };
 
 int at_client_port_init(void)
@@ -833,76 +841,32 @@ MSH_CMD_EXPORT(ec800_client_attach, AT client attach to access network);
 MSH_CMD_EXPORT_ALIAS(at_client_dev_init, at_client_init, initialize AT client);
 #endif
 
-static void thread_mqtt_urc_handle(void *parameter)
-{
-    rt_uint32_t recv;
-    while (1) {
-        rt_event_recv(ec800.event, EVENT_URC_STATE_DISCONNECT,
-                      RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR, RT_WAITING_FOREVER, &recv);
-        switch (recv) {
-            case EVENT_URC_STATE_DISCONNECT:
-                ec800_rebuild_mqtt_network();
-                break;
-            default:
-                break;
-        }
-    }
-}
-
-static int mqtt_urc_app_init(void)
-{
-    rt_thread_t tid;
-
-    tid = rt_thread_create("mqtt urc", thread_mqtt_urc_handle, NULL,
-                           EC800_URC_THREAD_STACK_SIZE, EC800_URC_THREAD_PRIORITY, 200);
-    if (tid) {
-        rt_thread_startup(tid);
-    } else {
-        LOG_E("create mqtt app thread failed.");
-        return -RT_ERROR;
-    }
-    return RT_EOK;
-}
-INIT_APP_EXPORT(mqtt_urc_app_init);
-
 int is_moudle_power_on(void)
 {
     /* 发送 AT 判断模块是否开机 */
     return check_send_cmd(AT_TEST, AT_OK, 0, AT_DEFAULT_TIMEOUT);
 }
 
-int ec800_update_location(struct mqtt_data *ec800_mqtt_data)
+#define AT_CMD_ECHO_OFF "ATE0"
+
+int ec800_echo_off(void)
 {
-    int result;
-
-    //    result = is_moudle_power_on();
-    //    if (result != RT_EOK) {
-    //        ec800_power_switch();   //开机
-    //        rt_thread_delay(5000);  //延迟5s再与模块通讯，否则模块可能不回复或者检测不到SIM卡
-    //    }
-
-    result = is_moudle_power_on();
-    if (result != RT_EOK) {
-        LOG_E("Error.");
-        return result;
-    }
-
-    result = check_send_cmd(EC800_AT_CMD_OPEN_GNSS, AT_OK, 1, 3000);
-    if (result != RT_EOK) {
-        LOG_E("Error to exec %s.", EC800_AT_CMD_OPEN_GNSS);
-        return result;
-    }
-    return 0;
+    return check_send_cmd(AT_CMD_ECHO_OFF, AT_OK, 1, AT_DEFAULT_TIMEOUT);
 }
 
-int ec800_gps_update_info(void)
+int ec800_open_gps(void)
+{
+    return check_send_cmd(EC800_AT_CMD_OPEN_GNSS, AT_OK, 1, AT_DEFAULT_TIMEOUT);
+}
+
+int ec800_gps_update(void)
 {
     int result         = RT_EOK;
     at_response_t resp = RT_NULL;
 
-    result = is_moudle_power_on();
-    if (result != RT_EOK)
-        return result;
+    //    result = is_moudle_power_on();
+    //    if (result != RT_EOK)
+    //        return result;
 
     // check_send_cmd(EC800_AT_CMD_OPEN_GNSS, AT_OK, 1, 2000);
 
@@ -912,36 +876,19 @@ int ec800_gps_update_info(void)
         return -RT_ENOMEM;
     }
 
-    if (!ec800.gps_state) {
-        //        at_client_obj_send(ec800.client, EC800_AT_CMD_GNSS_QUERY, strlen(EC800_AT_CMD_GNSS_QUERY));
-        resp->line_num = 2;
-        result         = at_obj_exec_cmd(ec800.client, resp, EC800_AT_CMD_GNSS_QUERY);
-        if (result < 0) {
-            LOG_E("AT client send commands failed or wait response timeout!");
-            goto __exit;
-        }
-    }
+    ec800_open_gps();
 
-    if (!ec800.gps_state) {
-        //        at_client_obj_send(ec800.client, EC800_AT_CMD_OPEN_GNSS, strlen(EC800_AT_CMD_OPEN_GNSS));
-        resp->line_num = 1;
-        result         = at_obj_exec_cmd(ec800.client, resp, EC800_AT_CMD_OPEN_GNSS);
-        if (result < 0) {
-            LOG_E("AT client send commands failed or wait response timeout!");
-            goto __exit;
-        }
-    }
-
-    // at_client_obj_send(ec800.client, EC800_AT_CMD_NEMA_RMC, strlen(EC800_AT_CMD_NEMA_RMC));
+#if GPS_TEST_ON
     resp->line_num = 2;
-    result         = at_obj_exec_cmd(ec800.client, resp, EC800_AT_CMD_NEMA_RMC);
+    result         = at_obj_exec_cmd(ec800.client, resp, "AT+QGPSGNMEA=\"GSA\"");
     if (result < 0) {
         LOG_E("AT client send commands failed or wait response timeout!");
         goto __exit;
     }
+#endif
+    result = at_obj_exec_cmd(ec800.client, resp, EC800_AT_CMD_NEMA_RMC);
 
-    resp->line_num = 1;
-    result         = at_obj_exec_cmd(ec800.client, resp, EC800_AT_CMD_GET_GPS_LOC);
+    result = at_obj_exec_cmd(ec800.client, resp, EC800_AT_CMD_GET_GPS_LOC);
     if (result < 0) {
         LOG_E("AT client send commands failed or wait response timeout!");
         goto __exit;

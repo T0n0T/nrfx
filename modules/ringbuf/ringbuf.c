@@ -402,7 +402,7 @@ struct ringbuffer *ringbuffer_create(uint32_t size)
     if (rb == NULL)
         goto exit;
 
-    pool = (uint8_t *)malloc(size);
+    pool = (uint8_t *)calloc(1, size);
     if (pool == NULL) {
         free(rb);
         rb = NULL;
