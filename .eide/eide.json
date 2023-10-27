@@ -121,6 +121,9 @@
                 "path": "modules/ec800mqtt/ec800_mqtt.c"
               },
               {
+                "path": "modules/ec800mqtt/ec800m_at_cmd.c"
+              },
+              {
                 "path": "modules/ec800mqtt/ec800m.c"
               }
             ],
@@ -493,7 +496,8 @@
     "nrf52832_xxaa": {
       "excludeList": [
         "<virtual_root>/Modules/at/at_server.c",
-        "<virtual_root>/Modules/ringbuf"
+        "<virtual_root>/Modules/ringbuf",
+        "<virtual_root>/Modules/ec800m/ec800_mqtt.c"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -619,7 +623,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": ""
+        "otherCmds": "ip 192.168.230.1"
       },
       "uploadConfigMap": {},
       "custom_dep": {

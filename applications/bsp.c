@@ -62,7 +62,7 @@ void gpio_uninit(void)
 }
 
 /** pwm beep */
-static nrfx_pwm_t m_pwm0                     = NRFX_PWM_INSTANCE(0);
+static nrfx_pwm_t              m_pwm0        = NRFX_PWM_INSTANCE(0);
 static nrf_pwm_values_common_t seq0_values[] = {125};
 
 void beep_init(void)
@@ -134,7 +134,7 @@ void bsp_uninit(void)
 }
 
 APP_TIMER_DEF(leds_tmr);
-#include "at.h"
+#include "ec800m.h"
 /**
  * @brief Handle events from leds timer.
  *
@@ -143,7 +143,7 @@ APP_TIMER_DEF(leds_tmr);
  *
  * @param[in]   p_context   parameter registered in timer start function.
  */
-static void leds_timer_handler(void *p_context)
+static void leds_timer_handler(void* p_context)
 {
     nrf_gpio_pin_toggle(LED1);
 }
@@ -158,5 +158,6 @@ void bsp_init(void)
     APP_ERROR_CHECK(app_timer_start(leds_tmr, APP_TIMER_TICKS(1000), NULL));
 
     btn_init();
-    at_client_init("sss", 512);
+    ec800_init();
+    
 }

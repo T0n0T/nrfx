@@ -19,9 +19,9 @@
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
-nrfx_uart_t p_instance    = NRFX_UART_INSTANCE(0);
-nrfx_uart_config_t config = NRFX_UART_DEFAULT_CONFIG;
-static char rx_ch;
+nrfx_uart_t        p_instance = NRFX_UART_INSTANCE(0);
+nrfx_uart_config_t config     = NRFX_UART_DEFAULT_CONFIG;
+static char        rx_ch;
 // #define AT_PRINT_RAW_CMD
 
 #ifdef AT_USING_CLIENT
@@ -33,13 +33,13 @@ static char rx_ch;
 
 static struct at_client at_client_table[AT_CLIENT_NUM_MAX] = {0};
 
-extern size_t at_utils_send(void *dev,
-                            uint32_t pos,
-                            const void *buffer,
-                            size_t size);
-extern size_t at_vprintfln(void *device, const char *format, va_list args);
-extern void at_print_raw_cmd(const char *type, const char *cmd, size_t size);
-extern const char *at_get_last_cmd(size_t *cmd_size);
+extern size_t      at_utils_send(void*       dev,
+                                 uint32_t    pos,
+                                 const void* buffer,
+                                 size_t      size);
+extern size_t      at_vprintfln(void* device, const char* format, va_list args);
+extern void        at_print_raw_cmd(const char* type, const char* cmd, size_t size);
+extern const char* at_get_last_cmd(size_t* cmd_size);
 
 /**
  * Create response object.
@@ -63,7 +63,7 @@ at_response_t at_create_resp(size_t buf_size, size_t line_num, int32_t timeout)
         return NULL;
     }
 
-    resp->buf = (char *)calloc(1, buf_size);
+    resp->buf = (char*)calloc(1, buf_size);
     if (resp->buf == NULL) {
         NRF_LOG_ERROR("AT create response object failed! No memory for response buffer!");
         free(resp);
@@ -110,13 +110,13 @@ void at_delete_resp(at_response_t resp)
  */
 at_response_t at_resp_set_info(at_response_t resp, size_t buf_size, size_t line_num, int32_t timeout)
 {
-    char *p_temp;
+    char* p_temp;
     ASSERT(resp);
 
     if (resp->buf_size != buf_size) {
         resp->buf_size = buf_size;
 
-        p_temp = (char *)realloc(resp->buf, buf_size);
+        p_temp = (char*)realloc(resp->buf, buf_size);
         if (p_temp == NULL) {
             NRF_LOG_DEBUG("No memory for realloc response buffer size(%d).", buf_size);
             return NULL;
@@ -140,11 +140,11 @@ at_response_t at_resp_set_info(at_response_t resp, size_t buf_size, size_t line_
  * @return != NULL: response line buffer
  *          = NULL: input response line error
  */
-const char *at_resp_get_line(at_response_t resp, size_t resp_line)
+const char* at_resp_get_line(at_response_t resp, size_t resp_line)
 {
-    char *resp_buf      = resp->buf;
-    char *resp_line_buf = NULL;
-    size_t line_num     = 1;
+    char*  resp_buf      = resp->buf;
+    char*  resp_line_buf = NULL;
+    size_t line_num      = 1;
 
     ASSERT(resp);
 
@@ -175,11 +175,11 @@ const char *at_resp_get_line(at_response_t resp, size_t resp_line)
  * @return != NULL: response line buffer
  *          = NULL: no matching data
  */
-const char *at_resp_get_line_by_kw(at_response_t resp, const char *keyword)
+const char* at_resp_get_line_by_kw(at_response_t resp, const char* keyword)
 {
-    char *resp_buf      = resp->buf;
-    char *resp_line_buf = NULL;
-    size_t line_num     = 1;
+    char*  resp_buf      = resp->buf;
+    char*  resp_line_buf = NULL;
+    size_t line_num      = 1;
 
     ASSERT(resp);
     ASSERT(keyword);
@@ -208,11 +208,11 @@ const char *at_resp_get_line_by_kw(at_response_t resp, const char *keyword)
  *          0 : parsed without match
  *         >0 : the number of arguments successfully parsed
  */
-int at_resp_parse_line_args(at_response_t resp, size_t resp_line, const char *resp_expr, ...)
+int at_resp_parse_line_args(at_response_t resp, size_t resp_line, const char* resp_expr, ...)
 {
-    va_list args;
-    int resp_args_num         = 0;
-    const char *resp_line_buf = NULL;
+    va_list     args;
+    int         resp_args_num = 0;
+    const char* resp_line_buf = NULL;
 
     ASSERT(resp);
     ASSERT(resp_expr);
@@ -241,11 +241,11 @@ int at_resp_parse_line_args(at_response_t resp, size_t resp_line, const char *re
  *          0 : parsed without match
  *         >0 : the number of arguments successfully parsed
  */
-int at_resp_parse_line_args_by_kw(at_response_t resp, const char *keyword, const char *resp_expr, ...)
+int at_resp_parse_line_args_by_kw(at_response_t resp, const char* keyword, const char* resp_expr, ...)
 {
-    va_list args;
-    int resp_args_num         = 0;
-    const char *resp_line_buf = NULL;
+    va_list     args;
+    int         resp_args_num = 0;
+    const char* resp_line_buf = NULL;
 
     ASSERT(resp);
     ASSERT(resp_expr);
@@ -275,12 +275,12 @@ int at_resp_parse_line_args_by_kw(at_response_t resp, const char *keyword, const
  *        -2 : wait timeout
  *        -7 : enter AT CLI mode
  */
-int at_obj_exec_cmd(at_client_t client, at_response_t resp, const char *cmd_expr, ...)
+int at_obj_exec_cmd(at_client_t client, at_response_t resp, const char* cmd_expr, ...)
 {
-    va_list args;
-    size_t cmd_size = 0;
-    uint32_t result = EOK;
-    const char *cmd = NULL;
+    va_list     args;
+    size_t      cmd_size = 0;
+    uint32_t    result   = EOK;
+    const char* cmd      = NULL;
 
     ASSERT(cmd_expr);
 
@@ -305,12 +305,19 @@ int at_obj_exec_cmd(at_client_t client, at_response_t resp, const char *cmd_expr
 
     client->resp = resp;
 
+    /* clear the receive buffer */
+    xStreamBufferReset(client->rx_buf);
+
+    /* clear the current received one line data buffer, Ignore dirty data before transmission */
+    memset(client->recv_line_buf, 0x00, client->recv_line_len);
+    client->recv_line_len = 0;
+
     va_start(args, cmd_expr);
     at_vprintfln(client->device, cmd_expr, args);
     va_end(args);
 
     if (resp != NULL) {
-        if (xSemaphoreTake(client->resp_notice, pdMS_TO_TICKS(resp->timeout)) != EOK) {
+        if (xSemaphoreTake(client->resp_notice, pdMS_TO_TICKS(resp->timeout)) != pdTRUE) {
             cmd = at_get_last_cmd(&cmd_size);
             NRF_LOG_WARNING("execute command (%.*s) timeout (%d ticks)!", cmd_size, cmd, resp->timeout);
             client->resp_status = AT_RESP_TIMEOUT;
@@ -345,9 +352,9 @@ __exit:
  */
 int at_client_obj_wait_connect(at_client_t client, uint32_t timeout)
 {
-    uint32_t result     = EOK;
-    at_response_t resp  = NULL;
-    uint32_t start_time = 0;
+    uint32_t      result     = EOK;
+    at_response_t resp       = NULL;
+    uint32_t      start_time = 0;
 
     if (client == NULL) {
         NRF_LOG_ERROR("input AT client object is NULL, please create or get AT Client object!");
@@ -378,7 +385,7 @@ int at_client_obj_wait_connect(at_client_t client, uint32_t timeout)
         resp->line_counts = 0;
         at_utils_send(client->device, 0, "AT\r\n", 4);
 
-        if (xSemaphoreTake(client->resp_notice, pdMS_TO_TICKS(resp->timeout)) != EOK)
+        if (xSemaphoreTake(client->resp_notice, pdMS_TO_TICKS(resp->timeout)) != pdTRUE)
             continue;
         else
             break;
@@ -403,7 +410,7 @@ int at_client_obj_wait_connect(at_client_t client, uint32_t timeout)
  * @return >0: send data size
  *         =0: send failed
  */
-size_t at_client_obj_send(at_client_t client, const char *buf, size_t size)
+size_t at_client_obj_send(at_client_t client, const char* buf, size_t size)
 {
     size_t len;
 
@@ -425,7 +432,7 @@ size_t at_client_obj_send(at_client_t client, const char *buf, size_t size)
     return len;
 }
 
-static uint32_t at_client_getchar(at_client_t client, char *ch, TickType_t timeout)
+static uint32_t at_client_getchar(at_client_t client, char* ch, TickType_t timeout)
 {
     xStreamBufferReceive(client->rx_buf, ch, 1, timeout);
     return EOK;
@@ -444,10 +451,10 @@ static uint32_t at_client_getchar(at_client_t client, char *ch, TickType_t timeo
  * @return >0: receive data size
  *         =0: receive failed
  */
-size_t at_client_obj_recv(at_client_t client, char *buf, size_t size, int32_t timeout)
+size_t at_client_obj_recv(at_client_t client, char* buf, size_t size, int32_t timeout)
 {
     char ch;
-    int read_idx = 0;
+    int  read_idx = 0;
 
     ASSERT(buf);
 
@@ -470,7 +477,7 @@ size_t at_client_obj_recv(at_client_t client, char *buf, size_t size, int32_t ti
     }
 
 #ifdef AT_PRINT_RAW_CMD
-    at_print_raw_cmd("urc_recv", buf, len);
+    at_print_raw_cmd("urc_recv", buf, read_idx);
 #endif
 
     return read_idx;
@@ -499,7 +506,7 @@ void at_obj_set_end_sign(at_client_t client, char ch)
  * @param table URC table
  * @param size table size
  */
-int at_obj_set_urc_table(at_client_t client, const struct at_urc *urc_table, size_t table_sz)
+int at_obj_set_urc_table(at_client_t client, const struct at_urc* urc_table, size_t table_sz)
 {
     size_t idx;
 
@@ -514,7 +521,7 @@ int at_obj_set_urc_table(at_client_t client, const struct at_urc *urc_table, siz
     }
 
     if (client->urc_table_size == 0) {
-        client->urc_table = (struct at_urc_table *)calloc(1, sizeof(struct at_urc_table));
+        client->urc_table = (struct at_urc_table*)calloc(1, sizeof(struct at_urc_table));
         if (client->urc_table == NULL) {
             return -ENOMEM;
         }
@@ -523,10 +530,10 @@ int at_obj_set_urc_table(at_client_t client, const struct at_urc *urc_table, siz
         client->urc_table[0].urc_size = table_sz;
         client->urc_table_size++;
     } else {
-        struct at_urc_table *new_urc_table = NULL;
+        struct at_urc_table* new_urc_table = NULL;
 
         /* realloc urc table space */
-        new_urc_table = (struct at_urc_table *)realloc(client->urc_table, client->urc_table_size * sizeof(struct at_urc_table) + sizeof(struct at_urc_table));
+        new_urc_table = (struct at_urc_table*)realloc(client->urc_table, client->urc_table_size * sizeof(struct at_urc_table) + sizeof(struct at_urc_table));
         if (new_urc_table == NULL) {
             return -ENOMEM;
         }
@@ -546,7 +553,7 @@ int at_obj_set_urc_table(at_client_t client, const struct at_urc *urc_table, siz
  *
  * @return AT client object
  */
-at_client_t at_client_get(const char *dev_name)
+at_client_t at_client_get(const char* dev_name)
 {
     return &at_client_table[0];
 }
@@ -565,13 +572,13 @@ at_client_t at_client_get_first(void)
     return &at_client_table[0];
 }
 
-static const struct at_urc *get_urc_obj(at_client_t client)
+static const struct at_urc* get_urc_obj(at_client_t client)
 {
-    size_t i, j, prefix_len, suffix_len;
-    size_t bufsz;
-    char *buffer                   = NULL;
-    const struct at_urc *urc       = NULL;
-    struct at_urc_table *urc_table = NULL;
+    size_t               i, j, prefix_len, suffix_len;
+    size_t               bufsz;
+    char*                buffer    = NULL;
+    const struct at_urc* urc       = NULL;
+    struct at_urc_table* urc_table = NULL;
 
     if (client->urc_table == NULL) {
         return NULL;
@@ -602,8 +609,8 @@ static const struct at_urc *get_urc_obj(at_client_t client)
 static int at_recv_readline(at_client_t client)
 {
     size_t read_len = 0;
-    char ch = 0, last_ch = 0;
-    bool is_full = 0;
+    char   ch = 0, last_ch = 0;
+    bool   is_full = 0;
 
     memset(client->recv_line_buf, 0x00, client->recv_bufsz);
     client->recv_line_len = 0;
@@ -631,7 +638,7 @@ static int at_recv_readline(at_client_t client)
         }
         last_ch = ch;
     }
-    at_print_raw_cmd("recvline", client->recv_line_buf, read_len);
+
 #ifdef AT_PRINT_RAW_CMD
     at_print_raw_cmd("recvline", client->recv_line_buf, read_len);
 #endif
@@ -641,7 +648,7 @@ static int at_recv_readline(at_client_t client)
 
 static void client_parser(at_client_t client)
 {
-    const struct at_urc *urc;
+    const struct at_urc* urc;
 
     while (1) {
         NRF_LOG_DEBUG("client parser");
@@ -694,7 +701,7 @@ static void client_parser(at_client_t client)
     }
 }
 
-static void at_client_rx_ind(nrfx_uart_event_t const *p_event, void *p_context)
+static void at_client_rx_ind(nrfx_uart_event_t const* p_event, void* p_context)
 {
     at_client_t client = (at_client_t)p_context;
     if (p_event->type == NRFX_UART_EVT_RX_DONE) {
@@ -717,14 +724,14 @@ static int at_client_para_init(at_client_t client)
 #define AT_CLIENT_RESP_NAME   "at_cr"
 #define AT_CLIENT_THREAD_NAME "at_clnt"
 
-    int result               = EOK;
+    int        result        = EOK;
     static int at_client_num = 0;
-    char name[NAME_MAX];
+    char       name[NAME_MAX];
 
     client->status = AT_STATUS_UNINITIALIZED;
 
     client->recv_line_len = 0;
-    client->recv_line_buf = (char *)calloc(1, client->recv_bufsz);
+    client->recv_line_buf = (char*)calloc(1, client->recv_bufsz);
     if (client->recv_line_buf == NULL) {
         NRF_LOG_ERROR("AT client initialize failed! No memory for receive buffer.");
         result = -ENOMEM;
@@ -763,7 +770,7 @@ static int at_client_para_init(at_client_t client)
     client->urc_table_size = 0;
 
     snprintf(name, NAME_MAX, "%s%d", AT_CLIENT_THREAD_NAME, at_client_num);
-    xTaskCreate((void (*)(void *parameter))client_parser,
+    xTaskCreate((void (*)(void* parameter))client_parser,
                 name,
                 512,
                 client,
@@ -814,12 +821,12 @@ __exit:
  *        -1 : initialize failed
  *        -5 : no memory
  */
-int at_client_init(const char *dev_name, size_t recv_bufsz)
+int at_client_init(const char* dev_name, size_t recv_bufsz)
 {
-    int idx            = 0;
-    int result         = EOK;
-    uint32_t err_code  = NRF_SUCCESS;
-    at_client_t client = NULL;
+    int         idx      = 0;
+    int         result   = EOK;
+    uint32_t    err_code = NRF_SUCCESS;
+    at_client_t client   = NULL;
 
     ASSERT(recv_bufsz > 0);
 
@@ -836,7 +843,7 @@ int at_client_init(const char *dev_name, size_t recv_bufsz)
 
     config.pseltxd   = UART_PIN_TX;
     config.pselrxd   = UART_PIN_RX;
-    config.p_context = (void *)client;
+    config.p_context = (void*)client;
 
     client->device = &p_instance;
     client->cfg    = &config;
