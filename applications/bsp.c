@@ -158,6 +158,5 @@ void bsp_init(void)
     APP_ERROR_CHECK(app_timer_start(leds_tmr, APP_TIMER_TICKS(1000), NULL));
 
     btn_init();
-    ec800_init();
-    
+    ec800m_init();
 }

@@ -12,29 +12,64 @@
 #define _EC800M_H_
 
 #include "at.h"
+#include "event_groups.h"
 
-#define AT_CMD_BUF_LEN          64
+#define EC800M_BUF_LEN          64
 #define AT_CLIENT_RECV_BUFF_LEN 128
+
+/** ec800m event */
+#define EC800M_EVENT_MQTT_IDLE     (1 << 0)
+#define EC800M_EVENT_MQTT_RELEASE  (1 << 1)
+#define EC800M_EVENT_MQTT_CONNECT  (1 << 2)
+#define EC800M_EVENT_MQTT_ALIVE    (1 << 3)
+#define EC800M_EVENT_MQTT_SUBCIRBE (1 << 4)
+#define EC800M_EVENT_MQTT_PUBLISH  (1 << 5)
+#define EC800M_EVENT_GNSS_CONF     (1 << 6)
+#define EC800M_EVENT_GNSS_OPEN     (1 << 7)
+#define EC800M_EVENT_GNSS_FULSH    (1 << 8)
+
+typedef enum {
+    EC800M_IDLE = 0,
+    EC800M_MQTT_CLOSE,
+    EC800M_MQTT_OPEN,
+    EC800M_MQTT_CONN,
+    EC800M_MQTT_DISC,
+} ec800m_status_t;
+
 typedef struct {
-    at_client_t client;
-    uint32_t    pwr_pin;
-    uint32_t    wakeup_pin;
-    bool        is_init;
+    char*    host;
+    char*    port;
+    uint32_t keepalive;
+    char*    clientid;
+    char*    username;
+    char*    password;
+    char*    subtopic;
+} ec800m_mqtt_t;
+
+typedef struct {
+    at_client_t        client;
+    uint32_t           pwr_pin;
+    uint32_t           wakeup_pin;
+    ec800m_mqtt_t      mqtt;
+    ec800m_status_t    status;
+    EventGroupHandle_t event;
+    TimerHandle_t      timer;
+    int                rssi;
+    bool               waiting;
 } ec800m_t;
 
 #pragma pack(8)
 struct at_cmd {
-    uint32_t desc;
-    char*    cmd_expr;
-    char*    resp_keyword;
-    int32_t  timeout;
+    char*   desc;
+    char*   cmd_expr;
+    char*   resp_keyword;
+    int32_t timeout;
 };
 typedef struct at_cmd* at_cmd_t;
 #pragma pack()
 
-extern const struct at_cmd at_cmd_list[];
 #define AT_CMD(NUM)          (&at_cmd_list[NUM])
-#define AT_CMD_NAME(CMD_NUM) (##CMD_NUM)
+#define AT_CMD_NAME(CMD_NUM) (#CMD_NUM)
 typedef enum {
     /** common */
     AT_CMD_TEST,
@@ -76,7 +111,8 @@ typedef enum {
     AT_CMD_GNSS_NMEA_RMC,
 
     /** mqtt */
-    AT_CMD_MQTT_OPEN,
+    AT_CMD_MQTT_REL,
+    AT_CMD_MQTT_CHECK_REL,
     AT_CMD_MQTT_CLOSE,
     AT_CMD_MQTT_STATUS,
     AT_CMD_MQTT_CONNECT,
@@ -84,6 +120,7 @@ typedef enum {
     AT_CMD_MQTT_PUBLISH,
     AT_CMD_MQTT_SUBSCRIBE,
     AT_CMD_MQTT_READBUF,
+    AT_CMD_MQTT_CONF_ALIVE,
 
     AT_CMD_MAX,
 } at_cmd_desc_t;
@@ -98,6 +135,9 @@ typedef struct
     char const* name;
 } at_cmd_strerror_t;
 
-int ec800_init(void);
+extern ec800m_t            ec800m;
+extern const struct at_cmd at_cmd_list[];
+
+int ec800m_init(void);
 
 #endif

@@ -651,7 +651,6 @@ static void client_parser(at_client_t client)
     const struct at_urc* urc;
 
     while (1) {
-        NRF_LOG_DEBUG("client parser");
         if (at_recv_readline(client) > 0) {
             if ((urc = get_urc_obj(client)) != NULL) {
                 /* current receive is request, try to execute related operations */

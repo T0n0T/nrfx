@@ -124,6 +124,9 @@
                 "path": "modules/ec800mqtt/ec800m_at_cmd.c"
               },
               {
+                "path": "modules/ec800mqtt/ec800m_at_urc.c"
+              },
+              {
                 "path": "modules/ec800mqtt/ec800m.c"
               }
             ],
@@ -623,7 +626,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": "ip 192.168.230.1"
+        "otherCmds": ""
       },
       "uploadConfigMap": {},
       "custom_dep": {
