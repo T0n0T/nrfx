@@ -36,17 +36,17 @@ static ec800m_mqtt_t _cfg           = EC800M_MQTT_DEFAULT_CFG;
 uint8_t              sm4_flag = 0;
 static uint8_t       sm4_id   = 0;
 const static uint8_t key[]    = {
-       0x77, 0x7f, 0x23, 0xc6,
-       0xfe, 0x7b, 0x48, 0x73,
-       0xdd, 0x59, 0x5c, 0xff,
-       0xf6, 0x5f, 0x58, 0xec};
+    0x77, 0x7f, 0x23, 0xc6,
+    0xfe, 0x7b, 0x48, 0x73,
+    0xdd, 0x59, 0x5c, 0xff,
+    0xf6, 0x5f, 0x58, 0xec};
 
 char* build_msg_updata(char* device_id, gps_info_t info, int energyStatus, int correctlyWear);
 
 void publish_handle(void)
 {
     // char* publish_data = build_msg_updata(ec800m.mqtt.clientid, ec800m_gnss_get(), 1, 1);
-    uint8_t publish_data[6] = {0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x00};
+    uint8_t publish_data[6] = {0x68, 0x65, 0x6c, 0x6c, 0x6f};
 
     // if (sm4_flag) {
     //     pdata      origin_mqtt = {strlen(publish_data), (uint8_t*)publish_data};
@@ -59,7 +59,7 @@ void publish_handle(void)
     // } else {
     // }
 
-    ec800m_mqtt_pub(ec800m.mqtt.pubtopic, publish_data);
+    ec800m_mqtt_pub(ec800m.mqtt.pubtopic, publish_data, 5);
 
     // free(publish_data);
 }
@@ -108,6 +108,7 @@ static int mqtt_init(void)
 void app_task(void* pvParameter)
 {
     mqtt_init();
+    // vTaskDelete(NULL);
     while (1) {
         publish_handle();
         vTaskDelay(pdMS_TO_TICKS(5000));

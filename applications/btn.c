@@ -20,14 +20,14 @@
 #include "nrf_pwr_mgmt.h"
 
 #define NRF_LOG_MODULE_NAME btn
-#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_DEBUG
+#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_INFO
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
 #define OS_DELAY vTaskDelay
 
-static Button_t SW_BUTTON;
-static TaskHandle_t m_btn_task;
+static Button_t      SW_BUTTON;
+static TaskHandle_t  m_btn_task;
 static TimerHandle_t button_tmr;
 
 uint8_t read_sw_btn(void)
@@ -41,9 +41,10 @@ void btn_release(void)
     xTimerStart(button_tmr, 0);
 }
 
+#include "ec800m.h"
 void btn_click(void)
 {
-    NRF_LOG_DEBUG("single click!");
+    NRF_LOG_INFO("single click!");
 }
 
 void btn_double(void)
@@ -61,7 +62,7 @@ void btn_long_free(void)
     nrf_pwr_mgmt_shutdown(NRF_PWR_MGMT_SHUTDOWN_STAY_IN_SYSOFF);
 }
 
-void btn_create(Button_t *p)
+void btn_create(Button_t* p)
 {
     Button_Create(
         "SW",
@@ -83,7 +84,6 @@ static void btn_work_on(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
     }
 }
 
-#include "SEGGER_RTT.h"
 void btn_work_off(TimerHandle_t xTimer)
 {
     __disable_irq();
@@ -91,7 +91,7 @@ void btn_work_off(TimerHandle_t xTimer)
     __enable_irq();
 }
 
-static void btn_task(void *pvParameter)
+static void btn_task(void* pvParameter)
 {
     while (1) {
         Button_Process();

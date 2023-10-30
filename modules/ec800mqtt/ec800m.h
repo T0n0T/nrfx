@@ -13,18 +13,19 @@
 
 #include "at.h"
 #include "gps_rmc.h"
-#include "event_groups.h"
+#include "timers.h"
+#include "queue.h"
 
 #define EC800M_RESET_MAX        10
 #define EC800M_BUF_LEN          256
 #define AT_CLIENT_RECV_BUFF_LEN 128
 
 /** ec800m event */
-#define EC800M_EVENT_IDLE          (1 << 0)
-#define EC800M_EVENT_MQTT_RELEASE  (1 << 1)
-#define EC800M_EVENT_MQTT_CONNECT  (1 << 2)
-#define EC800M_EVENT_MQTT_SUBCIRBE (1 << 3)
-#define EC800M_EVENT_GNSS_FULSH    (1 << 4)
+#define EC800M_TASK_IDLE          (1 << 0)
+#define EC800M_TASK_MQTT_RELEASE  (1 << 1)
+#define EC800M_TASK_MQTT_CONNECT  (1 << 2)
+#define EC800M_TASK_MQTT_SUBCIRBE (1 << 3)
+#define EC800M_TASK_MQTT_PUBLISH  (1 << 4)
 
 #define EC800M_MQTT_DEFAULT_CFG                        \
     {                                                  \
@@ -58,15 +59,20 @@ typedef struct {
 } ec800m_mqtt_t;
 
 typedef struct {
-    at_client_t        client;
-    uint32_t           pwr_pin;
-    uint32_t           wakeup_pin;
-    ec800m_mqtt_t      mqtt;
-    ec800m_status_t    status;
-    EventGroupHandle_t event;
-    TimerHandle_t      timer;
-    int                rssi;
-    uint8_t            reset_need;
+    uint32_t task;
+    void*    data;
+} ec800m_task_t;
+
+typedef struct {
+    at_client_t     client;
+    uint32_t        pwr_pin;
+    uint32_t        wakeup_pin;
+    ec800m_mqtt_t   mqtt;
+    ec800m_status_t status;
+    QueueHandle_t   task_queue;
+    TimerHandle_t   timer;
+    int             rssi;
+    uint8_t         reset_need;
 } ec800m_t;
 
 #pragma pack(8)
@@ -141,7 +147,7 @@ extern const struct at_cmd at_cmd_list[];
 
 void       ec800m_init(void);
 int        ec800m_mqtt_connect(void);
-int        ec800m_mqtt_pub(char* topic, char* payload);
+int        ec800m_mqtt_pub(char* topic, void* payload, uint32_t len);
 int        ec800m_mqtt_sub(char* subtopic);
 int        ec800m_mqtt_conf(ec800m_mqtt_t* cfg);
 gps_info_t ec800m_gnss_get(void);

@@ -692,10 +692,12 @@ static void client_parser(at_client_t client)
                 }
 
                 client->resp = NULL;
+
                 xSemaphoreGive(client->resp_notice);
             } else {
-                NRF_LOG_DEBUG("unrecognized line: %.*s", client->recv_line_len, client->recv_line_buf);
+                // NRF_LOG_DEBUG("unrecognized line: %*.s", client->recv_line_len, client->recv_line_buf);
             }
+            NRF_LOG_DEBUG("line: %*.s", client->recv_line_len, client->recv_line_buf);
         }
     }
 }
