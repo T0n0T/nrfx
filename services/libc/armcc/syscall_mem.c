@@ -11,25 +11,27 @@
 #include <FreeRTOS.h>
 #include <string.h>
 #include <stddef.h>
+#include <stdarg.h>
+#include "SEGGER_RTT.h"
 
 #ifdef __CC_ARM
 /* avoid the heap and heap-using library functions supplied by arm */
 #pragma import(__use_no_heap)
 #endif /* __CC_ARM */
 
-void *malloc(size_t n)
+void* malloc(size_t n)
 {
     return pvPortMalloc(n);
 }
 
-void *realloc(void *rmem, size_t n)
+void* realloc(void* rmem, size_t n)
 {
     return pvPortRealloc(rmem, n);
 }
 
-void *calloc(size_t nelem, size_t elsize)
+void* calloc(size_t nelem, size_t elsize)
 {
-    void *p;
+    void* p;
 
     /* allocate 'count' objects of size 'size' */
     p = pvPortMalloc(nelem * elsize);
@@ -40,7 +42,7 @@ void *calloc(size_t nelem, size_t elsize)
     return p;
 }
 
-void free(void *rmem)
+void free(void* rmem)
 {
     vPortFree(rmem);
 }

@@ -54,7 +54,7 @@ static TimerHandle_t m_sensor_contact_timer; /**< Definition of sensor contact d
 static TaskHandle_t m_logger_thread; /**< Definition of Logger thread. */
 #endif
 
-static void advertising_start(void *p_erase_bonds);
+static void advertising_start(void* p_erase_bonds);
 
 /**@brief Callback function for asserts in the SoftDevice.
  *
@@ -67,7 +67,7 @@ static void advertising_start(void *p_erase_bonds);
  * @param[in]   line_num   Line number of the failing ASSERT call.
  * @param[in]   file_name  File name of the failing ASSERT call.
  */
-void assert_nrf_callback(uint16_t line_num, const uint8_t *p_file_name)
+void assert_nrf_callback(uint16_t line_num, const uint8_t* p_file_name)
 {
     app_error_handler(DEAD_BEEF, line_num, p_file_name);
 }
@@ -76,7 +76,7 @@ void assert_nrf_callback(uint16_t line_num, const uint8_t *p_file_name)
  *
  * @param[in] p_evt  Peer Manager event.
  */
-static void pm_evt_handler(pm_evt_t const *p_evt)
+static void pm_evt_handler(pm_evt_t const* p_evt)
 {
     bool delete_bonds = false;
 
@@ -100,7 +100,7 @@ static void pm_evt_handler(pm_evt_t const *p_evt)
 static void battery_level_update(void)
 {
     ret_code_t err_code;
-    uint8_t battery_level;
+    uint8_t    battery_level;
 
     battery_level = 99;
 
@@ -138,8 +138,8 @@ static void battery_level_meas_timeout_handler(TimerHandle_t xTimer)
 static void heart_rate_meas_timeout_handler(TimerHandle_t xTimer)
 {
     static uint32_t cnt = 0;
-    ret_code_t err_code;
-    uint16_t heart_rate;
+    ret_code_t      err_code;
+    uint16_t        heart_rate;
 
     UNUSED_PARAMETER(xTimer);
 
@@ -213,14 +213,14 @@ static void timers_init(void)
  */
 static void gap_params_init(void)
 {
-    ret_code_t err_code;
-    ble_gap_conn_params_t gap_conn_params;
+    ret_code_t              err_code;
+    ble_gap_conn_params_t   gap_conn_params;
     ble_gap_conn_sec_mode_t sec_mode;
 
     BLE_GAP_CONN_SEC_MODE_SET_OPEN(&sec_mode);
 
     err_code = sd_ble_gap_device_name_set(&sec_mode,
-                                          (const uint8_t *)DEVICE_NAME,
+                                          (const uint8_t*)DEVICE_NAME,
                                           strlen(DEVICE_NAME));
     APP_ERROR_CHECK(err_code);
 
@@ -263,12 +263,12 @@ static void nrf_qwr_error_handler(uint32_t nrf_error)
  */
 static void services_init(void)
 {
-    ret_code_t err_code;
-    ble_hrs_init_t hrs_init;
-    ble_bas_init_t bas_init;
-    ble_dis_init_t dis_init;
+    ret_code_t         err_code;
+    ble_hrs_init_t     hrs_init;
+    ble_bas_init_t     bas_init;
+    ble_dis_init_t     dis_init;
     nrf_ble_qwr_init_t qwr_init = {0};
-    uint8_t body_sensor_location;
+    uint8_t            body_sensor_location;
 
     // Initialize Queued Write Module.
     qwr_init.error_handler = nrf_qwr_error_handler;
@@ -311,7 +311,7 @@ static void services_init(void)
     // Initialize Device Information Service.
     memset(&dis_init, 0, sizeof(dis_init));
 
-    ble_srv_ascii_to_utf8(&dis_init.manufact_name_str, (char *)MANUFACTURER_NAME);
+    ble_srv_ascii_to_utf8(&dis_init.manufact_name_str, (char*)MANUFACTURER_NAME);
 
     dis_init.dis_char_rd_sec = SEC_OPEN;
 
@@ -348,7 +348,7 @@ static void application_timers_start(void)
  *
  * @param[in]   p_evt   Event received from the Connection Parameters Module.
  */
-static void on_conn_params_evt(ble_conn_params_evt_t *p_evt)
+static void on_conn_params_evt(ble_conn_params_evt_t* p_evt)
 {
     ret_code_t err_code;
 
@@ -370,7 +370,7 @@ static void conn_params_error_handler(uint32_t nrf_error)
 /**@brief Function for initializing the Connection Parameters module. */
 static void conn_params_init(void)
 {
-    ret_code_t err_code;
+    ret_code_t             err_code;
     ble_conn_params_init_t cp_init;
 
     memset(&cp_init, 0, sizeof(cp_init));
@@ -435,7 +435,7 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
  * @param[in]   p_ble_evt   Bluetooth stack event.
  * @param[in]   p_context   Unused.
  */
-static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context)
+static void ble_evt_handler(ble_evt_t const* p_ble_evt, void* p_context)
 {
     uint32_t err_code;
 
@@ -545,7 +545,7 @@ static void ble_stack_init(void)
 static void peer_manager_init(void)
 {
     ble_gap_sec_params_t sec_param;
-    ret_code_t err_code;
+    ret_code_t           err_code;
 
     err_code = pm_init();
     APP_ERROR_CHECK(err_code);
@@ -587,7 +587,7 @@ static void delete_bonds(void)
 /**@brief Function for initializing the Advertising functionality. */
 static void advertising_init(void)
 {
-    ret_code_t err_code;
+    ret_code_t             err_code;
     ble_advertising_init_t init;
 
     memset(&init, 0, sizeof(init));
@@ -621,9 +621,9 @@ static void log_init(void)
 }
 
 /**@brief Function for starting advertising. */
-static void advertising_start(void *p_erase_bonds)
+static void advertising_start(void* p_erase_bonds)
 {
-    bool erase_bonds = *(bool *)p_erase_bonds;
+    bool erase_bonds = *(bool*)p_erase_bonds;
 
     if (erase_bonds) {
         delete_bonds();
@@ -643,7 +643,7 @@ static void advertising_start(void *p_erase_bonds)
  * @param[in]   arg   Pointer used for passing some arbitrary information (context) from the
  *                    osThreadCreate() call to the thread.
  */
-static void logger_thread(void *arg)
+static void logger_thread(void* arg)
 {
     UNUSED_PARAMETER(arg);
 
@@ -721,6 +721,8 @@ int main(void)
     peer_manager_init();
     application_timers_start();
     bsp_init();
+    ec800m_init();
+    app_init();
 
     // Create a FreeRTOS task for the BLE stack.
     // The task will run advertising_start() before entering its loop.

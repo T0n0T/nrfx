@@ -34,6 +34,15 @@
         ],
         "folders": [
           {
+            "name": "APP",
+            "files": [
+              {
+                "path": "applications/app.c"
+              }
+            ],
+            "folders": []
+          },
+          {
             "name": "DFU",
             "files": [
               {
@@ -73,7 +82,11 @@
       },
       {
         "name": "Modules",
-        "files": [],
+        "files": [
+          {
+            "path": "services/gnss/gps_rmc.c"
+          }
+        ],
         "folders": [
           {
             "name": "at",
@@ -110,6 +123,15 @@
               },
               {
                 "path": "modules/ccm3310/decode.c"
+              }
+            ],
+            "folders": []
+          },
+          {
+            "name": "CJSON",
+            "files": [
+              {
+                "path": "nrf_sdk/external/cJSON/cJSON.c"
               }
             ],
             "folders": []
@@ -626,7 +648,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": ""
+        "otherCmds": "ip 192.168.230.1"
       },
       "uploadConfigMap": {},
       "custom_dep": {
@@ -772,7 +794,9 @@
           "modules/button",
           "modules/at/include",
           "modules/ringbuf",
-          "modules/ec800mqtt"
+          "modules/ec800mqtt",
+          "services/gnss",
+          "nrf_sdk/external/cJSON"
         ],
         "libList": [],
         "sourceDirList": [],

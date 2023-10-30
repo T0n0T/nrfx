@@ -12,21 +12,31 @@
 #define _EC800M_H_
 
 #include "at.h"
+#include "gps_rmc.h"
 #include "event_groups.h"
 
-#define EC800M_BUF_LEN          64
+#define EC800M_RESET_MAX        10
+#define EC800M_BUF_LEN          256
 #define AT_CLIENT_RECV_BUFF_LEN 128
 
 /** ec800m event */
-#define EC800M_EVENT_MQTT_IDLE     (1 << 0)
+#define EC800M_EVENT_IDLE          (1 << 0)
 #define EC800M_EVENT_MQTT_RELEASE  (1 << 1)
 #define EC800M_EVENT_MQTT_CONNECT  (1 << 2)
-#define EC800M_EVENT_MQTT_ALIVE    (1 << 3)
-#define EC800M_EVENT_MQTT_SUBCIRBE (1 << 4)
-#define EC800M_EVENT_MQTT_PUBLISH  (1 << 5)
-#define EC800M_EVENT_GNSS_CONF     (1 << 6)
-#define EC800M_EVENT_GNSS_OPEN     (1 << 7)
-#define EC800M_EVENT_GNSS_FULSH    (1 << 8)
+#define EC800M_EVENT_MQTT_SUBCIRBE (1 << 3)
+#define EC800M_EVENT_GNSS_FULSH    (1 << 4)
+
+#define EC800M_MQTT_DEFAULT_CFG                        \
+    {                                                  \
+        .host      = "broker.emqx.io",                 \
+        .port      = "1883",                           \
+        .keepalive = 300,                              \
+        .clientid  = "CYGC_TEST",                      \
+        .username  = NULL,                             \
+        .password  = NULL,                             \
+        .subtopic  = "/iot/CYGC_TEST/BR/device/reply", \
+        .pubtopic  = "/iot/CYGC_TEST/BR/device/data",  \
+    }
 
 typedef enum {
     EC800M_IDLE = 0,
@@ -44,6 +54,7 @@ typedef struct {
     char*    username;
     char*    password;
     char*    subtopic;
+    char*    pubtopic;
 } ec800m_mqtt_t;
 
 typedef struct {
@@ -55,7 +66,7 @@ typedef struct {
     EventGroupHandle_t event;
     TimerHandle_t      timer;
     int                rssi;
-    bool               waiting;
+    uint8_t            reset_need;
 } ec800m_t;
 
 #pragma pack(8)
@@ -125,19 +136,14 @@ typedef enum {
     AT_CMD_MAX,
 } at_cmd_desc_t;
 
-#define AT_STRERROR_ENTITY(desc)    \
-    {                               \
-        .code = desc, .name = #desc \
-    }
-typedef struct
-{
-    uint32_t    code;
-    char const* name;
-} at_cmd_strerror_t;
-
 extern ec800m_t            ec800m;
 extern const struct at_cmd at_cmd_list[];
 
-int ec800m_init(void);
+void       ec800m_init(void);
+int        ec800m_mqtt_connect(void);
+int        ec800m_mqtt_pub(char* topic, char* payload);
+int        ec800m_mqtt_sub(char* subtopic);
+int        ec800m_mqtt_conf(ec800m_mqtt_t* cfg);
+gps_info_t ec800m_gnss_get(void);
 
 #endif

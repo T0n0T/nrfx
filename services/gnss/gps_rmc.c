@@ -15,7 +15,7 @@
  * @param   {date: 待转换日期结构体指针}
  * @return: void
  */
-void UTC2BTC(gps_date_t *date)
+void UTC2BTC(gps_date_t* date)
 {
     date->hour += 8;
     if (date->hour >= 24) {
@@ -51,7 +51,7 @@ void UTC2BTC(gps_date_t *date)
  * @param   {date:  解析结果存储结构体指针, utc_time: utc格式的时间, utc_date: utc格式的日期}
  * @return: void
  */
-void gps_date_parse(gps_date_t *date, uint32_t utc_time, uint32_t utc_date)
+void gps_date_parse(gps_date_t* date, uint32_t utc_time, uint32_t utc_date)
 {
     if (!date) return;
     date->year   = utc_date % 100 + 2000;
@@ -69,13 +69,13 @@ void gps_date_parse(gps_date_t *date, uint32_t utc_time, uint32_t utc_date)
  * @param   {info: 需要解析的结构体, 前提是这个结构体中的 string 必须要有值}
  * @return: void
  */
-void gps_float_parse(gps_float_t *info)
+void gps_float_parse(gps_float_t* info)
 {
     if (!info) return;
     info->value   = atof(info->string);
     info->value_h = atol(info->string);
     info->value_l = 0;
-    char *p       = strstr(info->string, ".");
+    char* p       = strstr(info->string, ".");
     if (p)
         info->value_l = atol(++p);
 #ifdef GPS_RMC_SHOW_DEBUG
@@ -94,7 +94,7 @@ void gps_float_parse(gps_float_t *info)
  * @param   {coord: 度分秒存储结构体, source: 经纬度信息结构体}
  * @return: void
  */
-void gps_source_to_dms_format(gps_dms_format_t *coord, gps_float_t *source)
+void gps_source_to_dms_format(gps_dms_format_t* coord, gps_float_t* source)
 {
     if (!source || !coord) return;
     if (!source->value)
@@ -114,7 +114,7 @@ void gps_source_to_dms_format(gps_dms_format_t *coord, gps_float_t *source)
  * @param   {coord: 待存储转换结构的信息的结构体, source: 从这个结构体中解析转换}
  * @return: void
  */
-void gps_coord_dms_format_transform(gps_coord_dms_format_t *coord, gps_source_coord_t *source)
+void gps_coord_dms_format_transform(gps_coord_dms_format_t* coord, gps_source_coord_t* source)
 {
     if (!coord || !source) return;
     gps_source_to_dms_format(&coord->latitude, &source->latitude);
@@ -128,7 +128,7 @@ void gps_coord_dms_format_transform(gps_coord_dms_format_t *coord, gps_source_co
  * @param   {location: 待存储结构体, source: 从这个结构体中解析转换}
  * @return: void
  */
-void gps_source_to_location_format(gps_float_t *location, gps_float_t *source)
+void gps_source_to_location_format(gps_float_t* location, gps_float_t* source)
 {
     if (!location || !source) return;
     if (source->value == 0)
@@ -150,7 +150,7 @@ void gps_source_to_location_format(gps_float_t *location, gps_float_t *source)
  * @param   {location: 待存储结构体, source: 从这个结构体中解析转换}
  * @return: void
  */
-void gps_coord_location_format_transform(gps_coord_t *location, gps_coord_t *source)
+void gps_coord_location_format_transform(gps_coord_t* location, gps_coord_t* source)
 {
     if (!location || !source) return;
     gps_source_to_location_format(&location->latitude, &source->latitude);
@@ -163,7 +163,7 @@ void gps_coord_location_format_transform(gps_coord_t *location, gps_coord_t *sou
  * @param   {location: 待处理存储结构体}
  * @return: void
  */
-void gps_coord_handle(gps_coord_info_t *location)
+void gps_coord_handle(gps_coord_info_t* location)
 {
     if (!location) return;
 #ifdef GPS_RMC_USE_DMS_FORMAT
@@ -197,14 +197,14 @@ void gps_print_info(gps_info_t info)
         printf("Direction: %s\n", info->direction.string);
     }
 }
-#define GPS_RMC_SHOW_DEBUG
+// #define GPS_RMC_SHOW_DEBUG
 /**
  * @name:   gps_rmc_parse
  * @msg:    gps rmc类型信息解析
  * @param   {info: 待存储解析结构结构体指针, buff: rmc类型信息字符串}
  * @return: void
  */
-char gps_rmc_parse(gps_info_t info, char *buff)
+char gps_rmc_parse(gps_info_t info, char* buff)
 {
     if (!info) return 0;
     if (strlen(buff) < 30) {
@@ -216,7 +216,7 @@ char gps_rmc_parse(gps_info_t info, char *buff)
 #endif // GPS_RMC_SHOW_DEBUG
         return 0;
     }
-    static char hms_s[15] = {0}, ymd_s[15] = {0};
+    static char     hms_s[15] = {0}, ymd_s[15] = {0};
     static uint32_t hms, ymd;
     //  解析出状态
     sscanf(
@@ -239,7 +239,7 @@ char gps_rmc_parse(gps_info_t info, char *buff)
             &info->ADEN);
         while (num != 9) {
             char *front_comma, *after_comma;
-            char tmp[80] = {0};
+            char  tmp[80] = {0};
 
             front_comma = strchr(buff, ',');
             after_comma = strchr(front_comma + 1, ',');
@@ -257,17 +257,17 @@ char gps_rmc_parse(gps_info_t info, char *buff)
 
             after_comma[0] = '0';
             num            = sscanf(
-                buff,
-                "%*[^,],%[^,],%*c,%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],,,%[^,]",
-                hms_s,
-                info->coord.source.longitude.string,
-                &info->NS,
-                info->coord.source.latitude.string,
-                &info->EW,
-                info->speed.string,
-                info->direction.string,
-                ymd_s,
-                &info->ADEN);
+                           buff,
+                           "%*[^,],%[^,],%*c,%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],,,%[^,]",
+                           hms_s,
+                           info->coord.source.longitude.string,
+                           &info->NS,
+                           info->coord.source.latitude.string,
+                           &info->EW,
+                           info->speed.string,
+                           info->direction.string,
+                           ymd_s,
+                           &info->ADEN);
         }
 
         //  有效，处理所有数据

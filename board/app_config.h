@@ -1,6 +1,10 @@
 #ifndef APP_CONFIG_H
 #define APP_CONFIG_H
 
+#define DEVICE_ID
+#define SUBCIRBE_TOPIC
+#define PUBLISH_TOPIC
+
 #define NRFX_SYSTICK_ENABLED  1
 #define NRFX_NVMC_ENABLED     1
 #define NRF_PWR_MGMT_ENABLED  1
@@ -9,6 +13,17 @@
 #define BLE_DIS_ENABLED       1
 #define BLE_HRS_ENABLED       1
 #define BLE_LOG_ENABLED       1
+
+#define configPRE_SLEEP_PROCESSING \
+    do {                           \
+        extern void PRE_SLEEP();   \
+        PRE_SLEEP();               \
+    } while (0);
+#define configPOST_SLEEP_PROCESSING \
+    do {                            \
+        extern void POST_SLEEP();   \
+        POST_SLEEP();               \
+    } while (0);
 
 #if 0
 // ccm3310s-t

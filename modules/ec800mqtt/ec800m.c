@@ -9,23 +9,17 @@
  *
  */
 #include "ec800m.h"
+#include "nrfx_gpiote.h"
 
 #define NRF_LOG_MODULE_NAME ec800mqtt
 #define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_DEBUG
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
-static char                send_buf[EC800M_BUF_LEN];
+static char send_buf[EC800M_BUF_LEN];
+
 extern const struct at_urc urc_table[];
 ec800m_t                   ec800m;
-
-int ec800m_mqtt_connect(char* host, char* port,
-                        char* client_id, char* username, char* password,
-                        int   keep_alive,
-                        char* sub_topic);
-
-int ec800m_mqtt_pub(char* topic, char* payload);
-int ec800m_mqtt_sub(char* sub_topic);
 
 /**
  * @brief
@@ -74,7 +68,6 @@ int at_cmd_exec(at_client_t dev, char* prase_buf, at_cmd_desc_t at_cmd_id, ...)
 
     if (prase_buf) {
         strncpy(prase_buf, recv_line_buf, strlen(recv_line_buf));
-        NRF_LOG_DEBUG("prase_buf: %s", prase_buf);
     }
 
 __exit:
@@ -88,6 +81,10 @@ __exit:
 void ec800m_event_handle(EventBits_t uxBits)
 {
     switch (uxBits) {
+        case EC800M_EVENT_IDLE:
+            ec800m.status = EC800M_IDLE;
+            at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_STATUS);
+            break;
         case EC800M_EVENT_MQTT_RELEASE:
             if (ec800m.status == EC800M_IDLE) {
                 at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_CLOSE);
@@ -102,23 +99,14 @@ void ec800m_event_handle(EventBits_t uxBits)
         case EC800M_EVENT_MQTT_CONNECT:
             if (ec800m.status == EC800M_MQTT_OPEN) {
                 char cmd_para[30] = {0};
-                if (ec800m.mqtt.user_name && ec800m.mqtt.password) {
-                    sprintf(cmd_para, "%s,%s,%s", ec800m.mqtt.client_id, ec800m.mqtt.username, ec800m.mqtt.password);
+                if (ec800m.mqtt.username && ec800m.mqtt.password) {
+                    sprintf(cmd_para, "%s,%s,%s", ec800m.mqtt.clientid, ec800m.mqtt.username, ec800m.mqtt.password);
                 } else {
-                    sprintf(cmd_para, "%s", ec800m.mqtt.client_id);
+                    sprintf(cmd_para, "%s", ec800m.mqtt.clientid);
                 }
                 at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_CONNECT, cmd_para);
             } else {
                 NRF_LOG_WARNING("mqtt has not released");
-            }
-            break;
-        case EC800M_EVENT_MQTT_ALIVE:
-            if (ec800m.status == EC800M_MQTT_CLOSE) {
-                if (ec800m.mqtt.keep_alive) {
-                    at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_CONF_ALIVE, ec800m.mqtt.keep_alive);
-                }
-            } else {
-                NRF_LOG_WARNING("do keepalive configuration only when mqtt closed");
             }
             break;
         case EC800M_EVENT_MQTT_SUBCIRBE:
@@ -135,12 +123,21 @@ void ec800m_event_handle(EventBits_t uxBits)
 
 void ec800m_timer_cb(TimerHandle_t timer)
 {
-    if (ec800m.status == EC800M_MQTT_CONN) {
-        /* code */
+    switch (ec800m.status) {
+        case EC800M_MQTT_CONN:
+            xEventGroupSetBits(ec800m.event, EC800M_EVENT_IDLE);
+            break;
+        default:
+            ec800m.reset_need++;
+            if (ec800m.reset_need >= EC800M_RESET_MAX) {
+                NRF_LOG_INFO("ec800m timer reset");
+            }
+
+            break;
     }
 }
 
-void ec800m_init_task(void* p)
+void ec800m_task(void* p)
 {
     int result = EOK;
     NRF_LOG_DEBUG("Init at client device.");
@@ -164,11 +161,11 @@ void ec800m_init_task(void* p)
     }
 
     /** reset ec800m */
-    // result = at_cmd_exec(ec800m.client, NULL, AT_CMD_RESET);
-    // if (result < 0) {
-    //     NRF_LOG_ERROR("ec800m reset failed.");
-    //     goto __exit;
-    // }
+    result = at_cmd_exec(ec800m.client, NULL, AT_CMD_RESET);
+    if (result < 0) {
+        NRF_LOG_ERROR("ec800m reset failed.");
+        goto __exit;
+    }
     vTaskDelay(500);
 
     /** turn off cmd echo */
@@ -186,14 +183,14 @@ void ec800m_init_task(void* p)
     }
 
     /** check signal */
-    char signal_str[10] = {0};
-    result              = at_cmd_exec(ec800m.client, signal_str, AT_CMD_CHECK_SIGNAL);
+    char* parse_str = malloc(20);
+    result          = at_cmd_exec(ec800m.client, parse_str, AT_CMD_CHECK_SIGNAL);
     if (result < 0) {
         NRF_LOG_ERROR("ec800m check signal failed.");
         goto __exit;
     } else {
         int rssi = 0, err_rate = 0;
-        sscanf(signal_str, "+CSQ: %d,%d", &rssi, &err_rate);
+        sscanf(parse_str, "+CSQ: %d,%d", &rssi, &err_rate);
         if (rssi != 99 && rssi) {
             ec800m.rssi = rssi;
         } else {
@@ -201,20 +198,56 @@ void ec800m_init_task(void* p)
         }
     }
 
+    /** configure gnss*/
+    memset(parse_str, 0, sizeof(parse_str));
+    result = at_cmd_exec(ec800m.client, parse_str, AT_CMD_GNSS_STATUS);
+    if (result < 0) {
+        goto __exit;
+    } else {
+        int gnss_status = -1;
+        sscanf(parse_str, "+QGPS: %d", &gnss_status);
+        switch (gnss_status) {
+            case 0:
+                result = at_cmd_exec(ec800m.client, NULL, AT_CMD_GNSS_OPEN);
+                if (result < 0) {
+                    goto __exit;
+                }
+                break;
+            case 1:
+                NRF_LOG_INFO("gnss has already open!");
+                break;
+            default:
+                NRF_LOG_ERROR("Command [AT+QGPS?] fail!");
+                result = -ERROR;
+                goto __exit;
+        }
+    }
+
+    /** only use rmc */
+    result = at_cmd_exec(ec800m.client, NULL, AT_CMD_GNSS_NMEA_CONF, 2);
+    if (result < 0) {
+        goto __exit;
+    }
+
+    vTaskDelay(1000);
+    /** use sleep mode */
+    // result = at_cmd_exec(ec800m.client, NULL, AT_CMD_LOW_POWER);
+    // if (result < 0) {
+    //     goto __exit;
+    // }
+
+    free(parse_str);
     /** set urc */
     at_obj_set_urc_table(ec800m.client, urc_table, 5);
-    // ec800m_mqtt_connect("broker.emqx.io", "1883", "gryacawv", NULL, NULL, NULL, "topic/example");
-    xEventGroupSetBits(ec800m.event, EC800M_EVENT_MQTT_RELEASE);
+    ec800m.status = EC800M_IDLE;
     EventBits_t uxBits;
     while (1) {
+
         uxBits = xEventGroupWaitBits(ec800m.event,
-                                     EC800M_EVENT_MQTT_RELEASE |
+                                     EC800M_EVENT_IDLE |
+                                         EC800M_EVENT_MQTT_RELEASE |
                                          EC800M_EVENT_MQTT_CONNECT |
-                                         EC800M_EVENT_MQTT_ALIVE |
                                          EC800M_EVENT_MQTT_SUBCIRBE |
-                                         EC800M_EVENT_MQTT_PUBLISH |
-                                         EC800M_EVENT_GNSS_CONF |
-                                         EC800M_EVENT_GNSS_OPEN |
                                          EC800M_EVENT_GNSS_FULSH,
                                      pdTRUE, pdFALSE, portMAX_DELAY);
         ec800m_event_handle(uxBits);
@@ -225,132 +258,114 @@ __exit:
     vTaskDelete(NULL);
 }
 
-int ec800m_mqtt_connect(char* host, char* port,
-                        char* client_id, char* username, char* password,
-                        int   keep_alive,
-                        char* sub_topic)
+int ec800m_mqtt_conf(ec800m_mqtt_t* cfg)
 {
-    int result = EOK;
-
     char prase_str[20] = {0};
-    if (host == NULL || port == NULL || client_id == NULL) {
+    if (cfg->host == NULL || cfg->port == NULL || cfg->clientid == NULL) {
         NRF_LOG_INFO("host and port of mqtt should be configure.");
-        result = -EINVAL;
-        goto __exit;
+        return -EINVAL;
     }
+    memcpy(&ec800m.mqtt, cfg, sizeof(ec800m_mqtt_t));
+    return EOK;
+}
 
-    /** configure keepalive if needed */
-    if (keep_alive) {
-        result = at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_CONF_ALIVE, keep_alive);
-        if (result < 0) {
-            goto __exit;
-        }
-    }
-
-    /** open mqtt client */
-    result = at_cmd_exec(ec800m.client, prase_str, AT_CMD_MQTT_REL, host, port);
-
-    /** mqtt connect */
-    char cmd_para[30] = {0};
-    if (username && password) {
-        sprintf(cmd_para, "%s,%s,%s", client_id, username, password);
-    } else {
-        sprintf(cmd_para, "%s", client_id);
-    }
-    memset(prase_str, 0, sizeof(prase_str));
-    result = at_cmd_exec(ec800m.client, prase_str, AT_CMD_MQTT_CONNECT, cmd_para);
-    if (result < 0) {
-        goto __exit;
-    } else {
-    }
-
-    /** check mqtt status */
-    vTaskDelay(500);
-    memset(prase_str, 0, sizeof(prase_str));
-    result = at_cmd_exec(ec800m.client, prase_str, AT_CMD_MQTT_STATUS);
-    if (result < 0) {
-        goto __exit;
-    } else {
-        int state = 0;
-        sscanf(prase_str, "+QMTCONN: %*d,%d", &state);
-        switch (state) {
-            case 1:
-                NRF_LOG_INFO("mqtt is initializing.");
-                result = -EBUSY;
-                break;
-            case 2:
-                NRF_LOG_INFO("mqtt is connecting.");
-                result = -EBUSY;
-                break;
-            case 3:
-                NRF_LOG_INFO("mqtt connect success.");
-                break;
-            case 4:
-                NRF_LOG_INFO("mqtt is disconnecting.");
-                result = -ERROR;
-                break;
-            default:
-                break;
-        }
-    }
-
-    /** configure sub topic if needed */
-    if (sub_topic) {
-        result = ec800m_mqtt_sub(sub_topic);
-    }
-
-__exit:
-    return result;
+int ec800m_mqtt_connect(void)
+{
+    xEventGroupSetBits(ec800m.event, EC800M_EVENT_MQTT_RELEASE);
+    return EOK;
 }
 
 int ec800m_mqtt_pub(char* topic, char* payload)
 {
     int result = EOK;
-
-    char prase_str[10] = {0};
     if (topic == NULL || payload == NULL) {
         NRF_LOG_INFO("topic and payload should be specified.");
         result = -EINVAL;
-    }
-
-    result = at_cmd_exec(ec800m.client, prase_str, AT_CMD_MQTT_PUBLISH, topic, payload);
-    if (result < 0) {
         goto __exit;
+    }
+    char* tmp_payload = (char*)malloc(strlen(payload) + 1);
+    if (tmp_payload == NULL) {
+        NRF_LOG_ERROR("tmpbuf for mqtt payload create fail");
+        result = -ENOMEM;
+        goto __exit;
+    }
+    strcpy(tmp_payload, payload);
+    tmp_payload[strlen(payload)] = '\0';
+
+    if (ec800m.status == EC800M_MQTT_CONN) {
+        char recv[20] = {0};
+        int  err_code = 0;
+        at_set_end_sign('>');
+        at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_PUBLISH, topic, strlen(tmp_payload));
+        at_set_end_sign(0);
+        taskENTER_CRITICAL();
+        at_client_send(tmp_payload, strlen(tmp_payload));
+        at_client_recv(recv, sizeof(recv), 1000);
+        taskEXIT_CRITICAL();
+
+        sscanf(recv, "+QMTPUBEX: %*d,%*d,%d", &err_code);
+        if (err_code != 0) {
+            NRF_LOG_ERROR("publish msg fail err[%d]", err_code);
+            result = -ERROR;
+        }
     } else {
+        NRF_LOG_WARNING("mqtt has not connected, status in %d", ec800m.status);
+        result = -ERROR;
     }
-
 __exit:
+    free(tmp_payload);
     return result;
 }
 
-int ec800m_mqtt_sub(char* sub_topic)
+int ec800m_mqtt_sub(char* subtopic)
 {
-    int result = EOK;
-
-    if (sub_topic == NULL) {
-        NRF_LOG_INFO("sub_topic should be specified.");
-        result = -EINVAL;
+    if (subtopic == NULL) {
+        NRF_LOG_INFO("subtopic should be specified.");
+        return -EINVAL;
     }
-    result =
-        if (result < 0)
-    {
-        goto __exit;
+    if (subtopic) {
+        ec800m.mqtt.subtopic = subtopic;
     }
-    else
-    {
-    }
-
-__exit:
-    return result;
+    xEventGroupSetBits(ec800m.event, EC800M_EVENT_MQTT_SUBCIRBE);
+    return EOK;
 }
 
-int ec800m_init(void)
+gps_info_t ec800m_gnss_get(void)
+{
+    char                   parse_str[128] = {0};
+    char*                  rmc            = 0;
+    static struct gps_info rmcinfo        = {0};
+    if (at_cmd_exec(ec800m.client, parse_str, AT_CMD_GNSS_NMEA_RMC) < 0) {
+        return &rmcinfo;
+    }
+    if (sscanf(parse_str, "+QGPSGNMEA:%s", rmc) > 0) {
+        if (gps_rmc_parse(&rmcinfo, rmc)) {
+            NRF_LOG_DEBUG("%d %d %d %d %d %d", rmcinfo.date.year, rmcinfo.date.month, rmcinfo.date.day,
+                          rmcinfo.date.hour, rmcinfo.date.minute, rmcinfo.date.second);
+            // struct tm tm_new = {0};
+            // tm_new.tm_year   = rmcinfo.date.year - 1900;
+            // tm_new.tm_mon    = rmcinfo.date.month - 1; /* .tm_min's range is [0-11] */
+            // tm_new.tm_mday   = rmcinfo.date.day;
+            // tm_new.tm_hour   = rmcinfo.date.hour;
+            // tm_new.tm_min    = rmcinfo.date.minute;
+            // tm_new.tm_sec    = rmcinfo.date.second;
+            // time_t now       = mktime(&tm_new);
+
+        } else {
+            NRF_LOG_WARNING("GNSS info is invailed");
+            return &rmcinfo;
+        }
+    }
+    return &rmcinfo;
+}
+
+void ec800m_init(void)
 {
     static TaskHandle_t task_handle = NULL;
 
-    BaseType_t xReturned = xTaskCreate(ec800m_init_task,
+    BaseType_t xReturned = xTaskCreate(ec800m_task,
                                        "EC800M",
-                                       512,
+                                       1024,
                                        0,
                                        3,
                                        &task_handle);

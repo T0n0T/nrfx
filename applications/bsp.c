@@ -158,5 +158,14 @@ void bsp_init(void)
     APP_ERROR_CHECK(app_timer_start(leds_tmr, APP_TIMER_TICKS(1000), NULL));
 
     btn_init();
-    ec800m_init();
+}
+
+void PRE_SLEEP(void)
+{
+    // nrf_uart_disable(NRF_UART0);
+}
+
+void POST_SLEEP(void)
+{
+    // nrf_uart_enable(NRF_UART0);
 }
