@@ -26,7 +26,7 @@ void gpio_init(void)
     // nrf_gpio_cfg_output(LED2);
     // nrf_gpio_cfg_output(LED3);
 
-    // nrf_gpio_cfg_output(POWER_KEEP);
+    nrf_gpio_cfg_output(EC800_PIN_DTR);
 
     // nrf_gpio_pin_write(LED2, 1);
     // nrf_gpio_pin_write(LED3, 1);

@@ -9,6 +9,7 @@
  *
  */
 #include "app.h"
+#include "time.h"
 #include "cJSON.h"
 #include "ec800m.h"
 // #include "blood.h"
@@ -36,17 +37,20 @@ static ec800m_mqtt_t _cfg           = EC800M_MQTT_DEFAULT_CFG;
 uint8_t              sm4_flag = 0;
 static uint8_t       sm4_id   = 0;
 const static uint8_t key[]    = {
-    0x77, 0x7f, 0x23, 0xc6,
-    0xfe, 0x7b, 0x48, 0x73,
-    0xdd, 0x59, 0x5c, 0xff,
-    0xf6, 0x5f, 0x58, 0xec};
+       0x77, 0x7f, 0x23, 0xc6,
+       0xfe, 0x7b, 0x48, 0x73,
+       0xdd, 0x59, 0x5c, 0xff,
+       0xf6, 0x5f, 0x58, 0xec};
 
 char* build_msg_updata(char* device_id, gps_info_t info, int energyStatus, int correctlyWear);
 
 void publish_handle(void)
 {
-    // char* publish_data = build_msg_updata(ec800m.mqtt.clientid, ec800m_gnss_get(), 1, 1);
-    uint8_t publish_data[6] = {0x68, 0x65, 0x6c, 0x6c, 0x6f};
+    if (ec800m.status != EC800M_MQTT_CONN) {
+        return;
+    }
+
+    char* publish_data = build_msg_updata(ec800m.mqtt.clientid, ec800m_gnss_get(), 1, 1);
 
     // if (sm4_flag) {
     //     pdata      origin_mqtt = {strlen(publish_data), (uint8_t*)publish_data};
@@ -59,9 +63,9 @@ void publish_handle(void)
     // } else {
     // }
 
-    ec800m_mqtt_pub(ec800m.mqtt.pubtopic, publish_data, 5);
+    ec800m_mqtt_pub(ec800m.mqtt.pubtopic, publish_data, strlen(publish_data));
 
-    // free(publish_data);
+    free(publish_data);
 }
 
 static int mqtt_init(void)
@@ -85,7 +89,11 @@ static int mqtt_init(void)
     // }
     ec800m_mqtt_conf(&_cfg);
     ec800m_mqtt_connect();
-    ec800m_mqtt_sub(cfg.subtopic);
+    while (ec800m.status != EC800M_MQTT_CONN) {
+        vTaskDelay(200);
+    }
+
+    ec800m_mqtt_sub(ec800m.mqtt.subtopic);
 
     // sm4_id = ccm3310_sm4_setkey((uint8_t*)key);
     // if (!sm4_id) {
@@ -118,7 +126,7 @@ void app_task(void* pvParameter)
 void app_init(void)
 {
     BaseType_t xReturned = xTaskCreate(app_task,
-                                       "BLE",
+                                       "APP",
                                        512,
                                        0,
                                        5,
@@ -135,7 +143,16 @@ char* build_msg_updata(char* device_id, gps_info_t info, int energyStatus, int c
     char*  out;
     root = cJSON_CreateObject();
 
-    cJSON_AddNumberToObject(root, "timestamp", 0);
+    struct tm tm_now = {0};
+    tm_now.tm_year   = info->date.year - 1900;
+    tm_now.tm_mon    = info->date.month - 1; /* .tm_min's range is [0-11] */
+    tm_now.tm_mday   = info->date.day;
+    tm_now.tm_hour   = info->date.hour;
+    tm_now.tm_min    = info->date.minute;
+    tm_now.tm_sec    = info->date.second;
+    time_t now       = mktime(&tm_now);
+
+    cJSON_AddNumberToObject(root, "timestamp", now);
     cJSON_AddStringToObject(root, "type", "SmartBraceletServiceUp");
     cJSON_AddItemToObject(root, "body", body = cJSON_CreateObject());
     cJSON_AddStringToObject(body, "deviceId", device_id);

@@ -20,13 +20,6 @@
 #define EC800M_BUF_LEN          256
 #define AT_CLIENT_RECV_BUFF_LEN 128
 
-/** ec800m event */
-#define EC800M_TASK_IDLE          (1 << 0)
-#define EC800M_TASK_MQTT_RELEASE  (1 << 1)
-#define EC800M_TASK_MQTT_CONNECT  (1 << 2)
-#define EC800M_TASK_MQTT_SUBCIRBE (1 << 3)
-#define EC800M_TASK_MQTT_PUBLISH  (1 << 4)
-
 #define EC800M_MQTT_DEFAULT_CFG                        \
     {                                                  \
         .host      = "broker.emqx.io",                 \
@@ -58,9 +51,10 @@ typedef struct {
     char*    pubtopic;
 } ec800m_mqtt_t;
 
-typedef struct {
-    uint32_t task;
-    void*    data;
+typedef enum {
+    EC800M_TASK_CHECK = 1,
+    EC800M_TASK_MQTT_RELEASE,
+    EC800M_TASK_MQTT_CONNECT
 } ec800m_task_t;
 
 typedef struct {

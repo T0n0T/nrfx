@@ -75,6 +75,9 @@
         "name": "Libc",
         "files": [
           {
+            "path": "services/libc/armcc/ctime.c"
+          },
+          {
             "path": "services/libc/armcc/syscall_mem.c"
           }
         ],
@@ -139,9 +142,6 @@
           {
             "name": "ec800m",
             "files": [
-              {
-                "path": "modules/ec800mqtt/ec800_mqtt.c"
-              },
               {
                 "path": "modules/ec800mqtt/ec800m_at_cmd.c"
               },
@@ -648,7 +648,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": ""
+        "otherCmds": "ip 192.168.230.1"
       },
       "uploadConfigMap": {},
       "custom_dep": {

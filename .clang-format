@@ -23,7 +23,7 @@ BreakBeforeBraces: Linux
 # for more conf, you can ref: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 #
 
-AllowShortIfStatementsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: false
 
 AllowShortLoopsOnASingleLine: true
 

@@ -3,8 +3,8 @@
     "beforeBuildTasks": [],
     "afterBuildTasks": [],
     "global": {
-        "use-microLIB": true,
-        "output-debug-info": "enable"
+        "output-debug-info": "enable",
+        "use-microLIB": true
     },
     "c/cpp-compiler": {
         "optimization": "level-3",
@@ -19,7 +19,6 @@
     },
     "linker": {
         "output-format": "elf",
-        "xo-base": "",
         "ro-base": "0x00000000",
         "rw-base": "0x20000000",
         "misc-controls": "--diag_suppress 6330"

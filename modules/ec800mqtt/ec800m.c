@@ -12,14 +12,14 @@
 #include "nrfx_gpiote.h"
 
 #define NRF_LOG_MODULE_NAME ec800mqtt
-#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_DEBUG
+#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_INFO
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
-static char send_buf[EC800M_BUF_LEN];
-
+static char                send_buf[EC800M_BUF_LEN];
 extern const struct at_urc urc_table[];
 ec800m_t                   ec800m;
+static TaskHandle_t        task_handle = NULL;
 
 /**
  * @brief
@@ -77,12 +77,13 @@ __exit:
     return result;
 }
 
-void ec800m_task_handle(ec800m_task_t* task_cb)
+void ec800m_task_handle(ec800m_task_t* task)
 {
-    switch (task_cb->task) {
-        case EC800M_TASK_IDLE:
+    switch (*task) {
+        case EC800M_TASK_CHECK:
             ec800m.status = EC800M_IDLE;
             at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_STATUS);
+            xTimerStart(ec800m.timer, 0);
             break;
         case EC800M_TASK_MQTT_RELEASE:
             if (ec800m.status == EC800M_IDLE) {
@@ -108,34 +109,8 @@ void ec800m_task_handle(ec800m_task_t* task_cb)
                 NRF_LOG_WARNING("mqtt has not released");
             }
             break;
-        case EC800M_TASK_MQTT_SUBCIRBE:
-            if (ec800m.status == EC800M_MQTT_CONN) {
-                at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_SUBSCRIBE, (char*)task_cb->data);
-            } else {
-                NRF_LOG_WARNING("mqtt has not connected");
-            }
 
         default:
-            break;
-    }
-}
-
-void ec800m_timer_cb(TimerHandle_t timer)
-{
-    switch (ec800m.status) {
-        case EC800M_MQTT_CONN:
-            ec800m_task_t task_cb = {
-                .task = EC800M_TASK_IDLE,
-                .data = NULL,
-            };
-            xQueueSend(ec800m.task_queue, &task_cb, 300);
-            break;
-        default:
-            ec800m.reset_need++;
-            if (ec800m.reset_need >= EC800M_RESET_MAX) {
-                NRF_LOG_INFO("ec800m timer reset");
-            }
-
             break;
     }
 }
@@ -144,19 +119,8 @@ void ec800m_task(void* p)
 {
     int result = EOK;
     NRF_LOG_DEBUG("Init at client device.");
-    result = at_client_init("EC800MCN", AT_CLIENT_RECV_BUFF_LEN);
-    if (result < 0) {
-        NRF_LOG_ERROR("at client ec800m serial init failed.");
-        return;
-    }
 
-    memset(&ec800m, 0, sizeof(ec800m));
-    ec800m.client     = at_client_get(NULL);
-    ec800m.pwr_pin    = EC800_PIN_PWR;
-    ec800m.wakeup_pin = EC800_PIN_DTR;
-    ec800m.task_queue = xQueueCreate(10, sizeof(ec800m_task_t));
-    ec800m.timer      = xTimerCreate("ec800m_timer", pdMS_TO_TICKS(1000), pdFALSE, (void*)0, ec800m_timer_cb);
-
+    nrf_gpio_pin_write(ec800m.wakeup_pin, 0);
     result = at_client_obj_wait_connect(ec800m.client, 1000);
     if (result < 0) {
         NRF_LOG_ERROR("at client connect failed.");
@@ -234,11 +198,11 @@ void ec800m_task(void* p)
 
     vTaskDelay(1000);
     /** use sleep mode */
-    // result = at_cmd_exec(ec800m.client, NULL, AT_CMD_LOW_POWER);
-    // if (result < 0) {
-    //     goto __exit;
-    // }
-
+    result = at_cmd_exec(ec800m.client, NULL, AT_CMD_LOW_POWER);
+    if (result < 0) {
+        goto __exit;
+    }
+    nrf_gpio_pin_write(ec800m.wakeup_pin, 1);
     free(parse_str);
     /** set urc */
     at_obj_set_urc_table(ec800m.client, urc_table, 5);
@@ -247,7 +211,9 @@ void ec800m_task(void* p)
     while (1) {
         memset(&task_cb, 0, sizeof(ec800m_task_t));
         xQueueReceive(ec800m.task_queue, &task_cb, portMAX_DELAY);
+        nrf_gpio_pin_write(ec800m.wakeup_pin, 0);
         ec800m_task_handle(&task_cb);
+        nrf_gpio_pin_write(ec800m.wakeup_pin, 1);
         // xTimerStart(ec800m.timer, 0);
     }
 
@@ -268,12 +234,8 @@ int ec800m_mqtt_conf(ec800m_mqtt_t* cfg)
 
 int ec800m_mqtt_connect(void)
 {
-    ec800m_task_t task_cb = {
-        .task = EC800M_TASK_MQTT_RELEASE,
-        .data = NULL,
-    };
-
-    return xQueueSend(ec800m.task_queue, &task_cb, 300);
+    ec800m_task_t task = EC800M_TASK_MQTT_RELEASE;
+    return xQueueSend(ec800m.task_queue, &task, 300);
 }
 
 int ec800m_mqtt_pub(char* topic, void* payload, uint32_t len)
@@ -294,25 +256,21 @@ int ec800m_mqtt_pub(char* topic, void* payload, uint32_t len)
     tmp_payload[len] = '\0';
 
     if (ec800m.status == EC800M_MQTT_CONN) {
-        char recv[20] = {0};
-        int  err_code = 0;
+        nrf_gpio_pin_write(ec800m.wakeup_pin, 0);
         at_set_end_sign('>');
-        at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_PUBLISH, topic, len + 1);
+        at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_PUBLISH, topic, len);
+        at_client_send(tmp_payload, len);
+        at_set_end_sign(0);
 
-        at_client_send(tmp_payload, len + 1);
-
-        // at_client_recv(recv, sizeof(recv), 1000);
-        // at_set_end_sign(0);
-        // sscanf(recv, "+QMTPUBEX: %*d,%*d,%d", &err_code);
-        // if (err_code != 0) {
-        //     NRF_LOG_ERROR("publish msg fail err[%d]", err_code);
-        //     result = -ERROR;
-        // }
+        nrf_gpio_pin_write(ec800m.wakeup_pin, 1);
     } else {
-        NRF_LOG_WARNING("mqtt has not connected, status in %d", ec800m.status);
+        NRF_LOG_WARNING("mqtt has not connected, try to reconnect", ec800m.status);
+        ec800m_task_t task = EC800M_TASK_CHECK;
+        xQueueSend(ec800m.task_queue, &task, 300);
         result = -ERROR;
     }
 __exit:
+
     free(tmp_payload);
     return result;
 }
@@ -323,52 +281,84 @@ int ec800m_mqtt_sub(char* subtopic)
         NRF_LOG_INFO("subtopic should be specified.");
         return -EINVAL;
     }
-    ec800m_task_t task_cb = {
-        .task = EC800M_TASK_MQTT_RELEASE,
-        .data = subtopic,
-    };
-
-    return xQueueSend(ec800m.task_queue, &task_cb, 300);
+    if (ec800m.status == EC800M_MQTT_CONN) {
+        nrf_gpio_pin_write(ec800m.wakeup_pin, 0);
+        at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_SUBSCRIBE, subtopic);
+        nrf_gpio_pin_write(ec800m.wakeup_pin, 1);
+    } else {
+        NRF_LOG_WARNING("mqtt has not connected, try to reconnect", ec800m.status);
+        ec800m_task_t task = EC800M_TASK_CHECK;
+        xQueueSend(ec800m.task_queue, &task, 300);
+        return -ERROR;
+    }
+    return EOK;
 }
 
 gps_info_t ec800m_gnss_get(void)
 {
-    char                   parse_str[128] = {0};
-    char*                  rmc            = 0;
-    static struct gps_info rmcinfo        = {0};
-    if (at_cmd_exec(ec800m.client, parse_str, AT_CMD_GNSS_NMEA_RMC) < 0) {
-        return &rmcinfo;
-    }
-    if (sscanf(parse_str, "+QGPSGNMEA:%s", rmc) > 0) {
-        if (gps_rmc_parse(&rmcinfo, rmc)) {
-            NRF_LOG_DEBUG("%d %d %d %d %d %d", rmcinfo.date.year, rmcinfo.date.month, rmcinfo.date.day,
-                          rmcinfo.date.hour, rmcinfo.date.minute, rmcinfo.date.second);
-            // struct tm tm_new = {0};
-            // tm_new.tm_year   = rmcinfo.date.year - 1900;
-            // tm_new.tm_mon    = rmcinfo.date.month - 1; /* .tm_min's range is [0-11] */
-            // tm_new.tm_mday   = rmcinfo.date.day;
-            // tm_new.tm_hour   = rmcinfo.date.hour;
-            // tm_new.tm_min    = rmcinfo.date.minute;
-            // tm_new.tm_sec    = rmcinfo.date.second;
-            // time_t now       = mktime(&tm_new);
-
-        } else {
-            NRF_LOG_WARNING("GNSS info is invailed");
-            return &rmcinfo;
+    char                   rmc[128] = {0};
+    static struct gps_info rmcinfo  = {0};
+    at_response_t          resp     = at_create_resp(128, 0, 300);
+    nrf_gpio_pin_write(ec800m.wakeup_pin, 0);
+    if (at_obj_exec_cmd(ec800m.client, resp, "AT+QGPSGNMEA=\"RMC\"") == EOK) {
+        if (at_resp_parse_line_args_by_kw(resp, "+QGPSGNMEA:", "+QGPSGNMEA:%s", rmc) > 0) {
+            if (!gps_rmc_parse(&rmcinfo, rmc)) {
+                NRF_LOG_WARNING("gnss info invalid");
+            } else {
+                NRF_LOG_DEBUG("%d %d %d %d %d %d", rmcinfo.date.year, rmcinfo.date.month, rmcinfo.date.day,
+                              rmcinfo.date.hour, rmcinfo.date.minute, rmcinfo.date.second);
+            }
         }
     }
+    nrf_gpio_pin_write(ec800m.wakeup_pin, 1);
+    at_delete_resp(resp);
     return &rmcinfo;
+}
+
+void ec800m_timer_cb(TimerHandle_t timer)
+{
+    switch (ec800m.status) {
+        case EC800M_MQTT_CONN:
+            break;
+        default:
+            ec800m.reset_need++;
+            ec800m_task_t task = EC800M_TASK_CHECK;
+            xQueueSend(ec800m.task_queue, &task, 0);
+            if (ec800m.reset_need >= EC800M_RESET_MAX) {
+                NRF_LOG_INFO("ec800m timer reset");
+                vTaskDelete(task_handle);
+                xTaskCreate(ec800m_task,
+                            "EC800M",
+                            1024,
+                            0,
+                            3,
+                            &task_handle);
+                vTaskResume(task_handle);
+                ec800m.reset_need = 0;
+            }
+            break;
+    }
 }
 
 void ec800m_init(void)
 {
-    static TaskHandle_t task_handle = NULL;
-    BaseType_t          xReturned   = xTaskCreate(ec800m_task,
-                                                  "EC800M",
-                                                  1024,
-                                                  0,
-                                                  3,
-                                                  &task_handle);
+    if (at_client_init("EC800MCN", AT_CLIENT_RECV_BUFF_LEN) < 0) {
+        NRF_LOG_ERROR("at client ec800m serial init failed.");
+        return;
+    }
+
+    memset(&ec800m, 0, sizeof(ec800m));
+    ec800m.client        = at_client_get(NULL);
+    ec800m.pwr_pin       = EC800_PIN_PWR;
+    ec800m.wakeup_pin    = EC800_PIN_DTR;
+    ec800m.task_queue    = xQueueCreate(10, sizeof(ec800m_task_t));
+    ec800m.timer         = xTimerCreate("ec800m_timer", pdMS_TO_TICKS(3000), pdFALSE, (void*)0, ec800m_timer_cb);
+    BaseType_t xReturned = xTaskCreate(ec800m_task,
+                                       "EC800M",
+                                       1024,
+                                       0,
+                                       3,
+                                       &task_handle);
     if (xReturned != pdPASS) {
         NRF_LOG_ERROR("button task not created.");
         APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);

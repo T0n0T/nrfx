@@ -1,10 +1,7 @@
 #ifndef APP_CONFIG_H
 #define APP_CONFIG_H
 
-#define DEVICE_ID
-#define SUBCIRBE_TOPIC
-#define PUBLISH_TOPIC
-
+#define NRF_LOG_DEFERRED      0
 #define NRFX_SYSTICK_ENABLED  1
 #define NRFX_NVMC_ENABLED     1
 #define NRF_PWR_MGMT_ENABLED  1

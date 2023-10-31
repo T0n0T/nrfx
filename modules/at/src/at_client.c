@@ -22,7 +22,6 @@ NRF_LOG_MODULE_REGISTER();
 nrfx_uart_t        p_instance = NRFX_UART_INSTANCE(0);
 nrfx_uart_config_t config     = NRFX_UART_DEFAULT_CONFIG;
 static char        rx_ch;
-// #define AT_PRINT_RAW_CMD
 
 #ifdef AT_USING_CLIENT
 
@@ -435,6 +434,7 @@ size_t at_client_obj_send(at_client_t client, const char* buf, size_t size)
 static uint32_t at_client_getchar(at_client_t client, char* ch, TickType_t timeout)
 {
     xStreamBufferReceive(client->rx_buf, ch, 1, timeout);
+    // NRF_LOG_RAW_INFO("%c", *ch);
     return EOK;
 }
 
@@ -697,7 +697,6 @@ static void client_parser(at_client_t client)
             } else {
                 // NRF_LOG_DEBUG("unrecognized line: %*.s", client->recv_line_len, client->recv_line_buf);
             }
-            NRF_LOG_DEBUG("line: %*.s", client->recv_line_len, client->recv_line_buf);
         }
     }
 }
@@ -708,8 +707,8 @@ static void at_client_rx_ind(nrfx_uart_event_t const* p_event, void* p_context)
     if (p_event->type == NRFX_UART_EVT_RX_DONE) {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         nrfx_uart_rx(client->device, &rx_ch, 1);
+        // NRF_LOG_RAW_INFO("%c", rx_ch);
         xStreamBufferSendFromISR(client->rx_buf, &rx_ch, 1, &xHigherPriorityTaskWoken);
-        // xSemaphoreGiveFromISR(at_client_table[0].rx_notice, &xHigherPriorityTaskWoken);
         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }
     if (p_event->type == NRFX_UART_EVT_TX_DONE) {
@@ -739,7 +738,7 @@ static int at_client_para_init(at_client_t client)
         goto __exit;
     }
 
-    client->rx_buf = xStreamBufferCreate(64, 1);
+    client->rx_buf = xStreamBufferCreate(128, 1);
     if (client->rx_buf == NULL) {
         NRF_LOG_ERROR("AT client initialize failed! at_client_rx_buf create failed!");
         result = -ENOMEM;
