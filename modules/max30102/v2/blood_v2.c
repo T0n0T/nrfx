@@ -2,6 +2,7 @@
 #include "max30102.h"
 
 #define NRF_LOG_MODULE_NAME BLOOD
+#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_INFO
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 /**
@@ -179,7 +180,7 @@ int max30102_data_handle(int32_t* heart_rate, int32_t* sp02)
             if (change_flag > 3) {
                 change_flag  = 3;
                 s_ecg_status = 1;
-                NRF_LOG_INFO("ecg_status change: %d", ecg_status);
+                NRF_LOG_DEBUG("ecg_status change: %d", s_ecg_status);
             }
 
             break;
@@ -188,7 +189,7 @@ int max30102_data_handle(int32_t* heart_rate, int32_t* sp02)
             if (change_flag < 0) {
                 change_flag  = 0;
                 s_ecg_status = 0;
-                NRF_LOG_INFO("ecg_status change: %d", ecg_status);
+                NRF_LOG_DEBUG("ecg_status change: %d", s_ecg_status);
             }
 
             break;
@@ -249,29 +250,25 @@ MODE_ENTRY:
 
 void blood_Loop(void)
 {
-    blood_data_update_proximity();
     ecg_status = 0;
-    if (current_mode == HRM_SPO2) {
-        max30102_ecg_init();
-        for (size_t i = 0; i < SAMPLE_NUM; i++) {
-            ecg_status += max30102_data_handle(&n_heart_rate, &n_sp02);
-        }
-        ecg_status = ecg_status > 3 ? 1 : 0;
+    int temp   = 0;
+    max30102_ecg_init();
+    for (size_t i = 0; i < SAMPLE_NUM; i++) {
+        temp += max30102_data_handle(&n_heart_rate, &n_sp02);
     }
+    ecg_status = temp > 3 ? 1 : 0;
+    maxim_max30102_reset();
 }
 
 void max30102_thread_entry(void* args)
 {
-    checkout_spo2_flag = 0;
-    checkout_prox_flag = 0;
-    ecg_status         = 0;
-    current_mode       = PROX;
+    ecg_status = 0;
 
     int32_t n_heart_rate = 0;
     int32_t n_sp02       = 0;
 
     while (1) {
         blood_Loop();
-        vTaskDelay(60000);
+        vTaskDelay(30000);
     }
 }

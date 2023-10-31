@@ -168,13 +168,13 @@ void bsp_init(void)
 void PRE_SLEEP(void)
 {
     // nrf_uart_disable(NRF_UART0);
-    spim_uninit();
-    twim_uninit();
+    // spim_uninit();
+    // twim_uninit();
 }
 
 void POST_SLEEP(void)
 {
     // nrf_uart_enable(NRF_UART0);
-    spim_init();
-    twim_init();
+    // spim_init();
+    // twim_init();
 }

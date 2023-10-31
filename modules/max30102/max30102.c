@@ -171,18 +171,14 @@ void max30102_init(void)
         return;
     } // Reads/clears the interrupt status register
 
-    if (!maxim_max30102_init_proximity_mode()) {
-        NRF_LOG_ERROR("set max30102 proximity_mode error.");
-        return;
+    BaseType_t xReturned = xTaskCreate(max30102_thread_entry,
+                                       "MAX30102",
+                                       1024,
+                                       0,
+                                       4,
+                                       &max30102_handle);
+    if (xReturned != pdPASS) {
+        NRF_LOG_ERROR("MAX30102 task not created.");
+        APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
     }
-    // BaseType_t xReturned = xTaskCreate(max30102_thread_entry,
-    //                                    "MAX30102",
-    //                                    1024,
-    //                                    0,
-    //                                    4,
-    //                                    &max30102_handle);
-    // if (xReturned != pdPASS) {
-    //     NRF_LOG_ERROR("MAX30102 task not created.");
-    //     APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
-    // }
 }

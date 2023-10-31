@@ -68,6 +68,7 @@
 
 extern void max30102_thread_entry(void* args);
 
+bool maxim_max30102_reset();
 bool maxim_max30102_init_proximity_mode();
 bool maxim_max30102_write_reg(uint8_t uch_addr, uint8_t uch_data);
 bool maxim_max30102_read_reg(uint8_t uch_addr, uint8_t* data, uint16_t len);

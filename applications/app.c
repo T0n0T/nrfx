@@ -12,7 +12,7 @@
 #include "time.h"
 #include "cJSON.h"
 #include "ec800m.h"
-// #include "blood.h"
+#include "blood.h"
 #include "ccm3310.h"
 #include "nrf_fstorage_sd.h"
 
@@ -50,7 +50,7 @@ void publish_handle(void)
         return;
     }
 
-    char* publish_data = build_msg_updata(ec800m.mqtt.clientid, ec800m_gnss_get(), 1, 1);
+    char* publish_data = build_msg_updata(ec800m.mqtt.clientid, ec800m_gnss_get(), ecg_status, 1);
 
     // if (sm4_flag) {
     //     pdata      origin_mqtt = {strlen(publish_data), (uint8_t*)publish_data};
