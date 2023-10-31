@@ -24,7 +24,6 @@
 #include "app_timer.h"
 
 #include "bsp.h"
-#include "ec800m.h"
 #include "app.h"
 
 #include "nrf_log.h"

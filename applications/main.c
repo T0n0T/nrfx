@@ -708,25 +708,24 @@ int main(void)
     // Activate deep sleep mode.
     SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
 
-    // // Configure and initialize the BLE stack.
-    // ble_stack_init();
+    // Configure and initialize the BLE stack.
+    ble_stack_init();
 
-    // // Initialize modules.
+    // Initialize modules.
     timers_init();
-    // gap_params_init();
-    // gatt_init();
-    // advertising_init();
-    // services_init();
-    // conn_params_init();
-    // peer_manager_init();
-    // application_timers_start();
+    gap_params_init();
+    gatt_init();
+    advertising_init();
+    services_init();
+    conn_params_init();
+    peer_manager_init();
+    application_timers_start();
     bsp_init();
-    ec800m_init();
     app_init();
 
     // Create a FreeRTOS task for the BLE stack.
     // The task will run advertising_start() before entering its loop.
-    // nrf_sdh_freertos_init(advertising_start, &erase_bonds);
+    nrf_sdh_freertos_init(advertising_start, &erase_bonds);
 
     NRF_LOG_INFO("FreeRTOS started.");
     // Start FreeRTOS scheduler.

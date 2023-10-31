@@ -1,13 +1,9 @@
 #include "blood.h"
 #include "max30102.h"
-#include "bsp.h"
-#include <rtthread.h>
-#include <rtdevice.h>
-#include <stdio.h>
 
-#define DBG_LEVEL DBG_INFO
-#define LOG_TAG   "blood.cal"
-#include <rtdbg.h>
+#define NRF_LOG_MODULE_NAME BLOOD
+#include "nrf_log.h"
+NRF_LOG_MODULE_REGISTER();
 /**
   ******************************************************************************
   * 使用实例:
@@ -19,7 +15,7 @@
              while(1)
              {
                  max30102_data_handle(&n_heart_rate, &n_sp02);            //
-                 printf("heart:%d, sp02:%d\r\n", n_heart_rate, n_sp02);
+                 NRF_LOG_INFO("heart:%d, sp02:%d\r\n", n_heart_rate, n_sp02);
              }
 
   *
@@ -29,24 +25,24 @@
 #define MAX_BRIGHTNESS 255
 #define SAMPLE_NUM     5
 uint32_t aun_ir_buffer[500];  // IR LED sensor data
-int32_t n_ir_buffer_length;   // data length
+int32_t  n_ir_buffer_length;  // data length
 uint32_t aun_red_buffer[500]; // Red LED sensor data
-int32_t n_sp02;               // SPO2 value
-int8_t ch_spo2_valid;         // indicator to show if the SP02 calculation is valid
-int32_t n_heart_rate;         // heart rate value
-int8_t ch_hr_valid;           // indicator to show if the heart rate calculation is valid
-uint8_t uch_dummy;
-uint8_t change_flag;
-uint8_t ecg_status;
-int heart = 0;
+int32_t  n_sp02;              // SPO2 value
+int8_t   ch_spo2_valid;       // indicator to show if the SP02 calculation is valid
+int32_t  n_heart_rate;        // heart rate value
+int8_t   ch_hr_valid;         // indicator to show if the heart rate calculation is valid
+uint8_t  uch_dummy;
+uint8_t  change_flag;
+uint8_t  ecg_status;
+int      heart = 0;
 
-static void max30102_read_fifo(uint32_t *pun_red_led, uint32_t *pun_ir_led);
+static void max30102_read_fifo(uint32_t* pun_red_led, uint32_t* pun_ir_led);
 
 void max30102_ecg_init(void)
 {
     uint32_t un_min, un_max;
     uint32_t un_prev_data;
-    int i;
+    int      i;
 
     maxim_max30102_write_reg(REG_INTR_ENABLE_1, 0xc0); // INTR setting
     maxim_max30102_write_reg(REG_INTR_ENABLE_1, 0xc0); // INTR setting
@@ -65,7 +61,7 @@ void max30102_ecg_init(void)
     n_ir_buffer_length = 500; // buffer length of 100 stores 5 seconds of samples running at 100sps
 
     for (i = 0; i < n_ir_buffer_length; i++) {
-        while (nrf_gpio_pin_read(cfg.irq_pin.pin) == 1)
+        while (nrf_gpio_pin_read(MAX_PIN_INT) == 1)
             ; // wait until the interrupt pin asserts
         max30102_read_fifo(&aun_red_buffer[i], &aun_ir_buffer[i]);
 
@@ -79,23 +75,23 @@ void max30102_ecg_init(void)
     maxim_heart_rate_and_oxygen_saturation(aun_ir_buffer, n_ir_buffer_length, aun_red_buffer, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid);
 }
 
-static void max30102_read_fifo(uint32_t *pun_red_led, uint32_t *pun_ir_led)
+static void max30102_read_fifo(uint32_t* pun_red_led, uint32_t* pun_ir_led)
 {
     uint32_t un_temp;
-    uint8_t uch_temp;
-    uint8_t ach_i2c_data[6] = {0};
+    uint8_t  uch_temp;
+    uint8_t  ach_i2c_data[6] = {0};
 
     if (!maxim_max30102_read_reg(REG_INTR_STATUS_1, &uch_temp, sizeof(uch_temp))) {
-        LOG_E("Max30102 clean intr1 failed.");
+        NRF_LOG_ERROR("Max30102 clean intr1 failed.");
         return;
     }
     if (!maxim_max30102_read_reg(REG_INTR_STATUS_2, &uch_temp, sizeof(uch_temp))) {
-        LOG_E("Max30102 clean intr2 failed.");
+        NRF_LOG_ERROR("Max30102 clean intr2 failed.");
         return;
     }
 
     if (!maxim_max30102_read_reg(REG_FIFO_DATA, ach_i2c_data, ARRAY_SIZE(ach_i2c_data))) {
-        LOG_E("Max30102 read fifo failed.");
+        NRF_LOG_ERROR("Max30102 read fifo failed.");
         return;
     }
 
@@ -108,16 +104,16 @@ static void max30102_read_fifo(uint32_t *pun_red_led, uint32_t *pun_ir_led)
     }
 }
 
-int max30102_data_handle(int32_t *heart_rate, int32_t *sp02)
+int max30102_data_handle(int32_t* heart_rate, int32_t* sp02)
 {
     // variables to calculate the on-board LED brightness that reflects the heartbeats
     uint32_t un_min, un_max, un_prev_data;
-    int i;
-    int s_ecg_status;
-    int retry = 10;
-    uint8_t temp[6];
-    float f_temp;
-    int32_t n_brightness;
+    int      i;
+    int      s_ecg_status;
+    int      retry = 10;
+    uint8_t  temp[6];
+    float    f_temp;
+    int32_t  n_brightness;
 
     while (1) {
         i      = 0;
@@ -137,11 +133,11 @@ int max30102_data_handle(int32_t *heart_rate, int32_t *sp02)
         // rt_enter_critical();
         for (i = 400; i < 500; i++) {
             un_prev_data = aun_red_buffer[i - 1];
-            while (nrf_gpio_pin_read(cfg.irq_pin.pin)) {
+            while (nrf_gpio_pin_read(MAX_PIN_INT)) {
             }
 
             max30102_read_fifo(&aun_red_buffer[i], &aun_ir_buffer[i]);
-            LOG_D("[%d]: aun_red_buffer = %d, aun_ir_buffer = %d", i, aun_red_buffer[i], aun_ir_buffer[i]);
+            NRF_LOG_DEBUG("[%d]: aun_red_buffer = %d, aun_ir_buffer = %d", i, aun_red_buffer[i], aun_ir_buffer[i]);
             if (aun_red_buffer[i] > un_prev_data) {
                 f_temp = aun_red_buffer[i] - un_prev_data;
                 f_temp /= (un_max - un_min);
@@ -171,7 +167,6 @@ int max30102_data_handle(int32_t *heart_rate, int32_t *sp02)
                 heart        = 0;
             }
         }
-        // rt_exit_critical();
 
         maxim_heart_rate_and_oxygen_saturation(aun_ir_buffer, n_ir_buffer_length, aun_red_buffer, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid);
         n_heart_rate = n_heart_rate / 6;
@@ -180,11 +175,11 @@ int max30102_data_handle(int32_t *heart_rate, int32_t *sp02)
             *heart_rate = n_heart_rate;
             *sp02       = n_sp02;
             change_flag++;
-            //            printf("HR=%d, spo2:%d\r\n", n_heart_rate, n_sp02);
+            //            NRF_LOG_INFO("HR=%d, spo2:%d\r\n", n_heart_rate, n_sp02);
             if (change_flag > 3) {
                 change_flag  = 3;
                 s_ecg_status = 1;
-                printf("ecg_status change: %d", ecg_status);
+                NRF_LOG_INFO("ecg_status change: %d", ecg_status);
             }
 
             break;
@@ -193,7 +188,7 @@ int max30102_data_handle(int32_t *heart_rate, int32_t *sp02)
             if (change_flag < 0) {
                 change_flag  = 0;
                 s_ecg_status = 0;
-                printf("ecg_status change: %d", ecg_status);
+                NRF_LOG_INFO("ecg_status change: %d", ecg_status);
             }
 
             break;
@@ -205,25 +200,25 @@ int max30102_data_handle(int32_t *heart_rate, int32_t *sp02)
 }
 
 HRM_Mode current_mode;
-int checkout_spo2_flag, checkout_prox_flag;
+int      checkout_spo2_flag, checkout_prox_flag;
 
 void blood_data_update_proximity(void)
 {
-    int retry         = 8;
-    uint8_t reg       = 0;
-    uint8_t read_ptr  = 0;
-    uint8_t write_ptr = 0;
+    int      retry     = 8;
+    uint8_t  reg       = 0;
+    uint8_t  read_ptr  = 0;
+    uint8_t  write_ptr = 0;
     uint32_t fifo_ir;
-    while (nrf_gpio_pin_read(cfg.irq_pin.pin) == 0) {
+    while (nrf_gpio_pin_read(MAX_PIN_INT) == 0) {
         while (retry--) {
             max30102_read_fifo(0, &fifo_ir); // read from MAX30102 FIFO2
-            LOG_D("mode get data[%d]:  fifo_ir: %06d", 8 - retry, fifo_ir);
+            NRF_LOG_DEBUG("mode get data[%d]:  fifo_ir: %06d", 8 - retry, fifo_ir);
             if (fifo_ir > 5000 && current_mode == PROX) {
                 if (checkout_spo2_flag > 3) {
                     checkout_spo2_flag = 0;
                     // max30102_checkout_HRM_SPO2_mode();
                     current_mode = HRM_SPO2;
-                    LOG_D("checkout into hrm_spo2.");
+                    NRF_LOG_DEBUG("checkout into hrm_spo2.");
                     goto MODE_ENTRY;
                 }
                 checkout_prox_flag = 0;
@@ -235,7 +230,7 @@ void blood_data_update_proximity(void)
                     maxim_max30102_init_proximity_mode();
                     current_mode = PROX;
                     ecg_status   = 0;
-                    LOG_D("checkout into prox_mode.");
+                    NRF_LOG_DEBUG("checkout into prox_mode.");
                     goto MODE_ENTRY;
                 }
                 checkout_spo2_flag = 0;
@@ -248,7 +243,7 @@ void blood_data_update_proximity(void)
 
 MODE_ENTRY:
     if (current_mode == HRM_SPO2) {
-        LOG_D("HRM_SPO2_MODE!!!!!!!!!!!!!!!!!!!");
+        NRF_LOG_DEBUG("HRM_SPO2_MODE!!!!!!!!!!!!!!!!!!!");
     }
 }
 
@@ -265,7 +260,7 @@ void blood_Loop(void)
     }
 }
 
-void max30102_thread_entry(void *args)
+void max30102_thread_entry(void* args)
 {
     checkout_spo2_flag = 0;
     checkout_prox_flag = 0;
@@ -274,10 +269,9 @@ void max30102_thread_entry(void *args)
 
     int32_t n_heart_rate = 0;
     int32_t n_sp02       = 0;
-    rt_pin_mode(cfg.irq_pin.pin, PIN_MODE_INPUT_PULLUP);
 
     while (1) {
         blood_Loop();
-        rt_thread_mdelay(60000);
+        vTaskDelay(60000);
     }
 }

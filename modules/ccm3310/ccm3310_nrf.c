@@ -12,11 +12,22 @@
 #include <string.h>
 #include <ccm3310.h>
 
-nrfx_spim_t instance           = NRFX_SPIM_INSTANCE(1);
+nrfx_spim_t        instance    = NRFX_SPIM_INSTANCE(1);
 nrfx_spim_config_t config_spim = NRFX_SPIM_DEFAULT_CONFIG;
-uint8_t recv_buf[1024];
+uint8_t            recv_buf[1024];
 
-int ccm3310_init(void)
+void spim_init(void)
+{
+    ret_code_t code = nrfx_spim_init(&instance, &config_spim, 0, (void*)instance.drv_inst_idx);
+    APP_ERROR_CHECK(code);
+}
+
+void spim_uninit(void)
+{
+    nrfx_spim_uninit(&instance);
+}
+
+void ccm3310_init(void)
 {
     config_spim.sck_pin   = PIN_SCK;
     config_spim.mosi_pin  = PIN_MOSI;
@@ -24,19 +35,13 @@ int ccm3310_init(void)
     config_spim.ss_pin    = PIN_SS;
     config_spim.frequency = NRF_SPIM_FREQ_1M;
     config_spim.mode      = NRF_SPIM_MODE_3;
-    nrfx_spim_init(&instance, &config_spim, 0, (void *)instance.drv_inst_idx);
-    return 0;
+    spim_init();
 }
 
-void ccm3310_uninit(void)
+int ccm3310_transfer(uint8_t* send_buf, int send_len, uint8_t** decode_data, int recv_len)
 {
-    nrfx_spim_uninit(&instance);
-}
-
-int ccm3310_transfer(uint8_t *send_buf, int send_len, uint8_t **decode_data, int recv_len)
-{
-    int len           = 0;
-    uint8_t status    = 1;
+    int        len    = 0;
+    uint8_t    status = 1;
     nrfx_err_t result = NRFX_SUCCESS;
 
     memset(recv_buf, 0xff, sizeof(recv_buf));

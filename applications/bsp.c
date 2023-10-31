@@ -12,6 +12,8 @@
 #include <stdio.h>
 
 #include "ccm3310.h"
+#include "max30102.h"
+#include "ec800m.h"
 #include "button.h"
 #include <nrfx_power.h>
 #include <nrfx_systick.h>
@@ -26,7 +28,7 @@ void gpio_init(void)
     // nrf_gpio_cfg_output(LED2);
     // nrf_gpio_cfg_output(LED3);
 
-    nrf_gpio_cfg_output(EC800_PIN_DTR);
+    nrf_gpio_cfg_output(MAX_PIN_INT);
 
     // nrf_gpio_pin_write(LED2, 1);
     // nrf_gpio_pin_write(LED3, 1);
@@ -158,14 +160,21 @@ void bsp_init(void)
     APP_ERROR_CHECK(app_timer_start(leds_tmr, APP_TIMER_TICKS(1000), NULL));
 
     btn_init();
+    ec800m_init();
+    ccm3310_init();
+    max30102_init();
 }
 
 void PRE_SLEEP(void)
 {
     // nrf_uart_disable(NRF_UART0);
+    spim_uninit();
+    twim_uninit();
 }
 
 void POST_SLEEP(void)
 {
     // nrf_uart_enable(NRF_UART0);
+    spim_init();
+    twim_init();
 }

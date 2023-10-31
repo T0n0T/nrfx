@@ -71,7 +71,7 @@
 #define MAX_PIN_SDA     7
 
 // hal
-#define BEEP            12
+#define BEEP            -1
 #define SW              13
 #define LED1            17
 #define LED2            18
@@ -83,7 +83,7 @@
 #define UART_PIN_TX     6
 #define EC800_PIN_RESET -1
 #define EC800_PIN_PWR   -1
-#define EC800_PIN_DTR   4
+#define EC800_PIN_DTR   12
 #define EC800_PIN_RI    -1
 #endif
 

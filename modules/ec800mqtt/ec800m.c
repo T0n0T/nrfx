@@ -118,8 +118,6 @@ void ec800m_task_handle(ec800m_task_t* task)
 void ec800m_task(void* p)
 {
     int result = EOK;
-    NRF_LOG_DEBUG("Init at client device.");
-
     nrf_gpio_pin_write(ec800m.wakeup_pin, 0);
     result = at_client_obj_wait_connect(ec800m.client, 1000);
     if (result < 0) {

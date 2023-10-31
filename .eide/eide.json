@@ -156,7 +156,17 @@
           },
           {
             "name": "max30102",
-            "files": [],
+            "files": [
+              {
+                "path": "modules/max30102/max30102.c"
+              },
+              {
+                "path": "modules/max30102/v2/algorithm_v2.c"
+              },
+              {
+                "path": "modules/max30102/v2/blood_v2.c"
+              }
+            ],
             "folders": []
           },
           {
@@ -796,7 +806,9 @@
           "modules/ringbuf",
           "modules/ec800mqtt",
           "services/gnss",
-          "nrf_sdk/external/cJSON"
+          "nrf_sdk/external/cJSON",
+          "modules/max30102/v2",
+          "modules/max30102"
         ],
         "libList": [],
         "sourceDirList": [],

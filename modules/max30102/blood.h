@@ -3,6 +3,7 @@
 
 #include "math.h"
 #include "stdint.h"
+
 typedef enum {
     HRM_SPO2 = 1,
     PROX,
@@ -10,14 +11,14 @@ typedef enum {
 
 typedef struct
 {
-    int heart;  // 心率数据
-    float SpO2; // 血氧数据
+    int   heart; // 心率数据
+    float SpO2;  // 血氧数据
 } BloodData;
 
 extern BloodData g_blooddata;
-extern uint8_t ecg_status;
-void blood_data_translate(void);
-void blood_data_update(void);
-void blood_Loop(void);
+extern uint8_t   ecg_status;
+void             blood_data_translate(void);
+void             blood_data_update(void);
+void             blood_Loop(void);
 
 #endif
