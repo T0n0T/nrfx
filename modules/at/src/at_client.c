@@ -717,8 +717,10 @@ static void at_client_rx_ind(nrfx_uart_event_t const* p_event, void* p_context)
         transfer_status = true;
     }
     if (p_event->type == NRFX_UART_EVT_ERROR) {
-        uint32_t err = nrfx_uart_errorsrc_get(&p_instance);
-        NRF_LOG_RAW_INFO("NRFX_UART_EVT_ERROR[%d]", err);
+        NRF_LOG_ERROR("NRFX_UART_EVT_ERROR[%d], when %d bytes",
+                      p_event->data.error.error_mask,
+                      p_event->data.error.rxtx.bytes);
+        nrfx_uart_rx(client->device, &rx_ch, 1);
     }
 }
 
