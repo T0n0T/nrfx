@@ -70,6 +70,9 @@ void write_cfg(config_t* cfg)
 {
     uint32_t err_code;
     err_code = nrf_fstorage_erase(&fstorage, fstorage.start_addr, 1, NULL);
+    while (nrf_fstorage_is_busy(&fstorage)) {
+        sd_app_evt_wait();
+    }
     if (err_code != NRF_SUCCESS) {
         char* wrong_str = "earse flash fail!\r\n";
         NRF_LOG_ERROR("earse flash fail!");
@@ -78,6 +81,9 @@ void write_cfg(config_t* cfg)
     }
 
     err_code = nrf_fstorage_write(&fstorage, fstorage.start_addr, cfg, sizeof(config_t), NULL);
+    while (nrf_fstorage_is_busy(&fstorage)) {
+        sd_app_evt_wait();
+    }
     if (err_code != NRF_SUCCESS) {
         NRF_LOG_ERROR("write config fail!");
         char* wrong_str = "flash write fail!\r\n";
@@ -94,6 +100,9 @@ int read_cfg(config_t* cfg)
 {
     uint32_t err_code;
     err_code = nrf_fstorage_read(&fstorage, fstorage.start_addr, cfg, sizeof(config_t));
+    while (nrf_fstorage_is_busy(&fstorage)) {
+        sd_app_evt_wait();
+    }
     if (err_code == NRF_SUCCESS) {
         NRF_LOG_INFO("read mqtt config success");
         return EOK;

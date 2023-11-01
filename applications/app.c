@@ -28,6 +28,9 @@ static void
 read_cfg_from_flash(void)
 {
     APP_ERROR_CHECK(nrf_fstorage_init(&fstorage, &nrf_fstorage_sd, NULL));
+    while (nrf_fstorage_is_busy(&fstorage)) {
+        sd_app_evt_wait();
+    }
     config_t tmp_cfg = {0};
     if (read_cfg(&tmp_cfg) == EOK) {
         memcpy(&global_cfg, &tmp_cfg, sizeof(config_t));

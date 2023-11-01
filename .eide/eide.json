@@ -372,6 +372,9 @@
             "path": "nrf_sdk/components/libraries/fds/fds.c"
           },
           {
+            "path": "nrf_sdk/components/libraries/fifo/app_fifo.c"
+          },
+          {
             "path": "nrf_sdk/components/libraries/fstorage/nrf_fstorage_sd.c"
           },
           {
@@ -400,6 +403,12 @@
           },
           {
             "path": "nrf_sdk/components/libraries/timer/app_timer_freertos.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/uart/app_uart_fifo.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/uart/retarget.c"
           },
           {
             "path": "nrf_sdk/components/libraries/util/app_error_handler_keil.c"
@@ -675,7 +684,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": "ip 192.168.230.1"
+        "otherCmds": ""
       },
       "uploadConfigMap": {},
       "custom_dep": {
@@ -826,7 +835,9 @@
           "services/gnss",
           "nrf_sdk/external/cJSON",
           "modules/max30102/v2",
-          "modules/max30102"
+          "modules/max30102",
+          "nrf_sdk/components/libraries/fifo",
+          "nrf_sdk/components/libraries/uart"
         ],
         "libList": [],
         "sourceDirList": [],

@@ -6,6 +6,9 @@
 #define NRFX_NVMC_ENABLED             1
 #define NRF_PWR_MGMT_ENABLED          1
 #define NRF_DFU_TRANSPORT_BLE         1
+#define APP_UART_ENABLED              1
+#define APP_FIFO_ENABLED              1
+#define APP_UART_DRIVER_INSTANCE      0
 #define BLE_BAS_ENABLED               1
 #define BLE_DIS_ENABLED               1
 #define BLE_HRS_ENABLED               1

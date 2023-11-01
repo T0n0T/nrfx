@@ -40,14 +40,15 @@ BLE_HRS_DEF(m_hrs);       /**< Heart rate service instance. */
 NRF_BLE_GATT_DEF(m_gatt); /**< GATT module instance. */
 NRF_BLE_QWR_DEF(m_qwr);   /**< Context for the Queued Write module.*/
 
-uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID; /**< Handle of the current connection. */
-
-static ble_uuid_t m_adv_uuids[] = /**< Universally unique service identifiers. */
+uint16_t          m_conn_handle          = BLE_CONN_HANDLE_INVALID;      /**< Handle of the current connection. */
+static uint16_t   m_ble_nus_max_data_len = BLE_GATT_ATT_MTU_DEFAULT - 3; /**< Maximum length of data (in bytes) that can be transmitted to the peer by the Nordic UART service module. */
+static ble_uuid_t m_adv_uuids[]          =                               /**< Universally unique service identifiers. */
     {
         {BLE_UUID_HEART_RATE_SERVICE, BLE_UUID_TYPE_BLE},
         {BLE_UUID_BATTERY_SERVICE, BLE_UUID_TYPE_BLE},
         {BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE},
-        {BLE_UUID_NUS_SERVICE, BLE_UUID_TYPE_BLE}};
+        // {BLE_UUID_NUS_SERVICE, BLE_UUID_TYPE_VENDOR_BEGIN}
+};
 
 static TimerHandle_t m_battery_timer;        /**< Definition of battery timer. */
 static TimerHandle_t m_heart_rate_timer;     /**< Definition of heart rate timer. */
@@ -236,10 +237,27 @@ static void gap_params_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
+/**@brief Function for handling events from the GATT library. */
+void gatt_evt_handler(nrf_ble_gatt_t* p_gatt, nrf_ble_gatt_evt_t const* p_evt)
+{
+    if ((m_conn_handle == p_evt->conn_handle) && (p_evt->evt_id == NRF_BLE_GATT_EVT_ATT_MTU_UPDATED)) {
+        m_ble_nus_max_data_len = p_evt->params.att_mtu_effective - OPCODE_LENGTH - HANDLE_LENGTH;
+        NRF_LOG_INFO("Data len is set to 0x%X(%d)", m_ble_nus_max_data_len, m_ble_nus_max_data_len);
+    }
+    NRF_LOG_DEBUG("ATT MTU exchange completed. central 0x%x peripheral 0x%x",
+                  p_gatt->att_mtu_desired_central,
+                  p_gatt->att_mtu_desired_periph);
+}
+
 /**@brief Function for initializing the GATT module. */
 static void gatt_init(void)
 {
-    ret_code_t err_code = nrf_ble_gatt_init(&m_gatt, NULL);
+    ret_code_t err_code;
+
+    err_code = nrf_ble_gatt_init(&m_gatt, gatt_evt_handler);
+    APP_ERROR_CHECK(err_code);
+
+    err_code = nrf_ble_gatt_att_mtu_periph_set(&m_gatt, NRF_SDH_BLE_GATT_MAX_MTU_SIZE);
     APP_ERROR_CHECK(err_code);
 }
 
@@ -274,50 +292,51 @@ static void services_init(void)
     err_code = nrf_ble_qwr_init(&m_qwr, &qwr_init);
     APP_ERROR_CHECK(err_code);
 
-    // Initialize Heart Rate Service.
-    body_sensor_location = BLE_HRS_BODY_SENSOR_LOCATION_WRIST;
+    {
+        // Initialize Heart Rate Service.
+        body_sensor_location = BLE_HRS_BODY_SENSOR_LOCATION_WRIST;
 
-    memset(&hrs_init, 0, sizeof(hrs_init));
+        memset(&hrs_init, 0, sizeof(hrs_init));
 
-    hrs_init.evt_handler                 = NULL;
-    hrs_init.is_sensor_contact_supported = true;
-    hrs_init.p_body_sensor_location      = &body_sensor_location;
+        hrs_init.evt_handler                 = NULL;
+        hrs_init.is_sensor_contact_supported = true;
+        hrs_init.p_body_sensor_location      = &body_sensor_location;
 
-    // Here the sec level for the Heart Rate Service can be changed/increased.
-    hrs_init.hrm_cccd_wr_sec = SEC_OPEN;
-    hrs_init.bsl_rd_sec      = SEC_OPEN;
+        // Here the sec level for the Heart Rate Service can be changed/increased.
+        hrs_init.hrm_cccd_wr_sec = SEC_OPEN;
+        hrs_init.bsl_rd_sec      = SEC_OPEN;
 
-    err_code = ble_hrs_init(&m_hrs, &hrs_init);
-    APP_ERROR_CHECK(err_code);
+        err_code = ble_hrs_init(&m_hrs, &hrs_init);
+        APP_ERROR_CHECK(err_code);
 
-    // Initialize Battery Service.
-    memset(&bas_init, 0, sizeof(bas_init));
+        // Initialize Battery Service.
+        memset(&bas_init, 0, sizeof(bas_init));
 
-    // Here the sec level for the Battery Service can be changed/increased.
-    bas_init.bl_rd_sec        = SEC_OPEN;
-    bas_init.bl_cccd_wr_sec   = SEC_OPEN;
-    bas_init.bl_report_rd_sec = SEC_OPEN;
+        // Here the sec level for the Battery Service can be changed/increased.
+        bas_init.bl_rd_sec        = SEC_OPEN;
+        bas_init.bl_cccd_wr_sec   = SEC_OPEN;
+        bas_init.bl_report_rd_sec = SEC_OPEN;
 
-    bas_init.evt_handler          = NULL;
-    bas_init.support_notification = true;
-    bas_init.p_report_ref         = NULL;
-    bas_init.initial_batt_level   = 100;
+        bas_init.evt_handler          = NULL;
+        bas_init.support_notification = true;
+        bas_init.p_report_ref         = NULL;
+        bas_init.initial_batt_level   = 100;
 
-    err_code = ble_bas_init(&m_bas, &bas_init);
-    APP_ERROR_CHECK(err_code);
+        err_code = ble_bas_init(&m_bas, &bas_init);
+        APP_ERROR_CHECK(err_code);
 
-    // Initialize Device Information Service.
-    memset(&dis_init, 0, sizeof(dis_init));
+        // Initialize Device Information Service.
+        memset(&dis_init, 0, sizeof(dis_init));
 
-    ble_srv_ascii_to_utf8(&dis_init.manufact_name_str, (char*)MANUFACTURER_NAME);
+        ble_srv_ascii_to_utf8(&dis_init.manufact_name_str, (char*)MANUFACTURER_NAME);
 
-    dis_init.dis_char_rd_sec = SEC_OPEN;
+        dis_init.dis_char_rd_sec = SEC_OPEN;
 
-    err_code = ble_dis_init(&dis_init);
-    APP_ERROR_CHECK(err_code);
-
+        err_code = ble_dis_init(&dis_init);
+        APP_ERROR_CHECK(err_code);
+    }
     // Initialize Nus Service.
-    nus_service_init();
+    // nus_service_init();
 
     // Initialize DFU Service.
     dfu_service_init();

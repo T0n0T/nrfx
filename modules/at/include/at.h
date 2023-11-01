@@ -24,6 +24,7 @@
 #include "stream_buffer.h"
 #include "queue.h"
 #include "nrfx_uart.h"
+#include "app_uart.h"
 
 // #define AT_PRINT_RAW_CMD
 
@@ -144,6 +145,7 @@ struct at_client {
     size_t recv_bufsz;
 
     SemaphoreHandle_t lock;
+    SemaphoreHandle_t rx_notice;
 
     at_response_t     resp;
     SemaphoreHandle_t resp_notice;
