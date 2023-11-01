@@ -114,17 +114,6 @@ void beep_off(void)
     nrfx_pwm_stop(&m_pwm0, 1);
 }
 
-void bsp_sleep(void)
-{
-    // nrfx_clock_hfclk_start();
-    // gpio_init();
-    // beep_init();
-    // ccm3310_init();
-    // i2c0_init();
-
-    // nrfx_uart_init(&uart0, &uart0_config, uart0_event_hander);
-}
-
 void bsp_uninit(void)
 {
     // gpio_uninit();
@@ -161,20 +150,20 @@ void bsp_init(void)
 
     btn_init();
     ec800m_init();
-    ccm3310_init();
-    max30102_init();
+    // ccm3310_init();
+    // max30102_init();
 }
 
 void PRE_SLEEP(void)
 {
     // nrf_uart_disable(NRF_UART0);
-    // spim_uninit();
-    // twim_uninit();
+    spim_uninit();
+    twim_uninit();
 }
 
 void POST_SLEEP(void)
 {
     // nrf_uart_enable(NRF_UART0);
-    // spim_init();
-    // twim_init();
+    spim_init();
+    twim_init();
 }

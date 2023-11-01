@@ -37,6 +37,9 @@ uint8_t  change_flag;
 uint8_t  ecg_status;
 int      heart = 0;
 
+int32_t sp02;
+int32_t heart_rate;
+
 static void max30102_read_fifo(uint32_t* pun_red_led, uint32_t* pun_ir_led);
 
 void max30102_ecg_init(void)
@@ -250,13 +253,21 @@ MODE_ENTRY:
 
 void blood_Loop(void)
 {
-    ecg_status = 0;
-    int temp   = 0;
+    ecg_status        = 0;
+    int     temp      = 0;
+    int32_t temp_hr   = 0;
+    int32_t temp_sp02 = 0;
+
     max30102_ecg_init();
     for (size_t i = 0; i < SAMPLE_NUM; i++) {
         temp += max30102_data_handle(&n_heart_rate, &n_sp02);
+        temp_hr += n_heart_rate;
+        temp_sp02 += n_sp02;
     }
     ecg_status = temp > 3 ? 1 : 0;
+    heart_rate = temp_hr / SAMPLE_NUM;
+    sp02       = temp_sp02 / SAMPLE_NUM;
+
     maxim_max30102_reset();
 }
 

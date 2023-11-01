@@ -16,6 +16,7 @@
 #include "ble_bas.h"
 #include "ble_hrs.h"
 #include "ble_dis.h"
+#include "ble_nus.h"
 #include "ble_conn_params.h"
 
 #include "peer_manager.h"
@@ -32,19 +33,21 @@
 #include "nrf_ble_qwr.h"
 
 #include "common.h"
+#include "blood.h"
 
 BLE_BAS_DEF(m_bas);       /**< Battery service instance. */
 BLE_HRS_DEF(m_hrs);       /**< Heart rate service instance. */
 NRF_BLE_GATT_DEF(m_gatt); /**< GATT module instance. */
 NRF_BLE_QWR_DEF(m_qwr);   /**< Context for the Queued Write module.*/
 
-static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID; /**< Handle of the current connection. */
+uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID; /**< Handle of the current connection. */
 
 static ble_uuid_t m_adv_uuids[] = /**< Universally unique service identifiers. */
     {
         {BLE_UUID_HEART_RATE_SERVICE, BLE_UUID_TYPE_BLE},
         {BLE_UUID_BATTERY_SERVICE, BLE_UUID_TYPE_BLE},
-        {BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE}};
+        {BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE},
+        {BLE_UUID_NUS_SERVICE, BLE_UUID_TYPE_BLE}};
 
 static TimerHandle_t m_battery_timer;        /**< Definition of battery timer. */
 static TimerHandle_t m_heart_rate_timer;     /**< Definition of heart rate timer. */
@@ -137,15 +140,10 @@ static void battery_level_meas_timeout_handler(TimerHandle_t xTimer)
  */
 static void heart_rate_meas_timeout_handler(TimerHandle_t xTimer)
 {
-    static uint32_t cnt = 0;
-    ret_code_t      err_code;
-    uint16_t        heart_rate;
+    ret_code_t err_code;
 
     UNUSED_PARAMETER(xTimer);
 
-    heart_rate = 80; // 心率
-
-    cnt++;
     err_code = ble_hrs_heart_rate_measurement_send(&m_hrs, heart_rate);
     if ((err_code != NRF_SUCCESS) &&
         (err_code != NRF_ERROR_INVALID_STATE) &&
@@ -318,6 +316,10 @@ static void services_init(void)
     err_code = ble_dis_init(&dis_init);
     APP_ERROR_CHECK(err_code);
 
+    // Initialize Nus Service.
+    nus_service_init();
+
+    // Initialize DFU Service.
     dfu_service_init();
 }
 
@@ -709,23 +711,23 @@ int main(void)
     SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
 
     // Configure and initialize the BLE stack.
-    // ble_stack_init();
+    ble_stack_init();
 
-    // // Initialize modules.
-    // timers_init();
-    // gap_params_init();
-    // gatt_init();
-    // advertising_init();
-    // services_init();
-    // conn_params_init();
-    // peer_manager_init();
-    // application_timers_start();
+    // Initialize modules.
+    timers_init();
+    gap_params_init();
+    gatt_init();
+    advertising_init();
+    services_init();
+    conn_params_init();
+    peer_manager_init();
+    application_timers_start();
     bsp_init();
     app_init();
 
     // Create a FreeRTOS task for the BLE stack.
     // The task will run advertising_start() before entering its loop.
-    // nrf_sdh_freertos_init(advertising_start, &erase_bonds);
+    nrf_sdh_freertos_init(advertising_start, &erase_bonds);
 
     NRF_LOG_INFO("FreeRTOS started.");
     // Start FreeRTOS scheduler.

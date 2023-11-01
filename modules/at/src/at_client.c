@@ -305,7 +305,7 @@ int at_obj_exec_cmd(at_client_t client, at_response_t resp, const char* cmd_expr
     client->resp = resp;
 
     /* clear the receive buffer */
-    xStreamBufferReset(client->rx_buf);
+    xQueueReset(client->rx_queue);
 
     /* clear the current received one line data buffer, Ignore dirty data before transmission */
     memset(client->recv_line_buf, 0x00, client->recv_line_len);
@@ -319,6 +319,10 @@ int at_obj_exec_cmd(at_client_t client, at_response_t resp, const char* cmd_expr
         if (xSemaphoreTake(client->resp_notice, pdMS_TO_TICKS(resp->timeout)) != pdTRUE) {
             cmd = at_get_last_cmd(&cmd_size);
             NRF_LOG_WARNING("execute command (%s) timeout (%d ticks)!", cmd, resp->timeout);
+            taskDISABLE_INTERRUPTS();
+            vQueueDelete(client->rx_queue);
+            client->rx_queue = xQueueCreate(128, sizeof(char*));
+            taskENABLE_INTERRUPTS();
             client->resp_status = AT_RESP_TIMEOUT;
             result              = -ETIMEOUT;
             goto __exit;
@@ -433,8 +437,7 @@ size_t at_client_obj_send(at_client_t client, const char* buf, size_t size)
 
 static uint32_t at_client_getchar(at_client_t client, char* ch, TickType_t timeout)
 {
-    size_t num = xStreamBufferReceive(client->rx_buf, ch, 1, timeout);
-    NRF_LOG_DEBUG("%c read %d, remain %d", *ch, num, xStreamBufferSpacesAvailable(client->rx_buf));
+    xQueueReceive(client->rx_queue, ch, timeout);
     return EOK;
 }
 
@@ -703,17 +706,19 @@ static void client_parser(at_client_t client)
 
 static void at_client_rx_ind(nrfx_uart_event_t const* p_event, void* p_context)
 {
+    taskDISABLE_INTERRUPTS();
     at_client_t client = (at_client_t)p_context;
     if (p_event->type == NRFX_UART_EVT_RX_DONE) {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         nrfx_uart_rx(client->device, &rx_ch, 1);
-        size_t num = xStreamBufferSendFromISR(client->rx_buf, &rx_ch, 1, &xHigherPriorityTaskWoken);
-        // NRF_LOG_RAW_INFO("%c write in %d, remain %d \n", rx_ch, num, xStreamBufferSpacesAvailable(client->rx_buf));
+        NRF_LOG_RAW_INFO("%c", rx_ch);
+        xQueueSendFromISR(client->rx_queue, &rx_ch, &xHigherPriorityTaskWoken);
         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }
     if (p_event->type == NRFX_UART_EVT_TX_DONE) {
         transfer_status = true;
     }
+    taskENABLE_INTERRUPTS();
 }
 
 /* initialize the client object parameters */
@@ -738,9 +743,9 @@ static int at_client_para_init(at_client_t client)
         goto __exit;
     }
 
-    client->rx_buf = xStreamBufferCreate(256, 1);
-    if (client->rx_buf == NULL) {
-        NRF_LOG_ERROR("AT client initialize failed! at_client_rx_buf create failed!");
+    client->rx_queue = xQueueCreate(64, sizeof(char*));
+    if (client->rx_queue == NULL) {
+        NRF_LOG_ERROR("AT client initialize failed! at_client_rx_queue create failed!");
         result = -ENOMEM;
         goto __exit;
     }
@@ -748,13 +753,6 @@ static int at_client_para_init(at_client_t client)
     client->lock = xSemaphoreCreateMutex();
     if (client->lock == NULL) {
         NRF_LOG_ERROR("AT client initialize failed! at_client_recv_lock create failed!");
-        result = -ENOMEM;
-        goto __exit;
-    }
-
-    client->rx_notice = xSemaphoreCreateCounting(UINT_FAST16_MAX, 0);
-    if (client->rx_notice == NULL) {
-        NRF_LOG_ERROR("AT client initialize failed! at_client_notice semaphore create failed!");
         result = -ENOMEM;
         goto __exit;
     }
@@ -783,12 +781,8 @@ __exit:
             vSemaphoreDelete(client->lock);
         }
 
-        if (client->rx_buf) {
-            vStreamBufferDelete(client->rx_buf);
-        }
-
-        if (client->rx_notice) {
-            vSemaphoreDelete(client->rx_notice);
+        if (client->rx_queue) {
+            vQueueDelete(client->rx_queue);
         }
 
         if (client->resp_notice) {

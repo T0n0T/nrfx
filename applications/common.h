@@ -75,4 +75,7 @@
 
 BLE_ADVERTISING_DEF(m_advertising); /**< Advertising module instance. */
 
-void dfu_service_init(void);
+extern uint16_t m_conn_handle;
+
+extern void dfu_service_init(void);
+extern void nus_service_init(void);

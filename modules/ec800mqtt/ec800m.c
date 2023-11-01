@@ -89,6 +89,9 @@ void ec800m_task_handle(ec800m_task_t* task)
             if (ec800m.status == EC800M_IDLE) {
                 at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_CLOSE);
                 vTaskDelay(500);
+                if (ec800m.mqtt.keepalive) {
+                    at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_CONF_ALIVE, ec800m.mqtt.keepalive);
+                }
                 if (ec800m.status == EC800M_MQTT_CLOSE) {
                     at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_REL, ec800m.mqtt.host, ec800m.mqtt.port);
                 }

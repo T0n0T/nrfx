@@ -1,15 +1,34 @@
 #ifndef APP_CONFIG_H
 #define APP_CONFIG_H
 
-#define NRF_LOG_DEFERRED      0
-#define NRFX_SYSTICK_ENABLED  1
-#define NRFX_NVMC_ENABLED     1
-#define NRF_PWR_MGMT_ENABLED  1
-#define NRF_DFU_TRANSPORT_BLE 1
-#define BLE_BAS_ENABLED       1
-#define BLE_DIS_ENABLED       1
-#define BLE_HRS_ENABLED       1
-#define BLE_LOG_ENABLED       1
+#define NRF_LOG_DEFERRED              0
+#define NRFX_SYSTICK_ENABLED          1
+#define NRFX_NVMC_ENABLED             1
+#define NRF_PWR_MGMT_ENABLED          1
+#define NRF_DFU_TRANSPORT_BLE         1
+#define BLE_BAS_ENABLED               1
+#define BLE_DIS_ENABLED               1
+#define BLE_HRS_ENABLED               1
+#define BLE_LOG_ENABLED               1
+#define SM4_ENABLED                   0
+#define MQTT_PUBLISH_DEFAULT_INTERVAL 5000
+
+#define EC800M_MQTT_DEFAULT_CFG                        \
+    {                                                  \
+        .host      = "broker.emqx.io",                 \
+        .port      = "1883",                           \
+        .keepalive = 300,                              \
+        .clientid  = "CYGC_TEST",                      \
+        .username  = NULL,                             \
+        .password  = NULL,                             \
+        .subtopic  = "/iot/CYGC_TEST/BR/device/reply", \
+        .pubtopic  = "/iot/CYGC_TEST/BR/device/data",  \
+    }
+
+#define SM4_DEFAULT_KEY                                                                                \
+    {                                                                                                  \
+        0x77, 0x7f, 0x23, 0xc6, 0xfe, 0x7b, 0x48, 0x73, 0xdd, 0x59, 0x5c, 0xff, 0xf6, 0x5f, 0x58, 0xec \
+    }
 
 #define configPRE_SLEEP_PROCESSING \
     do {                           \

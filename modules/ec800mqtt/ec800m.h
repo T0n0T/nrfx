@@ -16,21 +16,9 @@
 #include "timers.h"
 #include "queue.h"
 
-#define EC800M_RESET_MAX        10
+#define EC800M_RESET_MAX        5
 #define EC800M_BUF_LEN          256
 #define AT_CLIENT_RECV_BUFF_LEN 128
-
-#define EC800M_MQTT_DEFAULT_CFG                        \
-    {                                                  \
-        .host      = "broker.emqx.io",                 \
-        .port      = "1883",                           \
-        .keepalive = 300,                              \
-        .clientid  = "CYGC_TEST",                      \
-        .username  = NULL,                             \
-        .password  = NULL,                             \
-        .subtopic  = "/iot/CYGC_TEST/BR/device/reply", \
-        .pubtopic  = "/iot/CYGC_TEST/BR/device/data",  \
-    }
 
 typedef enum {
     EC800M_IDLE = 0,

@@ -38,6 +38,12 @@
             "files": [
               {
                 "path": "applications/app.c"
+              },
+              {
+                "path": "applications/data_build.c"
+              },
+              {
+                "path": "applications/data_wr.c"
               }
             ],
             "folders": []
@@ -192,6 +198,9 @@
             "path": "nrf_sdk/components/ble/ble_advertising/ble_advertising.c"
           },
           {
+            "path": "nrf_sdk/components/ble/ble_link_ctx_manager/ble_link_ctx_manager.c"
+          },
+          {
             "path": "nrf_sdk/components/ble/common/ble_advdata.c"
           },
           {
@@ -259,6 +268,9 @@
           },
           {
             "path": "nrf_sdk/components/ble/ble_services/ble_hrs/ble_hrs.c"
+          },
+          {
+            "path": "nrf_sdk/components/ble/ble_services/ble_nus/ble_nus.c"
           }
         ],
         "folders": []
@@ -663,7 +675,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": ""
+        "otherCmds": "ip 192.168.230.1"
       },
       "uploadConfigMap": {},
       "custom_dep": {
@@ -700,6 +712,7 @@
           "nrf_sdk/components/ble/nrf_ble_gatt",
           "nrf_sdk/components/ble/nrf_ble_qwr",
           "nrf_sdk/components/ble/peer_manager",
+          "nrf_sdk/components/ble/ble_link_ctx_manager",
           "nrf_sdk/components/libraries/atomic",
           "nrf_sdk/components/libraries/atomic_fifo",
           "nrf_sdk/components/libraries/atomic_flags",

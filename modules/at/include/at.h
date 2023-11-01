@@ -22,6 +22,7 @@
 #include "task.h"
 #include "semphr.h"
 #include "stream_buffer.h"
+#include "queue.h"
 #include "nrfx_uart.h"
 
 // #define AT_PRINT_RAW_CMD
@@ -128,9 +129,9 @@ struct at_urc_table {
 typedef struct at_urc* at_urc_table_t;
 
 struct at_client {
-    nrfx_uart_t*         device;
-    nrfx_uart_config_t*  cfg;
-    StreamBufferHandle_t rx_buf;
+    nrfx_uart_t*        device;
+    nrfx_uart_config_t* cfg;
+    QueueHandle_t       rx_queue;
 
     at_status_t status;
     char        end_sign;
@@ -141,9 +142,8 @@ struct at_client {
     size_t recv_line_len;
     /* The maximum supported receive data length */
     size_t recv_bufsz;
-    // SemaphoreHandle_t rx_notice;
+
     SemaphoreHandle_t lock;
-    SemaphoreHandle_t rx_notice;
 
     at_response_t     resp;
     SemaphoreHandle_t resp_notice;
