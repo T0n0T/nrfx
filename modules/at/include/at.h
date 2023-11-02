@@ -26,7 +26,7 @@
 #include "nrfx_uart.h"
 #include "app_uart.h"
 
-// #define AT_PRINT_RAW_CMD
+#define AT_PRINT_RAW_CMD
 
 extern bool transfer_status;
 
@@ -145,7 +145,6 @@ struct at_client {
     size_t recv_bufsz;
 
     SemaphoreHandle_t lock;
-    SemaphoreHandle_t rx_notice;
 
     at_response_t     resp;
     SemaphoreHandle_t resp_notice;

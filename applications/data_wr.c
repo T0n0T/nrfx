@@ -103,7 +103,7 @@ int read_cfg(config_t* cfg)
     while (nrf_fstorage_is_busy(&fstorage)) {
         sd_app_evt_wait();
     }
-    if (err_code == NRF_SUCCESS) {
+    if (err_code == NRF_SUCCESS && cfg->mqtt_cfg.host[0] != '\0' && cfg->mqtt_cfg.host[0] != 0xff) {
         NRF_LOG_INFO("read mqtt config success");
         return EOK;
     } else {
@@ -135,11 +135,12 @@ static void nus_data_handler(ble_nus_evt_t* p_evt)
             } else if (strncmp(recv_data, "check:", 6) == 0) {
                 char* cfg_str = build_msg_cfg(&global_cfg);
                 ble_write(cfg_str, strlen(cfg_str));
+                free(cfg_str);
             } else {
                 char* wrong_str = "Wrong command\r\n";
                 ble_write(wrong_str, strlen(wrong_str));
             }
-
+            free(recv_data);
             break;
         case BLE_NUS_EVT_COMM_STARTED:
             char* wel_str = "You can update or check config here with a json-format string\r\n\

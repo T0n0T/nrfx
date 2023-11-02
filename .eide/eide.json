@@ -684,7 +684,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": ""
+        "otherCmds": "ip 192.168.230.1"
       },
       "uploadConfigMap": {},
       "custom_dep": {

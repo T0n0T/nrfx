@@ -29,14 +29,14 @@ typedef enum {
 } ec800m_status_t;
 
 typedef struct {
-    char*    host;
-    char*    port;
+    char     host[30];
+    char     port[10];
     uint32_t keepalive;
-    char*    clientid;
-    char*    username;
-    char*    password;
-    char*    subtopic;
-    char*    pubtopic;
+    char     clientid[60];
+    char     username[60];
+    char     password[60];
+    char     subtopic[60];
+    char     pubtopic[60];
 } ec800m_mqtt_t;
 
 typedef enum {

@@ -709,7 +709,7 @@ static void at_client_rx_ind(nrfx_uart_event_t const* p_event, void* p_context)
     if (p_event->type == NRFX_UART_EVT_RX_DONE) {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         nrfx_uart_rx(client->device, &rx_ch, 1);
-        NRF_LOG_RAW_INFO("%c", rx_ch);
+        // NRF_LOG_RAW_INFO("%c", rx_ch);
         xQueueSendFromISR(client->rx_queue, &rx_ch, &xHigherPriorityTaskWoken);
         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }

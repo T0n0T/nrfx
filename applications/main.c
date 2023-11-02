@@ -292,49 +292,48 @@ static void services_init(void)
     err_code = nrf_ble_qwr_init(&m_qwr, &qwr_init);
     APP_ERROR_CHECK(err_code);
 
-    {
-        // Initialize Heart Rate Service.
-        body_sensor_location = BLE_HRS_BODY_SENSOR_LOCATION_WRIST;
+    // Initialize Heart Rate Service.
+    body_sensor_location = BLE_HRS_BODY_SENSOR_LOCATION_WRIST;
 
-        memset(&hrs_init, 0, sizeof(hrs_init));
+    memset(&hrs_init, 0, sizeof(hrs_init));
 
-        hrs_init.evt_handler                 = NULL;
-        hrs_init.is_sensor_contact_supported = true;
-        hrs_init.p_body_sensor_location      = &body_sensor_location;
+    hrs_init.evt_handler                 = NULL;
+    hrs_init.is_sensor_contact_supported = true;
+    hrs_init.p_body_sensor_location      = &body_sensor_location;
 
-        // Here the sec level for the Heart Rate Service can be changed/increased.
-        hrs_init.hrm_cccd_wr_sec = SEC_OPEN;
-        hrs_init.bsl_rd_sec      = SEC_OPEN;
+    // Here the sec level for the Heart Rate Service can be changed/increased.
+    hrs_init.hrm_cccd_wr_sec = SEC_OPEN;
+    hrs_init.bsl_rd_sec      = SEC_OPEN;
 
-        err_code = ble_hrs_init(&m_hrs, &hrs_init);
-        APP_ERROR_CHECK(err_code);
+    err_code = ble_hrs_init(&m_hrs, &hrs_init);
+    APP_ERROR_CHECK(err_code);
 
-        // Initialize Battery Service.
-        memset(&bas_init, 0, sizeof(bas_init));
+    // Initialize Battery Service.
+    memset(&bas_init, 0, sizeof(bas_init));
 
-        // Here the sec level for the Battery Service can be changed/increased.
-        bas_init.bl_rd_sec        = SEC_OPEN;
-        bas_init.bl_cccd_wr_sec   = SEC_OPEN;
-        bas_init.bl_report_rd_sec = SEC_OPEN;
+    // Here the sec level for the Battery Service can be changed/increased.
+    bas_init.bl_rd_sec        = SEC_OPEN;
+    bas_init.bl_cccd_wr_sec   = SEC_OPEN;
+    bas_init.bl_report_rd_sec = SEC_OPEN;
 
-        bas_init.evt_handler          = NULL;
-        bas_init.support_notification = true;
-        bas_init.p_report_ref         = NULL;
-        bas_init.initial_batt_level   = 100;
+    bas_init.evt_handler          = NULL;
+    bas_init.support_notification = true;
+    bas_init.p_report_ref         = NULL;
+    bas_init.initial_batt_level   = 100;
 
-        err_code = ble_bas_init(&m_bas, &bas_init);
-        APP_ERROR_CHECK(err_code);
+    err_code = ble_bas_init(&m_bas, &bas_init);
+    APP_ERROR_CHECK(err_code);
 
-        // Initialize Device Information Service.
-        memset(&dis_init, 0, sizeof(dis_init));
+    // Initialize Device Information Service.
+    memset(&dis_init, 0, sizeof(dis_init));
 
-        ble_srv_ascii_to_utf8(&dis_init.manufact_name_str, (char*)MANUFACTURER_NAME);
+    ble_srv_ascii_to_utf8(&dis_init.manufact_name_str, (char*)MANUFACTURER_NAME);
 
-        dis_init.dis_char_rd_sec = SEC_OPEN;
+    dis_init.dis_char_rd_sec = SEC_OPEN;
 
-        err_code = ble_dis_init(&dis_init);
-        APP_ERROR_CHECK(err_code);
-    }
+    err_code = ble_dis_init(&dis_init);
+    APP_ERROR_CHECK(err_code);
+
     // Initialize Nus Service.
     // nus_service_init();
 
@@ -530,37 +529,6 @@ static void ble_stack_init(void)
     // Register a handler for BLE events.
     NRF_SDH_BLE_OBSERVER(m_ble_observer, APP_BLE_OBSERVER_PRIO, ble_evt_handler, NULL);
 }
-
-// static void bsp_event_handler(bsp_event_t event)
-// {
-//     ret_code_t err_code;
-
-//     switch (event) {
-//         case BSP_EVENT_SLEEP:
-//             sleep_mode_enter();
-//             break;
-
-//         case BSP_EVENT_DISCONNECT:
-//             err_code = sd_ble_gap_disconnect(m_conn_handle,
-//                                              BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
-//             if (err_code != NRF_ERROR_INVALID_STATE) {
-//                 APP_ERROR_CHECK(err_code);
-//             }
-//             break;
-
-//         case BSP_EVENT_WHITELIST_OFF:
-//             if (m_conn_handle == BLE_CONN_HANDLE_INVALID) {
-//                 err_code = ble_advertising_restart_without_whitelist(&m_advertising);
-//                 if (err_code != NRF_ERROR_INVALID_STATE) {
-//                     APP_ERROR_CHECK(err_code);
-//                 }
-//             }
-//             break;
-
-//         default:
-//             break;
-//     }
-// }
 
 /**@brief Function for the Peer Manager initialization. */
 static void peer_manager_init(void)

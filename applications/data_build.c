@@ -77,30 +77,32 @@ int parse_cfg(char* json, config_t* config)
 {
     cJSON * cfgjson = NULL, *mqttjson = NULL;
     uint8_t hex[16];
-    char    hexString[33];
+    char*   hexString;
     cfgjson = cJSON_Parse(json);
-    if (cfgjson == NULL) {
-        cJSON_Delete(cfgjson);
+
+    if (!cfgjson) {
+        printf("Error before: [%s]\n", cJSON_GetErrorPtr());
         return -EINVAL;
     }
-    mqttjson                   = cJSON_GetObjectItem(cfgjson, "mqtt");
-    config->mqtt_cfg.host      = cJSON_GetObjectItem(mqttjson, "host")->string;
-    config->mqtt_cfg.port      = cJSON_GetObjectItem(mqttjson, "port")->string;
+    mqttjson = cJSON_GetObjectItem(cfgjson, "mqtt");
+    strcpy(config->mqtt_cfg.host, cJSON_GetObjectItem(mqttjson, "host")->valuestring);
+    strcpy(config->mqtt_cfg.port, cJSON_GetObjectItem(mqttjson, "port")->valuestring);
     config->mqtt_cfg.keepalive = cJSON_GetObjectItem(mqttjson, "keepalive")->valueint;
-    config->mqtt_cfg.clientid  = cJSON_GetObjectItem(mqttjson, "clientId")->string;
-    config->mqtt_cfg.username  = cJSON_GetObjectItem(mqttjson, "userName")->string;
-    config->mqtt_cfg.password  = cJSON_GetObjectItem(mqttjson, "passWord")->string;
-    config->mqtt_cfg.subtopic  = cJSON_GetObjectItem(mqttjson, "subTopic")->string;
-    config->mqtt_cfg.pubtopic  = cJSON_GetObjectItem(mqttjson, "pubTopic")->string;
-    config->publish_interval   = cJSON_GetObjectItem(cfgjson, "publishInterval")->valueint;
-    config->sm4_flag           = cJSON_GetObjectItem(cfgjson, "sm4Flag")->valueint;
-    strcpy(hexString, cJSON_GetObjectItem(cfgjson, "pubTopic")->string);
+    strcpy(config->mqtt_cfg.clientid, cJSON_GetObjectItem(mqttjson, "clientId")->valuestring);
+    strcpy(config->mqtt_cfg.username, cJSON_GetObjectItem(mqttjson, "userName")->valuestring);
+    strcpy(config->mqtt_cfg.password, cJSON_GetObjectItem(mqttjson, "passWord")->valuestring);
+    strcpy(config->mqtt_cfg.subtopic, cJSON_GetObjectItem(mqttjson, "subTopic")->valuestring);
+    strcpy(config->mqtt_cfg.pubtopic, cJSON_GetObjectItem(mqttjson, "pubTopic")->valuestring);
+    config->publish_interval = cJSON_GetObjectItem(cfgjson, "publishInterval")->valueint;
+    config->sm4_flag         = cJSON_GetObjectItem(cfgjson, "sm4Flag")->valueint;
+    hexString                = cJSON_GetObjectItem(cfgjson, "sm4Key")->valuestring;
     for (int i = 0; i < 32; i += 2) {
         char byteString[3] = {hexString[i], hexString[i + 1], '\0'};
         hex[i / 2]         = (uint8_t)strtol(byteString, NULL, 16);
     }
 
     memcpy(config->sm4_key, hex, 16);
+
     cJSON_Delete(cfgjson);
     return EOK;
 }
