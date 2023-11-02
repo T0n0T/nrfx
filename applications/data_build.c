@@ -11,6 +11,7 @@
 #include "app.h"
 #include "cJSON.h"
 #include "time.h"
+#include "nrf_log.h"
 
 char* build_msg_mqtt(char* device_id, gps_info_t info, int energyStatus, int correctlyWear)
 {
@@ -53,6 +54,9 @@ char* build_msg_cfg(config_t* config)
     hexString[32] = '\0';
 
     root = cJSON_CreateObject();
+    if (!root) {
+        NRF_LOG_ERROR("no memory for json build");
+    }
 
     cJSON_AddItemToObject(root, "mqtt", mqtt = cJSON_CreateObject());
     cJSON_AddStringToObject(mqtt, "host", config->mqtt_cfg.host);
@@ -81,7 +85,7 @@ int parse_cfg(char* json, config_t* config)
     cfgjson = cJSON_Parse(json);
 
     if (!cfgjson) {
-        printf("Error before: [%s]\n", cJSON_GetErrorPtr());
+        NRF_LOG_ERROR("Error before: [%s]\n", cJSON_GetErrorPtr());
         return -EINVAL;
     }
     mqttjson = cJSON_GetObjectItem(cfgjson, "mqtt");

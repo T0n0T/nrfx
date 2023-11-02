@@ -26,7 +26,7 @@
 #include "nrfx_uart.h"
 #include "app_uart.h"
 
-#define AT_PRINT_RAW_CMD
+// #define AT_PRINT_RAW_CMD
 
 extern bool transfer_status;
 

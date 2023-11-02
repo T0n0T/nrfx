@@ -33,7 +33,6 @@
 #include "nrf_ble_qwr.h"
 
 #include "common.h"
-#include "blood.h"
 
 BLE_BAS_DEF(m_bas);       /**< Battery service instance. */
 BLE_HRS_DEF(m_hrs);       /**< Heart rate service instance. */
@@ -41,13 +40,13 @@ NRF_BLE_GATT_DEF(m_gatt); /**< GATT module instance. */
 NRF_BLE_QWR_DEF(m_qwr);   /**< Context for the Queued Write module.*/
 
 uint16_t          m_conn_handle          = BLE_CONN_HANDLE_INVALID;      /**< Handle of the current connection. */
-static uint16_t   m_ble_nus_max_data_len = BLE_GATT_ATT_MTU_DEFAULT - 3; /**< Maximum length of data (in bytes) that can be transmitted to the peer by the Nordic UART service module. */
+uint16_t          m_ble_nus_max_data_len = BLE_GATT_ATT_MTU_DEFAULT - 3; /**< Maximum length of data (in bytes) that can be transmitted to the peer by the Nordic UART service module. */
 static ble_uuid_t m_adv_uuids[]          =                               /**< Universally unique service identifiers. */
     {
         {BLE_UUID_HEART_RATE_SERVICE, BLE_UUID_TYPE_BLE},
         {BLE_UUID_BATTERY_SERVICE, BLE_UUID_TYPE_BLE},
         {BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE},
-        // {BLE_UUID_NUS_SERVICE, BLE_UUID_TYPE_VENDOR_BEGIN}
+        {BLE_UUID_NUS_SERVICE, BLE_UUID_TYPE_VENDOR_BEGIN},
 };
 
 static TimerHandle_t m_battery_timer;        /**< Definition of battery timer. */
@@ -335,7 +334,7 @@ static void services_init(void)
     APP_ERROR_CHECK(err_code);
 
     // Initialize Nus Service.
-    // nus_service_init();
+    nus_service_init();
 
     // Initialize DFU Service.
     dfu_service_init();
@@ -584,7 +583,7 @@ static void advertising_init(void)
     init.advdata.name_type               = BLE_ADVDATA_FULL_NAME;
     init.advdata.include_appearance      = true;
     init.advdata.flags                   = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
-    init.advdata.uuids_complete.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
+    init.advdata.uuids_complete.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]) - 1;
     init.advdata.uuids_complete.p_uuids  = m_adv_uuids;
 
     init.config.ble_adv_fast_enabled  = true;

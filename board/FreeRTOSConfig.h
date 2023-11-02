@@ -36,13 +36,13 @@
 
 #if defined(__ARMCC_VERSION)
 extern int Image$$RW_IRAM1$$ZI$$Limit;
-#define HEAP_BEGIN ((void *)&Image$$RW_IRAM1$$ZI$$Limit)
+#define HEAP_BEGIN ((void*)&Image$$RW_IRAM1$$ZI$$Limit)
 #elif __ICCARM__
 #pragma section = "CSTACK"
 #define HEAP_BEGIN (__segment_end("CSTACK"))
 #else
 extern int __bss_end__;
-#define HEAP_BEGIN ((void *)&__bss_end__)
+#define HEAP_BEGIN ((void*)&__bss_end__)
 #endif
 
 #define HEAP_END (0x20010000)
@@ -75,7 +75,7 @@ extern int __bss_end__;
 #define configTICK_RATE_HZ                      1024
 #define configMAX_PRIORITIES                    (3)
 #define configMINIMAL_STACK_SIZE                (60)
-#define configTOTAL_HEAP_SIZE                   (20480)
+#define configTOTAL_HEAP_SIZE                   (22480)
 #define configMAX_TASK_NAME_LEN                 (4)
 #define configUSE_16_BIT_TICKS                  0
 #define configIDLE_SHOULD_YIELD                 1

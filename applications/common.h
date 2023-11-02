@@ -23,6 +23,7 @@
 #include "nrf_sdh_freertos.h"
 #include "app_timer.h"
 
+#include "blood.h"
 #include "bsp.h"
 #include "app.h"
 
@@ -75,6 +76,7 @@
 
 BLE_ADVERTISING_DEF(m_advertising); /**< Advertising module instance. */
 
+extern uint16_t m_ble_nus_max_data_len;
 extern uint16_t m_conn_handle;
 
 extern void dfu_service_init(void);

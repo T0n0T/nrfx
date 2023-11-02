@@ -13,12 +13,25 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ringbuf.h>
+
+#include "FreeRTOS.h"
+#include "task.h"
+#include "stream_buffer.h"
 #include "nrf_fstorage_sd.h"
 
 #define NRF_LOG_MODULE_NAME config_wr
 #define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_DEBUG
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
+
+#define TX_BUF_SIZE 512 // 日志发送缓存大小（字节数）
+#define RX_BUF_SIZE 512 // 接收缓存大小（字节数）
+
+static TaskHandle_t         data_wr_task_handle = NULL;
+static StreamBufferHandle_t data_wr_buf         = NULL;
+static bool                 data_wr_enabled     = false;
+static char                 tx_buf[TX_BUF_SIZE];
 
 /* nrf library cfg */
 BLE_NUS_DEF(m_nus, NRF_SDH_BLE_TOTAL_LINK_COUNT); /**< nus service instance. */
@@ -52,18 +65,53 @@ static void fstorage_evt_handler(nrf_fstorage_evt_t* p_evt)
     }
 }
 
-/*------- nus handle---------*/
-static void ble_write(char* str, uint16_t len)
+void ble_nus_output(const char* str)
 {
-    uint32_t err_code;
-    do {
-        err_code = ble_nus_data_send(&m_nus, (uint8_t*)str, &len, m_conn_handle);
-        if ((err_code != NRF_ERROR_INVALID_STATE) &&
-            (err_code != NRF_ERROR_RESOURCES) &&
-            (err_code != NRF_ERROR_NOT_FOUND)) {
-            APP_ERROR_CHECK(err_code);
+    if (data_wr_enabled) {
+        xStreamBufferSend(data_wr_buf, (void*)str, strlen(str), 0);
+    }
+}
+
+static void ble_tx_flush_process(void)
+{
+    // 判断日志使能
+    if (data_wr_enabled) {
+        uint32_t       err_code;
+        static uint8_t data_array[TX_BUF_SIZE];
+        uint16_t       data_len = 0;
+        uint8_t*       index    = 0;
+        // 获取日志数据
+        data_len = xStreamBufferReceive(data_wr_buf, &data_array, TX_BUF_SIZE, portMAX_DELAY);
+        index    = &data_array[0];
+        while (data_len > 0) {
+            if (data_len >= m_ble_nus_max_data_len) {
+                NRF_LOG_INFO("Ready to send data len %d over BLE LOG", m_ble_nus_max_data_len);
+                // 日志接收的数据使用notify发送给BLE主机
+                do {
+                    err_code = ble_nus_data_send(&m_nus, index, &m_ble_nus_max_data_len, m_conn_handle);
+                    if ((err_code != NRF_ERROR_INVALID_STATE) &&
+                        (err_code != NRF_ERROR_RESOURCES) &&
+                        (err_code != NRF_ERROR_NOT_FOUND)) {
+                        APP_ERROR_CHECK(err_code);
+                    }
+                } while (err_code == NRF_ERROR_RESOURCES);
+                index += m_ble_nus_max_data_len;
+                data_len -= m_ble_nus_max_data_len;
+            } else {
+                NRF_LOG_INFO("Ready to send data len %d over BLE LOG", data_len);
+                // 日志接收的数据使用notify发送给BLE主机
+                do {
+                    err_code = ble_nus_data_send(&m_nus, index, &data_len, m_conn_handle);
+                    if ((err_code != NRF_ERROR_INVALID_STATE) &&
+                        (err_code != NRF_ERROR_RESOURCES) &&
+                        (err_code != NRF_ERROR_NOT_FOUND)) {
+                        APP_ERROR_CHECK(err_code);
+                    }
+                } while (err_code == NRF_ERROR_RESOURCES);
+                break;
+            }
         }
-    } while (err_code == NRF_ERROR_RESOURCES);
+    }
 }
 
 void write_cfg(config_t* cfg)
@@ -74,9 +122,8 @@ void write_cfg(config_t* cfg)
         sd_app_evt_wait();
     }
     if (err_code != NRF_SUCCESS) {
-        char* wrong_str = "earse flash fail!\r\n";
         NRF_LOG_ERROR("earse flash fail!");
-        ble_write(wrong_str, strlen(wrong_str));
+        ble_nus_output("earse flash fail!\r\n");
         return;
     }
 
@@ -86,14 +133,12 @@ void write_cfg(config_t* cfg)
     }
     if (err_code != NRF_SUCCESS) {
         NRF_LOG_ERROR("write config fail!");
-        char* wrong_str = "flash write fail!\r\n";
-        ble_write(wrong_str, strlen(wrong_str));
+        ble_nus_output("flash write fail!\r\n");
         return;
     }
 
-    char* succ_str = "config parse success, restart to make config work\r\n";
     NRF_LOG_INFO("write config success!");
-    ble_write(succ_str, strlen(succ_str));
+    ble_nus_output("config parse success, restart to make config work\r\n");
 }
 
 int read_cfg(config_t* cfg)
@@ -119,47 +164,75 @@ static void nus_data_handler(ble_nus_evt_t* p_evt)
     uint16_t len = 0;
     switch (p_evt->type) {
         case BLE_NUS_EVT_RX_DATA:
-            char* recv_data = malloc(p_evt->params.rx_data.length);
-            memcpy(recv_data, p_evt->params.rx_data.p_data, p_evt->params.rx_data.length);
-            if (strncmp(recv_data, "update:", 7) == 0) {
-                config_t tmp_cfg = {0};
-                err_code         = parse_cfg(&recv_data[8], &tmp_cfg);
-                if (err_code != EOK) {
-                    char* wrong_str = "config parse fail\r\n";
-                    ble_write(wrong_str, strlen(wrong_str));
-                } else {
-                    memcpy(&global_cfg, &tmp_cfg, sizeof(config_t));
-                    write_cfg(&global_cfg);
-                }
+            if (data_wr_enabled) {
+                char* recv_data = malloc(p_evt->params.rx_data.length);
+                memcpy(recv_data, p_evt->params.rx_data.p_data, p_evt->params.rx_data.length);
+                if (strncmp(recv_data, "update:", 7) == 0) {
+                    config_t tmp_cfg = {0};
+                    err_code         = parse_cfg(&recv_data[8], &tmp_cfg);
+                    if (err_code != EOK) {
+                        char* wrong_str = "config parse fail\r\n";
+                        ble_nus_output(wrong_str);
+                    } else {
+                        memcpy(&global_cfg, &tmp_cfg, sizeof(config_t));
+                        write_cfg(&global_cfg);
+                    }
 
-            } else if (strncmp(recv_data, "check:", 6) == 0) {
-                char* cfg_str = build_msg_cfg(&global_cfg);
-                ble_write(cfg_str, strlen(cfg_str));
-                free(cfg_str);
-            } else {
-                char* wrong_str = "Wrong command\r\n";
-                ble_write(wrong_str, strlen(wrong_str));
+                } else if (strncmp(recv_data, "check", 5) == 0) {
+                    char* cfg_str = build_msg_cfg(&global_cfg);
+                    ble_nus_output(cfg_str);
+                    free(cfg_str);
+                } else {
+                    ble_nus_output("Wrong command\r\n");
+                }
+                free(recv_data);
             }
-            free(recv_data);
+
             break;
         case BLE_NUS_EVT_COMM_STARTED:
-            char* wel_str = "You can update or check config here with a json-format string\r\n\
+            vTaskResume(data_wr_task_handle);
+            data_wr_enabled = true;
+            char* wel_str   = "You can update or check config here with a json-format string\r\n\
                              -- using word [update:(json...)] to update setting\r\n\
                              -- uinsg word [check]  to check setting, than will recieve a json string build from current config\r\n";
-            ble_write(wel_str, strlen(wel_str));
+            ble_nus_output(wel_str);
+            break;
+
+        case BLE_NUS_EVT_COMM_STOPPED:
+            vTaskSuspend(data_wr_task_handle);
+            xStreamBufferReset(data_wr_buf);
+            data_wr_enabled = false;
             break;
         default:
             break;
     }
 }
 
+void cfg_wr_task(void* p)
+{
+    while (1) {
+        ble_tx_flush_process();
+        vTaskDelay(500);
+    }
+}
+
 void nus_service_init(void)
 {
     ble_nus_init_t nus_init;
+    data_wr_buf = xStreamBufferCreate(512, 1);
     // Initialize NUS.
     memset(&nus_init, 0, sizeof(nus_init));
-
     nus_init.data_handler = nus_data_handler;
-
     APP_ERROR_CHECK(ble_nus_init(&m_nus, &nus_init));
+    BaseType_t xReturned = xTaskCreate(cfg_wr_task,
+                                       "CFG_WR",
+                                       1024,
+                                       0,
+                                       5,
+                                       &data_wr_task_handle);
+    if (xReturned != pdPASS) {
+        NRF_LOG_ERROR("button task not created.");
+        APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
+    }
+    vTaskSuspend(data_wr_task_handle);
 }

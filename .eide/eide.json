@@ -557,7 +557,6 @@
     "nrf52832_xxaa": {
       "excludeList": [
         "<virtual_root>/Modules/at/at_server.c",
-        "<virtual_root>/Modules/ringbuf",
         "<virtual_root>/Modules/ec800m/ec800_mqtt.c"
       ],
       "toolchain": "AC5",

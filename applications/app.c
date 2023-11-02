@@ -34,9 +34,6 @@ static void read_cfg_from_flash(void)
     if (read_cfg(&tmp_cfg) == EOK) {
         memcpy(&global_cfg, &tmp_cfg, sizeof(config_t));
     }
-    //  else {
-    //     NRF_LOG_WARNING("read config from flash fail,using default config");
-    // }
 }
 
 void publish_handle(void)
@@ -68,6 +65,11 @@ static int mqtt_init(void)
     ec800m_mqtt_t cfg = {0};
 
     read_cfg_from_flash();
+
+    char* src = build_msg_cfg(&global_cfg);
+    NRF_LOG_INFO("%s", src);
+    free(src);
+
     ec800m_mqtt_conf(&global_cfg.mqtt_cfg);
     ec800m_mqtt_connect();
     while (ec800m.status != EC800M_MQTT_CONN) {
