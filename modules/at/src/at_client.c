@@ -318,8 +318,7 @@ int at_obj_exec_cmd(at_client_t client, at_response_t resp, const char* cmd_expr
     if (resp != NULL) {
         if (xSemaphoreTake(client->resp_notice, pdMS_TO_TICKS(resp->timeout)) != pdTRUE) {
             cmd = at_get_last_cmd(&cmd_size);
-            NRF_LOG_WARNING("execute command (%s) timeout (%d ticks)!", cmd, resp->timeout);
-            // NRF_LOG_INFO("Queue remain %d", uxQueueSpacesAvailable(client->rx_queue));
+            NRF_LOG_WARNING("execute command (%*.s) timeout (%d ticks)!", cmd_size, cmd, resp->timeout);
             nrf_uart_disable(NRF_UART0);
             nrf_uart_enable(NRF_UART0);
             client->resp_status = AT_RESP_TIMEOUT;
@@ -328,7 +327,7 @@ int at_obj_exec_cmd(at_client_t client, at_response_t resp, const char* cmd_expr
         }
         if (client->resp_status != AT_RESP_OK) {
             cmd = at_get_last_cmd(&cmd_size);
-            NRF_LOG_ERROR("execute command (%.*s) failed!", cmd_size, cmd);
+            NRF_LOG_ERROR("execute command (%*.s) failed!", cmd_size, cmd);
             result = -ERROR;
             goto __exit;
         }
@@ -373,11 +372,10 @@ int at_client_obj_wait_connect(at_client_t client, uint32_t timeout)
     client->resp = resp;
 
     start_time = xTaskGetTickCount();
-
     while (1) {
         /* Check whether it is timeout */
         if (xTaskGetTickCount() - start_time > pdMS_TO_TICKS(timeout)) {
-            NRF_LOG_ERROR("wait AT client(%s) connect timeout(%d tick).", timeout);
+            NRF_LOG_ERROR("wait AT client connect timeout(%d tick).", timeout);
             result = -ETIMEOUT;
             break;
         }
@@ -775,7 +773,7 @@ static int at_client_para_init(at_client_t client)
                 name,
                 512,
                 client,
-                tskIDLE_PRIORITY + 3,
+                configMAX_PRIORITIES - 2,
                 client->parser);
 
 __exit:

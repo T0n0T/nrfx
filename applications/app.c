@@ -114,7 +114,7 @@ void app_init(void)
                                        "APP",
                                        512,
                                        0,
-                                       5,
+                                       configMAX_PRIORITIES - 3,
                                        &m_app_task);
     if (xReturned != pdPASS) {
         NRF_LOG_ERROR("app task not created.");

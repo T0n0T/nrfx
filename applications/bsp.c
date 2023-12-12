@@ -144,14 +144,14 @@ void bsp_init(void)
     ret_code_t err_code = NRF_SUCCESS;
     gpio_init();
 
-    // beep_init();
+    beep_init();
     APP_ERROR_CHECK(app_timer_create(&leds_tmr, APP_TIMER_MODE_REPEATED, leds_timer_handler));
     APP_ERROR_CHECK(app_timer_start(leds_tmr, APP_TIMER_TICKS(1000), NULL));
 
     btn_init();
     ec800m_init();
-    // ccm3310_init();
-    // max30102_init();
+    ccm3310_init();
+    max30102_init();
 }
 
 void PRE_SLEEP(void)

@@ -358,7 +358,7 @@ void ec800m_init(void)
                                        "EC800M",
                                        1024,
                                        0,
-                                       3,
+                                       configMAX_PRIORITIES - 2,
                                        &task_handle);
     if (xReturned != pdPASS) {
         NRF_LOG_ERROR("button task not created.");

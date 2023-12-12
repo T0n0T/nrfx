@@ -144,7 +144,7 @@ static void heart_rate_meas_timeout_handler(TimerHandle_t xTimer)
 
     UNUSED_PARAMETER(xTimer);
 
-    err_code = ble_hrs_heart_rate_measurement_send(&m_hrs, heart_rate);
+    err_code = ble_hrs_heart_rate_measurement_send(&m_hrs, xheart);
     if ((err_code != NRF_SUCCESS) &&
         (err_code != NRF_ERROR_INVALID_STATE) &&
         (err_code != NRF_ERROR_RESOURCES) &&

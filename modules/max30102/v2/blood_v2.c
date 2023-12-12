@@ -2,7 +2,7 @@
 #include "max30102.h"
 
 #define NRF_LOG_MODULE_NAME BLOOD
-#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_INFO
+#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_DEBUG
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 /**
@@ -28,17 +28,12 @@ NRF_LOG_MODULE_REGISTER();
 uint32_t aun_ir_buffer[500];  // IR LED sensor data
 int32_t  n_ir_buffer_length;  // data length
 uint32_t aun_red_buffer[500]; // Red LED sensor data
-int32_t  n_sp02;              // SPO2 value
-int8_t   ch_spo2_valid;       // indicator to show if the SP02 calculation is valid
-int32_t  n_heart_rate;        // heart rate value
-int8_t   ch_hr_valid;         // indicator to show if the heart rate calculation is valid
-uint8_t  uch_dummy;
-uint8_t  change_flag;
-uint8_t  ecg_status;
-int      heart = 0;
 
-int32_t sp02;
-int32_t heart_rate;
+uint8_t uch_dummy;
+uint8_t change_flag;
+uint8_t ecg_status;
+int32_t xheart;
+int32_t xsp02;
 
 static void max30102_read_fifo(uint32_t* pun_red_led, uint32_t* pun_ir_led);
 
@@ -46,6 +41,10 @@ void max30102_ecg_init(void)
 {
     uint32_t un_min, un_max;
     uint32_t un_prev_data;
+    int32_t  n_sp02;        // SPO2 value
+    int8_t   ch_spo2_valid; // indicator to show if the SP02 calculation is valid
+    int32_t  n_heart_rate;  // heart rate value
+    int8_t   ch_hr_valid;   // indicator to show if the heart rate calculation is valid
     int      i;
 
     maxim_max30102_write_reg(REG_INTR_ENABLE_1, 0xc0); // INTR setting
@@ -57,8 +56,8 @@ void max30102_ecg_init(void)
     maxim_max30102_write_reg(REG_FIFO_CONFIG, 0x0f); // sample avg = 1, fifo rollover=false, fifo almost full = 17
     maxim_max30102_write_reg(REG_MODE_CONFIG, 0x03); // 0x02 for Red only, 0x03 for SpO2 mode 0x07 multimode LED
     maxim_max30102_write_reg(REG_SPO2_CONFIG, 0x27); // SPO2_ADC range = 4096nA, SPO2 sample rate (100 Hz), LED pulseWidth (400uS)
-    maxim_max30102_write_reg(REG_LED1_PA, 0x24);     // Choose value for ~ 7mA for LED1
-    maxim_max30102_write_reg(REG_LED2_PA, 0x24);     // Choose value for ~ 7mA for LED2
+    maxim_max30102_write_reg(REG_LED1_PA, 0xff);     // Choose value for ~ 7mA for LED1
+    maxim_max30102_write_reg(REG_LED2_PA, 0x7f);     // Choose value for ~ 7mA for LED2
     maxim_max30102_write_reg(REG_PILOT_PA, 0x7f);    // Choose value for ~ 25mA for Pilot LED
     un_min             = 0x3FFFF;
     un_max             = 0;
@@ -113,11 +112,15 @@ int max30102_data_handle(int32_t* heart_rate, int32_t* sp02)
     // variables to calculate the on-board LED brightness that reflects the heartbeats
     uint32_t un_min, un_max, un_prev_data;
     int      i;
-    int      s_ecg_status;
     int      retry = 10;
-    uint8_t  temp[6];
     float    f_temp;
     int32_t  n_brightness;
+
+    int     s_ecg_status;
+    int32_t n_sp02;        // SPO2 value
+    int8_t  ch_spo2_valid; // indicator to show if the SP02 calculation is valid
+    int32_t n_heart_rate;  // heart rate value
+    int8_t  ch_hr_valid;   // indicator to show if the heart rate calculation is valid
 
     while (1) {
         i      = 0;
@@ -134,14 +137,13 @@ int max30102_data_handle(int32_t* heart_rate, int32_t* sp02)
                 un_max = aun_red_buffer[i];
         }
         // take 100 sets of samples before calculating the heart rate.
-        // rt_enter_critical();
         for (i = 400; i < 500; i++) {
             un_prev_data = aun_red_buffer[i - 1];
             while (nrf_gpio_pin_read(MAX_PIN_INT)) {
             }
 
             max30102_read_fifo(&aun_red_buffer[i], &aun_ir_buffer[i]);
-            NRF_LOG_DEBUG("[%d]: aun_red_buffer = %d, aun_ir_buffer = %d", i, aun_red_buffer[i], aun_ir_buffer[i]);
+            // NRF_LOG_DEBUG("[%d]: aun_red_buffer = %d, aun_ir_buffer = %d", i, aun_red_buffer[i], aun_ir_buffer[i]);
             if (aun_red_buffer[i] > un_prev_data) {
                 f_temp = aun_red_buffer[i] - un_prev_data;
                 f_temp /= (un_max - un_min);
@@ -157,29 +159,20 @@ int max30102_data_handle(int32_t* heart_rate, int32_t* sp02)
                 if (n_brightness > MAX_BRIGHTNESS)
                     n_brightness = MAX_BRIGHTNESS;
             }
-
-            // send samples and calculation result to terminal program through UART
-            if (ch_hr_valid == 1 && ch_spo2_valid == 1 && n_heart_rate < 120 && n_sp02 < 101) //**/ ch_hr_valid == 1 && ch_spo2_valid ==1 && n_heart_rate<120 && n_sp02<101
-            {
-                heart = n_heart_rate;
-            } else {
-                n_heart_rate = 0;
-                heart        = 0;
-            }
-            if (ch_hr_valid == 0) {
-                n_heart_rate = 0;
-                heart        = 0;
-            }
         }
 
+        ch_hr_valid   = 0;
+        ch_spo2_valid = 0;
+        n_heart_rate  = 0;
+        n_sp02        = 0;
+        s_ecg_status  = 0;
         maxim_heart_rate_and_oxygen_saturation(aun_ir_buffer, n_ir_buffer_length, aun_red_buffer, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid);
-        n_heart_rate = n_heart_rate / 6;
-        if ((ch_hr_valid == 1) && (ch_spo2_valid == 1) && (n_heart_rate > 50) && (n_heart_rate < 120) && (n_sp02 < 101) && (n_sp02 > 80)) //**/ ch_hr_valid == 1 && ch_spo2_valid ==1 && n_heart_rate<120 && n_sp02<101
+        n_heart_rate = n_heart_rate / 5;
+        if ((ch_hr_valid == 1) && (ch_spo2_valid == 1) && (n_heart_rate > 60) && (n_heart_rate < 120) && (n_sp02 < 101) && (n_sp02 > 80)) //**/ ch_hr_valid == 1 && ch_spo2_valid ==1 && n_heart_rate<120 && n_sp02<101
         {
             *heart_rate = n_heart_rate;
             *sp02       = n_sp02;
             change_flag++;
-            //            NRF_LOG_INFO("HR=%d, spo2:%d\r\n", n_heart_rate, n_sp02);
             if (change_flag > 3) {
                 change_flag  = 3;
                 s_ecg_status = 1;
@@ -200,6 +193,8 @@ int max30102_data_handle(int32_t* heart_rate, int32_t* sp02)
             retry--;
         }
     }
+    NRF_LOG_INFO("HR=%d, spo2:%d, s_ecg_status: %d", n_heart_rate, n_sp02, s_ecg_status);
+
     return s_ecg_status;
 }
 
@@ -253,21 +248,25 @@ MODE_ENTRY:
 
 void blood_Loop(void)
 {
-    ecg_status        = 0;
-    int     temp      = 0;
-    int32_t temp_hr   = 0;
-    int32_t temp_sp02 = 0;
+    ecg_status            = 0;
+    int      temp         = 0;
+    uint32_t temp_hr      = 0;
+    uint32_t temp_sp02    = 0;
+    int32_t  n_sp02       = 0;
+    int32_t  n_heart_rate = 0;
 
     max30102_ecg_init();
     for (size_t i = 0; i < SAMPLE_NUM; i++) {
+        int32_t n_sp02       = 0;
+        int32_t n_heart_rate = 0;
         temp += max30102_data_handle(&n_heart_rate, &n_sp02);
         temp_hr += n_heart_rate;
         temp_sp02 += n_sp02;
     }
-    ecg_status = temp > 3 ? 1 : 0;
-    heart_rate = temp_hr / SAMPLE_NUM;
-    sp02       = temp_sp02 / SAMPLE_NUM;
-
+    ecg_status = temp > 4 ? 1 : 0;
+    xheart     = temp_hr / SAMPLE_NUM;
+    xsp02      = temp_sp02 / SAMPLE_NUM;
+    NRF_LOG_INFO("--------------------heart_rate: %d, sp02: %d, ecg: %d", xheart, xsp02, ecg_status);
     maxim_max30102_reset();
 }
 
@@ -280,6 +279,6 @@ void max30102_thread_entry(void* args)
 
     while (1) {
         blood_Loop();
-        vTaskDelay(30000);
+        vTaskDelay(3000);
     }
 }

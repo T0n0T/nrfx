@@ -9,8 +9,8 @@ typedef enum {
     PROX,
 } HRM_Mode; // 血液状态
 
-extern int32_t sp02;
-extern int32_t heart_rate;
+extern int32_t xsp02;
+extern int32_t xheart;
 extern uint8_t ecg_status;
 void           blood_data_translate(void);
 void           blood_data_update(void);

@@ -175,7 +175,7 @@ void max30102_init(void)
                                        "MAX30102",
                                        1024,
                                        0,
-                                       4,
+                                       configMAX_PRIORITIES - 3,
                                        &max30102_handle);
     if (xReturned != pdPASS) {
         NRF_LOG_ERROR("MAX30102 task not created.");

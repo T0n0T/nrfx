@@ -119,7 +119,7 @@ void btn_init(void)
                                        "BLE",
                                        256,
                                        0,
-                                       5,
+                                       configMAX_PRIORITIES - 2,
                                        &m_btn_task);
     if (xReturned != pdPASS) {
         NRF_LOG_ERROR("button task not created.");

@@ -152,7 +152,7 @@ int read_cfg(config_t* cfg)
         NRF_LOG_INFO("read mqtt config success");
         return EOK;
     } else {
-        NRF_LOG_ERROR("flash read fail, using default config");
+        NRF_LOG_WARNING("flash read fail, using default config");
         NRF_LOG_INFO("using default config!");
         return -ERROR;
     }
