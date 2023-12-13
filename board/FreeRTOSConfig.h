@@ -64,7 +64,6 @@ extern int __bss_end__;
  *
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
-
 #define configTICK_SOURCE                       FREERTOS_USE_RTC
 
 #define configUSE_PREEMPTION                    1
@@ -75,7 +74,7 @@ extern int __bss_end__;
 #define configTICK_RATE_HZ                      1024
 #define configMAX_PRIORITIES                    (10)
 #define configMINIMAL_STACK_SIZE                (60)
-#define configTOTAL_HEAP_SIZE                   (24000)
+#define configTOTAL_HEAP_SIZE                   (25000)
 #define configMAX_TASK_NAME_LEN                 (4)
 #define configUSE_16_BIT_TICKS                  0
 #define configIDLE_SHOULD_YIELD                 1

@@ -14,6 +14,7 @@
 
 static TaskHandle_t m_app_task;
 static uint8_t      sm4_id = 0;
+static uint8_t      sm4_flag;
 
 config_t global_cfg = {
     .mqtt_cfg         = EC800M_MQTT_DEFAULT_CFG,
@@ -21,8 +22,6 @@ config_t global_cfg = {
     .sm4_flag         = SM4_ENABLED,
     .sm4_key          = SM4_DEFAULT_KEY,
 };
-
-static uint8_t sm4_flag;
 
 static void read_cfg_from_flash(void)
 {
@@ -67,7 +66,6 @@ static int mqtt_init(void)
     read_cfg_from_flash();
 
     char* src = build_msg_cfg(&global_cfg);
-    NRF_LOG_INFO("%s", src);
     free(src);
 
     ec800m_mqtt_conf(&global_cfg.mqtt_cfg);
@@ -104,6 +102,7 @@ void app_task(void* pvParameter)
     // vTaskDelete(NULL);
     while (1) {
         publish_handle();
+        NRF_LOG_INFO("mqtt app task loop");
         vTaskDelay(pdMS_TO_TICKS(3000));
     }
 }

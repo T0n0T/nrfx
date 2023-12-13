@@ -73,7 +73,6 @@ __exit:
     if (resp) {
         at_delete_resp(resp);
     }
-
     return result;
 }
 
@@ -89,6 +88,7 @@ void ec800m_task_handle(ec800m_task_t* task)
             if (ec800m.status == EC800M_IDLE) {
                 at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_CLOSE);
                 vTaskDelay(500);
+                ec800m.status = EC800M_MQTT_CLOSE;
                 if (ec800m.mqtt.keepalive) {
                     at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_CONF_ALIVE, ec800m.mqtt.keepalive);
                 }
@@ -122,7 +122,7 @@ void ec800m_task(void* p)
 {
     int result = EOK;
     nrf_gpio_pin_write(ec800m.wakeup_pin, 0);
-    result = at_client_obj_wait_connect(ec800m.client, 1000);
+    result = at_client_obj_wait_connect(ec800m.client, 10000);
     if (result < 0) {
         NRF_LOG_ERROR("at client connect failed.");
         goto __exit;
@@ -199,15 +199,16 @@ void ec800m_task(void* p)
 
     vTaskDelay(1000);
     /** use sleep mode */
-    result = at_cmd_exec(ec800m.client, NULL, AT_CMD_LOW_POWER);
-    if (result < 0) {
-        goto __exit;
-    }
+    // result = at_cmd_exec(ec800m.client, NULL, AT_CMD_LOW_POWER);
+    // if (result < 0) {
+    //     goto __exit;
+    // }
     nrf_gpio_pin_write(ec800m.wakeup_pin, 1);
     free(parse_str);
     /** set urc */
     at_obj_set_urc_table(ec800m.client, urc_table, 5);
     ec800m.status = EC800M_IDLE;
+    NRF_LOG_DEBUG("ec800m init OK!");
     ec800m_task_t task_cb;
     while (1) {
         memset(&task_cb, 0, sizeof(ec800m_task_t));

@@ -8,6 +8,9 @@
  * @copyright Copyright (c) 2023
  *
  */
+#ifndef __APP_H__
+#define __APP_H__
+
 #include <stdio.h>
 #include <stdint.h>
 #include "ec800m.h"
@@ -33,3 +36,5 @@ char* build_msg_cfg(config_t* config);
 int   parse_cfg(char* json, config_t* config);
 void  write_cfg(config_t* cfg);
 int   read_cfg(config_t* cfg);
+
+#endif

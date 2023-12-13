@@ -8,6 +8,9 @@
  * @copyright Copyright (c) 2023
  *
  */
+#ifndef __COMMON_H__
+#define __COMMON_H__
+
 #include <stdint.h>
 #include <string.h>
 #include "nordic_common.h"
@@ -81,3 +84,5 @@ extern uint16_t m_conn_handle;
 
 extern void dfu_service_init(void);
 extern void nus_service_init(void);
+
+#endif
