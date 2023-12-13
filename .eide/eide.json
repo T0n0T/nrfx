@@ -97,18 +97,6 @@
         "files": [],
         "folders": [
           {
-            "name": "at",
-            "files": [
-              {
-                "path": "modules/at/src/at_client.c"
-              },
-              {
-                "path": "modules/at/src/at_utils.c"
-              }
-            ],
-            "folders": []
-          },
-          {
             "name": "button",
             "files": [
               {
@@ -131,15 +119,6 @@
               },
               {
                 "path": "modules/ccm3310/decode.c"
-              }
-            ],
-            "folders": []
-          },
-          {
-            "name": "CJSON",
-            "files": [
-              {
-                "path": "nrf_sdk/external/cJSON/cJSON.c"
               }
             ],
             "folders": []
@@ -179,15 +158,6 @@
               },
               {
                 "path": "modules/max30102/v2/blood_v2.c"
-              }
-            ],
-            "folders": []
-          },
-          {
-            "name": "ringbuf",
-            "files": [
-              {
-                "path": "modules/ringbuf/ringbuf.c"
               }
             ],
             "folders": []
@@ -493,6 +463,42 @@
           }
         ],
         "folders": []
+      },
+      {
+        "name": "Services",
+        "files": [],
+        "folders": [
+          {
+            "name": "at",
+            "files": [
+              {
+                "path": "services/at/src/at_client.c"
+              },
+              {
+                "path": "services/at/src/at_utils.c"
+              }
+            ],
+            "folders": []
+          },
+          {
+            "name": "CJSON",
+            "files": [
+              {
+                "path": "nrf_sdk/external/cJSON/cJSON.c"
+              }
+            ],
+            "folders": []
+          },
+          {
+            "name": "ringbuf",
+            "files": [
+              {
+                "path": "services/ringbuf/ringbuf.c"
+              }
+            ],
+            "folders": []
+          }
+        ]
       },
       {
         "name": "Third Parties",
@@ -831,8 +837,8 @@
           "applications",
           "modules/ccm3310",
           "modules/button",
-          "modules/at/include",
-          "modules/ringbuf",
+          "services/at/include",
+          "services/ringbuf",
           "modules/ec800mqtt",
           "services/gnss",
           "nrf_sdk/external/cJSON",
