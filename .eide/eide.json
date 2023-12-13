@@ -490,6 +490,88 @@
             "folders": []
           },
           {
+            "name": "mqttclient",
+            "files": [
+              {
+                "path": "services/mqttclient/common/mqtt_list.c"
+              },
+              {
+                "path": "services/mqttclient/common/random.c"
+              },
+              {
+                "path": "services/mqttclient/mqttclient/mqttclient.c"
+              },
+              {
+                "path": "services/mqttclient/network/nettype_tcp.c"
+              },
+              {
+                "path": "services/mqttclient/network/nettype_tls.c"
+              },
+              {
+                "path": "services/mqttclient/network/network.c"
+              }
+            ],
+            "folders": [
+              {
+                "name": "paho-mqtt",
+                "files": [
+                  {
+                    "path": "services/mqttclient/mqtt/MQTTConnectClient.c"
+                  },
+                  {
+                    "path": "services/mqttclient/mqtt/MQTTConnectServer.c"
+                  },
+                  {
+                    "path": "services/mqttclient/mqtt/MQTTDeserializePublish.c"
+                  },
+                  {
+                    "path": "services/mqttclient/mqtt/MQTTFormat.c"
+                  },
+                  {
+                    "path": "services/mqttclient/mqtt/MQTTPacket.c"
+                  },
+                  {
+                    "path": "services/mqttclient/mqtt/MQTTSerializePublish.c"
+                  },
+                  {
+                    "path": "services/mqttclient/mqtt/MQTTSubscribeClient.c"
+                  },
+                  {
+                    "path": "services/mqttclient/mqtt/MQTTSubscribeServer.c"
+                  },
+                  {
+                    "path": "services/mqttclient/mqtt/MQTTUnsubscribeClient.c"
+                  },
+                  {
+                    "path": "services/mqttclient/mqtt/MQTTUnsubscribeServer.c"
+                  }
+                ],
+                "folders": []
+              },
+              {
+                "name": "port",
+                "files": [
+                  {
+                    "path": "services/mqttclient/platform/FreeRTOS/platform_memory.c"
+                  },
+                  {
+                    "path": "services/mqttclient/platform/FreeRTOS/platform_mutex.c"
+                  },
+                  {
+                    "path": "services/mqttclient/platform/FreeRTOS/platform_net_socket.c"
+                  },
+                  {
+                    "path": "services/mqttclient/platform/FreeRTOS/platform_thread.c"
+                  },
+                  {
+                    "path": "services/mqttclient/platform/FreeRTOS/platform_timer.c"
+                  }
+                ],
+                "folders": []
+              }
+            ]
+          },
+          {
             "name": "ringbuf",
             "files": [
               {
@@ -566,7 +648,8 @@
     "nrf52832_xxaa": {
       "excludeList": [
         "<virtual_root>/Modules/at/at_server.c",
-        "<virtual_root>/Modules/ec800m/ec800_mqtt.c"
+        "<virtual_root>/Modules/ec800m/ec800_mqtt.c",
+        "<virtual_root>/Services/mqttclient"
       ],
       "toolchain": "AC5",
       "compileConfig": {
@@ -851,7 +934,9 @@
           "services/mqttclient/mqtt",
           "services/mqttclient/mqttclient",
           "services/mqttclient/network",
-          "services/mqttclient/platform/FreeRTOS"
+          "services/mqttclient/platform/FreeRTOS",
+          ".eide/deps",
+          ".cmsis/include"
         ],
         "libList": [],
         "sourceDirList": [],
@@ -870,7 +955,8 @@
           "BOARD_CUSTOM",
           "DEBUG",
           "USE_APP_CONFIG",
-          "AT_USING_CLIENT"
+          "AT_USING_CLIENT",
+          "MQTT_NETWORK_TYPE_NO_TLS"
         ]
       }
     },
