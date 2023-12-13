@@ -97,18 +97,6 @@
         "files": [],
         "folders": [
           {
-            "name": "at",
-            "files": [
-              {
-                "path": "modules/at/src/at_client.c"
-              },
-              {
-                "path": "modules/at/src/at_utils.c"
-              }
-            ],
-            "folders": []
-          },
-          {
             "name": "button",
             "files": [
               {
@@ -136,15 +124,6 @@
             "folders": []
           },
           {
-            "name": "CJSON",
-            "files": [
-              {
-                "path": "nrf_sdk/external/cJSON/cJSON.c"
-              }
-            ],
-            "folders": []
-          },
-          {
             "name": "ec800m",
             "files": [
               {
@@ -160,15 +139,6 @@
             "folders": []
           },
           {
-            "name": "gnss",
-            "files": [
-              {
-                "path": "services/gnss/gps_rmc.c"
-              }
-            ],
-            "folders": []
-          },
-          {
             "name": "max30102",
             "files": [
               {
@@ -179,15 +149,6 @@
               },
               {
                 "path": "modules/max30102/v2/blood_v2.c"
-              }
-            ],
-            "folders": []
-          },
-          {
-            "name": "ringbuf",
-            "files": [
-              {
-                "path": "modules/ringbuf/ringbuf.c"
               }
             ],
             "folders": []
@@ -493,6 +454,133 @@
           }
         ],
         "folders": []
+      },
+      {
+        "name": "Services",
+        "files": [],
+        "folders": [
+          {
+            "name": "at",
+            "files": [
+              {
+                "path": "services/at/src/at_client.c"
+              },
+              {
+                "path": "services/at/src/at_utils.c"
+              }
+            ],
+            "folders": []
+          },
+          {
+            "name": "CJSON",
+            "files": [
+              {
+                "path": "nrf_sdk/external/cJSON/cJSON.c"
+              }
+            ],
+            "folders": []
+          },
+          {
+            "name": "gnss",
+            "files": [
+              {
+                "path": "services/gnss/gps_rmc.c"
+              }
+            ],
+            "folders": []
+          },
+          {
+            "name": "mqttclient",
+            "files": [
+              {
+                "path": "services/mqttclient/common/mqtt_list.c"
+              },
+              {
+                "path": "services/mqttclient/common/random.c"
+              },
+              {
+                "path": "services/mqttclient/mqttclient/mqttclient.c"
+              },
+              {
+                "path": "services/mqttclient/network/nettype_tcp.c"
+              },
+              {
+                "path": "services/mqttclient/network/nettype_tls.c"
+              },
+              {
+                "path": "services/mqttclient/network/network.c"
+              }
+            ],
+            "folders": [
+              {
+                "name": "paho-mqtt",
+                "files": [
+                  {
+                    "path": "services/mqttclient/mqtt/MQTTConnectClient.c"
+                  },
+                  {
+                    "path": "services/mqttclient/mqtt/MQTTConnectServer.c"
+                  },
+                  {
+                    "path": "services/mqttclient/mqtt/MQTTDeserializePublish.c"
+                  },
+                  {
+                    "path": "services/mqttclient/mqtt/MQTTFormat.c"
+                  },
+                  {
+                    "path": "services/mqttclient/mqtt/MQTTPacket.c"
+                  },
+                  {
+                    "path": "services/mqttclient/mqtt/MQTTSerializePublish.c"
+                  },
+                  {
+                    "path": "services/mqttclient/mqtt/MQTTSubscribeClient.c"
+                  },
+                  {
+                    "path": "services/mqttclient/mqtt/MQTTSubscribeServer.c"
+                  },
+                  {
+                    "path": "services/mqttclient/mqtt/MQTTUnsubscribeClient.c"
+                  },
+                  {
+                    "path": "services/mqttclient/mqtt/MQTTUnsubscribeServer.c"
+                  }
+                ],
+                "folders": []
+              },
+              {
+                "name": "port",
+                "files": [
+                  {
+                    "path": "services/mqttclient/platform/FreeRTOS/platform_memory.c"
+                  },
+                  {
+                    "path": "services/mqttclient/platform/FreeRTOS/platform_mutex.c"
+                  },
+                  {
+                    "path": "services/mqttclient/platform/FreeRTOS/platform_net_socket.c"
+                  },
+                  {
+                    "path": "services/mqttclient/platform/FreeRTOS/platform_thread.c"
+                  },
+                  {
+                    "path": "services/mqttclient/platform/FreeRTOS/platform_timer.c"
+                  }
+                ],
+                "folders": []
+              }
+            ]
+          },
+          {
+            "name": "ringbuf",
+            "files": [
+              {
+                "path": "services/ringbuf/ringbuf.c"
+              }
+            ],
+            "folders": []
+          }
+        ]
       },
       {
         "name": "Third Parties",
@@ -813,33 +901,37 @@
           "nrf_sdk/components/softdevice/s132/headers/nrf52",
           "nrf_sdk/components/libraries/bootloader",
           "nrf_sdk/components/libraries/bootloader/dfu",
+          "nrf_sdk/components/libraries/fifo",
+          "nrf_sdk/components/libraries/uart",
           "nrf_sdk/external/fprintf",
           "nrf_sdk/external/freertos/portable/ARM/nrf52",
           "nrf_sdk/external/freertos/portable/CMSIS/nrf52",
           "nrf_sdk/external/freertos/source/include",
           "nrf_sdk/external/segger_rtt",
           "nrf_sdk/external/utf_converter",
+          "nrf_sdk/external/cJSON",
           "nrf_sdk/integration/nrfx",
           "nrf_sdk/integration/nrfx/legacy",
           "nrf_sdk/modules/nrfx",
           "nrf_sdk/modules/nrfx/drivers/include",
           "nrf_sdk/modules/nrfx/hal",
-          ".cmsis/include",
-          ".eide/deps",
           "nrf_sdk/modules/nrfx/mdk",
           "board",
           "applications",
           "modules/ccm3310",
           "modules/button",
-          "modules/at/include",
-          "modules/ringbuf",
           "modules/ec800mqtt",
-          "services/gnss",
-          "nrf_sdk/external/cJSON",
           "modules/max30102/v2",
           "modules/max30102",
-          "nrf_sdk/components/libraries/fifo",
-          "nrf_sdk/components/libraries/uart"
+          "services/gnss",
+          "services/at/include",
+          "services/ringbuf",
+          "services/mqttclient/common",
+          "services/mqttclient/config",
+          "services/mqttclient/mqtt",
+          "services/mqttclient/mqttclient",
+          "services/mqttclient/network",
+          "services/mqttclient/platform/FreeRTOS"
         ],
         "libList": [],
         "sourceDirList": [],
