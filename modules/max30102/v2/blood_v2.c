@@ -2,7 +2,7 @@
 #include "max30102.h"
 
 #define NRF_LOG_MODULE_NAME BLOOD
-#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_DEBUG
+#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_INFO
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 /**
@@ -193,7 +193,7 @@ int max30102_data_handle(int32_t* heart_rate, int32_t* sp02)
             retry--;
         }
     }
-    NRF_LOG_INFO("HR=%d, spo2:%d, s_ecg_status: %d", n_heart_rate, n_sp02, s_ecg_status);
+    NRF_LOG_DEBUG("HR=%d, spo2:%d, s_ecg_status: %d", n_heart_rate, n_sp02, s_ecg_status);
 
     return s_ecg_status;
 }
@@ -266,7 +266,7 @@ void blood_Loop(void)
     ecg_status = temp > 4 ? 1 : 0;
     xheart     = temp_hr / SAMPLE_NUM;
     xsp02      = temp_sp02 / SAMPLE_NUM;
-    NRF_LOG_INFO("--------------------heart_rate: %d, sp02: %d, ecg: %d", xheart, xsp02, ecg_status);
+    // NRF_LOG_INFO("--------------------heart_rate: %d, sp02: %d, ecg: %d", xheart, xsp02, ecg_status);
     maxim_max30102_reset();
 }
 

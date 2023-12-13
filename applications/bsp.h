@@ -8,12 +8,15 @@
  * @copyright Copyright (c) 2023
  *
  */
+#ifndef __BSP_H__
+#define __BSP_H__
+
 #include "nrfx_pwm.h"
 #include "nrfx_gpiote.h"
 #include "nrf_drv_clock.h"
 #include "nrfx_rtc.h"
 
-extern int flag;
+extern int              flag;
 extern const nrfx_rtc_t rtc_instance;
 
 void gpio_init(void);
@@ -29,3 +32,5 @@ void btn_init(void);
 
 void bsp_init(void);
 void bsp_uninit(void);
+
+#endif

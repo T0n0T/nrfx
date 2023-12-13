@@ -8,6 +8,9 @@
  * @copyright Copyright (c) 2023
  *
  */
+#ifndef __CCM3310_H__
+#define __CCM3310_H__
+
 #include "nrf_gpio.h"
 #include "nrfx_spim.h"
 #include <ccm3310_sm4.h>
@@ -32,3 +35,5 @@ int decode(uint8_t* raw, uint8_t** data, int* len);
 int encode(uint8_t cla, uint8_t ins, uint8_t p1, uint8_t p2, uint8_t* send_pack, uint8_t* data, uint32_t data_len);
 
 uint32_t crc32(const uint8_t* buf, uint32_t size);
+
+#endif
