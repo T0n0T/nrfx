@@ -139,15 +139,6 @@
             "folders": []
           },
           {
-            "name": "gnss",
-            "files": [
-              {
-                "path": "services/gnss/gps_rmc.c"
-              }
-            ],
-            "folders": []
-          },
-          {
             "name": "max30102",
             "files": [
               {
@@ -490,6 +481,15 @@
             "folders": []
           },
           {
+            "name": "gnss",
+            "files": [
+              {
+                "path": "services/gnss/gps_rmc.c"
+              }
+            ],
+            "folders": []
+          },
+          {
             "name": "ringbuf",
             "files": [
               {
@@ -819,33 +819,39 @@
           "nrf_sdk/components/softdevice/s132/headers/nrf52",
           "nrf_sdk/components/libraries/bootloader",
           "nrf_sdk/components/libraries/bootloader/dfu",
+          "nrf_sdk/components/libraries/fifo",
+          "nrf_sdk/components/libraries/uart",
           "nrf_sdk/external/fprintf",
           "nrf_sdk/external/freertos/portable/ARM/nrf52",
           "nrf_sdk/external/freertos/portable/CMSIS/nrf52",
           "nrf_sdk/external/freertos/source/include",
           "nrf_sdk/external/segger_rtt",
           "nrf_sdk/external/utf_converter",
+          "nrf_sdk/external/cJSON",
           "nrf_sdk/integration/nrfx",
           "nrf_sdk/integration/nrfx/legacy",
           "nrf_sdk/modules/nrfx",
           "nrf_sdk/modules/nrfx/drivers/include",
           "nrf_sdk/modules/nrfx/hal",
-          ".cmsis/include",
-          ".eide/deps",
           "nrf_sdk/modules/nrfx/mdk",
           "board",
           "applications",
           "modules/ccm3310",
           "modules/button",
-          "services/at/include",
-          "services/ringbuf",
+          "modules/at/include",
+          "modules/ringbuf",
           "modules/ec800mqtt",
-          "services/gnss",
-          "nrf_sdk/external/cJSON",
           "modules/max30102/v2",
           "modules/max30102",
-          "nrf_sdk/components/libraries/fifo",
-          "nrf_sdk/components/libraries/uart"
+          "services/gnss",
+          "services/at/include",
+          "services/ringbuf",
+          "services/mqttclient/common",
+          "services/mqttclient/config",
+          "services/mqttclient/mqtt",
+          "services/mqttclient/mqttclient",
+          "services/mqttclient/network",
+          "services/mqttclient/platform/FreeRTOS"
         ],
         "libList": [],
         "sourceDirList": [],
