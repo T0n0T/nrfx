@@ -79,7 +79,7 @@ __exit:
 void ec800m_task_handle(ec800m_task_t* task)
 {
     switch (*task) {
-        case EC800M_TASK_CHECK:
+        case EC800M_TASK_MQTT_CHECK:
             ec800m.status = EC800M_IDLE;
             at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_STATUS);
             xTimerStart(ec800m.timer, 0);
@@ -199,10 +199,10 @@ void ec800m_task(void* p)
 
     vTaskDelay(1000);
     /** use sleep mode */
-    // result = at_cmd_exec(ec800m.client, NULL, AT_CMD_LOW_POWER);
-    // if (result < 0) {
-    //     goto __exit;
-    // }
+    result = at_cmd_exec(ec800m.client, NULL, AT_CMD_LOW_POWER);
+    if (result < 0) {
+        goto __exit;
+    }
     nrf_gpio_pin_write(ec800m.wakeup_pin, 1);
     free(parse_str);
     /** set urc */
@@ -221,79 +221,6 @@ void ec800m_task(void* p)
 
 __exit:
     vTaskDelete(NULL);
-}
-
-int ec800m_mqtt_conf(ec800m_mqtt_t* cfg)
-{
-    char prase_str[20] = {0};
-    if (cfg->host == NULL || cfg->port == NULL || cfg->clientid == NULL) {
-        NRF_LOG_INFO("host and port of mqtt should be configure.");
-        return -EINVAL;
-    }
-    memcpy(&ec800m.mqtt, cfg, sizeof(ec800m_mqtt_t));
-    return EOK;
-}
-
-int ec800m_mqtt_connect(void)
-{
-    ec800m_task_t task = EC800M_TASK_MQTT_RELEASE;
-    return xQueueSend(ec800m.task_queue, &task, 300);
-}
-
-int ec800m_mqtt_pub(char* topic, void* payload, uint32_t len)
-{
-    int result = EOK;
-    if (topic == NULL || payload == NULL) {
-        NRF_LOG_INFO("topic and payload should be specified.");
-        result = -EINVAL;
-        goto __exit;
-    }
-    char* tmp_payload = (char*)malloc(len + 1);
-    if (tmp_payload == NULL) {
-        NRF_LOG_ERROR("tmpbuf for mqtt payload create fail");
-        result = -ENOMEM;
-        goto __exit;
-    }
-    strcpy(tmp_payload, payload);
-    tmp_payload[len] = '\0';
-
-    if (ec800m.status == EC800M_MQTT_CONN) {
-        nrf_gpio_pin_write(ec800m.wakeup_pin, 0);
-        at_set_end_sign('>');
-        at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_PUBLISH, topic, len);
-        at_client_send(tmp_payload, len);
-        at_set_end_sign(0);
-
-        nrf_gpio_pin_write(ec800m.wakeup_pin, 1);
-    } else {
-        NRF_LOG_WARNING("mqtt has not connected, try to reconnect", ec800m.status);
-        ec800m_task_t task = EC800M_TASK_CHECK;
-        xQueueSend(ec800m.task_queue, &task, 300);
-        result = -ERROR;
-    }
-__exit:
-
-    free(tmp_payload);
-    return result;
-}
-
-int ec800m_mqtt_sub(char* subtopic)
-{
-    if (subtopic == NULL) {
-        NRF_LOG_INFO("subtopic should be specified.");
-        return -EINVAL;
-    }
-    if (ec800m.status == EC800M_MQTT_CONN) {
-        nrf_gpio_pin_write(ec800m.wakeup_pin, 0);
-        at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_SUBSCRIBE, subtopic);
-        nrf_gpio_pin_write(ec800m.wakeup_pin, 1);
-    } else {
-        NRF_LOG_WARNING("mqtt has not connected, try to reconnect", ec800m.status);
-        ec800m_task_t task = EC800M_TASK_CHECK;
-        xQueueSend(ec800m.task_queue, &task, 300);
-        return -ERROR;
-    }
-    return EOK;
 }
 
 gps_info_t ec800m_gnss_get(void)
@@ -324,7 +251,7 @@ void ec800m_timer_cb(TimerHandle_t timer)
             break;
         default:
             ec800m.reset_need++;
-            ec800m_task_t task = EC800M_TASK_CHECK;
+            ec800m_task_t task = EC800M_TASK_MQTT_CHECK;
             xQueueSend(ec800m.task_queue, &task, 0);
             if (ec800m.reset_need >= EC800M_RESET_MAX) {
                 NRF_LOG_INFO("ec800m timer reset");

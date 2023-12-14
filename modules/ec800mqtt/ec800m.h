@@ -40,9 +40,10 @@ typedef struct {
 } ec800m_mqtt_t;
 
 typedef enum {
-    EC800M_TASK_CHECK = 1,
+    EC800M_TASK_MQTT_CHECK = 1,
     EC800M_TASK_MQTT_RELEASE,
-    EC800M_TASK_MQTT_CONNECT
+    EC800M_TASK_MQTT_CONNECT,
+    EC800M_TASK_TCP_CONNECT,
 } ec800m_task_t;
 
 typedef struct {

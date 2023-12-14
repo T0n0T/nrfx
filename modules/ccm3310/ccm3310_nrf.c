@@ -59,7 +59,7 @@ int ccm3310_transfer(uint8_t* send_buf, int send_len, uint8_t** decode_data, int
             .rx_length   = send_len,
         };
     result = nrfx_spim_xfer(&instance, &spim_xfer_desc, 0);
-
+    NRFX_DELAY_US(5);
 #if defined(CCM3310_RAW_PRINTF)
     printf("\n========= print transmit ========\n");
     for (size_t i = 0; i < send_len; i++) {
@@ -72,7 +72,7 @@ int ccm3310_transfer(uint8_t* send_buf, int send_len, uint8_t** decode_data, int
 
 #endif
     status = 1;
-    // rt_pin_write(GINT0, PIN_LOW);
+    nrf_gpio_pin_write(GINT0, 0);
     while (status == 1) {
         status = nrf_gpio_pin_read(GINT1);
     }

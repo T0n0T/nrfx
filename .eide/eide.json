@@ -133,6 +133,12 @@
                 "path": "modules/ec800mqtt/ec800m_at_urc.c"
               },
               {
+                "path": "modules/ec800mqtt/ec800m_mqtt.c"
+              },
+              {
+                "path": "modules/ec800mqtt/ec800m_socket.c"
+              },
+              {
                 "path": "modules/ec800mqtt/ec800m.c"
               }
             ],
