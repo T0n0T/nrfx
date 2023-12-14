@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2023
  *
  */
-#include "ec800m.h"
+#include "ec800m_socket.h"
 
 #define NRF_LOG_MODULE_NAME ec800socket
 #define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_DEBUG

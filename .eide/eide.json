@@ -127,19 +127,22 @@
             "name": "ec800m",
             "files": [
               {
-                "path": "modules/ec800mqtt/ec800m_at_cmd.c"
+                "path": "modules/ec800m/ec800m_at_cmd.c"
               },
               {
-                "path": "modules/ec800mqtt/ec800m_at_urc.c"
+                "path": "modules/ec800m/ec800m.c"
               },
               {
-                "path": "modules/ec800mqtt/ec800m_mqtt.c"
+                "path": "modules/ec800m/mqtt/ec800m_mqtt_at_urc.c"
               },
               {
-                "path": "modules/ec800mqtt/ec800m_socket.c"
+                "path": "modules/ec800m/mqtt/ec800m_mqtt.c"
               },
               {
-                "path": "modules/ec800mqtt/ec800m.c"
+                "path": "modules/ec800m/socket/ec800m_socket_at_urc.c"
+              },
+              {
+                "path": "modules/ec800m/socket/ec800m_socket.c"
               }
             ],
             "folders": []
@@ -929,7 +932,9 @@
           "modules/button",
           "modules/at/include",
           "modules/ringbuf",
-          "modules/ec800mqtt",
+          "modules/ec800m",
+          "modules/ec800m/mqtt",
+          "modules/ec800m/socket",
           "modules/max30102/v2",
           "modules/max30102",
           "services/gnss",

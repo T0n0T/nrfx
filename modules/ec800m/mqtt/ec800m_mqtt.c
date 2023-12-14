@@ -8,12 +8,56 @@
  * @copyright Copyright (c) 2023
  *
  */
-#include "ec800m.h"
+#include "ec800m_mqtt.h"
 
 #define NRF_LOG_MODULE_NAME ec800mqtt
 #define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_DEBUG
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
+
+ec800m_mqtt_t mqtt_config;
+
+void ec800m_mqtt_task_handle(ec800m_task_t task)
+{
+    switch (task) {
+        case EC800M_TASK_MQTT_CHECK:
+            ec800m.status = EC800M_IDLE;
+            at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_STATUS);
+            xTimerStart(ec800m.timer, 0);
+            break;
+        case EC800M_TASK_MQTT_RELEASE:
+            if (ec800m.status == EC800M_IDLE) {
+                at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_CLOSE);
+                vTaskDelay(500);
+                ec800m.status = EC800M_MQTT_CLOSE;
+                if (mqtt_config.keepalive) {
+                    at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_CONF_ALIVE, mqtt_config.keepalive);
+                }
+                if (ec800m.status == EC800M_MQTT_CLOSE) {
+                    at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_REL, mqtt_config.host, mqtt_config.port);
+                }
+            } else {
+                at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_REL, mqtt_config.host, mqtt_config.port);
+            }
+            break;
+        case EC800M_TASK_MQTT_CONNECT:
+            if (ec800m.status == EC800M_MQTT_OPEN) {
+                char cmd_para[30] = {0};
+                if (mqtt_config.username && mqtt_config.password) {
+                    sprintf(cmd_para, "%s,%s,%s", mqtt_config.clientid, mqtt_config.username, mqtt_config.password);
+                } else {
+                    sprintf(cmd_para, "%s", mqtt_config.clientid);
+                }
+                at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_CONNECT, cmd_para);
+            } else {
+                NRF_LOG_WARNING("mqtt has not released");
+            }
+            break;
+
+        default:
+            break;
+    }
+}
 
 int ec800m_mqtt_conf(ec800m_mqtt_t* cfg)
 {
@@ -22,7 +66,7 @@ int ec800m_mqtt_conf(ec800m_mqtt_t* cfg)
         NRF_LOG_INFO("host and port of mqtt should be configure.");
         return -EINVAL;
     }
-    memcpy(&ec800m.mqtt, cfg, sizeof(ec800m_mqtt_t));
+    memcpy(&mqtt_config, cfg, sizeof(ec800m_mqtt_t));
     return EOK;
 }
 
