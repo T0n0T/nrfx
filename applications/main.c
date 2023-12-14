@@ -31,8 +31,8 @@ int main(void)
     log_init();
     bsp_init();
     APP_ERROR_CHECK(nrf_pwr_mgmt_init());
-    rt_pm_release_all(PM_SLEEP_MODE_NONE);
-    rt_pm_sleep_request(PM_BOARD_ID, PM_SLEEP_MODE_LIGHT);
+    // rt_pm_release_all(PM_SLEEP_MODE_NONE);
+    // rt_pm_sleep_request(PM_BOARD_ID, PM_SLEEP_MODE_LIGHT);
     max30102_init();
     ccm3310_init();
     mission_init();

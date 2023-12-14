@@ -22,7 +22,7 @@ struct at_device_ec800x _dev =
 
         EC800X_SAMPLE_POWER_PIN,
         EC800X_SAMPLE_RESET_PIN,
-        EC800X_SAMPLE_WAKEUP_PIN,
+        -1,
         EC800X_SAMPLE_RECV_BUFF_LEN,
         RT_NULL};
 

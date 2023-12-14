@@ -181,4 +181,5 @@ void max30102_init(void)
         NRF_LOG_ERROR("MAX30102 task not created.");
         APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
     }
+    rt_thread_startup(max30102_handle);
 }

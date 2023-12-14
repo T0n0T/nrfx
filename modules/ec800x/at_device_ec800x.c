@@ -61,14 +61,11 @@ static int ec800x_sleep(struct at_device *device)
     struct at_device_ec800x *ec800x = RT_NULL;
 
     ec800x = (struct at_device_ec800x *)device->user_data;
+    if (((struct at_device_ec800x *)(device->user_data))->wakeup_pin == -1) return RT_EOK;
+
     if (ec800x->sleep_status) // is sleep status
     {
         return (RT_EOK);
-    }
-    if (ec800x->wakeup_pin == -1) // use wakeup pin
-    {
-        LOG_E("no config wakeup pin, can not entry into sleep mode.");
-        return (-RT_ERROR);
     }
 
     resp = at_create_resp(64, 0, rt_tick_from_millisecond(300));
@@ -104,6 +101,7 @@ static int ec800x_wakeup(struct at_device *device)
     {
         return (RT_EOK);
     }
+    if (((struct at_device_ec800x *)(device->user_data))->wakeup_pin == -1) return RT_EOK;
 
     nrf_gpio_pin_write(ec800x->wakeup_pin, 0);
     rt_thread_mdelay(200);

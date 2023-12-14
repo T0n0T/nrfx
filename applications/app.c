@@ -44,7 +44,7 @@ NRF_FSTORAGE_DEF(nrf_fstorage_t fstorage) =
 struct rt_thread check_thread = {0};
 struct rt_thread mqtt_thread  = {0};
 char stack[1024]              = {0};
-char check_stack[1024]        = {0};
+char check_stack[2048]        = {0};
 /*-------client init---------*/
 mqtt_client_t *client      = NULL;
 mqtt_message_t publish_msg = {0};
@@ -73,24 +73,24 @@ void publish_handle(void)
 
     char *publish_data = build_msg_updata(DEVICE_ID, ec800x_get_gnss(), 1, ecg_status);
     // char *publish_data = build_msg_updata(DEVICE_ID, ec800x_get_gnss(), 1, 1);
-    if (sm4_flag) {
-        pdata origin_mqtt      = {rt_strlen(publish_data), (uint8_t *)publish_data};
-        ciphertext cipher_mqtt = ccm3310_sm4_encrypt(sm4_id, origin_mqtt);
-        if (cipher_mqtt.len > 0) {
-            memset(&publish_msg, 0, sizeof(publish_msg));
-            publish_msg.qos        = QOS0;
-            publish_msg.payloadlen = cipher_mqtt.len;
-            publish_msg.payload    = cipher_mqtt.data;
+    // if (sm4_flag) {
+    //     pdata origin_mqtt      = {rt_strlen(publish_data), (uint8_t *)publish_data};
+    //     ciphertext cipher_mqtt = ccm3310_sm4_encrypt(sm4_id, origin_mqtt);
+    //     if (cipher_mqtt.len > 0) {
+    //         memset(&publish_msg, 0, sizeof(publish_msg));
+    //         publish_msg.qos        = QOS0;
+    //         publish_msg.payloadlen = cipher_mqtt.len;
+    //         publish_msg.payload    = cipher_mqtt.data;
 
-        } else {
-            LOG_E("publish msg sm4 encrypt fail.");
-        }
-    } else {
+    //     } else {
+    //         LOG_E("publish msg sm4 encrypt fail.");
+    //     }
+    // } else {
         memset(&publish_msg, 0, sizeof(publish_msg));
         publish_msg.qos        = QOS0;
         publish_msg.payloadlen = rt_strlen(publish_data);
         publish_msg.payload    = publish_data;
-    }
+    // }
 
     err = mqtt_publish(client, MQTT_TOPIC_DATA, &publish_msg);
     if (err != KAWAII_MQTT_SUCCESS_ERROR) {
@@ -99,9 +99,10 @@ void publish_handle(void)
         if (flag++ == 3) {
             flag = 0;
             LOG_E("publish msg has too many errors, thread will be restarted now");
-            rt_thread_init(&check_thread, "mqtt_reset", mqtt_reset_thread, RT_NULL, check_stack, sizeof(check_stack), 21, 15);
-            rt_thread_startup(&check_thread);
-            rt_thread_mdelay(2000);
+            rt_hw_cpu_reset();
+            // rt_thread_init(&check_thread, "mqtt_reset", mqtt_reset_thread, RT_NULL, check_stack, sizeof(check_stack), 21, 15);
+            // rt_thread_startup(&check_thread);
+            // rt_thread_mdelay(2000);
         }
     } else {
         LOG_D("publish msg success!!!!!!!!");
@@ -287,8 +288,10 @@ void mission_deinit(void)
 void mqtt_reset_thread(void *p)
 {
     mission_deinit();
+
     extern void ec800x_init_thread_entry(void *p);
     ec800x_init_thread_entry(NULL);
+
     rt_thread_mdelay(2000);
     mission_init();
 }
