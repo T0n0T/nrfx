@@ -11,16 +11,15 @@
 #include "ec800m.h"
 #include "nrfx_gpiote.h"
 
-#define NRF_LOG_MODULE_NAME ec800mqtt
+#define NRF_LOG_MODULE_NAME ec800
 #define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_INFO
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
-static char                send_buf[EC800M_BUF_LEN];
-extern const struct at_urc urc_table[];
-ec800m_t                   ec800m;
-static TaskHandle_t        ec800m_task_handle = NULL;
-ec800m_task_group_t        task_groups[2];
+static char         send_buf[EC800M_BUF_LEN];
+static TaskHandle_t ec800m_task_handle;
+ec800m_t            ec800m;
+ec800m_task_group_t task_groups[2];
 static void (*timeout)(void);
 
 /**
@@ -169,7 +168,9 @@ void ec800m_task(void* p)
                 timeout = task_groups[i].timeout_handle;
                 xTimerChangePeriod(ec800m.timer, pdMS_TO_TICKS(task_cb.timeout), 0);
                 task_groups[i].task_handle(task_cb.task);
-                xTimerStart(ec800m.timer);
+                if (task_cb.timeout > 0) {
+                    xTimerStart(ec800m.timer, 0);
+                }
                 break;
             }
         }

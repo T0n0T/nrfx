@@ -37,11 +37,11 @@ static void read_cfg_from_flash(void)
 
 void publish_handle(void)
 {
-    if (ec800m.status != EC800M_MQTT_CONN) {
+    if (mqtt_status != EC800M_MQTT_CONN) {
         return;
     }
 
-    char* publish_data = build_msg_mqtt(ec800m.mqtt.clientid, ec800m_gnss_get(), ecg_status, 1);
+    char* publish_data = build_msg_mqtt(mqtt_config.clientid, ec800m_gnss_get(), ecg_status, 1);
 
     // if (sm4_flag) {
     //     pdata      origin_mqtt = {strlen(publish_data), (uint8_t*)publish_data};
@@ -54,7 +54,7 @@ void publish_handle(void)
     // } else {
     // }
 
-    ec800m_mqtt_pub(ec800m.mqtt.pubtopic, publish_data, strlen(publish_data));
+    ec800m_mqtt_pub(mqtt_config.pubtopic, publish_data, strlen(publish_data));
 
     free(publish_data);
 }
@@ -70,7 +70,7 @@ static int mqtt_init(void)
 
     ec800m_mqtt_conf(&global_cfg.mqtt_cfg);
     ec800m_mqtt_connect();
-    while (ec800m.status != EC800M_MQTT_CONN) {
+    while (mqtt_status != EC800M_MQTT_CONN) {
         vTaskDelay(200);
     }
 

@@ -11,5 +11,18 @@
 
 #ifndef __EC800M_SOCKET_H__
 #define __EC800M_SOCKET_H__
-#include "ec800m.h"
+
+#define EC800M_SOCKET_SUCCESS (1 << 0)
+#define EC800M_SOCKET_TIMEOUT (1 << 1)
+#define EC800M_SOCKET_ERROR   (1 << 2)
+typedef enum {
+    EC800M_TASK_SOCKET_CHECK = 1,
+    EC800M_TASK_SOCKET_INIT,
+    EC800M_TASK_SOCKET_OPEN,
+    EC800M_TASK_SOCKET_CONNECT,
+    EC800M_TASK_SOCKET_SEND,
+    EC800M_TASK_SOCKET_RECV,
+    EC800M_TASK_SOCKET_CLOSE,
+} ec800m_socket_task_t;
+
 #endif
