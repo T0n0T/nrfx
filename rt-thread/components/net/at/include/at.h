@@ -14,7 +14,7 @@
 
 #include <stddef.h>
 #include <rtthread.h>
-
+#define AT_PRINT_RAW_CMD
 #ifdef __cplusplus
 extern "C" {
 #endif

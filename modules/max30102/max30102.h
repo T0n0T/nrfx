@@ -10,9 +10,13 @@
 #ifndef PKG_MAX30102_H__
 #define PKG_MAX30102_H__
 
+#include "nrf_gpio.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <stddef.h>
+#include <stdint.h>
+
 #include <rtthread.h>
-#include "nrf_drv_twi.h"
-#include <drivers/sensor.h>
 
 #ifndef MAX30102_STACK_SIZE
 #define MAX30102_STACK_SIZE 0x300
@@ -60,14 +64,15 @@
 #define REG_PART_ID         0xFF
 
 #define MAX30102_ADDR       0x57 // 7-bit version of the above
-extern struct rt_sensor_config cfg;
 
 extern void max30102_thread_entry(void *args);
 
-int rt_hw_max30102_init(struct rt_sensor_config *cfg);
-rt_bool_t max30102_checkout_HRM_SPO2_mode();
-rt_bool_t max30102_checkout_proximity_mode();
-rt_bool_t maxim_max30102_init_proximity_mode();
-rt_bool_t maxim_max30102_write_reg(uint8_t uch_addr, uint8_t uch_data);
-rt_bool_t maxim_max30102_read_reg(uint8_t uch_addr, uint8_t *data, uint16_t len);
+bool maxim_max30102_reset();
+bool maxim_max30102_init_proximity_mode();
+bool maxim_max30102_write_reg(uint8_t uch_addr, uint8_t uch_data);
+bool maxim_max30102_read_reg(uint8_t uch_addr, uint8_t *data, uint16_t len);
+
+void max30102_init(void);
+void twim_init(void);
+void twim_uninit(void);
 #endif /*  MAX30102_H_ */

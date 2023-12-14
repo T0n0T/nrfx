@@ -117,7 +117,8 @@
             "drv_pm.h": "c",
             "nrf_drv_clock.h": "c",
             "nrf_drv_twi.h": "c",
-            "compiler_abstraction.h": "c"
+            "compiler_abstraction.h": "c",
+            "at.h": "c"
         },
         "cortex-debug.variableUseNaturalFormat": true
     },

@@ -35,27 +35,14 @@ void gpio_init(void)
     nrf_gpio_cfg_output(POR);
     nrf_gpio_cfg_output(GINT0);
     nrf_gpio_cfg_input(GINT1, NRF_GPIO_PIN_NOPULL);
-
-    nrf_gpio_cfg_output(EC800_PWR_EN);
-    nrf_gpio_pin_write(EC800_PWR_EN, 0);
 }
 
 void set_sleep_exit_pin(void)
 {
-    nrf_gpio_cfg_input(13, NRF_GPIO_PIN_PULLUP);
+    nrf_gpio_cfg_input(SW, NRF_GPIO_PIN_PULLUP);
     nrf_gpio_pin_sense_t sense = NRF_GPIO_PIN_SENSE_LOW;
-    nrf_gpio_cfg_sense_set(13, sense);
+    nrf_gpio_cfg_sense_set(SW, sense);
 }
-
-void show_pin(void)
-{
-    printf("SW sense is: %d\n", nrf_gpio_pin_sense_get(SW));
-    printf("SW dir   is: %d\n", nrf_gpio_pin_dir_get(SW));
-    printf("SW pull  is: %d\n", nrf_gpio_pin_pull_get(SW));
-    printf("SW input is: %d\n", nrf_gpio_pin_input_get(SW));
-    printf("SW level is: %d\n", nrf_gpio_pin_read(SW));
-}
-MSH_CMD_EXPORT(show_pin, show pin);
 
 void gpio_uninit(void)
 {
@@ -158,7 +145,6 @@ void bsp_init(void)
     // gpio_init();
     beep_init();
     // ccm3310_init();
-    i2c0_init();
 
     // nrfx_uart_init(&uart0, &uart0_config, uart0_event_hander);
 }
@@ -168,7 +154,6 @@ void bsp_uninit(void)
     // gpio_uninit();
     beep_uninit();
     // ccm3310_uninit();
-    i2c0_uninit();
     // nrfx_uart_uninit(&uart0);
     // nrfx_clock_hfclk_stop();
 }

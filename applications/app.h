@@ -13,6 +13,9 @@
 #include "nrf_log.h"
 #include "nrf_log_instance.h"
 
+#include "max30102.h"
+#include "ccm3310.h"
+
 #define DEVICE_ID "CYGC_001111"
 // #define MQTT_URI_HOST    "172.16.248.66"
 // #define MQTT_URI_PORT    "18891"

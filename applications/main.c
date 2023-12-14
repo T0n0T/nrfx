@@ -33,7 +33,9 @@ int main(void)
     APP_ERROR_CHECK(nrf_pwr_mgmt_init());
     rt_pm_release_all(PM_SLEEP_MODE_NONE);
     rt_pm_sleep_request(PM_BOARD_ID, PM_SLEEP_MODE_LIGHT);
-    // mission_init();
+    max30102_init();
+    ccm3310_init();
+    mission_init();
     while (1) {
         nrf_gpio_pin_toggle(LED1);
         rt_thread_mdelay(2000);

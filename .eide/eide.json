@@ -244,9 +244,6 @@
             "path": "board/sdk_config.h"
           },
           {
-            "path": "libraries/drivers/drv_i2c.c"
-          },
-          {
             "path": "libraries/drivers/drv_pm.c"
           },
           {
@@ -506,24 +503,9 @@
         "files": [
           {
             "path": "modules/max30102/max30102.c"
-          },
-          {
-            "path": "modules/max30102/port.c"
           }
         ],
         "folders": [
-          {
-            "name": "v1",
-            "files": [
-              {
-                "path": "modules/max30102/v1/algorithm_v1.c"
-              },
-              {
-                "path": "modules/max30102/v1/blood_v1.c"
-              }
-            ],
-            "folders": []
-          },
           {
             "name": "v2",
             "files": [
@@ -1050,7 +1032,7 @@
         },
         "proType": 1,
         "speed": 8000,
-        "otherCmds": "ip 192.168.230.1"
+        "otherCmds": ""
       },
       "uploadConfigMap": {},
       "custom_dep": {
