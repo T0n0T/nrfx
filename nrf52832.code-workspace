@@ -30,6 +30,8 @@
             "**/.vscode": true,
             "*.d": true,
             "*.dep": true,
+            "services/mqttclient/platform/RT-Thread": true,
+            "services/mqttclient/network/mbedtls": true
         }
     },
     "extensions": {

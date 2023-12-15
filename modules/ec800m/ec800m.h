@@ -27,7 +27,7 @@
 #define AT_CLIENT_RECV_BUFF_LEN 128
 
 typedef enum {
-    EC800M_IDLE,
+    EC800M_IDLE = 1,
     EC800M_BUSY,
     EC800M_ERROR,
 } ec800m_status_t;
@@ -35,13 +35,14 @@ typedef enum {
 typedef struct {
     uint32_t type;
     uint32_t task;
+    void*    param;
     uint32_t timeout;
 } ec800m_task_t;
 
 typedef struct {
     uint8_t id;
-    void (*init_handle)(void);
-    void (*task_handle)(int);
+    void (*init)(void);
+    void (*task_handle)(int, void*);
     void (*timeout_handle)(int);
 } ec800m_task_group_t;
 

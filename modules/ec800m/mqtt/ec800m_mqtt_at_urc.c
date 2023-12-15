@@ -49,7 +49,7 @@ NRF_LOG_MODULE_REGISTER();
 #define URC_QMTSTAT_CLIENT_DISCONN   8
 
 extern EventGroupHandle_t mqtt_event;
-extern uint8_t            mqtt_status;
+extern int                mqtt_task_publish(ec800m_mqtt_task_t task, uint32_t timeout);
 
 void urc_mqtt_open(struct at_client* client, const char* data, size_t size)
 {

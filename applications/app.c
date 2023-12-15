@@ -69,6 +69,9 @@ static int mqtt_init(void)
     free(src);
 
     ec800m_mqtt_conf(&global_cfg.mqtt_cfg);
+    while (ec800m.status != EC800M_IDLE) {
+        vTaskDelay(200);
+    }
     ec800m_mqtt_connect();
     while (mqtt_status != EC800M_MQTT_CONN) {
         vTaskDelay(200);

@@ -45,7 +45,6 @@ typedef enum {
 extern ec800m_mqtt_t        mqtt_config;
 extern ec800m_mqtt_status_t mqtt_status;
 
-int mqtt_task_publish(ec800m_mqtt_task_t task, uint32_t timeout);
 int ec800m_mqtt_connect(void);
 int ec800m_mqtt_pub(char* topic, void* payload, uint32_t len);
 int ec800m_mqtt_sub(char* subtopic);

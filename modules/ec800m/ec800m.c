@@ -16,10 +16,13 @@
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
-static char         send_buf[EC800M_BUF_LEN];
-static TaskHandle_t ec800m_task_handle;
-ec800m_t            ec800m;
-ec800m_task_group_t task_groups[2];
+static char                       send_buf[EC800M_BUF_LEN];
+static TaskHandle_t               ec800m_task_handle;
+ec800m_t                          ec800m;
+extern ec800m_task_group_t        ec800m_mqtt_task_group;
+static const ec800m_task_group_t* task_groups[] = {
+    &ec800m_mqtt_task_group,
+};
 static void (*timeout)(void);
 
 /**
@@ -155,19 +158,22 @@ void ec800m_task(void* p)
     }
     nrf_gpio_pin_write(ec800m.wakeup_pin, 1);
     free(parse_str);
-    /** set urc */
+
+    for (size_t i = 0; i < sizeof(task_groups) / sizeof(ec800m_task_group_t*); i++) {
+        task_groups[i]->init();
+    }
     ec800m.status = EC800M_IDLE;
-    NRF_LOG_DEBUG("ec800m init OK!");
     ec800m_task_t task_cb;
+    NRF_LOG_DEBUG("ec800m init OK!");
     while (1) {
         memset(&task_cb, 0, sizeof(ec800m_task_t));
         xQueueReceive(ec800m.task_queue, &task_cb, portMAX_DELAY);
         nrf_gpio_pin_write(ec800m.wakeup_pin, 0);
-        for (size_t i = 0; i < sizeof(task_groups) / sizeof(ec800m_task_group_t); i++) {
-            if (task_groups[i].id == task_cb.type) {
-                timeout = task_groups[i].timeout_handle;
+        for (size_t i = 0; i < sizeof(task_groups) / sizeof(ec800m_task_group_t*); i++) {
+            if (task_groups[i]->id == task_cb.type) {
+                timeout = task_groups[i]->timeout_handle;
                 xTimerChangePeriod(ec800m.timer, pdMS_TO_TICKS(task_cb.timeout), 0);
-                task_groups[i].task_handle(task_cb.task);
+                task_groups[i]->task_handle(task_cb.task, task_cb.param);
                 if (task_cb.timeout > 0) {
                     xTimerStart(ec800m.timer, 0);
                 }

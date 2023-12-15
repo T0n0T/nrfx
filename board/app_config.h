@@ -44,7 +44,7 @@
         POST_SLEEP();               \
     } while (0);
 
-#if 1
+#if 0
 // ccm3310s-t
 #define CCM_POR         -1
 #define CCM_GINT0       11

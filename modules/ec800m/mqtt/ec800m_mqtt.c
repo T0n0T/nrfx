@@ -27,6 +27,7 @@ int mqtt_task_publish(ec800m_mqtt_task_t task, uint32_t timeout)
     ec800m_task_t task_cb = {
         .type    = EC800_MQTT,
         .task    = task,
+        .param   = NULL,
         .timeout = timeout,
     };
     return xQueueSend(ec800m.task_queue, &task_cb, 300);
@@ -121,7 +122,7 @@ int ec800m_mqtt_sub(char* subtopic)
     return EOK;
 }
 
-void ec800m_mqtt_init_handle(void)
+static void ec800m_mqtt_init_handle(void)
 {
     mqtt_event  = xEventGroupCreate();
     mqtt_status = EC800M_MQTT_IDLE;
@@ -129,7 +130,7 @@ void ec800m_mqtt_init_handle(void)
     at_obj_set_urc_table(ec800m.client, mqtt_urc_table, 5);
 }
 
-void ec800m_mqtt_task_handle(int task)
+static void ec800m_mqtt_task_handle(int task, void* param)
 {
     if (task == EC800M_TASK_MQTT_CHECK) {
         mqtt_status = EC800M_MQTT_IDLE;
@@ -161,14 +162,14 @@ void ec800m_mqtt_task_handle(int task)
     }
 }
 
-void ec800m_mqtt_timeout_handle(int task)
+static void ec800m_mqtt_timeout_handle(int task)
 {
     xEventGroupSetBits(mqtt_event, EC800M_MQTT_TIMEOUT);
 }
 
 ec800m_task_group_t ec800m_mqtt_task_group = {
     .id             = EC800_MQTT,
-    .init_handle    = ec800m_mqtt_init_handle,
+    .init           = ec800m_mqtt_init_handle,
     .task_handle    = ec800m_mqtt_task_handle,
     .timeout_handle = ec800m_mqtt_timeout_handle,
 };

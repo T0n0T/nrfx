@@ -35,11 +35,11 @@ const struct at_cmd at_cmd_list[] = {
     {AT_CMD_NAME(AT_CMD_CONF_DNS), "AT+QIDNSCFG=1,%s", "OK", 300},
     {AT_CMD_NAME(AT_CMD_QUERY_DNS), "AT+QIDNSCFG=1", "+QIDNSCFG:", 300},
 
-    /** socket,buffer mode */
-    {AT_CMD_NAME(AT_CMD_SOCKET_OPEN), "AT+QIOPEN=1,%d,\"%s\"", "OK", 1500000},
+    /** socket,direct-out mode */
+    {AT_CMD_NAME(AT_CMD_SOCKET_OPEN), "AT+QIOPEN=1,%d,\"%s\",\"%s\",\"%s\",0,1", "OK", 1500000},
     {AT_CMD_NAME(AT_CMD_SOCKET_CLOSE), "AT+QICLOSE=%d", "OK", 10000},
     {AT_CMD_NAME(AT_CMD_SOCKET_SEND), "AT+QISEND=%d,%d", "OK", 300},
-    {AT_CMD_NAME(AT_CMD_SOCKET_RECV), "AT+QIRD", "OK", 300},
+    {AT_CMD_NAME(AT_CMD_SOCKET_RECV), "AT+QIRD=%d,%d", "OK", 300},
     {AT_CMD_NAME(AT_CMD_SOCKET_STATUS), "AT+QISTATE?", "OK", 5000},
 
     /** gnss */

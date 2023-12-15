@@ -7,21 +7,21 @@
  */
 #include "platform_net_socket.h"
 
-int platform_net_socket_connect(const char *host, const char *port, int proto)
+int platform_net_socket_connect(const char* host, const char* port, int proto)
 {
-    int fd, ret = MQTT_SOCKET_UNKNOWN_HOST_ERROR;
+    int             fd, ret = MQTT_SOCKET_UNKNOWN_HOST_ERROR;
     struct addrinfo hints, *addr_list, *cur;
-    
+
     /* Do name resolution with both IPv6 and IPv4 */
     memset(&hints, 0, sizeof(hints));
-    hints.ai_family = AF_UNSPEC;
+    hints.ai_family   = AF_UNSPEC;
     hints.ai_socktype = (proto == PLATFORM_NET_PROTO_UDP) ? SOCK_DGRAM : SOCK_STREAM;
     hints.ai_protocol = (proto == PLATFORM_NET_PROTO_UDP) ? IPPROTO_UDP : IPPROTO_TCP;
-    
+
     if (getaddrinfo(host, port, &hints, &addr_list) != 0) {
         return ret;
     }
-    
+
     for (cur = addr_list; cur != NULL; cur = cur->ai_next) {
         fd = socket(cur->ai_family, cur->ai_socktype, cur->ai_protocol);
         if (fd < 0) {
@@ -42,29 +42,19 @@ int platform_net_socket_connect(const char *host, const char *port, int proto)
     return ret;
 }
 
-int platform_net_socket_recv(int fd, void *buf, size_t len, int flags)
+int platform_net_socket_recv(int fd, void* buf, size_t len, int flags)
 {
     return recv(fd, buf, len, flags);
 }
 
-int platform_net_socket_recv_timeout(int fd, unsigned char *buf, int len, int timeout)
+int platform_net_socket_recv_timeout(int fd, unsigned char* buf, int len, int timeout)
 {
-    int nread;
-    int nleft = len;
-    unsigned char *ptr; 
+    int            nread;
+    int            nleft = len;
+    unsigned char* ptr;
     ptr = buf;
 
-    struct timeval tv = {
-        timeout / 1000, 
-        (timeout % 1000) * 1000
-    };
-    
-    if (tv.tv_sec < 0 || (tv.tv_sec == 0 && tv.tv_usec <= 0)) {
-        tv.tv_sec = 0;
-        tv.tv_usec = 100;
-    }
-
-    platform_net_socket_setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(struct timeval));
+    platform_net_socket_setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(int));
 
     while (nleft > 0) {
         nread = platform_net_socket_recv(fd, ptr, nleft, 0);
@@ -80,25 +70,14 @@ int platform_net_socket_recv_timeout(int fd, unsigned char *buf, int len, int ti
     return len - nleft;
 }
 
-int platform_net_socket_write(int fd, void *buf, size_t len)
+int platform_net_socket_write(int fd, void* buf, size_t len)
 {
     return write(fd, buf, len);
 }
 
-int platform_net_socket_write_timeout(int fd, unsigned char *buf, int len, int timeout)
+int platform_net_socket_write_timeout(int fd, unsigned char* buf, int len, int timeout)
 {
-    struct timeval tv = {
-        timeout / 1000, 
-        (timeout % 1000) * 1000
-    };
-    
-    if (tv.tv_sec < 0 || (tv.tv_sec == 0 && tv.tv_usec <= 0)) {
-        tv.tv_sec = 0;
-        tv.tv_usec = 100;
-    }
-
-    setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv,sizeof(struct timeval));
-    
+    platform_net_socket_setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(int));
     return write(fd, buf, len);
 }
 
@@ -109,18 +88,13 @@ int platform_net_socket_close(int fd)
 
 int platform_net_socket_set_block(int fd)
 {
-    unsigned long mode = 0;
-    return ioctlsocket(fd, FIONBIO, &mode);
 }
 
 int platform_net_socket_set_nonblock(int fd)
 {
-    unsigned long mode = 1;
-    return ioctlsocket(fd, FIONBIO, &mode);
 }
 
-int platform_net_socket_setsockopt(int fd, int level, int optname, const void *optval, socklen_t optlen)
+int platform_net_socket_setsockopt(int fd, int level, int optname, const void* optval, socklen_t optlen)
 {
     return setsockopt(fd, level, optname, optval, optlen);
 }
-
