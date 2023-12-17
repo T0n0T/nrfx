@@ -47,6 +47,9 @@
               },
               {
                 "path": "applications/data_wr.c"
+              },
+              {
+                "path": "applications/mqtt_app.c"
               }
             ],
             "folders": []

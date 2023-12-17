@@ -26,7 +26,8 @@ const struct at_cmd at_cmd_list[] = {
     {AT_CMD_NAME(AT_CMD_CHECK_PIN), "AT+CPIN?", "READY", 5000},
 
     /** tcp/ip using contextID=1 */
-    {AT_CMD_NAME(AT_CMD_ACT_PDP), "AT+QIACT=1", "OK", 1500000},
+    {AT_CMD_NAME(AT_CMD_ACT_PDP), "AT+QIACT=1", "OK", 15000},
+    {AT_CMD_NAME(AT_CMD_CHECK_PDP), "AT+QIACT?", "OK", 15000},
     {AT_CMD_NAME(AT_CMD_DEACT_PDP), "AT+QIDEACT=1", "OK", 40000},
     {AT_CMD_NAME(AT_CMD_DATAECHO_OFF), "AT+QISDE=0", "OK", 300},
     {AT_CMD_NAME(AT_CMD_PING), "AT+QPING=1,%s,%d,1", "+QPING:", 5000},
@@ -35,12 +36,12 @@ const struct at_cmd at_cmd_list[] = {
     {AT_CMD_NAME(AT_CMD_CONF_DNS), "AT+QIDNSCFG=1,%s", "OK", 300},
     {AT_CMD_NAME(AT_CMD_QUERY_DNS), "AT+QIDNSCFG=1", "+QIDNSCFG:", 300},
 
-    /** socket,direct-out mode */
-    {AT_CMD_NAME(AT_CMD_SOCKET_OPEN), "AT+QIOPEN=1,%d,\"%s\",\"%s\",\"%s\",0,1", "OK", 1500000},
+    /** socket,buffer mode */
+    {AT_CMD_NAME(AT_CMD_SOCKET_OPEN), "AT+QIOPEN=1,%d,\"%s\",\"%s\",%s", "OK", 1500000},
     {AT_CMD_NAME(AT_CMD_SOCKET_CLOSE), "AT+QICLOSE=%d", "OK", 10000},
     {AT_CMD_NAME(AT_CMD_SOCKET_SEND), "AT+QISEND=%d,%d", "OK", 300},
     {AT_CMD_NAME(AT_CMD_SOCKET_RECV), "AT+QIRD=%d,%d", "OK", 300},
-    {AT_CMD_NAME(AT_CMD_SOCKET_STATUS), "AT+QISTATE?", "OK", 5000},
+    {AT_CMD_NAME(AT_CMD_SOCKET_STATUS), "AT+QISTATE=1,%d", "OK", 5000},
 
     /** gnss */
     {AT_CMD_NAME(AT_CMD_GNSS_OPEN), "AT+QGPS=1", "OK", 300},
@@ -61,4 +62,6 @@ const struct at_cmd at_cmd_list[] = {
     {AT_CMD_NAME(AT_CMD_MQTT_SUBSCRIBE), "AT+QMTSUB=0,1,\"%s\",2", "OK", 3000},
     {AT_CMD_NAME(AT_CMD_MQTT_READBUF), "AT+QMTRECV=0", "OK", 5000},
     {AT_CMD_NAME(AT_CMD_MQTT_CONF_ALIVE), "AT+QMTCFG=\"keepalive\",0,%d", "OK", 300},
+
+    {AT_CMD_NAME(AT_CMD_ERR_CHECK), "AT+QIGETERROR", "OK", 300},
 };

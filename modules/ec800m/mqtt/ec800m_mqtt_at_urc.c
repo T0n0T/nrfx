@@ -109,6 +109,7 @@ void urc_mqtt_close(struct at_client* client, const char* data, size_t size)
 
 void urc_mqtt_conn(struct at_client* client, const char* data, size_t size)
 {
+    xTimerStop(ec800m.timer, 0);
     taskENTER_CRITICAL();
     int         res = 0, ret_code = 0, state = 0;
     EventBits_t event = 0;

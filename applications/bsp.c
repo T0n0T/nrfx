@@ -19,7 +19,7 @@
 #include <nrfx_systick.h>
 
 #include "FreeRTOS.h"
-#include "app_timer.h"
+#include "timers.h"
 
 /** gpio */
 void gpio_init(void)
@@ -124,8 +124,8 @@ void bsp_uninit(void)
     // nrfx_clock_hfclk_stop();
 }
 
-APP_TIMER_DEF(leds_tmr);
-#include "ec800m.h"
+TimerHandle_t leds_tmr;
+
 /**
  * @brief Handle events from leds timer.
  *
@@ -134,7 +134,7 @@ APP_TIMER_DEF(leds_tmr);
  *
  * @param[in]   p_context   parameter registered in timer start function.
  */
-static void leds_timer_handler(void* p_context)
+static void leds_timer_handler(TimerHandle_t xTimer)
 {
     nrf_gpio_pin_toggle(LED1);
 }
@@ -145,9 +145,8 @@ void bsp_init(void)
     gpio_init();
 
     beep_init();
-    APP_ERROR_CHECK(app_timer_create(&leds_tmr, APP_TIMER_MODE_REPEATED, leds_timer_handler));
-    APP_ERROR_CHECK(app_timer_start(leds_tmr, APP_TIMER_TICKS(1000), NULL));
-
+    leds_tmr = xTimerCreate("leds", pdMS_TO_TICKS(1000), pdTRUE, NULL, leds_timer_handler);
+    xTimerStart(leds_tmr, 0);
     btn_init();
     ec800m_init();
     ccm3310_init();

@@ -162,7 +162,7 @@ static void ec800m_mqtt_task_handle(int task, void* param)
     }
 }
 
-static void ec800m_mqtt_timeout_handle(int task)
+static void ec800m_mqtt_timeout_handle(int task, void* param)
 {
     xEventGroupSetBits(mqtt_event, EC800M_MQTT_TIMEOUT);
 }

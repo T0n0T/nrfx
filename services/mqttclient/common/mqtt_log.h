@@ -9,59 +9,86 @@
 #define _MQTT_LOG_H_
 
 #include "mqtt_defconfig.h"
+#include "nrf_log.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define MQTT_LOG_BASE_LEVEL      (0)
-#define MQTT_LOG_ERR_LEVEL       (MQTT_LOG_BASE_LEVEL + 1)
-#define MQTT_LOG_WARN_LEVEL      (MQTT_LOG_ERR_LEVEL + 1)
-#define MQTT_LOG_INFO_LEVEL      (MQTT_LOG_WARN_LEVEL + 1)
-#define MQTT_LOG_DEBUG_LEVEL     (MQTT_LOG_INFO_LEVEL + 1)
+#define MQTT_LOG_BASE_LEVEL  (0)
+#define MQTT_LOG_ERR_LEVEL   (MQTT_LOG_BASE_LEVEL + 1)
+#define MQTT_LOG_WARN_LEVEL  (MQTT_LOG_ERR_LEVEL + 1)
+#define MQTT_LOG_INFO_LEVEL  (MQTT_LOG_WARN_LEVEL + 1)
+#define MQTT_LOG_DEBUG_LEVEL (MQTT_LOG_INFO_LEVEL + 1)
 
 #ifdef MQTT_LOG_IS_SALOF
-    #include "salof.h"
+#include "salof.h"
 
-    #define MQTT_LOG_D(fmt, ...)    SALOF_LOG_DEBUG(fmt, ##__VA_ARGS__)
-    #define MQTT_LOG_I(fmt, ...)    SALOF_LOG_INFO(fmt, ##__VA_ARGS__)
-    #define MQTT_LOG_W(fmt, ...)    SALOF_LOG_WARN(fmt, ##__VA_ARGS__)
-    #define MQTT_LOG_E(fmt, ...)    SALOF_LOG_ERR(fmt, ##__VA_ARGS__)
-    #define mqtt_log_init   salof_init
+#define MQTT_LOG_D(fmt, ...) SALOF_LOG_DEBUG(fmt, ##__VA_ARGS__)
+#define MQTT_LOG_I(fmt, ...) SALOF_LOG_INFO(fmt, ##__VA_ARGS__)
+#define MQTT_LOG_W(fmt, ...) SALOF_LOG_WARN(fmt, ##__VA_ARGS__)
+#define MQTT_LOG_E(fmt, ...) SALOF_LOG_ERR(fmt, ##__VA_ARGS__)
+#define mqtt_log_init        salof_init
+#elif MQTT_LOG_IS_NRF_LOG
+#define MQTT_LOG_D(...) NRF_LOG_DEBUG(__VA_ARGS__)
+#define MQTT_LOG_I(...) NRF_LOG_INFO(__VA_ARGS__)
+#define MQTT_LOG_W(...) NRF_LOG_WARNING(__VA_ARGS__)
+#define MQTT_LOG_E(...) NRF_LOG_ERROR(__VA_ARGS__)
+#define mqtt_log_init
 #else
-    #include <stdio.h>
-    
+#include <stdio.h>
+
 #if MQTT_LOG_LEVEL < MQTT_LOG_DEBUG_LEVEL
-    #define MQTT_LOG_D(fmt, ...)
+#define MQTT_LOG_D(fmt, ...)
 #else
-    #define MQTT_LOG_D(fmt, ...)        { printf(fmt, ##__VA_ARGS__); printf("\n");}
+#define MQTT_LOG_D(fmt, ...)        \
+    {                               \
+        printf(fmt, ##__VA_ARGS__); \
+        printf("\n");               \
+    }
 #endif
 
 #if MQTT_LOG_LEVEL < MQTT_LOG_INFO_LEVEL
-    #define MQTT_LOG_I(fmt, ...)
+#define MQTT_LOG_I(fmt, ...)
 #else
-    #define MQTT_LOG_I(fmt, ...)        { printf(fmt, ##__VA_ARGS__); printf("\n");}
+#define MQTT_LOG_I(fmt, ...)        \
+    {                               \
+        printf(fmt, ##__VA_ARGS__); \
+        printf("\n");               \
+    }
 #endif
 
 #if MQTT_LOG_LEVEL < MQTT_LOG_WARN_LEVEL
-    #define MQTT_LOG_W(fmt, ...)
+#define MQTT_LOG_W(fmt, ...)
 #else
-    #define MQTT_LOG_W(fmt, ...)        { printf(fmt, ##__VA_ARGS__); printf("\n");}
+#define MQTT_LOG_W(fmt, ...)        \
+    {                               \
+        printf(fmt, ##__VA_ARGS__); \
+        printf("\n");               \
+    }
 #endif
 
 #if MQTT_LOG_LEVEL < MQTT_LOG_ERR_LEVEL
-    #define MQTT_LOG_E(fmt, ...)
+#define MQTT_LOG_E(fmt, ...)
 #else
-    #define MQTT_LOG_E(fmt, ...)        { printf(fmt, ##__VA_ARGS__); printf("\n");}
+#define MQTT_LOG_E(fmt, ...)        \
+    {                               \
+        printf(fmt, ##__VA_ARGS__); \
+        printf("\n");               \
+    }
 #endif
 
 #if MQTT_LOG_LEVEL < MQTT_LOG_BASE_LEVEL
-    #define MQTT_LOG(fmt, ...)
+#define MQTT_LOG(fmt, ...)
 #else
-    #define MQTT_LOG(fmt, ...)          { printf(fmt, ##__VA_ARGS__); printf("\n");}
+#define MQTT_LOG(fmt, ...)          \
+    {                               \
+        printf(fmt, ##__VA_ARGS__); \
+        printf("\n");               \
+    }
 #endif
 
-    #define mqtt_log_init()
+#define mqtt_log_init()
 #endif
 
 #ifdef __cplusplus

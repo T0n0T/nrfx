@@ -20,8 +20,13 @@ static char                       send_buf[EC800M_BUF_LEN];
 static TaskHandle_t               ec800m_task_handle;
 ec800m_t                          ec800m;
 extern ec800m_task_group_t        ec800m_mqtt_task_group;
+extern ec800m_task_group_t        ec800m_socket_task_group;
 static const ec800m_task_group_t* task_groups[] = {
+#if EC800M_MQTT_SOFT
     &ec800m_mqtt_task_group,
+#else
+    &ec800m_socket_task_group,
+#endif
 };
 static void (*timeout)(void);
 
@@ -156,7 +161,6 @@ void ec800m_task(void* p)
     if (result < 0) {
         goto __exit;
     }
-    nrf_gpio_pin_write(ec800m.wakeup_pin, 1);
     free(parse_str);
 
     for (size_t i = 0; i < sizeof(task_groups) / sizeof(ec800m_task_group_t*); i++) {
@@ -165,6 +169,7 @@ void ec800m_task(void* p)
     ec800m.status = EC800M_IDLE;
     ec800m_task_t task_cb;
     NRF_LOG_DEBUG("ec800m init OK!");
+    nrf_gpio_pin_write(ec800m.wakeup_pin, 1);
     while (1) {
         memset(&task_cb, 0, sizeof(ec800m_task_t));
         xQueueReceive(ec800m.task_queue, &task_cb, portMAX_DELAY);

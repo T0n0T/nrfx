@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "ec800m.h"
+#include "mqttclient.h"
 #include "blood.h"
 #include "ble_nus.h"
 #include "nrf_fstorage_sd.h"

@@ -43,7 +43,7 @@ typedef struct {
     uint8_t id;
     void (*init)(void);
     void (*task_handle)(int, void*);
-    void (*timeout_handle)(int);
+    void (*timeout_handle)(int, void*);
 } ec800m_task_group_t;
 
 typedef struct {
@@ -85,6 +85,7 @@ typedef enum {
 
     /** tcp/ip */
     AT_CMD_ACT_PDP,
+    AT_CMD_CHECK_PDP,
     AT_CMD_DEACT_PDP,
     AT_CMD_DATAECHO_OFF,
     AT_CMD_PING,
@@ -120,6 +121,7 @@ typedef enum {
     AT_CMD_MQTT_READBUF,
     AT_CMD_MQTT_CONF_ALIVE,
 
+    AT_CMD_ERR_CHECK,
     AT_CMD_MAX,
 } at_cmd_desc_t;
 
