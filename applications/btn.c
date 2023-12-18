@@ -49,12 +49,12 @@ void btn_click(void)
 
 void btn_double(void)
 {
-    NRF_LOG_DEBUG("double click!");
+    NRF_LOG_INFO("double click!");
 }
 
 void btn_long_free(void)
 {
-    NRF_LOG_DEBUG("long click!");
+    NRF_LOG_INFO("long click!");
     beep_on();
     OS_DELAY(500);
     bsp_uninit();
@@ -78,7 +78,6 @@ void btn_create(Button_t* p)
 static void btn_work_on(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
     NRF_LOG_DEBUG("btn work on!");
-    BaseType_t xHigherPriorityTaskWoken;
     if (pin == SW) {
         xTaskResumeFromISR(m_btn_task);
     }
@@ -95,16 +94,19 @@ static void btn_task(void* pvParameter)
 {
     while (1) {
         Button_Process();
+        NRF_LOG_DEBUG("process!!");
         vTaskDelay(30);
     }
 }
 
 void btn_init(void)
 {
-    nrfx_gpiote_init();
+    nrfx_err_t err = nrfx_gpiote_init();
+    APP_ERROR_CHECK(err);
     nrfx_gpiote_in_config_t cfg = NRFX_GPIOTE_CONFIG_IN_SENSE_HITOLO(0);
     cfg.pull                    = NRF_GPIO_PIN_PULLUP;
-    nrfx_gpiote_in_init(SW, &cfg, btn_work_on);
+    err                         = nrfx_gpiote_in_init(SW, &cfg, btn_work_on);
+    APP_ERROR_CHECK(err);
     nrfx_gpiote_in_event_enable(SW, true);
     // nrf_gpio_cfg_input(SW, NRF_GPIO_PIN_PULLUP);
     btn_create(&SW_BUTTON);
@@ -114,7 +116,7 @@ void btn_init(void)
         pdFALSE,
         0,
         btn_work_off);
-
+    NRF_LOG_DEBUG("button init!");
     BaseType_t xReturned = xTaskCreate(btn_task,
                                        "BLE",
                                        256,

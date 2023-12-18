@@ -14,7 +14,7 @@
 #include "nrfx_gpiote.h"
 
 #define NRF_LOG_MODULE_NAME ec800mqtt
-#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_DEBUG
+#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_INFO
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 

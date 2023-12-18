@@ -966,7 +966,6 @@
           "__HEAP_SIZE=1024",
           "__STACK_SIZE=2048",
           "BOARD_CUSTOM",
-          "DEBUG",
           "USE_APP_CONFIG",
           "AT_USING_CLIENT",
           "MQTT_NETWORK_TYPE_NO_TLS"

@@ -173,7 +173,7 @@ void max30102_init(void)
 
     BaseType_t xReturned = xTaskCreate(max30102_thread_entry,
                                        "MAX30102",
-                                       1024,
+                                       512,
                                        0,
                                        configMAX_PRIORITIES - 3,
                                        &max30102_handle);

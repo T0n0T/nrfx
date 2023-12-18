@@ -76,15 +76,27 @@ __exit:
     return result;
 }
 
+void ec800M_wake_up(void)
+{
+    int result = EOK;
+    do {
+        nrf_gpio_pin_write(ec800m.wakeup_pin, 0);
+        NRF_LOG_INFO("wake up module!!");
+        result = at_client_obj_wait_connect(ec800m.client, 10000);
+        vTaskDelay(pdMS_TO_TICKS(500));
+    } while (result < 0);
+}
+
 void ec800m_task(void* p)
 {
     int result = EOK;
-    nrf_gpio_pin_write(ec800m.wakeup_pin, 0);
-    result = at_client_obj_wait_connect(ec800m.client, 10000);
-    if (result < 0) {
-        NRF_LOG_ERROR("at client connect failed.");
-        goto __exit;
-    }
+    // nrf_gpio_pin_write(ec800m.wakeup_pin, 0);
+    // result = at_client_obj_wait_connect(ec800m.client, 10000);
+    // if (result < 0) {
+    //     NRF_LOG_ERROR("at client connect failed.");
+    //     goto __exit;
+    // }
+    ec800M_wake_up();
 
     /** reset ec800m */
     result = at_cmd_exec(ec800m.client, NULL, AT_CMD_RESET);
@@ -173,7 +185,6 @@ void ec800m_task(void* p)
     while (1) {
         memset(&task_cb, 0, sizeof(ec800m_task_t));
         xQueueReceive(ec800m.task_queue, &task_cb, portMAX_DELAY);
-        nrf_gpio_pin_write(ec800m.wakeup_pin, 0);
         for (size_t i = 0; i < sizeof(task_groups) / sizeof(ec800m_task_group_t*); i++) {
             if (task_groups[i]->id == task_cb.type) {
                 timeout = task_groups[i]->timeout_handle;
@@ -185,7 +196,6 @@ void ec800m_task(void* p)
                 break;
             }
         }
-        nrf_gpio_pin_write(ec800m.wakeup_pin, 1);
     }
 
 __exit:
@@ -198,9 +208,9 @@ gps_info_t ec800m_gnss_get(void)
     char                   rmc[128] = {0};
     static struct gps_info rmcinfo  = {0};
     at_response_t          resp     = at_create_resp(128, 0, 300);
-    nrf_gpio_pin_write(ec800m.wakeup_pin, 0);
     if (at_obj_exec_cmd(ec800m.client, resp, "AT+QGPSGNMEA=\"RMC\"") == EOK) {
         if (at_resp_parse_line_args_by_kw(resp, "+QGPSGNMEA:", "+QGPSGNMEA:%s", rmc) > 0) {
+            NRF_LOG_DEBUG("rmc: %s", rmc);
             if (!gps_rmc_parse(&rmcinfo, rmc)) {
                 NRF_LOG_WARNING("gnss info invalid");
             } else {
@@ -209,7 +219,6 @@ gps_info_t ec800m_gnss_get(void)
             }
         }
     }
-    nrf_gpio_pin_write(ec800m.wakeup_pin, 1);
     at_delete_resp(resp);
     return &rmcinfo;
 }
@@ -236,8 +245,8 @@ void ec800m_init(void)
 
     BaseType_t xReturned = xTaskCreate(ec800m_task,
                                        "EC800M",
-                                       1024,
-                                       0,
+                                       512,
+                                       NULL,
                                        configMAX_PRIORITIES - 2,
                                        &ec800m_task_handle);
     if (xReturned != pdPASS) {

@@ -44,9 +44,9 @@ void gpio_init(void)
 
 void set_sleep_exit_pin(void)
 {
-    nrf_gpio_cfg_input(13, NRF_GPIO_PIN_PULLUP);
+    nrf_gpio_cfg_input(SW, NRF_GPIO_PIN_PULLUP);
     nrf_gpio_pin_sense_t sense = NRF_GPIO_PIN_SENSE_LOW;
-    nrf_gpio_cfg_sense_set(13, sense);
+    nrf_gpio_cfg_sense_set(SW, sense);
 }
 
 void gpio_uninit(void)

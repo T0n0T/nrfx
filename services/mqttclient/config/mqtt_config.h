@@ -36,7 +36,7 @@
 #define MQTT_KEEP_ALIVE_INTERVAL        50 // unit: second
 #define MQTT_VERSION                    4  // 4 is mqtt 3.1.1
 #define MQTT_RECONNECT_DEFAULT_DURATION 1000
-#define MQTT_THREAD_STACK_SIZE          2048
+#define MQTT_THREAD_STACK_SIZE          1024
 #define MQTT_THREAD_PRIO                5
 #define MQTT_THREAD_TICK                50
 

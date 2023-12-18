@@ -30,6 +30,18 @@
         .pubtopic  = "/iot/CYGC_TEST/BR/device/data",  \
     }
 
+// #define EC800M_MQTT_DEFAULT_CFG                        \
+//     {                                                  \
+//         .host      = "112.125.89.8",                   \
+//         .port      = "47369",                          \
+//         .keepalive = 300,                              \
+//         .clientid  = "CYGC_TEST",                      \
+//         .username  = NULL,                             \
+//         .password  = NULL,                             \
+//         .subtopic  = "/iot/CYGC_TEST/BR/device/reply", \
+//         .pubtopic  = "/iot/CYGC_TEST/BR/device/data",  \
+//     }
+
 #define SM4_DEFAULT_KEY                                                                                \
     {                                                                                                  \
         0x77, 0x7f, 0x23, 0xc6, 0xfe, 0x7b, 0x48, 0x73, 0xdd, 0x59, 0x5c, 0xff, 0xf6, 0x5f, 0x58, 0xec \
@@ -46,7 +58,7 @@
         POST_SLEEP();               \
     } while (0);
 
-#if 0
+#if 1
 // ccm3310s-t
 #define CCM_POR         -1
 #define CCM_GINT0       11
@@ -96,7 +108,7 @@
 
 // hal
 #define BEEP            -1
-#define SW              13
+#define SW              20
 #define LED1            17
 #define LED2            18
 #define LED3            19

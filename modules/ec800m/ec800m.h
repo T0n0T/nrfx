@@ -74,6 +74,7 @@ typedef enum {
     AT_CMD_RESET,
     AT_CMD_ECHO_OFF,
     AT_CMD_LOW_POWER,
+    AT_CMD_LOW_POWER_OFF,
 
     /** simcard */
     AT_CMD_IMSI,
@@ -130,6 +131,7 @@ extern const struct at_cmd at_cmd_list[];
 
 void       ec800m_init(void);
 int        at_cmd_exec(at_client_t dev, char* prase_buf, at_cmd_desc_t at_cmd_id, ...);
+void       ec800M_wake_up(void);
 gps_info_t ec800m_gnss_get(void);
 
 #endif

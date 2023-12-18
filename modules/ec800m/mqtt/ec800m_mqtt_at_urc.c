@@ -13,7 +13,7 @@
 #include "ec800m_mqtt.h"
 
 #define NRF_LOG_MODULE_NAME ec800mqtturc
-#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_DEBUG
+#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_INFO
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 

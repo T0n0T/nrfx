@@ -12,7 +12,7 @@
 #include "ec800m_socket.h"
 
 #define NRF_LOG_MODULE_NAME ec800socketurc
-#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_DEBUG
+#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_INFO
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
@@ -74,7 +74,6 @@ void urc_socket_recv(struct at_client* client, const char* data, size_t size)
     socket[socket_num].status |= EC800M_SOCKET_RECV;
     taskEXIT_CRITICAL();
     xSemaphoreGive(socket[socket_num].recv_sync);
-    NRF_LOG_INFO("data come!!!");
 }
 
 void urc_socket_close(struct at_client* client, const char* data, size_t size)
@@ -180,7 +179,7 @@ void err_get(struct at_client* client, const char* data, size_t size)
 void err_check(struct at_client* client, const char* data, size_t size)
 {
     BaseType_t res = socket_task_publish(EC800M_TASK_ERR_CHECK, NULL, 0);
-    NRF_LOG_ERROR("Need to check ERR, %d",res);
+    NRF_LOG_ERROR("Need to check ERR, %d", res);
 }
 
 const struct at_urc socket_urc_table[] = {

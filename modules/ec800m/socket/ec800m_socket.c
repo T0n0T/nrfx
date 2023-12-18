@@ -12,7 +12,7 @@
 #include "ec800m_socket.h"
 
 #define NRF_LOG_MODULE_NAME ec800socket
-#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_DEBUG
+#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_INFO
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
@@ -24,7 +24,7 @@ ec800m_socket_data_t data_recv;
 int socket_task_publish(ec800m_socket_task_t task, void* param, uint32_t timeout)
 {
     xQueueReset(socket_response);
-    NRF_LOG_INFO("reset the response!!");
+    NRF_LOG_DEBUG("reset the response!!");
     ec800m_task_t task_cb = {
         .type    = EC800_SOCKET,
         .task    = task,
@@ -36,7 +36,7 @@ int socket_task_publish(ec800m_socket_task_t task, void* param, uint32_t timeout
 
 void response(uint32_t result)
 {
-    NRF_LOG_RAW_INFO("socket response: %d\r\n", result);
+    NRF_LOG_DEBUG("socket response: %d\r\n", result);
     xQueueOverwrite(socket_response, &result);
 }
 
@@ -44,7 +44,7 @@ int socket_task_wait_response()
 {
     uint32_t result = 10;
     xQueueReceive(socket_response, &result, portMAX_DELAY);
-    NRF_LOG_RAW_INFO("socket get response: %d\r\n", result);
+    NRF_LOG_DEBUG("socket get response: %d", result);
     return result;
 }
 
@@ -146,12 +146,11 @@ void ec800m_socket_init_handle(void)
         socket[i].recv_sync = xSemaphoreCreateBinary();
     }
 
-    NRF_LOG_INFO("finish socket init!")
+    NRF_LOG_INFO("ec800m socket init!")
 }
 
 void ec800m_socket_task_handle(int task, void* param)
 {
-    NRF_LOG_WARNING("task is %d", task);
     if (task == EC800M_TASK_PDP_DEACT) {
         at_cmd_exec(ec800m.client, NULL, AT_CMD_DEACT_PDP);
     }

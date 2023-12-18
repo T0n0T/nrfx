@@ -47,27 +47,34 @@ void publish_handle(void)
         return;
     }
 #endif
-    char* publish_data = build_msg_mqtt(global_cfg.mqtt_cfg.clientid, ec800m_gnss_get(), ecg_status, 1);
-    // if (sm4_flag) {
-    //     pdata      origin_mqtt = {strlen(publish_data), (uint8_t*)publish_data};
-    //     ciphertext cipher_mqtt = ccm3310_sm4_encrypt(sm4_id, origin_mqtt);
-    //     if (cipher_mqtt.len > 0) {
-
-    //     } else {
-    //         NRF_LOG_ERROR("publish msg sm4 encrypt fail.");
-    //     }
-    // } else {
-    // }
-
+    char* publish_data = build_msg_mqtt(global_cfg.mqtt_cfg.clientid, ec800m_gnss_get(), 1, ecg_status);
+    if (sm4_flag) {
+        pdata      origin_mqtt = {strlen(publish_data), (uint8_t*)publish_data};
+        ciphertext cipher_mqtt = ccm3310_sm4_encrypt(sm4_id, origin_mqtt);
+        if (cipher_mqtt.len > 0) {
 #if EC800M_MQTT_SOFT
-    ec800m_mqtt_pub(global_cfg.mqtt_cfg.pubtopic, publish_data, strlen(publish_data));
+            ec800m_mqtt_pub(global_cfg.mqtt_cfg.pubtopic, cipher_mqtt.data, cipher_mqtt.len);
 #else
-    memset(&publish_msg, 0, sizeof(publish_msg));
-    publish_msg.qos        = QOS0;
-    publish_msg.payloadlen = strlen(publish_data);
-    publish_msg.payload    = publish_data;
-    mqtt_publish(client, global_cfg.mqtt_cfg.pubtopic, &publish_msg);
+            memset(&publish_msg, 0, sizeof(publish_msg));
+            publish_msg.qos        = QOS0;
+            publish_msg.payloadlen = cipher_mqtt.len;
+            publish_msg.payload    = cipher_mqtt.data;
+            mqtt_publish(client, global_cfg.mqtt_cfg.pubtopic, &publish_msg);
 #endif
+        } else {
+            NRF_LOG_ERROR("publish msg sm4 encrypt fail.");
+        }
+    } else {
+#if EC800M_MQTT_SOFT
+        ec800m_mqtt_pub(global_cfg.mqtt_cfg.pubtopic, publish_data, strlen(publish_data));
+#else
+        memset(&publish_msg, 0, sizeof(publish_msg));
+        publish_msg.qos = QOS0;
+        publish_msg.payloadlen = strlen(publish_data);
+        publish_msg.payload = publish_data;
+        mqtt_publish(client, global_cfg.mqtt_cfg.pubtopic, &publish_msg);
+#endif
+    }
     free(publish_data);
 }
 
@@ -78,6 +85,7 @@ static int mqtt_init(void)
     read_cfg_from_flash();
 
     char* src = build_msg_cfg(&global_cfg);
+    NRF_LOG_RAW_INFO("%s\r\n", src);
     free(src);
 
     while (ec800m.status != EC800M_IDLE) {
@@ -104,8 +112,8 @@ static int mqtt_init(void)
         NRF_LOG_ERROR("mqtt connect fail, err[%d]", err);
         return -1;
     }
-    // extern void sub_handle(void* client, message_data_t* msg);
-    // mqtt_subscribe(client, global_cfg.mqtt_cfg.subtopic, QOS1, sub_handle);
+    extern void sub_handle(void* client, message_data_t* msg);
+    mqtt_subscribe(client, global_cfg.mqtt_cfg.subtopic, QOS1, sub_handle);
 #endif
     if (global_cfg.sm4_flag) {
         sm4_id = ccm3310_sm4_setkey((uint8_t*)global_cfg.sm4_key);
@@ -133,9 +141,10 @@ void app_task(void* pvParameter)
     mqtt_init();
     // vTaskDelete(NULL);
     while (1) {
-        // publish_handle();
-        NRF_LOG_INFO("mqtt app task loop");
-        vTaskDelay(pdMS_TO_TICKS(3000));
+        ec800M_wake_up();
+        publish_handle();
+        // NRF_LOG_INFO("mqtt app task loop");
+        vTaskDelay(pdMS_TO_TICKS(30000));
     }
 }
 
