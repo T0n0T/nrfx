@@ -12,6 +12,13 @@
 #include <string.h>
 #include <ccm3310.h>
 
+// #define CCM3310_RAW_PRINTF
+
+#define NRF_LOG_MODULE_NAME ccm3310
+#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_INFO
+#include "nrf_log.h"
+NRF_LOG_MODULE_REGISTER();
+
 nrfx_spim_t        instance    = NRFX_SPIM_INSTANCE(1);
 nrfx_spim_config_t config_spim = NRFX_SPIM_DEFAULT_CONFIG;
 uint8_t            recv_buf[1024];
@@ -59,13 +66,18 @@ int ccm3310_transfer(uint8_t* send_buf, int send_len, uint8_t** decode_data, int
             .rx_length   = send_len,
         };
     result = nrfx_spim_xfer(&instance, &spim_xfer_desc, 0);
+    if (result != NRFX_SUCCESS) {
+        NRF_LOG_ERROR("ccm3310 has error [%d]", result);
+        return -1;
+    }
+
     NRFX_DELAY_US(5);
 #if defined(CCM3310_RAW_PRINTF)
-    printf("\n========= print transmit ========\n");
+    NRF_LOG_RAW_INFO("\n========= print transmit ========\n");
     for (size_t i = 0; i < send_len; i++) {
-        printf("0x%02x ", *(send_buf + i));
+        NRF_LOG_RAW_INFO("0x%02x ", *(send_buf + i));
         if (i % 4 == 3) {
-            printf("\n");
+            NRF_LOG_RAW_INFO("\n");
         }
     }
 #else
@@ -83,13 +95,16 @@ int ccm3310_transfer(uint8_t* send_buf, int send_len, uint8_t** decode_data, int
     spim_xfer_desc.rx_length   = recv_len;
 
     result = nrfx_spim_xfer(&instance, &spim_xfer_desc, 0);
-    // nrfx_spim_uninit(&instance);
+    if (result != NRFX_SUCCESS) {
+        NRF_LOG_ERROR("ccm3310 has error [%d]", result);
+        return -1;
+    }
 #if defined(CCM3310_RAW_PRINTF)
-    printf("\n========= print receive =========\n");
+    NRF_LOG_RAW_INFO("\n========= print receive =========\n");
     for (size_t i = 0; i < recv_len; i++) {
-        printf("0x%02x ", recv_buf[i]);
+        NRF_LOG_RAW_INFO("0x%02x ", recv_buf[i]);
         if (i % 4 == 3) {
-            printf("\n");
+            NRF_LOG_RAW_INFO("\n");
         }
         if (recv_buf[i] == 0x01 && recv_buf[i - 1] == 0x33 && recv_buf[i - 2] == 0x02 && recv_buf[i - 3] == 0x56) {
             break;
@@ -100,5 +115,5 @@ int ccm3310_transfer(uint8_t* send_buf, int send_len, uint8_t** decode_data, int
     if (err == 0) {
         return len;
     }
-    return -1;
+    return -2;
 }

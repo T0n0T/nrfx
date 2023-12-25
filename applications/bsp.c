@@ -33,9 +33,9 @@ void gpio_init(void)
     // nrf_gpio_pin_write(LED2, 1);
     // nrf_gpio_pin_write(LED3, 1);
 
-    // nrf_gpio_cfg_output(POR);
-    // nrf_gpio_cfg_output(GINT0);
-    // nrf_gpio_cfg_input(GINT1, NRF_GPIO_PIN_NOPULL);
+    nrf_gpio_cfg_output(POR);
+    nrf_gpio_cfg_output(GINT0);
+    nrf_gpio_cfg_input(GINT1, NRF_GPIO_PIN_NOPULL);
 
     // nrf_gpio_pin_write(POR, 0);
     // NRFX_DELAY_US(50000);

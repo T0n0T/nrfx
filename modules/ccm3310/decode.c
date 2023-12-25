@@ -10,16 +10,16 @@
  */
 #include <ccm3310.h>
 
-#define NRF_LOG_MODULE_NAME ccm3310
+#define NRF_LOG_MODULE_NAME ccm3310decode
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
-static uint16_t decode_2bytes(uint8_t *msb)
+static uint16_t decode_2bytes(uint8_t* msb)
 {
     return *msb | (*(msb + 1) << 8);
 }
 
-static uint32_t decode_4bytes(uint8_t *msb)
+static uint32_t decode_4bytes(uint8_t* msb)
 {
     return *msb | (*(msb + 1) << 8) | (*(msb + 2) << 16) | (*(msb + 3) << 24);
 }
@@ -41,7 +41,7 @@ int numalgin(int num, int align)
  * @param len 数据长度
  * @return int 状态量，0为解包成功
  */
-int decode(uint8_t *raw, uint8_t **data, int *len)
+int decode(uint8_t* raw, uint8_t** data, int* len)
 {
     if (decode_4bytes(&raw[0]) != 0x33100252) {
         NRF_LOG_ERROR("decode wrong with upheader 0x%X, 0x%X", decode_4bytes(&raw[0]), 0x33100252);
@@ -71,10 +71,10 @@ int decode(uint8_t *raw, uint8_t **data, int *len)
  * @return size_t 包最终长度
  */
 int encode(uint8_t cla, uint8_t ins, uint8_t p1, uint8_t p2,
-           uint8_t *send_pack,
-           uint8_t *data, uint32_t data_len)
+           uint8_t* send_pack,
+           uint8_t* data, uint32_t data_len)
 {
-    uint8_t *ptr = 0;
+    uint8_t* ptr = 0;
     ptr          = send_pack;
     // 1.包头
     *(ptr++) = 0x53;

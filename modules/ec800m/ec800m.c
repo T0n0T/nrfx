@@ -181,10 +181,16 @@ void ec800m_task(void* p)
     ec800m.status = EC800M_IDLE;
     ec800m_task_t task_cb;
     NRF_LOG_DEBUG("ec800m init OK!");
-    nrf_gpio_pin_write(ec800m.wakeup_pin, 1);
+    TickType_t last_time = 0, current_time = 0;
     while (1) {
         memset(&task_cb, 0, sizeof(ec800m_task_t));
+        last_time = xTaskGetTickCount();
         xQueueReceive(ec800m.task_queue, &task_cb, portMAX_DELAY);
+        current_time = xTaskGetTickCount();
+        if (current_time - last_time > pdMS_TO_TICKS(15000)) {
+            ec800M_wake_up();
+        }
+
         for (size_t i = 0; i < sizeof(task_groups) / sizeof(ec800m_task_group_t*); i++) {
             if (task_groups[i]->id == task_cb.type) {
                 timeout = task_groups[i]->timeout_handle;
@@ -208,6 +214,7 @@ gps_info_t ec800m_gnss_get(void)
     char                   rmc[128] = {0};
     static struct gps_info rmcinfo  = {0};
     at_response_t          resp     = at_create_resp(128, 0, 300);
+    ec800M_wake_up();
     if (at_obj_exec_cmd(ec800m.client, resp, "AT+QGPSGNMEA=\"RMC\"") == EOK) {
         if (at_resp_parse_line_args_by_kw(resp, "+QGPSGNMEA:", "+QGPSGNMEA:%s", rmc) > 0) {
             NRF_LOG_DEBUG("rmc: %s", rmc);

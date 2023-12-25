@@ -279,6 +279,6 @@ void max30102_thread_entry(void* args)
 
     while (1) {
         blood_Loop();
-        vTaskDelay(3000);
+        vTaskDelay(10000);
     }
 }

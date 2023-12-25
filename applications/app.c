@@ -14,7 +14,7 @@
 
 static TaskHandle_t m_app_task;
 static uint8_t      sm4_id = 0;
-static uint8_t      sm4_flag;
+uint8_t             sm4_flag;
 
 #if !EC800M_MQTT_SOFT
 mqtt_client_t* client      = NULL;
@@ -89,6 +89,7 @@ static int mqtt_init(void)
     free(src);
 
     while (ec800m.status != EC800M_IDLE) {
+        NRF_LOG_WARNING("wating for ec800m!")
         vTaskDelay(200);
     }
 #if EC800M_MQTT_SOFT
@@ -141,7 +142,6 @@ void app_task(void* pvParameter)
     mqtt_init();
     // vTaskDelete(NULL);
     while (1) {
-        ec800M_wake_up();
         publish_handle();
         // NRF_LOG_INFO("mqtt app task loop");
         vTaskDelay(pdMS_TO_TICKS(30000));

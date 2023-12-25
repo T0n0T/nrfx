@@ -16,5 +16,6 @@
 
 nrf_sdk
 *.zip
-dfu_package/52832_freertos.hex
-dfu_package/settings.hex
+/dfu_package/52832_freertos.hex
+/dfu_package/settings.hex
+

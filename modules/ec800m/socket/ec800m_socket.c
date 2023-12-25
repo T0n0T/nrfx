@@ -77,7 +77,7 @@ int ec800m_socket_open(const char* domain, const char* port, int protocol)
     s->domain   = (char*)domain;
     s->port     = (char*)port;
     s->protocol = protocol;
-    socket_task_publish(EC800M_TASK_SOCKET_OPEN, s, 1000);
+    socket_task_publish(EC800M_TASK_SOCKET_OPEN, s, 7000);
     result = socket_task_wait_response();
     if (result) {
         NRF_LOG_ERROR("socket open fail, err[%d]", result);

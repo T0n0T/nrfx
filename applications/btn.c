@@ -50,6 +50,13 @@ void btn_click(void)
 void btn_double(void)
 {
     NRF_LOG_INFO("double click!");
+    beep_on();
+    extern uint8_t sm4_flag;
+    if (sm4_flag) {
+        sm4_flag = 0;
+    } else {
+        sm4_flag = 1;
+    }
 }
 
 void btn_long_free(void)
