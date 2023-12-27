@@ -248,6 +248,16 @@ void gatt_evt_handler(nrf_ble_gatt_t* p_gatt, nrf_ble_gatt_evt_t const* p_evt)
                   p_gatt->att_mtu_desired_periph);
 }
 
+void ble_mac_set(void)
+{
+    ble_gap_addr_t bleAddr = {
+        .addr_id_peer = BLE_GAP_ADDR_TYPE_PUBLIC,
+        .addr         = BLE_ADDR,
+    };
+    uint32_t err_code = sd_ble_gap_addr_set(&bleAddr);
+    APP_ERROR_CHECK(err_code);
+}
+
 /**@brief Function for initializing the GATT module. */
 static void gatt_init(void)
 {
@@ -676,7 +686,7 @@ int main(void)
     bool erase_bonds;
 
     // 使能中断之前，初始化异步SVCI接口到Bootloader
-    // APP_ERROR_CHECK(ble_dfu_buttonless_async_svci_init());
+    APP_ERROR_CHECK(ble_dfu_buttonless_async_svci_init());
 
     // Initialize modules.
     log_init();
@@ -701,6 +711,7 @@ int main(void)
     // Initialize modules.
     timers_init();
     gap_params_init();
+    ble_mac_set();
     gatt_init();
     advertising_init();
     services_init();
