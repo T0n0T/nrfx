@@ -250,10 +250,9 @@ void gatt_evt_handler(nrf_ble_gatt_t* p_gatt, nrf_ble_gatt_evt_t const* p_evt)
 
 void ble_mac_set(void)
 {
-    ble_gap_addr_t bleAddr = {
-        .addr_id_peer = BLE_GAP_ADDR_TYPE_PUBLIC,
-        .addr         = BLE_ADDR,
-    };
+    ble_gap_addr_t bleAddr = {0};
+    bleAddr.addr_id_peer   = BLE_GAP_ADDR_TYPE_PUBLIC;
+    memcpy(&bleAddr.addr, global_cfg.ble_mac, BLE_GAP_ADDR_LEN);
     uint32_t err_code = sd_ble_gap_addr_set(&bleAddr);
     APP_ERROR_CHECK(err_code);
 }
@@ -711,6 +710,10 @@ int main(void)
     // Initialize modules.
     timers_init();
     gap_params_init();
+    // read_cfg_from_flash();
+    char* src = build_msg_cfg(&global_cfg);
+    NRF_LOG_RAW_INFO("%s\r\n", src);
+    free(src);
     ble_mac_set();
     gatt_init();
     advertising_init();
@@ -719,7 +722,7 @@ int main(void)
     peer_manager_init();
     application_timers_start();
     bsp_init();
-    app_init();
+    // app_init();
 
     // Create a FreeRTOS task for the BLE stack.
     // The task will run advertising_start() before entering its loop.

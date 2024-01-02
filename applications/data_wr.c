@@ -85,7 +85,7 @@ static void ble_tx_flush_process(void)
         index    = &data_array[0];
         while (data_len > 0) {
             if (data_len >= m_ble_nus_max_data_len) {
-                NRF_LOG_INFO("Ready to send data len %d over BLE LOG", m_ble_nus_max_data_len);
+                NRF_LOG_DEBUG("Ready to send data len %d over BLE LOG", m_ble_nus_max_data_len);
                 // 日志接收的数据使用notify发送给BLE主机
                 do {
                     err_code = ble_nus_data_send(&m_nus, index, &m_ble_nus_max_data_len, m_conn_handle);
@@ -98,7 +98,7 @@ static void ble_tx_flush_process(void)
                 index += m_ble_nus_max_data_len;
                 data_len -= m_ble_nus_max_data_len;
             } else {
-                NRF_LOG_INFO("Ready to send data len %d over BLE LOG", data_len);
+                NRF_LOG_DEBUG("Ready to send data len %d over BLE LOG", data_len);
                 // 日志接收的数据使用notify发送给BLE主机
                 do {
                     err_code = ble_nus_data_send(&m_nus, index, &data_len, m_conn_handle);
@@ -160,32 +160,53 @@ int read_cfg(config_t* cfg)
 
 static void nus_data_handler(ble_nus_evt_t* p_evt)
 {
-    uint32_t err_code;
-    uint16_t len = 0;
+    uint32_t       err_code;
+    uint16_t       len      = 0;
+    static uint8_t wr_flag  = 0;
+    static char*   cfg_data = 0;
+    static char*   pos      = 0;
     switch (p_evt->type) {
         case BLE_NUS_EVT_RX_DATA:
             if (data_wr_enabled) {
-                char* recv_data = malloc(p_evt->params.rx_data.length);
-                memcpy(recv_data, p_evt->params.rx_data.p_data, p_evt->params.rx_data.length);
-                if (strncmp(recv_data, "update:", 7) == 0) {
-                    config_t tmp_cfg = {0};
-                    err_code         = parse_cfg(&recv_data[8], &tmp_cfg);
-                    if (err_code != EOK) {
-                        char* wrong_str = "config parse fail\r\n";
-                        ble_nus_output(wrong_str);
+                if (wr_flag) {
+                    if (len - p_evt->params.rx_data.length > 0) {
+                        memcpy(pos, p_evt->params.rx_data.p_data, p_evt->params.rx_data.length);
+                        pos += p_evt->params.rx_data.length;
+                        len -= p_evt->params.rx_data.length;
                     } else {
-                        memcpy(&global_cfg, &tmp_cfg, sizeof(config_t));
-                        write_cfg(&global_cfg);
+                        memcpy(pos, p_evt->params.rx_data.p_data, len);
+                        config_t tmp_cfg = {0};
+                        err_code         = parse_cfg(cfg_data, &tmp_cfg);
+                        if (err_code != EOK) {
+                            char* wrong_str = "config parse fail\r\n";
+                            ble_nus_output(wrong_str);
+                        } else {
+                            memcpy(&global_cfg, &tmp_cfg, sizeof(config_t));
+                            write_cfg(&global_cfg);
+                        }
+                        len     = 0;
+                        pos     = 0;
+                        wr_flag = 0;
+                        free(cfg_data);
                     }
-
-                } else if (strncmp(recv_data, "check", 5) == 0) {
-                    char* cfg_str = build_msg_cfg(&global_cfg);
-                    ble_nus_output(cfg_str);
-                    free(cfg_str);
                 } else {
-                    ble_nus_output("Wrong command\r\n");
+                    if (strstr(p_evt->params.rx_data.p_data, "update:")) {
+                        if (sscanf(p_evt->params.rx_data.p_data, "update:%d", &len) == 1) {
+                            cfg_data = calloc(1, len);
+                            pos      = cfg_data;
+                            wr_flag  = 1;
+                        } else {
+                            ble_nus_output("Wrong command\r\n");
+                        }
+                    } else if (strstr(p_evt->params.rx_data.p_data, "check")) {
+                        char* cfg_str = build_msg_cfg(&global_cfg);
+                        ble_nus_output(cfg_str);
+                        free(cfg_str);
+                    } else {
+                        ble_nus_output("Wrong command\r\n");
+                    }
                 }
-                free(recv_data);
+                // char* recv_data = malloc(p_evt->params.rx_data.length);
             }
 
             break;
@@ -193,7 +214,7 @@ static void nus_data_handler(ble_nus_evt_t* p_evt)
             vTaskResume(data_wr_task_handle);
             data_wr_enabled = true;
             char* wel_str   = "You can update or check config here with a json-format string\r\n\
-                             -- using word [update:(json...)] to update setting\r\n\
+                             -- using word [update:(size),(json...)] to update setting\r\n\
                              -- uinsg word [check]  to check setting, than will recieve a json string build from current config\r\n";
             ble_nus_output(wel_str);
             break;

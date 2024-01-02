@@ -24,6 +24,7 @@ typedef struct {
     uint16_t      publish_interval;
     uint8_t       sm4_flag;
     uint8_t       sm4_key[16];
+    uint8_t       ble_mac[6];
 } config_t;
 
 extern nrf_fstorage_t fstorage;
@@ -35,6 +36,7 @@ void                  app_init(void);
 char* build_msg_mqtt(char* device_id, gps_info_t info, int energyStatus, int correctlyWear);
 char* build_msg_cfg(config_t* config);
 int   parse_cfg(char* json, config_t* config);
+void  read_cfg_from_flash(void);
 void  write_cfg(config_t* cfg);
 int   read_cfg(config_t* cfg);
 

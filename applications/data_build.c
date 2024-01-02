@@ -47,11 +47,17 @@ char* build_msg_cfg(config_t* config)
 {
     cJSON *root, *mqtt;
     char*  out;
-    char   hexString[33];
+    char   sm4KeyhexStr[33] = {0};
+    char   blehexStr[13]    = {0};
     for (int i = 0; i < 16; i++) {
-        snprintf(hexString + 2 * i, 3, "%02x", config->sm4_key[i]);
+        snprintf(sm4KeyhexStr + 2 * i, 3, "%02x", config->sm4_key[i]);
     }
-    hexString[32] = '\0';
+    sm4KeyhexStr[32] = '\0';
+
+    for (int i = 0; i < 6; i++) {
+        snprintf(blehexStr + 2 * i, 3, "%02x", config->ble_mac[i]);
+    }
+    blehexStr[12] = '\0';
 
     root = cJSON_CreateObject();
     if (!root) {
@@ -70,7 +76,8 @@ char* build_msg_cfg(config_t* config)
 
     cJSON_AddNumberToObject(root, "publishInterval", config->publish_interval);
     cJSON_AddNumberToObject(root, "sm4Flag", config->sm4_flag);
-    cJSON_AddStringToObject(root, "sm4Key", hexString);
+    cJSON_AddStringToObject(root, "sm4Key", sm4KeyhexStr);
+    cJSON_AddStringToObject(root, "bleMac", blehexStr);
 
     out = cJSON_Print(root);
     cJSON_Delete(root);
@@ -106,7 +113,13 @@ int parse_cfg(char* json, config_t* config)
     }
 
     memcpy(config->sm4_key, hex, 16);
-
+    memset(hex, 0, sizeof(hex));
+    hexString = cJSON_GetObjectItem(cfgjson, "bleMac")->valuestring;
+    for (int i = 0; i < 12; i += 2) {
+        char byteString[3] = {hexString[i], hexString[i + 1], '\0'};
+        hex[i / 2]         = (uint8_t)strtol(byteString, NULL, 16);
+    }
+    memcpy(config->ble_mac, hex, 6);
     cJSON_Delete(cfgjson);
     return EOK;
 }

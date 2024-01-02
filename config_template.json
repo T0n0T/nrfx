@@ -1,0 +1,16 @@
+{
+    "mqtt": {
+        "host": "broker.emqx.io",
+        "port": "1883",
+        "keepalive": 300,
+        "clientId": "CYG_5E89460B99",
+        "userName": "",
+        "passWord": "",
+        "subTopic": "/iot/CYG_5E89460B99/BR/device/reply",
+        "pubTopic": "/iot/CYG_5E89460B99/BR/device/data"
+    },
+    "publishInterval": 5000,
+    "sm4Flag": 1,
+    "sm4Key": "777f23c6fe7b4873dd595cfff65f58ec",
+    "bleMac": "990B46895E"
+}

@@ -26,9 +26,10 @@ config_t global_cfg = {
     .publish_interval = MQTT_PUBLISH_DEFAULT_INTERVAL,
     .sm4_flag         = SM4_ENABLED,
     .sm4_key          = SM4_DEFAULT_KEY,
+    .ble_mac          = BLE_ADDR,
 };
 
-static void read_cfg_from_flash(void)
+void read_cfg_from_flash(void)
 {
     APP_ERROR_CHECK(nrf_fstorage_init(&fstorage, &nrf_fstorage_sd, NULL));
     while (nrf_fstorage_is_busy(&fstorage)) {
@@ -69,9 +70,9 @@ void publish_handle(void)
         ec800m_mqtt_pub(global_cfg.mqtt_cfg.pubtopic, publish_data, strlen(publish_data));
 #else
         memset(&publish_msg, 0, sizeof(publish_msg));
-        publish_msg.qos = QOS0;
+        publish_msg.qos        = QOS0;
         publish_msg.payloadlen = strlen(publish_data);
-        publish_msg.payload = publish_data;
+        publish_msg.payload    = publish_data;
         mqtt_publish(client, global_cfg.mqtt_cfg.pubtopic, &publish_msg);
 #endif
     }
@@ -80,9 +81,7 @@ void publish_handle(void)
 
 static int mqtt_init(void)
 {
-    ec800m_mqtt_t cfg = {0};
-
-    read_cfg_from_flash();
+    // read_cfg_from_flash();
 
     char* src = build_msg_cfg(&global_cfg);
     NRF_LOG_RAW_INFO("%s\r\n", src);
