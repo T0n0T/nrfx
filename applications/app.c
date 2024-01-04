@@ -82,13 +82,8 @@ void publish_handle(void)
 static int mqtt_init(void)
 {
     // read_cfg_from_flash();
-
-    char* src = build_msg_cfg(&global_cfg);
-    NRF_LOG_RAW_INFO("%s\r\n", src);
-    free(src);
-
     while (ec800m.status != EC800M_IDLE) {
-        NRF_LOG_WARNING("wating for ec800m!")
+        NRF_LOG_DEBUG("wating for ec800m!")
         vTaskDelay(200);
     }
 #if EC800M_MQTT_SOFT
