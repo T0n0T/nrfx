@@ -25,13 +25,13 @@
 void gpio_init(void)
 {
     nrf_gpio_cfg_output(LED1);
-    // nrf_gpio_cfg_output(LED2);
-    // nrf_gpio_cfg_output(LED3);
+    nrf_gpio_cfg_output(LED2);
+    nrf_gpio_cfg_output(LED3);
 
     nrf_gpio_cfg_output(MAX_PIN_INT);
 
-    // nrf_gpio_pin_write(LED2, 1);
-    // nrf_gpio_pin_write(LED3, 1);
+    nrf_gpio_pin_write(LED2, 1);
+    nrf_gpio_pin_write(LED3, 1);
 
     nrf_gpio_cfg_output(POR);
     nrf_gpio_cfg_output(GINT0);

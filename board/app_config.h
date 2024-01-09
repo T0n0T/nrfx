@@ -20,8 +20,8 @@
 
 #define EC800M_MQTT_DEFAULT_CFG                             \
     {                                                       \
-        .host      = "broker.emqx.io",                      \
-        .port      = "1883",                                \
+        .host      = "172.16.248.66",                       \
+        .port      = "18891",                               \
         .keepalive = 300,                                   \
         .clientid  = "CYG_5E89460B99",                      \
         .username  = NULL,                                  \

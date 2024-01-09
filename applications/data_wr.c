@@ -190,7 +190,9 @@ static void nus_data_handler(ble_nus_evt_t* p_evt)
                         free(cfg_data);
                     }
                 } else {
+                    NRF_LOG_INFO("ble recv: %*.s", p_evt->params.rx_data.length, p_evt->params.rx_data.p_data);
                     if (strstr(p_evt->params.rx_data.p_data, "update:")) {
+                        NRF_LOG_INFO("update cfg");
                         if (sscanf(p_evt->params.rx_data.p_data, "update:%d", &len) == 1) {
                             cfg_data = calloc(1, len);
                             pos      = cfg_data;
@@ -199,6 +201,7 @@ static void nus_data_handler(ble_nus_evt_t* p_evt)
                             ble_nus_output("Wrong command\r\n");
                         }
                     } else if (strstr(p_evt->params.rx_data.p_data, "check")) {
+                        NRF_LOG_INFO("check cfg");
                         char* cfg_str = build_msg_cfg(&global_cfg);
                         ble_nus_output(cfg_str);
                         free(cfg_str);

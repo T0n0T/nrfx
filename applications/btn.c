@@ -12,6 +12,7 @@
 #include <button.h>
 
 #include "FreeRTOS.h"
+#include "semphr.h"
 #include "task.h"
 #include "timers.h"
 
@@ -45,6 +46,8 @@ void btn_release(void)
 void btn_click(void)
 {
     NRF_LOG_INFO("single click!");
+    extern SemaphoreHandle_t m_app_sem;
+    xSemaphoreGive(m_app_sem);
 }
 
 void btn_double(void)

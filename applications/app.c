@@ -14,6 +14,7 @@
 
 static TaskHandle_t m_app_task;
 static uint8_t      sm4_id = 0;
+SemaphoreHandle_t   m_app_sem;
 uint8_t             sm4_flag;
 
 #if !EC800M_MQTT_SOFT
@@ -84,7 +85,8 @@ static int mqtt_init(void)
     // read_cfg_from_flash();
     while (ec800m.status != EC800M_IDLE) {
         NRF_LOG_DEBUG("wating for ec800m!")
-        vTaskDelay(200);
+        nrf_gpio_pin_write(LED2, 0);
+        vTaskDelay(pdMS_TO_TICKS(300));
     }
 #if EC800M_MQTT_SOFT
     ec800m_mqtt_conf(&global_cfg.mqtt_cfg);
@@ -133,17 +135,29 @@ static int mqtt_init(void)
 
 void app_task(void* pvParameter)
 {
-    mqtt_init();
-    // vTaskDelete(NULL);
+    if (mqtt_init() < 0) {
+        while (1) {
+            nrf_gpio_pin_write(LED2, 0);
+            vTaskDelay(pdMS_TO_TICKS(300));
+        }
+    }
+    nrf_gpio_pin_write(LED2, 0);
+    nrf_gpio_pin_write(LED3, 0);
+    vTaskDelay(pdMS_TO_TICKS(300));
+    nrf_gpio_pin_write(LED2, 1);
+    nrf_gpio_pin_write(LED3, 1);
     while (1) {
+        nrf_gpio_pin_write(LED3, 0);
         publish_handle();
+        nrf_gpio_pin_write(LED3, 1);
         // NRF_LOG_INFO("mqtt app task loop");
-        vTaskDelay(pdMS_TO_TICKS(30000));
+        xSemaphoreTake(m_app_sem, pdMS_TO_TICKS(30000));
     }
 }
 
 void app_init(void)
 {
+    m_app_sem            = xSemaphoreCreateBinary();
     BaseType_t xReturned = xTaskCreate(app_task,
                                        "APP",
                                        512,

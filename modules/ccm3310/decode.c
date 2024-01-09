@@ -82,10 +82,10 @@ int encode(uint8_t cla, uint8_t ins, uint8_t p1, uint8_t p2,
     *(ptr++) = 0x10;
     *(ptr++) = 0x33;
     // 2.数据区长度
-    *(ptr++) = data_len & 0x000000FF;
-    *(ptr++) = data_len & 0x0000FF00;
-    *(ptr++) = data_len & 0x00FF0000;
-    *(ptr++) = data_len & 0xFF000000;
+    *(ptr++) = (uint8_t)(data_len & 0x000000FF >> 0);
+    *(ptr++) = (uint8_t)(data_len & 0x0000FF00 >> 8);
+    *(ptr++) = (uint8_t)(data_len & 0x00FF0000 >> 16);
+    *(ptr++) = (uint8_t)(data_len & 0xFF000000 >> 24);
     // 3.命令段
     *(ptr++) = cla;
     *(ptr++) = ins;
@@ -112,10 +112,10 @@ int encode(uint8_t cla, uint8_t ins, uint8_t p1, uint8_t p2,
     // 7.crc
     // if (cla == 0x81) {
     //     uint32_t crc32_val = crc32(send_pack, ptr - send_pack + 1);
-    //     *(ptr++)           = crc32_val & 0x000000FF;
-    //     *(ptr++)           = crc32_val & 0x0000FF00;
-    //     *(ptr++)           = crc32_val & 0x00FF0000;
-    //     *(ptr++)           = crc32_val & 0xFF000000;
+    //     *(ptr++)           = (uint8_t)(crc32_val & 0x000000FF) >> 0;
+    //     *(ptr++)           = (uint8_t)(crc32_val & 0x0000FF00) >> 8;
+    //     *(ptr++)           = (uint8_t)(crc32_val & 0x00FF0000) >> 16;
+    //     *(ptr++)           = (uint8_t)(crc32_val & 0xFF000000) >> 24;
     // }
     return (int)(ptr - send_pack);
 }
