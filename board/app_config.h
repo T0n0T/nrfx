@@ -14,6 +14,7 @@
 #define BLE_HRS_ENABLED               1
 #define BLE_LOG_ENABLED               1
 #define SM4_ENABLED                   1
+#define NRF_LOG_INFO_COLOR            3
 
 #define EC800M_MQTT_SOFT              0
 #define MQTT_PUBLISH_DEFAULT_INTERVAL 5000

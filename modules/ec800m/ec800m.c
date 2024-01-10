@@ -81,7 +81,7 @@ void ec800M_wake_up(void)
     int result = EOK;
     do {
         nrf_gpio_pin_write(ec800m.wakeup_pin, 0);
-        NRF_LOG_INFO("wake up module!!");
+        NRF_LOG_DEBUG("wake up module!!");
         result = at_client_obj_wait_connect(ec800m.client, 10000);
         vTaskDelay(pdMS_TO_TICKS(500));
     } while (result < 0);

@@ -2036,7 +2036,7 @@
 // <7=> 7 
 
 #ifndef NRFX_GPIOTE_CONFIG_IRQ_PRIORITY
-#define NRFX_GPIOTE_CONFIG_IRQ_PRIORITY 1
+#define NRFX_GPIOTE_CONFIG_IRQ_PRIORITY 7
 #endif
 
 // <e> NRFX_GPIOTE_CONFIG_LOG_ENABLED - Enables logging in the module.
@@ -7750,7 +7750,7 @@
 // <4=> Debug 
 
 #ifndef NRF_LOG_DEFAULT_LEVEL
-#define NRF_LOG_DEFAULT_LEVEL 1
+#define NRF_LOG_DEFAULT_LEVEL 2
 #endif
 
 // <q> NRF_LOG_DEFERRED  - Enable deffered logger.

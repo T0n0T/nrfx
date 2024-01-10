@@ -21,7 +21,7 @@
 #include "nrf_pwr_mgmt.h"
 
 #define NRF_LOG_MODULE_NAME btn
-#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_INFO
+#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_WARNING
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
@@ -38,21 +38,21 @@ uint8_t read_sw_btn(void)
 
 void btn_release(void)
 {
-    NRF_LOG_DEBUG("click release!");
+    NRF_LOG_INFO("click release!");
     xTimerStart(button_tmr, 0);
 }
 
 #include "ec800m.h"
 void btn_click(void)
 {
-    NRF_LOG_INFO("single click!");
+    NRF_LOG_DEBUG("single click!");
     extern SemaphoreHandle_t m_app_sem;
     xSemaphoreGive(m_app_sem);
 }
 
 void btn_double(void)
 {
-    NRF_LOG_INFO("double click!");
+    NRF_LOG_DEBUG("double click!");
     beep_on();
     extern uint8_t sm4_flag;
     if (sm4_flag) {
@@ -64,7 +64,7 @@ void btn_double(void)
 
 void btn_long_free(void)
 {
-    NRF_LOG_INFO("long click!");
+    NRF_LOG_DEBUG("long click!");
     beep_on();
     OS_DELAY(500);
     bsp_uninit();
@@ -80,32 +80,33 @@ void btn_create(Button_t* p)
         read_sw_btn,
         0);
     Button_Attach(p, BUTTON_UP, btn_release);
-    Button_Attach(p, BUTTON_DOWM, btn_click);
+    Button_Attach(p, BUTTON_DOWN, btn_click);
     Button_Attach(p, BUTTON_DOUBLE, btn_double);
     Button_Attach(p, BUTTON_LONG_FREE, btn_long_free);
 }
 
 static void btn_work_on(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
-    NRF_LOG_DEBUG("btn work on!");
+    NRF_LOG_INFO("btn work on!");
     if (pin == SW) {
+        // Button_Process();
         xTaskResumeFromISR(m_btn_task);
     }
 }
 
 void btn_work_off(TimerHandle_t xTimer)
 {
-    __disable_irq();
+    // NRF_LOG_DEBUG("btn work off!");
     vTaskSuspend(m_btn_task);
-    __enable_irq();
 }
 
 static void btn_task(void* pvParameter)
 {
     while (1) {
-        Button_Process();
-        NRF_LOG_DEBUG("process!!");
+        // NRF_LOG_WARNING("btn->Button_State = %d", SW_BUTTON.Button_State);
         vTaskDelay(30);
+        Button_Process();
+        nrf_gpio_pin_toggle(LED2);
     }
 }
 
@@ -131,7 +132,7 @@ void btn_init(void)
                                        "BLE",
                                        256,
                                        0,
-                                       configMAX_PRIORITIES - 1,
+                                       configMAX_PRIORITIES,
                                        &m_btn_task);
     if (xReturned != pdPASS) {
         NRF_LOG_ERROR("button task not created.");

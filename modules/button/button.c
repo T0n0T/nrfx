@@ -21,14 +21,14 @@ NRF_LOG_MODULE_REGISTER();
  *                          Variable Declaration
  *******************************************************************/
 
-static struct button *Head_Button = NULL;
+static struct button* Head_Button = NULL;
 
 /*******************************************************************
  *                         Function Declaration
  *******************************************************************/
-static char *StrnCopy(char *dst, const char *src, uint32_t n);
-static void Print_Btn_Info(Button_t *btn);
-static void Add_Button(Button_t *btn);
+static char* StrnCopy(char* dst, const char* src, uint32_t n);
+static void  Print_Btn_Info(Button_t* btn);
+static void  Add_Button(Button_t* btn);
 
 /************************************************************
  * @brief   Create a Button
@@ -44,8 +44,8 @@ static void Add_Button(Button_t *btn);
  * @version v1.0
  * @note    NULL
  ***********************************************************/
-void Button_Create(const char *name,
-                   Button_t *btn,
+void Button_Create(const char* name,
+                   Button_t*   btn,
                    uint8_t (*read_btn_level)(void),
                    uint8_t btn_trigger_level)
 {
@@ -83,7 +83,7 @@ void Button_Create(const char *name,
  * @date    2018-xx-xx
  * @version v1.0
  ***********************************************************/
-void Button_Attach(Button_t *btn, Button_Event btn_event, Button_CallBack btn_callback)
+void Button_Attach(Button_t* btn, Button_Event btn_event, Button_CallBack btn_callback)
 {
     if (btn == NULL) {
         NRF_LOG_ERROR("struct button is NULL!");
@@ -108,11 +108,11 @@ void Button_Attach(Button_t *btn, Button_Event btn_event, Button_CallBack btn_ca
  * @version v1.0
  * @note    NULL
  ***********************************************************/
-void Button_Delete(Button_t *btn)
+void Button_Delete(Button_t* btn)
 {
-    struct button **curr;
+    struct button** curr;
     for (curr = &Head_Button; *curr;) {
-        struct button *entry = *curr;
+        struct button* entry = *curr;
         if (entry == btn) {
             *curr = entry->Next;
         } else {
@@ -130,7 +130,7 @@ void Button_Delete(Button_t *btn)
  * @date    2018-xx-xx
  * @version v1.0
  ***********************************************************/
-void Get_Button_EventInfo(Button_t *btn)
+void Get_Button_EventInfo(Button_t* btn)
 {
     for (uint8_t i = 0; i < number_of_event - 1; i++) {
         if (btn->CallBack_Function[i] != 0) {
@@ -149,7 +149,7 @@ void Get_Button_EventInfo(Button_t *btn)
  * @date    2018-xx-xx
  * @version v1.0
  ***********************************************************/
-uint8_t Get_Button_Event(Button_t *btn)
+uint8_t Get_Button_Event(Button_t* btn)
 {
     return (uint8_t)(btn->Button_Trigger_Event);
 }
@@ -163,7 +163,7 @@ uint8_t Get_Button_Event(Button_t *btn)
  * @date    2018-xx-xx
  * @version v1.0
  ***********************************************************/
-uint8_t Get_Button_State(Button_t *btn)
+uint8_t Get_Button_State(Button_t* btn)
 {
     return (uint8_t)(btn->Button_State);
 }
@@ -178,11 +178,11 @@ uint8_t Get_Button_State(Button_t *btn)
  * @version v1.0
  * @note    This function must be called in a certain period. The recommended period is 20~50ms.
  ***********************************************************/
-void Button_Cycle_Process(Button_t *btn)
+void Button_Cycle_Process(Button_t* btn)
 {
     /* Get the current button level */
     uint8_t current_level = (uint8_t)btn->Read_Button_Level();
-
+    // NRF_LOG_DEBUG("button level: %d",current_level);
     /* Button level changes, debounce */
     if ((current_level != btn->Button_Last_Level) && (++(btn->Debounce_Time) >= BUTTON_DEBOUNCE_TIME)) {
         /* Update current button level */
@@ -193,19 +193,19 @@ void Button_Cycle_Process(Button_t *btn)
 
         /* If the button is not pressed, change the button state to press (first press / double trigger) */
         if ((btn->Button_State == NONE_TRIGGER) || (btn->Button_State == BUTTON_DOUBLE)) {
-            btn->Button_State = BUTTON_DOWM;
+            btn->Button_State = BUTTON_DOWN;
         }
         // free button
-        else if (btn->Button_State == BUTTON_DOWM) {
+        else if (btn->Button_State == BUTTON_DOWN) {
             btn->Button_State = BUTTON_UP;
-            // NRF_LOG_DEBUG("button release\n");
+            NRF_LOG_DEBUG("button release");
             TRIGGER_CB(BUTTON_UP);
         }
     }
 
     switch (btn->Button_State) {
-        /* button dowm */
-        case BUTTON_DOWM: {
+        /* button down */
+        case BUTTON_DOWN: {
             if (btn->Button_Last_Level == btn->Button_Trigger_Level) {
 /* Support continuous triggering */
 #ifdef CONTINUOS_TRIGGER
@@ -220,7 +220,7 @@ void Button_Cycle_Process(Button_t *btn)
 
 #else
 
-                btn->Button_Trigger_Event = BUTTON_DOWM;
+                btn->Button_Trigger_Event = BUTTON_DOWN;
 
                 /* Update the trigger event before releasing the button as long press */
                 if (++(btn->Long_Time) >= BUTTON_LONG_TIME) {
@@ -247,6 +247,9 @@ void Button_Cycle_Process(Button_t *btn)
                 }
 
 #endif
+            } else {
+                btn->Button_State      = NONE_TRIGGER;
+                btn->Button_Last_State = NONE_TRIGGER;
             }
 
             break;
@@ -255,7 +258,7 @@ void Button_Cycle_Process(Button_t *btn)
         /* button up */
         case BUTTON_UP: {
             /* Trigger click */
-            if (btn->Button_Trigger_Event == BUTTON_DOWM) {
+            if (btn->Button_Trigger_Event == BUTTON_DOWN) {
                 /* double click */
                 if ((btn->Timer_Count <= BUTTON_DOUBLE_TIME) && (btn->Button_Last_State == BUTTON_DOUBLE)) {
                     btn->Button_Trigger_Event = BUTTON_DOUBLE;
@@ -272,7 +275,7 @@ void Button_Cycle_Process(Button_t *btn)
 #ifndef SINGLE_AND_DOUBLE_TRIGGER
 
                     /* click */
-                    TRIGGER_CB(BUTTON_DOWM);
+                    TRIGGER_CB(BUTTON_DOWN);
 #endif
                     btn->Button_State      = BUTTON_DOUBLE;
                     btn->Button_Last_State = BUTTON_DOUBLE;
@@ -318,12 +321,12 @@ void Button_Cycle_Process(Button_t *btn)
             }
 #ifdef SINGLE_AND_DOUBLE_TRIGGER
 
-            if ((btn->Timer_Count >= BUTTON_DOUBLE_TIME) && (btn->Button_Last_State != BUTTON_DOWM)) {
+            if ((btn->Timer_Count >= BUTTON_DOUBLE_TIME) && (btn->Button_Last_State != BUTTON_DOWN)) {
                 btn->Timer_Count = 0;
                 NRF_LOG_DEBUG("single click");
-                TRIGGER_CB(BUTTON_DOWM);
+                TRIGGER_CB(BUTTON_DOWN);
                 btn->Button_State      = NONE_TRIGGER;
-                btn->Button_Last_State = BUTTON_DOWM;
+                btn->Button_Last_State = BUTTON_DOWN;
             }
 
 #endif
@@ -348,7 +351,7 @@ void Button_Cycle_Process(Button_t *btn)
  ***********************************************************/
 void Button_Process(void)
 {
-    struct button *pass_btn;
+    struct button* pass_btn;
     for (pass_btn = Head_Button; pass_btn != NULL; pass_btn = pass_btn->Next) {
         Button_Cycle_Process(pass_btn);
     }
@@ -366,7 +369,7 @@ void Button_Process(void)
  ***********************************************************/
 void Search_Button(void)
 {
-    struct button *pass_btn;
+    struct button* pass_btn;
     for (pass_btn = Head_Button; pass_btn != NULL; pass_btn = pass_btn->Next) {
         NRF_LOG_DEBUG("button node have %s", pass_btn->Name);
     }
@@ -382,12 +385,12 @@ void Search_Button(void)
  * @version v1.0
  * @note    Not implemented yet
  ***********************************************************/
-void Button_Process_CallBack(void *btn)
+void Button_Process_CallBack(void* btn)
 {
     uint8_t btn_event = Get_Button_Event(btn);
 
     switch (btn_event) {
-        case BUTTON_DOWM: {
+        case BUTTON_DOWN: {
             NRF_LOG_DEBUG("Add processing logic for your press trigger");
             break;
         }
@@ -436,11 +439,11 @@ void Button_Process_CallBack(void *btn)
  * @version v1.0
  * @note    NULL
  ***********************************************************/
-static char *StrnCopy(char *dst, const char *src, uint32_t n)
+static char* StrnCopy(char* dst, const char* src, uint32_t n)
 {
     if (n != 0) {
-        char *d       = dst;
-        const char *s = src;
+        char*       d = dst;
+        const char* s = src;
         do {
             if ((*d++ = *s++) == 0) {
                 while (--n != 0)
@@ -462,7 +465,7 @@ static char *StrnCopy(char *dst, const char *src, uint32_t n)
  * @version v1.0
  * @note    NULL
  ***********************************************************/
-static void Print_Btn_Info(Button_t *btn)
+static void Print_Btn_Info(Button_t* btn)
 {
 
     NRF_LOG_DEBUG("button struct information:\n\
@@ -489,9 +492,9 @@ static void Print_Btn_Info(Button_t *btn)
  * @version v1.0
  * @note    NULL
  ***********************************************************/
-static void Add_Button(Button_t *btn)
+static void Add_Button(Button_t* btn)
 {
-    struct button *pass_btn = Head_Button;
+    struct button* pass_btn = Head_Button;
 
     while (pass_btn) {
         pass_btn = pass_btn->Next;

@@ -51,12 +51,12 @@
 
 #define TRIGGER_CB(event)              \
     if (btn->CallBack_Function[event]) \
-    btn->CallBack_Function[event]((Button_t *)btn)
+    btn->CallBack_Function[event]((Button_t*)btn)
 
-typedef void (*Button_CallBack)(void *); // The button triggers the callback function and needs to be implemented by the user.
+typedef void (*Button_CallBack)(void*); // The button triggers the callback function and needs to be implemented by the user.
 
 typedef enum {
-    BUTTON_DOWM = 0,
+    BUTTON_DOWN = 0,
     BUTTON_UP,
     BUTTON_DOUBLE,
     BUTTON_LONG,
@@ -94,30 +94,30 @@ typedef struct button {
 
     uint8_t Long_Time; /* Button press duration */
 
-    struct button *Next;
+    struct button* Next;
 
 } Button_t;
 
 /* Function declaration for external calls */
 
-void Button_Create(const char *name,
-                   Button_t *btn,
+void Button_Create(const char* name,
+                   Button_t*   btn,
                    uint8_t (*read_btn_level)(void),
                    uint8_t btn_trigger_level);
 
-void Button_Attach(Button_t *btn, Button_Event btn_event, Button_CallBack btn_callback);
+void Button_Attach(Button_t* btn, Button_Event btn_event, Button_CallBack btn_callback);
 
-void Button_Cycle_Process(Button_t *btn);
+void Button_Cycle_Process(Button_t* btn);
 
 void Button_Process(void);
 
-void Button_Delete(Button_t *btn);
+void Button_Delete(Button_t* btn);
 
 void Search_Button(void);
 
-void Get_Button_EventInfo(Button_t *btn);
-uint8_t Get_Button_Event(Button_t *btn);
-uint8_t Get_Button_State(Button_t *btn);
-void Button_Process_CallBack(void *btn);
+void    Get_Button_EventInfo(Button_t* btn);
+uint8_t Get_Button_Event(Button_t* btn);
+uint8_t Get_Button_State(Button_t* btn);
+void    Button_Process_CallBack(void* btn);
 
 #endif

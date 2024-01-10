@@ -116,7 +116,7 @@ void beep_off(void)
 
 void bsp_uninit(void)
 {
-    // gpio_uninit();
+    gpio_uninit();
     beep_uninit();
     // ccm3310_uninit();
     // i2c0_uninit();

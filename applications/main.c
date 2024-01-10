@@ -685,7 +685,7 @@ int main(void)
     bool erase_bonds;
 
     // 使能中断之前，初始化异步SVCI接口到Bootloader
-    // APP_ERROR_CHECK(ble_dfu_buttonless_async_svci_init());
+    APP_ERROR_CHECK(ble_dfu_buttonless_async_svci_init());
 
     // Initialize modules.
     log_init();

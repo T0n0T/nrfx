@@ -32,7 +32,8 @@
             "*.dep": true,
             "services/mqttclient/platform/RT-Thread": true,
             "services/mqttclient/network/mbedtls": true
-        }
+        },
+        "cortex-debug.variableUseNaturalFormat": false
     },
     "extensions": {
         "recommendations": [
