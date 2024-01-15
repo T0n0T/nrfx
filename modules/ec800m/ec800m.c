@@ -114,7 +114,11 @@ void ec800m_task(void* p)
     }
 
     /** check simcard with checking pin */
-    result = at_cmd_exec(ec800m.client, NULL, AT_CMD_CHECK_PIN);
+    int retry = 5;
+    do {
+        result = at_cmd_exec(ec800m.client, NULL, AT_CMD_CHECK_PIN);
+        vTaskDelay(1000);
+    } while (result < 0 && retry--);
     if (result < 0) {
         NRF_LOG_ERROR("ec800m simcard detect failed.");
         goto __exit;

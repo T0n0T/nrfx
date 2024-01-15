@@ -84,8 +84,8 @@ static int mqtt_init(void)
 {
     // read_cfg_from_flash();
     while (ec800m.status != EC800M_IDLE) {
-        NRF_LOG_DEBUG("wating for ec800m!")
-        nrf_gpio_pin_write(LED2, 0);
+        // NRF_LOG_DEBUG("wating for ec800m!")
+        nrf_gpio_pin_write(LED3, 0);
         vTaskDelay(pdMS_TO_TICKS(300));
     }
 #if EC800M_MQTT_SOFT
@@ -137,7 +137,7 @@ void app_task(void* pvParameter)
 {
     if (mqtt_init() < 0) {
         while (1) {
-            nrf_gpio_pin_write(LED2, 0);
+            nrf_gpio_pin_write(LED3, 0);
             vTaskDelay(pdMS_TO_TICKS(300));
         }
     }

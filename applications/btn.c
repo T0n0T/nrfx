@@ -21,7 +21,7 @@
 #include "nrf_pwr_mgmt.h"
 
 #define NRF_LOG_MODULE_NAME btn
-#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_WARNING
+#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_DEBUG
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
@@ -46,8 +46,8 @@ void btn_release(void)
 void btn_click(void)
 {
     NRF_LOG_DEBUG("single click!");
-    extern SemaphoreHandle_t m_app_sem;
-    xSemaphoreGive(m_app_sem);
+    // extern SemaphoreHandle_t m_app_sem;
+    // xSemaphoreGive(m_app_sem);
 }
 
 void btn_double(void)
@@ -89,7 +89,8 @@ static void btn_work_on(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
     NRF_LOG_INFO("btn work on!");
     if (pin == SW) {
-        // Button_Process();
+        SW_BUTTON.Button_Last_Level = 0;
+        SW_BUTTON.Button_State      = BUTTON_DOWN;
         xTaskResumeFromISR(m_btn_task);
     }
 }
@@ -104,9 +105,9 @@ static void btn_task(void* pvParameter)
 {
     while (1) {
         // NRF_LOG_WARNING("btn->Button_State = %d", SW_BUTTON.Button_State);
-        vTaskDelay(30);
         Button_Process();
         nrf_gpio_pin_toggle(LED2);
+        vTaskDelay(30);
     }
 }
 
