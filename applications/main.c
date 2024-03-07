@@ -710,10 +710,13 @@ int main(void)
     // Initialize modules.
     timers_init();
     gap_params_init();
+
     read_cfg_from_flash();
+
     char* src = build_msg_cfg(&global_cfg);
     NRF_LOG_RAW_INFO("%s\r\n", src);
     free(src);
+
     ble_mac_set();
     gatt_init();
     advertising_init();
@@ -721,6 +724,7 @@ int main(void)
     conn_params_init();
     peer_manager_init();
     application_timers_start();
+    
     bsp_init();
     app_init();
 
