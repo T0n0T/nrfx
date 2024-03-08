@@ -84,6 +84,7 @@ void urc_socket_close(struct at_client* client, const char* data, size_t size)
         NRF_LOG_ERROR("One socket has been close but socket_num wrong");
         return;
     }
+    NRF_LOG_INFO("socket close!!!!!!!")
     taskENTER_CRITICAL();
     socket[socket_num].status = EC800M_SOCKET_IDLE;
     taskEXIT_CRITICAL();

@@ -2,17 +2,7 @@
   "configurations": [
     {
       "name": "windows-gcc-x64",
-      "includePath": [
-        "${workspaceFolder}/**"
-      ],
-      "compilerPath": "C:/desktop/tools/w64devkit/bin/gcc.exe",
-      "cStandard": "${default}",
-      "cppStandard": "${default}",
-      "intelliSenseMode": "windows-gcc-x64",
-      "compilerArgs": [
-        ""
-      ],
-      "configurationProvider": "cl.eide"
+      "compileCommands": "build\\nrf52832_xxaa\\compile_commands.json"
     }
   ],
   "version": 4

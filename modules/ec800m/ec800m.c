@@ -12,7 +12,7 @@
 #include "nrfx_gpiote.h"
 
 #define NRF_LOG_MODULE_NAME ec800
-#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_INFO
+#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_DEBUG
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
@@ -76,7 +76,7 @@ __exit:
     return result;
 }
 
-void ec800M_wake_up(void)
+void ec800m_wake_up(void)
 {
     int result = EOK;
     do {
@@ -87,17 +87,12 @@ void ec800M_wake_up(void)
     } while (result < 0);
 }
 
-void ec800m_task(void* p)
+int ec800m_power_on(void)
 {
     int result = EOK;
-    // nrf_gpio_pin_write(ec800m.wakeup_pin, 0);
-    // result = at_client_obj_wait_connect(ec800m.client, 10000);
-    // if (result < 0) {
-    //     NRF_LOG_ERROR("at client connect failed.");
-    //     goto __exit;
-    // }
-    ec800M_wake_up();
-
+    nrf_gpio_pin_write(ec800m.pwr_pin, 1);
+    ec800m_wake_up();
+    vTaskDelay(500);
     /** reset ec800m */
     result = at_cmd_exec(ec800m.client, NULL, AT_CMD_RESET);
     if (result < 0) {
@@ -174,26 +169,43 @@ void ec800m_task(void* p)
     vTaskDelay(1000);
     /** use sleep mode */
     result = at_cmd_exec(ec800m.client, NULL, AT_CMD_LOW_POWER);
-    if (result < 0) {
-        goto __exit;
-    }
+    // if (result < 0) {
+    //     goto __exit;
+    // }
     free(parse_str);
 
+    ec800m.status = EC800M_IDLE;
+    NRF_LOG_DEBUG("ec800m init OK!");
+
+    return 0;
+__exit:
+    NRF_LOG_ERROR("ec800m init fail!");
+    return -1;
+}
+
+void ec800m_power_off(void)
+{
+    extern ec800m_socket_t      socket[SOCKET_MAX];
+    memset(socket, 0, sizeof(ec800m_socket_t) * 5);
+    nrf_gpio_pin_write(ec800m.pwr_pin, 0);
+}
+
+void ec800m_task(void* p)
+{
+    int result = EOK;
     for (size_t i = 0; i < sizeof(task_groups) / sizeof(ec800m_task_group_t*); i++) {
         task_groups[i]->init();
     }
-    ec800m.status = EC800M_IDLE;
-    ec800m_task_t task_cb;
-    NRF_LOG_DEBUG("ec800m init OK!");
     TickType_t last_time = 0, current_time = 0;
+    ec800m_task_t task_cb;
     while (1) {
         memset(&task_cb, 0, sizeof(ec800m_task_t));
         last_time = xTaskGetTickCount();
         xQueueReceive(ec800m.task_queue, &task_cb, portMAX_DELAY);
-        current_time = xTaskGetTickCount();
-        if (current_time - last_time > pdMS_TO_TICKS(15000)) {
-            ec800M_wake_up();
-        }
+        // current_time = xTaskGetTickCount();
+        // if (current_time - last_time > pdMS_TO_TICKS(10000)) {
+        //     ec800m_wake_up();
+        // }
 
         for (size_t i = 0; i < sizeof(task_groups) / sizeof(ec800m_task_group_t*); i++) {
             if (task_groups[i]->id == task_cb.type) {
@@ -208,9 +220,6 @@ void ec800m_task(void* p)
         }
     }
 
-__exit:
-    NRF_LOG_ERROR("ec800m init fail!");
-    vTaskDelete(NULL);
 }
 
 gps_info_t ec800m_gnss_get(void)
@@ -218,7 +227,7 @@ gps_info_t ec800m_gnss_get(void)
     char                   rmc[128] = {0};
     static struct gps_info rmcinfo  = {0};
     at_response_t          resp     = at_create_resp(128, 0, 300);
-    ec800M_wake_up();
+    ec800m_wake_up();
     if (at_obj_exec_cmd(ec800m.client, resp, "AT+QGPSGNMEA=\"RMC\"") == EOK) {
         if (at_resp_parse_line_args_by_kw(resp, "+QGPSGNMEA:", "+QGPSGNMEA:%s", rmc) > 0) {
             NRF_LOG_DEBUG("rmc: %s", rmc);
@@ -249,7 +258,7 @@ void ec800m_init(void)
 
     memset(&ec800m, 0, sizeof(ec800m));
     ec800m.client     = at_client_get(NULL);
-    ec800m.pwr_pin    = EC800_PIN_PWR;
+    ec800m.pwr_pin    = EC800_PIN_PWREN;
     ec800m.wakeup_pin = EC800_PIN_DTR;
     ec800m.task_queue = xQueueCreate(10, sizeof(ec800m_task_t));
     ec800m.timer      = xTimerCreate("ec800m_timer", pdMS_TO_TICKS(3000), pdFALSE, (void*)0, ec800m_timer_cb);

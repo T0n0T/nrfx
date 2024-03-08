@@ -969,7 +969,8 @@
           "USE_APP_CONFIG",
           "AT_USING_CLIENT",
           "MQTT_NETWORK_TYPE_NO_TLS",
-          "BLE_ADDR={0x66, 0x55, 0x44, 0x33, 0x22, 0x11}"
+          "BLE_ADDR={0x66, 0x55, 0x44, 0x33, 0x22, 0x11}",
+          "DEBUG"
         ]
       }
     },

@@ -33,6 +33,17 @@ int numalgin(int num, int align)
     return num;
 }
 
+uint8_t pkcs7_value(int length, int block_size)
+{
+    int padding_length = block_size - (length % block_size);
+
+    if (padding_length == 0) {
+        padding_length = block_size;
+    }
+    
+    return (uint8_t)padding_length;
+}
+
 /**
  * @brief 上行包解包
  *

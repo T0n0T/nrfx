@@ -83,13 +83,13 @@
 #define POWER_KEEP 28
 
 // ec800m
-#define UART_PIN_RX     4
-#define UART_PIN_TX     5
-#define EC800_PIN_RESET 22
-#define EC800_PIN_PWR   3
-#define EC800_PIN_DTR   7
-#define EC800_PIN_RI    6
-#define EC800_PWR_EN    8
+#define UART_PIN_RX      4
+#define UART_PIN_TX      5
+#define EC800_PIN_RESET  22
+#define EC800_PIN_PWRKEY 3
+#define EC800_PIN_DTR    7
+#define EC800_PIN_RI     6
+#define EC800_PIN_PWREN  8
 
 #else
 
