@@ -115,5 +115,6 @@ int ccm3310_transfer(uint8_t* send_buf, int send_len, uint8_t** decode_data, int
     if (err == 0) {
         return len;
     }
+    nrf_gpio_pin_write(GINT0, 0);
     return -2;
 }

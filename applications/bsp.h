@@ -16,6 +16,16 @@
 #include "nrf_drv_clock.h"
 #include "nrfx_rtc.h"
 
+#define LED_ON(x)                      \
+    do {                               \
+        nrf_gpio_pin_clear((uint32_t)x); \
+    } while (0);
+
+#define LED_OFF(x)                       \
+    do {                                 \
+        nrf_gpio_pin_set((uint32_t)x); \
+    } while (0);
+
 extern int              flag;
 extern const nrfx_rtc_t rtc_instance;
 
