@@ -88,6 +88,7 @@ int ec800m_socket_open(const char* domain, const char* port, int protocol)
 
 int ec800m_socket_close(int socket_num)
 {
+    socket[socket_num].status = EC800M_SOCKET_IDLE;
     socket_task_publish(EC800M_TASK_SOCKET_CLOSE, &socket[socket_num], 0);
     return EOK;
 }

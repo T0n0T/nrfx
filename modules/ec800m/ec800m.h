@@ -41,9 +41,9 @@ typedef struct {
 
 typedef struct {
     uint8_t id;
-    void (*init)(void);
-    void (*task_handle)(int, void*);
-    void (*timeout_handle)(int, void*);
+    void    (*init)(void);
+    void    (*task_handle)(int, void*);
+    void    (*timeout_handle)(int, void*);
 } ec800m_task_group_t;
 
 typedef struct {
@@ -123,6 +123,7 @@ typedef enum {
     AT_CMD_MQTT_CONF_ALIVE,
 
     AT_CMD_ERR_CHECK,
+    AT_CMD_POWER_DOWN,
     AT_CMD_MAX,
 } at_cmd_desc_t;
 
@@ -131,7 +132,9 @@ extern const struct at_cmd at_cmd_list[];
 
 void       ec800m_init(void);
 int        at_cmd_exec(at_client_t dev, char* prase_buf, at_cmd_desc_t at_cmd_id, ...);
-void       ec800M_wake_up(void);
+void       ec800m_wake_up(void);
+int        ec800m_power_on(void);
+void       ec800m_power_off(void);
 gps_info_t ec800m_gnss_get(void);
 
 #endif

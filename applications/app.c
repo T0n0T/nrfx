@@ -9,6 +9,8 @@
  *
  */
 #include "app.h"
+#include "bsp.h"
+#include "ec800m.h"
 #include "ccm3310.h"
 #include "nrf_log.h"
 
@@ -25,7 +27,7 @@ mqtt_message_t publish_msg = {0};
 config_t global_cfg = {
     .mqtt_cfg         = EC800M_MQTT_DEFAULT_CFG,
     .publish_interval = MQTT_PUBLISH_DEFAULT_INTERVAL,
-    .sm4_flag         = SM4_ENABLED,
+    .sm4_flag         = 0,
     .sm4_key          = SM4_DEFAULT_KEY,
     .ble_mac          = BLE_ADDR,
 };
@@ -82,12 +84,11 @@ void publish_handle(void)
 
 static int mqtt_init(void)
 {
-    // read_cfg_from_flash();
-    while (ec800m.status != EC800M_IDLE) {
-        // NRF_LOG_DEBUG("wating for ec800m!")
-        nrf_gpio_pin_write(LED3, 0);
-        vTaskDelay(pdMS_TO_TICKS(300));
-    }
+    // while (ec800m.status != EC800M_IDLE) {
+    //     // NRF_LOG_DEBUG("wating for ec800m!")
+    //     LED_OFF(LED3);
+    //     vTaskDelay(pdMS_TO_TICKS(300));
+    // }
 #if EC800M_MQTT_SOFT
     ec800m_mqtt_conf(&global_cfg.mqtt_cfg);
     ec800m_mqtt_connect();
@@ -104,14 +105,27 @@ static int mqtt_init(void)
     }
     mqtt_conf(client, &global_cfg);
 
-    int err = mqtt_connect(client);
-    if (err != MQTT_SUCCESS_ERROR) {
-        NRF_LOG_ERROR("mqtt connect fail, err[%d]", err);
-        return -1;
-    }
-    extern void sub_handle(void* client, message_data_t* msg);
-    mqtt_subscribe(client, global_cfg.mqtt_cfg.subtopic, QOS1, sub_handle);
+    // int err = mqtt_connect(client);
+    // if (err != MQTT_SUCCESS_ERROR) {
+    //     NRF_LOG_ERROR("mqtt connect fail, err[%d]", err);
+    //     return -1;
+    // }
+    // extern void sub_handle(void* client, message_data_t* msg);
+    // mqtt_subscribe(client, global_cfg.mqtt_cfg.subtopic, QOS1, sub_handle);
 #endif
+
+    return 0;
+}
+
+static int mqtt_deinit(void)
+{
+    
+    return 0;
+}
+
+void app_task(void* pvParameter)
+{
+    mqtt_init();
     if (global_cfg.sm4_flag) {
         sm4_id = ccm3310_sm4_setkey((uint8_t*)global_cfg.sm4_key);
         if (!sm4_id) {
@@ -129,28 +143,21 @@ static int mqtt_init(void)
             sm4_flag = 1;
         }
     }
-
-    return 0;
-}
-
-void app_task(void* pvParameter)
-{
-    if (mqtt_init() < 0) {
-        while (1) {
-            nrf_gpio_pin_write(LED3, 0);
-            vTaskDelay(pdMS_TO_TICKS(300));
-        }
-    }
-    nrf_gpio_pin_write(LED2, 0);
-    nrf_gpio_pin_write(LED3, 0);
+    LED_ON(LED2);
+    LED_ON(LED3);
     vTaskDelay(pdMS_TO_TICKS(300));
-    nrf_gpio_pin_write(LED2, 1);
-    nrf_gpio_pin_write(LED3, 1);
+    LED_OFF(LED2);
+    LED_OFF(LED3);
     while (1) {
-        nrf_gpio_pin_write(LED3, 0);
+        ec800m_power_on();
+        LED_ON(LED3);
+        mqtt_connect(client);
         publish_handle();
-        nrf_gpio_pin_write(LED3, 1);
+        LED_OFF(LED3);
+        mqtt_disconnect(client);
+        ec800m_power_off();
         // NRF_LOG_INFO("mqtt app task loop");
+        // xSemaphoreTake(m_app_sem, pdMS_TO_TICKS(global_cfg.publish_interval));
         xSemaphoreTake(m_app_sem, pdMS_TO_TICKS(30000));
     }
 }

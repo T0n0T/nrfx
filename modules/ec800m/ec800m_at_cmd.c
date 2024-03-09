@@ -15,8 +15,8 @@ const struct at_cmd at_cmd_list[] = {
     {AT_CMD_NAME(AT_CMD_TEST), "AT", "OK", 300},
     {AT_CMD_NAME(AT_CMD_RESET), "AT&F", "OK", 300},
     {AT_CMD_NAME(AT_CMD_ECHO_OFF), "ATE0", "OK", 300},
-    {AT_CMD_NAME(AT_CMD_LOW_POWER), "AT+QSCLK=1", "OK", 300},
-    {AT_CMD_NAME(AT_CMD_LOW_POWER_OFF), "AT+QSCLK=0", "OK", 300},
+    {AT_CMD_NAME(AT_CMD_LOW_POWER), "AT+QSCLKEX=1,1,10", "OK", 300},
+    {AT_CMD_NAME(AT_CMD_LOW_POWER_OFF), "AT+QSCLKEX=0", "OK", 300},
 
     /** simcard */
     {AT_CMD_NAME(AT_CMD_IMSI), "AT+CIMI", "OK", 300},
@@ -65,4 +65,5 @@ const struct at_cmd at_cmd_list[] = {
     {AT_CMD_NAME(AT_CMD_MQTT_CONF_ALIVE), "AT+QMTCFG=\"keepalive\",0,%d", "OK", 300},
 
     {AT_CMD_NAME(AT_CMD_ERR_CHECK), "AT+QIGETERROR", "OK", 500},
+    {AT_CMD_NAME(AT_CMD_POWER_DOWN), "AT+QPOWD", "OK", 300},
 };
