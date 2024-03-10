@@ -88,7 +88,7 @@ int ec800m_socket_open(const char* domain, const char* port, int protocol)
 
 int ec800m_socket_close(int socket_num)
 {
-    socket[socket_num].status = EC800M_SOCKET_IDLE;
+    // socket[socket_num].status = EC800M_SOCKET_IDLE;
     socket_task_publish(EC800M_TASK_SOCKET_CLOSE, &socket[socket_num], 0);
     return EOK;
 }
@@ -153,44 +153,44 @@ void ec800m_socket_init_handle(void)
 void ec800m_socket_task_handle(int task, void* param)
 {
     if (task == EC800M_TASK_PDP_DEACT) {
-        at_cmd_exec(ec800m.client, NULL, AT_CMD_DEACT_PDP);
+        at_cmd_exec(ec800m.client, AT_CMD_DEACT_PDP);
     }
     if (task == EC800M_TASK_PDP_ACT) {
-        at_cmd_exec(ec800m.client, NULL, AT_CMD_ACT_PDP);
+        at_cmd_exec(ec800m.client, AT_CMD_ACT_PDP);
     }
     if (task == EC800M_TASK_PDP_CHECK) {
-        at_cmd_exec(ec800m.client, NULL, AT_CMD_CHECK_PDP);
+        at_cmd_exec(ec800m.client, AT_CMD_CHECK_PDP);
     }
     if (task == EC800M_TASK_SOCKET_OPEN) {
         ec800m_socket_t* s          = (ec800m_socket_t*)param;
         const char*      protocol   = (s->protocol == EC800M_SOCKET_TCP_CLIENT) ? "TCP" : "UDP";
         int              socket_num = s - socket;
-        at_cmd_exec(ec800m.client, NULL, AT_CMD_SOCKET_OPEN, socket_num, protocol, s->domain, s->port);
+        at_cmd_exec(ec800m.client, AT_CMD_SOCKET_OPEN, socket_num, protocol, s->domain, s->port);
     }
     if (task == EC800M_TASK_SOCKET_CLOSE) {
         ec800m_socket_t* s          = (ec800m_socket_t*)param;
         int              socket_num = s - socket;
-        at_cmd_exec(ec800m.client, NULL, AT_CMD_SOCKET_CLOSE, socket_num);
+        at_cmd_exec(ec800m.client, AT_CMD_SOCKET_CLOSE, socket_num);
     }
     if (task == EC800M_TASK_SOCKET_CHECK) {
         ec800m_socket_t* s          = (ec800m_socket_t*)param;
         int              socket_num = s - socket;
-        at_cmd_exec(ec800m.client, NULL, AT_CMD_SOCKET_STATUS, socket_num);
+        at_cmd_exec(ec800m.client, AT_CMD_SOCKET_STATUS, socket_num);
     }
     if (task == EC800M_TASK_SOCKET_SEND) {
         ec800m_socket_data_t* data = (ec800m_socket_data_t*)param;
         at_set_end_sign('>');
-        at_cmd_exec(ec800m.client, NULL, AT_CMD_SOCKET_SEND, data->socket_num, data->len);
+        at_cmd_exec(ec800m.client, AT_CMD_SOCKET_SEND, data->socket_num, data->len);
         at_client_send(data->buf, data->len);
         at_set_end_sign(0);
     }
     if (task == EC800M_TASK_SOCKET_RECV) {
         ec800m_socket_data_t* data = (ec800m_socket_data_t*)param;
-        at_cmd_exec(ec800m.client, NULL, AT_CMD_SOCKET_RECV, data->socket_num, data->len);
+        at_cmd_exec(ec800m.client, AT_CMD_SOCKET_RECV, data->socket_num, data->len);
     }
     if (task == EC800M_TASK_ERR_CHECK) {
-        NRF_LOG_INFO("EC800M: Socket error check");
-        at_cmd_exec(ec800m.client, NULL, AT_CMD_ERR_CHECK);
+        NRF_LOG_WARNING("EC800M: Socket error check");
+        at_cmd_exec(ec800m.client, AT_CMD_ERR_CHECK);
     }
 }
 

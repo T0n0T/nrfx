@@ -130,6 +130,12 @@
             "name": "ec800m",
             "files": [
               {
+                "path": "modules/ec800m/common/ec800m_common_at_urc.c"
+              },
+              {
+                "path": "modules/ec800m/common/ec800m_common.c"
+              },
+              {
                 "path": "modules/ec800m/ec800m_at_cmd.c"
               },
               {
@@ -949,7 +955,8 @@
           "services/mqttclient/network",
           "services/mqttclient/platform/FreeRTOS",
           ".eide/deps",
-          ".cmsis/include"
+          ".cmsis/include",
+          "modules/ec800m/common"
         ],
         "libList": [],
         "sourceDirList": [],

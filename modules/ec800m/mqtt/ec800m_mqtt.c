@@ -89,7 +89,7 @@ int ec800m_mqtt_pub(char* topic, void* payload, uint32_t len)
     if (mqtt_status == EC800M_MQTT_CONN) {
         nrf_gpio_pin_write(ec800m.wakeup_pin, 0);
         at_set_end_sign('>');
-        at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_PUBLISH, topic, len);
+        at_cmd_exec(ec800m.client, AT_CMD_MQTT_PUBLISH, topic, len);
         at_client_send(tmp_payload, len);
         at_set_end_sign(0);
         nrf_gpio_pin_write(ec800m.wakeup_pin, 1);
@@ -112,7 +112,7 @@ int ec800m_mqtt_sub(char* subtopic)
     }
     if (mqtt_status == EC800M_MQTT_CONN) {
         nrf_gpio_pin_write(ec800m.wakeup_pin, 0);
-        at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_SUBSCRIBE, subtopic);
+        at_cmd_exec(ec800m.client, AT_CMD_MQTT_SUBSCRIBE, subtopic);
         nrf_gpio_pin_write(ec800m.wakeup_pin, 1);
     } else {
         NRF_LOG_WARNING("mqtt has not connected, try to reconnect", mqtt_status);
@@ -134,20 +134,20 @@ static void ec800m_mqtt_task_handle(int task, void* param)
 {
     if (task == EC800M_TASK_MQTT_CHECK) {
         mqtt_status = EC800M_MQTT_IDLE;
-        at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_STATUS);
+        at_cmd_exec(ec800m.client, AT_CMD_MQTT_STATUS);
     }
     if (task == EC800M_TASK_MQTT_OPEN) {
         if (mqtt_status == EC800M_MQTT_IDLE) {
-            at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_CLOSE);
+            at_cmd_exec(ec800m.client, AT_CMD_MQTT_CLOSE);
         } else {
             if (mqtt_config.keepalive) {
-                at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_CONF_ALIVE, mqtt_config.keepalive);
+                at_cmd_exec(ec800m.client, AT_CMD_MQTT_CONF_ALIVE, mqtt_config.keepalive);
             }
-            at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_REL, mqtt_config.host, mqtt_config.port);
+            at_cmd_exec(ec800m.client, AT_CMD_MQTT_REL, mqtt_config.host, mqtt_config.port);
         }
     }
     if (task == EC800M_TASK_MQTT_CLOSE) {
-        at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_CLOSE);
+        at_cmd_exec(ec800m.client, AT_CMD_MQTT_CLOSE);
     }
     if (task == EC800M_TASK_MQTT_CONNECT) {
         if (mqtt_status == EC800M_MQTT_OPEN) {
@@ -157,7 +157,7 @@ static void ec800m_mqtt_task_handle(int task, void* param)
             } else {
                 sprintf(cmd_para, "%s", mqtt_config.clientid);
             }
-            at_cmd_exec(ec800m.client, NULL, AT_CMD_MQTT_CONNECT, cmd_para);
+            at_cmd_exec(ec800m.client, AT_CMD_MQTT_CONNECT, cmd_para);
         }
     }
 }

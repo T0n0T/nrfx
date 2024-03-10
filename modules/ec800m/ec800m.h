@@ -16,9 +16,11 @@
 #include "timers.h"
 #include "event_groups.h"
 #include "queue.h"
+#include "semphr.h"
 #include "ec800m_mqtt.h"
 #include "ec800m_socket.h"
 
+#define EC800_COMM              0x00
 #define EC800_MQTT              0x01
 #define EC800_SOCKET            0x02
 #define EC800M_RESET_MAX        5
@@ -27,9 +29,10 @@
 #define AT_CLIENT_RECV_BUFF_LEN 128
 
 typedef enum {
-    EC800M_IDLE = 1,
-    EC800M_BUSY,
-    EC800M_ERROR,
+    EC800M_POWER_OFF = 1,
+    EC800M_POWER_ON,
+    EC800M_POWER_LOW,
+    EC800M_NORMAL,      
 } ec800m_status_t;
 
 typedef struct {
@@ -41,26 +44,26 @@ typedef struct {
 
 typedef struct {
     uint8_t id;
-    void    (*init)(void);
-    void    (*task_handle)(int, void*);
-    void    (*timeout_handle)(int, void*);
+    void (*init)(void);
+    void (*task_handle)(int, void*);
+    void (*timeout_handle)(int, void*);
 } ec800m_task_group_t;
 
 typedef struct {
-    at_client_t     client;
-    uint32_t        pwr_pin;
-    uint32_t        wakeup_pin;
-    QueueHandle_t   task_queue;
-    TimerHandle_t   timer;
-    ec800m_status_t status;
-    int             rssi;
+    at_client_t       client;
+    uint32_t          pwr_pin;
+    uint32_t          wakeup_pin;
+    QueueHandle_t     task_queue;
+    SemaphoreHandle_t task_mutx;
+    TimerHandle_t     timer;
+    ec800m_status_t   status;
+    int               rssi;
 } ec800m_t;
 
 #pragma pack(8)
 struct at_cmd {
     char*   desc;
     char*   cmd_expr;
-    char*   resp_keyword;
     int32_t timeout;
 };
 typedef struct at_cmd* at_cmd_t;
@@ -131,7 +134,7 @@ extern ec800m_t            ec800m;
 extern const struct at_cmd at_cmd_list[];
 
 void       ec800m_init(void);
-int        at_cmd_exec(at_client_t dev, char* prase_buf, at_cmd_desc_t at_cmd_id, ...);
+int        at_cmd_exec(at_client_t dev, at_cmd_desc_t at_cmd_id, ...);
 void       ec800m_wake_up(void);
 int        ec800m_power_on(void);
 void       ec800m_power_off(void);

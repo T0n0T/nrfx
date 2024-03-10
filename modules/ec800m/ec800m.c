@@ -19,6 +19,7 @@ NRF_LOG_MODULE_REGISTER();
 static char                       send_buf[EC800M_BUF_LEN];
 static TaskHandle_t               ec800m_task_handle;
 ec800m_t                          ec800m;
+extern ec800m_task_group_t        ec800m_comm_task_group;
 extern ec800m_task_group_t        ec800m_mqtt_task_group;
 extern ec800m_task_group_t        ec800m_socket_task_group;
 static const ec800m_task_group_t* task_groups[] = {
@@ -39,7 +40,7 @@ static void (*timeout)(void);
  * @param ... args used to combine with cmd
  * @return int
  */
-int at_cmd_exec(at_client_t dev, char* prase_buf, at_cmd_desc_t at_cmd_id, ...)
+int at_cmd_exec(at_client_t dev, at_cmd_desc_t at_cmd_id, ...)
 {
     va_list       args;
     int           result        = EOK;
@@ -61,14 +62,6 @@ int at_cmd_exec(at_client_t dev, char* prase_buf, at_cmd_desc_t at_cmd_id, ...)
         goto __exit;
     }
 
-    if (prase_buf) {
-        if ((recv_line_buf = at_resp_get_line_by_kw(resp, cmd->resp_keyword)) == NULL) {
-            NRF_LOG_ERROR("AT client execute [%s] failed!", cmd->desc);
-            goto __exit;
-        }
-        strncpy(prase_buf, recv_line_buf, strlen(recv_line_buf));
-    }
-
 __exit:
     if (resp) {
         at_delete_resp(resp);
@@ -87,125 +80,29 @@ void ec800m_wake_up(void)
     } while (result < 0);
 }
 
-int ec800m_power_on(void)
-{
-    int result = EOK;
-    nrf_gpio_pin_write(ec800m.pwr_pin, 1);
-    ec800m_wake_up();
-    vTaskDelay(500);
-    /** reset ec800m */
-    result = at_cmd_exec(ec800m.client, NULL, AT_CMD_RESET);
-    if (result < 0) {
-        NRF_LOG_ERROR("ec800m reset failed.");
-        goto __exit;
-    }
-    vTaskDelay(500);
-
-    /** turn off cmd echo */
-    result = at_cmd_exec(ec800m.client, NULL, AT_CMD_ECHO_OFF);
-    if (result < 0) {
-        NRF_LOG_ERROR("ec800m echo set off failed.");
-        goto __exit;
-    }
-
-    /** check simcard with checking pin */
-    int retry = 5;
-    do {
-        result = at_cmd_exec(ec800m.client, NULL, AT_CMD_CHECK_PIN);
-        vTaskDelay(1000);
-    } while (result < 0 && retry--);
-    if (result < 0) {
-        NRF_LOG_ERROR("ec800m simcard detect failed.");
-        goto __exit;
-    }
-
-    /** check signal */
-    char* parse_str = malloc(20);
-    result          = at_cmd_exec(ec800m.client, parse_str, AT_CMD_CHECK_SIGNAL);
-    if (result < 0) {
-        NRF_LOG_ERROR("ec800m check signal failed.");
-        goto __exit;
-    } else {
-        int rssi = 0, err_rate = 0;
-        sscanf(parse_str, "+CSQ: %d,%d", &rssi, &err_rate);
-        if (rssi != 99 && rssi) {
-            ec800m.rssi = rssi;
-        } else {
-            NRF_LOG_WARNING("ec800m signal strength get wrong.");
-        }
-    }
-
-    /** configure gnss*/
-    memset(parse_str, 0, sizeof(parse_str));
-    result = at_cmd_exec(ec800m.client, parse_str, AT_CMD_GNSS_STATUS);
-    if (result < 0) {
-        goto __exit;
-    } else {
-        int gnss_status = -1;
-        sscanf(parse_str, "+QGPS: %d", &gnss_status);
-        switch (gnss_status) {
-            case 0:
-                result = at_cmd_exec(ec800m.client, NULL, AT_CMD_GNSS_OPEN);
-                if (result < 0) {
-                    goto __exit;
-                }
-                break;
-            case 1:
-                NRF_LOG_INFO("gnss has already open!");
-                break;
-            default:
-                NRF_LOG_ERROR("Command [AT+QGPS?] fail!");
-                result = -ERROR;
-                goto __exit;
-        }
-    }
-
-    /** only use rmc */
-    result = at_cmd_exec(ec800m.client, NULL, AT_CMD_GNSS_NMEA_CONF, 2);
-    if (result < 0) {
-        goto __exit;
-    }
-
-    vTaskDelay(1000);
-    /** use sleep mode */
-    result = at_cmd_exec(ec800m.client, NULL, AT_CMD_LOW_POWER);
-    // if (result < 0) {
-    //     goto __exit;
-    // }
-    free(parse_str);
-
-    ec800m.status = EC800M_IDLE;
-    NRF_LOG_DEBUG("ec800m init OK!");
-
-    return 0;
-__exit:
-    NRF_LOG_ERROR("ec800m init fail!");
-    return -1;
-}
-
-void ec800m_power_off(void)
-{
-    extern ec800m_socket_t      socket[SOCKET_MAX];
-    memset(socket, 0, sizeof(ec800m_socket_t) * 5);
-    nrf_gpio_pin_write(ec800m.pwr_pin, 0);
-}
-
 void ec800m_task(void* p)
 {
     int result = EOK;
     for (size_t i = 0; i < sizeof(task_groups) / sizeof(ec800m_task_group_t*); i++) {
         task_groups[i]->init();
     }
-    TickType_t last_time = 0, current_time = 0;
+    TickType_t    last_time = 0, current_time = 0;
     ec800m_task_t task_cb;
+
+    ec800m.status = EC800M_POWER_OFF;
     while (1) {
         memset(&task_cb, 0, sizeof(ec800m_task_t));
         last_time = xTaskGetTickCount();
         xQueueReceive(ec800m.task_queue, &task_cb, portMAX_DELAY);
-        // current_time = xTaskGetTickCount();
-        // if (current_time - last_time > pdMS_TO_TICKS(10000)) {
-        //     ec800m_wake_up();
-        // }
+        xSemaphoreTake(ec800m.task_mutx, portMAX_DELAY);
+        if (ec800m.status == EC800M_POWER_OFF) {
+            continue;
+        } else if (ec800m.status == EC800M_POWER_LOW) {
+            current_time = xTaskGetTickCount();
+            if (current_time - last_time > pdMS_TO_TICKS(10000)) {
+                ec800m_wake_up();
+            }
+        }
 
         for (size_t i = 0; i < sizeof(task_groups) / sizeof(ec800m_task_group_t*); i++) {
             if (task_groups[i]->id == task_cb.type) {
@@ -214,39 +111,22 @@ void ec800m_task(void* p)
                 task_groups[i]->task_handle(task_cb.task, task_cb.param);
                 if (task_cb.timeout > 0) {
                     xTimerStart(ec800m.timer, 0);
+                } else {
+                    xSemaphoreGive(ec800m.task_mutx);
                 }
                 break;
             }
         }
     }
-
 }
 
-gps_info_t ec800m_gnss_get(void)
-{
-    char                   rmc[128] = {0};
-    static struct gps_info rmcinfo  = {0};
-    at_response_t          resp     = at_create_resp(128, 0, 300);
-    ec800m_wake_up();
-    if (at_obj_exec_cmd(ec800m.client, resp, "AT+QGPSGNMEA=\"RMC\"") == EOK) {
-        if (at_resp_parse_line_args_by_kw(resp, "+QGPSGNMEA:", "+QGPSGNMEA:%s", rmc) > 0) {
-            NRF_LOG_DEBUG("rmc: %s", rmc);
-            if (!gps_rmc_parse(&rmcinfo, rmc)) {
-                NRF_LOG_WARNING("gnss info invalid");
-            } else {
-                NRF_LOG_DEBUG("%d %d %d %d %d %d", rmcinfo.date.year, rmcinfo.date.month, rmcinfo.date.day,
-                              rmcinfo.date.hour, rmcinfo.date.minute, rmcinfo.date.second);
-            }
-        }
-    }
-    at_delete_resp(resp);
-    return &rmcinfo;
-}
+
 
 void ec800m_timer_cb(TimerHandle_t timer)
 {
     UNUSED_PARAMETER(timer);
     timeout();
+    xSemaphoreGive(ec800m.task_mutx);
 }
 
 void ec800m_init(void)
@@ -261,6 +141,7 @@ void ec800m_init(void)
     ec800m.pwr_pin    = EC800_PIN_PWREN;
     ec800m.wakeup_pin = EC800_PIN_DTR;
     ec800m.task_queue = xQueueCreate(10, sizeof(ec800m_task_t));
+    ec800m.task_mutx  = xSemaphoreCreateMutex();
     ec800m.timer      = xTimerCreate("ec800m_timer", pdMS_TO_TICKS(3000), pdFALSE, (void*)0, ec800m_timer_cb);
 
     BaseType_t xReturned = xTaskCreate(ec800m_task,
