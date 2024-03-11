@@ -12,8 +12,14 @@
 #ifndef EC800M_COMMON_H
 #define EC800M_COMMON_H
 
-// typedef enum {
-
-// } ec800m_comm_task_t;
+typedef enum {
+	EC800M_TASK_POWERON = 1,
+    EC800M_TASK_POWEROFF,
+    EC800M_TASK_POWERLOW,
+    EC800M_TASK_SIGNAL_CHECK,
+	EC800M_TASK_GNSS_CHECK,
+	EC800M_TASK_GNSS_OPEN,
+	EC800M_TASK_GNSS_GET,
+} ec800m_comm_task_t;
 
 #endif

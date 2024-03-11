@@ -16,10 +16,13 @@
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
+extern SemaphoreHandle_t comm_sync;
+extern int               comm_task_publish(ec800m_comm_task_t task, void* param);
+
 void ec800m_power_on_ready(struct at_client* client, const char* data, size_t size)
 {
     NRF_LOG_INFO("ec800m power on ready");
-    
+    comm_task_publish(EC800M_TASK_POWERON, NULL);
 }
 
 void ec800m_gnss_get_resp(struct at_client* client, const char* data, size_t size)

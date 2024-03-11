@@ -37,7 +37,6 @@ typedef struct {
     uint32_t type;
     uint32_t task;
     void*    param;
-    uint32_t timeout;
 } ec800m_task_t;
 
 typedef void* ec800m_resp_t;
@@ -45,7 +44,7 @@ typedef void* ec800m_resp_t;
 typedef struct {
     uint8_t id;
     void    (*init)(void);
-    void    (*task_handle)(int, void*);
+    void    (*task_handle)(int, void*, SemaphoreHandle_t);
     void    (*resp_handle)(int, void*);
 } ec800m_task_group_t;
 
@@ -54,7 +53,6 @@ typedef struct {
     uint32_t          pwr_pin;
     uint32_t          wakeup_pin;
     QueueHandle_t     task_queue;
-    SemaphoreHandle_t resp_sync;
     ec800m_status_t   status;
     int               rssi;
 } ec800m_t;

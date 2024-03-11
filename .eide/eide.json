@@ -667,9 +667,10 @@
       "excludeList": [
         "<virtual_root>/Modules/at/at_server.c",
         "<virtual_root>/Modules/ec800m/ec800_mqtt.c",
-        "<virtual_root>/Modules/ec800m/ec800m_common_at_urc.c",
         "<virtual_root>/Modules/ec800m/ec800m_mqtt_at_urc.c",
-        "<virtual_root>/Modules/ec800m/ec800m_mqtt.c"
+        "<virtual_root>/Modules/ec800m/ec800m_mqtt.c",
+        "<virtual_root>/Modules/ec800m/ec800m_socket_at_urc.c",
+        "<virtual_root>/Modules/ec800m/ec800m_socket.c"
       ],
       "toolchain": "AC5",
       "compileConfig": {

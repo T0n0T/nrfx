@@ -116,7 +116,7 @@ void ec800m_task(void* p)
 
         for (size_t i = 0; i < sizeof(task_groups) / sizeof(ec800m_task_group_t*); i++) {
             if (task_groups[i]->id == task_cb.type) {
-                task_groups[i]->task_handle(task_cb.task, task_cb.param);
+                task_groups[i]->task_handle(task_cb.task, task_cb.param, ec800m.resp_sync);
                 break;
             }
         }
