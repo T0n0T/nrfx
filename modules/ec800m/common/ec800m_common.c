@@ -21,7 +21,9 @@ int ec800m_power_on(void)
 {
     int result = EOK;
     int retry  = 5;
+    nrf_gpio_cfg_output(ec800m.pwr_pin);
     nrf_gpio_pin_write(ec800m.pwr_pin, 1);
+    vTaskDelay(3000);
     /** reset ec800m */
     result = at_cmd_exec(ec800m.client, AT_CMD_RESET);
     if (result < 0) {
@@ -73,10 +75,9 @@ int ec800m_check_signal(void)
     /** check signal */
     if (at_cmd_exec(ec800m.client, AT_CMD_CHECK_SIGNAL) < 0) {
         NRF_LOG_ERROR("ec800m check signal failed.");
-        goto __exit;
     } else {
         int rssi = 0, err_rate = 0;
-        sscanf(parse_str, "+CSQ: %d,%d", &rssi, &err_rate);
+        // sscanf(parse_str, "+CSQ: %d,%d", &rssi, &err_rate);
         if (rssi != 99 && rssi) {
             ec800m.rssi = rssi;
         } else {
@@ -88,29 +89,29 @@ int ec800m_check_signal(void)
 int ec800m_gnss_check(void)
 {
     /** configure gnss*/
-    result = at_cmd_exec(ec800m.client, AT_CMD_GNSS_STATUS);
-    if (result < 0) {
-        goto __exit;
-    } else {
-        //todo: urc
-        int gnss_status = -1;
-        sscanf(parse_str, "+QGPS: %d", &gnss_status);
-        switch (gnss_status) {
-            case 0:
-                result = at_cmd_exec(ec800m.client, AT_CMD_GNSS_OPEN);
-                if (result < 0) {
-                    goto __exit;
-                }
-                break;
-            case 1:
-                NRF_LOG_INFO("gnss has already open!");
-                break;
-            default:
-                NRF_LOG_ERROR("Command [AT+QGPS?] fail!");
-                result = -ERROR;
-                goto __exit;
-        }
-    }
+    // at_cmd_exec(ec800m.client, AT_CMD_GNSS_STATUS);
+    // if (result < 0) {
+    //     goto __exit;
+    // } else {
+    //     //todo: urc
+    //     int gnss_status = -1;
+    //     sscanf(parse_str, "+QGPS: %d", &gnss_status);
+    //     switch (gnss_status) {
+    //         case 0:
+    //             result = at_cmd_exec(ec800m.client, AT_CMD_GNSS_OPEN);
+    //             if (result < 0) {
+    //                 goto __exit;
+    //             }
+    //             break;
+    //         case 1:
+    //             NRF_LOG_INFO("gnss has already open!");
+    //             break;
+    //         default:
+    //             NRF_LOG_ERROR("Command [AT+QGPS?] fail!");
+    //             result = -ERROR;
+    //             goto __exit;
+    //     }
+    // }
 }
 
 int ec800m_gnss_open(void)
@@ -122,7 +123,7 @@ int ec800m_gnss_open(void)
 gps_info_t ec800m_gnss_get(void)
 {
     at_cmd_exec(ec800m.client, AT_CMD_GNSS_NMEA_RMC);
-    return &rmcinfo;
+    return 0;
 }
 
 void ec800m_comm_init_handle(void)
@@ -143,5 +144,5 @@ ec800m_task_group_t ec800m_comm_task_group = {
     .id             = EC800_COMM,
     .init           = ec800m_comm_init_handle,
     .task_handle    = ec800m_comm_task_handle,
-    .timeout_handle = ec800m_comm_timeout_handle,
+    // .timeout_handle = ec800m_comm_timeout_handle,
 };

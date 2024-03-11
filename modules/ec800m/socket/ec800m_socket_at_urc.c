@@ -26,7 +26,6 @@ void socket_open(struct at_client* client, const char* data, size_t size)
 {
     int      socket_num = -1;
     uint32_t err_code   = 0;
-    xTimerStop(ec800m.timer, 0);
     sscanf(data, "+QIOPEN: %d,%d", &socket_num, &err_code);
     if (socket_num < 0 || socket_num >= SOCKET_MAX) {
         response(EC800M_SOCKET_ERROR);
@@ -42,7 +41,6 @@ void socket_open(struct at_client* client, const char* data, size_t size)
 
 void socket_send(struct at_client* client, const char* data, size_t size)
 {
-    xTimerStop(ec800m.timer, 0);
     if (strstr(data, "SEND OK")) {
         response(EC800M_SOCKET_SUCCESS);
     } else if (strstr(data, "SEND FAIL")) {
@@ -52,7 +50,6 @@ void socket_send(struct at_client* client, const char* data, size_t size)
 
 void socket_recv(struct at_client* client, const char* data, size_t size)
 {
-    xTimerStop(ec800m.timer, 0);
     uint32_t len = 0;
     sscanf(data, "+QIRD: %d", &len);
     if (len) {
@@ -119,7 +116,6 @@ void pdp_check_status(struct at_client* client, const char* data, size_t size)
 {
     uint32_t pdp_num = 0;
     sscanf(data, "+QIACT: %d", &pdp_num);
-    xTimerStop(ec800m.timer, 0);
     if (pdp_num) {
         taskENTER_CRITICAL();
         pdp_status = EC800M_PDP_ACT;
@@ -143,7 +139,6 @@ void socket_check_status(struct at_client* client, const char* data, size_t size
     int      socket_num = -1;
     uint32_t state_code = 0;
     sscanf(data, "+QISTATE: %d,%*[^,],%*[^,],%*[^,],%*[^,],%d", &socket_num, &state_code);
-    xTimerStop(ec800m.timer, 0);
     if (socket_num < 0 || socket_num >= SOCKET_MAX) {
         response(EC800M_SOCKET_ERROR);
         return;

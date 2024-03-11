@@ -144,8 +144,8 @@ void bsp_init(void)
     // leds_tmr = xTimerCreate("leds", pdMS_TO_TICKS(1000), pdTRUE, NULL, leds_timer_handler);
     // // xTimerStart(leds_tmr, 0);
     btn_init();
-    ec800m_power_off();
-    // ec800m_init();
+    // ec800m_power_off();
+    ec800m_init();
     ccm3310_init();
     // max30102_init();
 }

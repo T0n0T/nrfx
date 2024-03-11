@@ -171,5 +171,5 @@ ec800m_task_group_t ec800m_mqtt_task_group = {
     .id             = EC800_MQTT,
     .init           = ec800m_mqtt_init_handle,
     .task_handle    = ec800m_mqtt_task_handle,
-    .timeout_handle = ec800m_mqtt_timeout_handle,
+    // .timeout_handle = ec800m_mqtt_timeout_handle,
 };

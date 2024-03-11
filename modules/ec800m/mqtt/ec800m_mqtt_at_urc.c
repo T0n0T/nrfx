@@ -87,9 +87,7 @@ void urc_mqtt_open(struct at_client* client, const char* data, size_t size)
     } else if (sscanf(data, "+QMTOPEN: %*d,%s", res_str) > 0) {
         NRF_LOG_DEBUG("mqtt has done release of [%s]", res_str);
         flag = 1;
-    } else {
-        mqtt_status = EC800M_IDLE;
-    }
+    } 
     taskEXIT_CRITICAL();
     if (flag == 1) {
         mqtt_status = EC800M_MQTT_OPEN;

@@ -17,6 +17,7 @@
 NRF_LOG_MODULE_REGISTER();
 
 static char                       send_buf[EC800M_BUF_LEN];
+static char                       recv_buf[EC800M_RECV_BUFF_LEN];
 static TaskHandle_t               ec800m_task_handle;
 ec800m_t                          ec800m;
 extern ec800m_task_group_t        ec800m_comm_task_group;
@@ -29,8 +30,11 @@ static const ec800m_task_group_t* task_groups[] = {
     &ec800m_socket_task_group,
 #endif
 };
-static void (*timeout)(void);
 
+static struct at_response resp = {
+    .buf      = recv_buf,
+    .buf_size = EC800M_RECV_BUFF_LEN,
+};
 /**
  * @brief execute cmd with id
  *
@@ -40,32 +44,37 @@ static void (*timeout)(void);
  * @param ... args used to combine with cmd
  * @return int
  */
-int at_cmd_exec(at_client_t dev, at_cmd_desc_t at_cmd_id, ...)
+int at_cmd_exec(at_client_t dev, at_cmd_desc_t at_cmd_id, char* keyword_line, ...)
 {
-    va_list       args;
-    int           result        = EOK;
-    const char*   recv_line_buf = 0;
-    at_cmd_t      cmd           = (at_cmd_t)AT_CMD(at_cmd_id);
-    at_response_t resp          = at_create_resp(AT_CLIENT_RECV_BUFF_LEN, 0, cmd->timeout);
-    if (resp == NULL) {
-        NRF_LOG_ERROR("No memory for response structure!");
-        return -ENOMEM;
-    }
+    va_list     args;
+    int         result        = EOK;
+    const char* recv_line_buf = 0;
+    at_cmd_t    cmd           = (at_cmd_t)AT_CMD(at_cmd_id);
+
     memset(send_buf, 0, sizeof(send_buf));
+    resp.line_counts = 0;
+    resp.line_num    = cmd->resp_linenum;
+    resp.timeout     = cmd->timeout;
 
     va_start(args, at_cmd_id);
     vsprintf(send_buf, cmd->cmd_expr, args);
     va_end(args);
 
-    result = at_obj_exec_cmd(dev, resp, send_buf);
+    result = at_obj_exec_cmd(dev, &resp, send_buf);
     if (result < 0) {
         goto __exit;
     }
 
-__exit:
-    if (resp) {
-        at_delete_resp(resp);
+    if (keyword_line && cmd->resp_keyword) {
+        if ((recv_line_buf = at_resp_get_line_by_kw(&resp, cmd->resp_keyword)) == NULL) {
+            NRF_LOG_ERROR("recvline err [%s]!", cmd->desc);
+            goto __exit;
+        }
+        strncpy(keyword_line, recv_line_buf, strlen(recv_line_buf));
     }
+
+__exit:
+
     return result;
 }
 
@@ -89,12 +98,13 @@ void ec800m_task(void* p)
     TickType_t    last_time = 0, current_time = 0;
     ec800m_task_t task_cb;
 
+    ec800m_power_on();
+
     ec800m.status = EC800M_POWER_OFF;
     while (1) {
         memset(&task_cb, 0, sizeof(ec800m_task_t));
         last_time = xTaskGetTickCount();
         xQueueReceive(ec800m.task_queue, &task_cb, portMAX_DELAY);
-        xSemaphoreTake(ec800m.task_mutx, portMAX_DELAY);
         if (ec800m.status == EC800M_POWER_OFF) {
             continue;
         } else if (ec800m.status == EC800M_POWER_LOW) {
@@ -106,32 +116,16 @@ void ec800m_task(void* p)
 
         for (size_t i = 0; i < sizeof(task_groups) / sizeof(ec800m_task_group_t*); i++) {
             if (task_groups[i]->id == task_cb.type) {
-                timeout = task_groups[i]->timeout_handle;
-                xTimerChangePeriod(ec800m.timer, pdMS_TO_TICKS(task_cb.timeout), 0);
                 task_groups[i]->task_handle(task_cb.task, task_cb.param);
-                if (task_cb.timeout > 0) {
-                    xTimerStart(ec800m.timer, 0);
-                } else {
-                    xSemaphoreGive(ec800m.task_mutx);
-                }
                 break;
             }
         }
     }
 }
 
-
-
-void ec800m_timer_cb(TimerHandle_t timer)
-{
-    UNUSED_PARAMETER(timer);
-    timeout();
-    xSemaphoreGive(ec800m.task_mutx);
-}
-
 void ec800m_init(void)
 {
-    if (at_client_init("EC800MCN", AT_CLIENT_RECV_BUFF_LEN) < 0) {
+    if (at_client_init("EC800MCN", EC800M_RECV_BUFF_LEN) < 0) {
         NRF_LOG_ERROR("at client ec800m serial init failed.");
         return;
     }
@@ -141,8 +135,6 @@ void ec800m_init(void)
     ec800m.pwr_pin    = EC800_PIN_PWREN;
     ec800m.wakeup_pin = EC800_PIN_DTR;
     ec800m.task_queue = xQueueCreate(10, sizeof(ec800m_task_t));
-    ec800m.task_mutx  = xSemaphoreCreateMutex();
-    ec800m.timer      = xTimerCreate("ec800m_timer", pdMS_TO_TICKS(3000), pdFALSE, (void*)0, ec800m_timer_cb);
 
     BaseType_t xReturned = xTaskCreate(ec800m_task,
                                        "EC800M",

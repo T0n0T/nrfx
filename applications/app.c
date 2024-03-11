@@ -149,13 +149,13 @@ void app_task(void* pvParameter)
     LED_OFF(LED2);
     LED_OFF(LED3);
     while (1) {
-        ec800m_power_on();
+        // ec800m_power_on();
         LED_ON(LED3);
         mqtt_connect(client);
         publish_handle();
         LED_OFF(LED3);
         mqtt_disconnect(client);
-        ec800m_power_off();
+        // ec800m_power_off();
         // NRF_LOG_INFO("mqtt app task loop");
         // xSemaphoreTake(m_app_sem, pdMS_TO_TICKS(global_cfg.publish_interval));
         xSemaphoreTake(m_app_sem, pdMS_TO_TICKS(30000));

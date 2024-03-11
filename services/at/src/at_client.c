@@ -318,7 +318,8 @@ int at_obj_exec_cmd(at_client_t client, at_response_t resp, const char* cmd_expr
     if (resp != NULL) {
         if (xSemaphoreTake(client->resp_notice, pdMS_TO_TICKS(resp->timeout)) != pdTRUE) {
             cmd = at_get_last_cmd(&cmd_size);
-            NRF_LOG_WARNING("execute command (%*.s) timeout (%d ticks)!", cmd_size, cmd, resp->timeout);
+            NRF_LOG_WARNING("execute command (%*.s) timeout (%d ticks)!", cmd_size - 2, cmd, resp->timeout);
+            //reset overflow error
             nrf_uart_disable(NRF_UART0);
             nrf_uart_enable(NRF_UART0);
             client->resp_status = AT_RESP_TIMEOUT;
@@ -327,7 +328,7 @@ int at_obj_exec_cmd(at_client_t client, at_response_t resp, const char* cmd_expr
         }
         if (client->resp_status != AT_RESP_OK) {
             cmd = at_get_last_cmd(&cmd_size);
-            NRF_LOG_ERROR("execute command (%*.s) failed!", cmd_size, cmd);
+            NRF_LOG_ERROR("execute command (%*.s) failed!", cmd_size - 2, cmd);
             result = -ERROR;
             goto __exit;
         }

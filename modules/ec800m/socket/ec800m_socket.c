@@ -213,5 +213,5 @@ ec800m_task_group_t ec800m_socket_task_group = {
     .id             = EC800_SOCKET,
     .init           = ec800m_socket_init_handle,
     .task_handle    = ec800m_socket_task_handle,
-    .timeout_handle = ec800m_socket_timeout_handle,
+    // .timeout_handle = ec800m_socket_timeout_handle,
 };

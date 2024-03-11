@@ -16,8 +16,16 @@
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
+void ec800m_power_on_ready(struct at_client* client, const char* data, size_t size)
+{
+    NRF_LOG_INFO("ec800m power on ready");
+    
+}
+
 void ec800m_gnss_get_resp(struct at_client* client, const char* data, size_t size)
 {
-    char                   rmc[128] = {0};
-    static struct gps_info rmcinfo  = {0};
 }
+
+const struct at_urc comm_urc_table[] = {
+    {"RDY", "\r\n", ec800m_power_on_ready},
+};

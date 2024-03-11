@@ -32,7 +32,7 @@ void mqtt_conf(mqtt_client_t* client, config_t* cfg)
         mqtt_set_password(client, cfg->mqtt_cfg.password);
     }
     mqtt_set_client_id(client, cfg->mqtt_cfg.clientid);
-    if (mqtt_config.keepalive) {
+    if (cfg->mqtt_cfg.keepalive) {
         mqtt_set_keep_alive_interval(client, cfg->mqtt_cfg.keepalive);
     }
     mqtt_set_clean_session(client, 1);
