@@ -13,7 +13,9 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include "ec800m.h"
+#include "ec800m_common.h"
+#include "ec800m_mqtt.h"
+#include "ec800m_socket.h"
 #include "mqttclient.h"
 #include "blood.h"
 #include "ble_nus.h"

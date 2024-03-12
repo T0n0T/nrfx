@@ -42,7 +42,7 @@ const struct at_cmd at_cmd_list[] = {
     {AT_CMD_NAME(AT_CMD_SOCKET_CLOSE), "AT+QICLOSE=%d", NULL, 0, 10000},
     {AT_CMD_NAME(AT_CMD_SOCKET_SEND), "AT+QISEND=%d,%d", NULL, 0, 300},
     {AT_CMD_NAME(AT_CMD_SOCKET_RECV), "AT+QIRD=%d,%d", NULL, 0, 300},
-    {AT_CMD_NAME(AT_CMD_SOCKET_STATUS), "AT+QISTATE=1,%d", NULL, 0, 5000},
+    {AT_CMD_NAME(AT_CMD_SOCKET_STATUS), "AT+QISTATE=1,%d", "+QISTATE:", 2, 5000},
 
     /** gnss */
     {AT_CMD_NAME(AT_CMD_GNSS_OPEN), "AT+QGPS=1", NULL, 0, 300},

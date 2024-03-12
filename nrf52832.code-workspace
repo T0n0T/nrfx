@@ -32,7 +32,8 @@
             "services/mqttclient/platform/RT-Thread": true,
             "services/mqttclient/network/mbedtls": true
         },
-        "cortex-debug.variableUseNaturalFormat": false
+        "cortex-debug.variableUseNaturalFormat": false,
+        "C_Cpp.default.compileCommands": "build\\nrf52832_xxaa\\compile_commands.json"
     },
     "extensions": {
         "recommendations": [

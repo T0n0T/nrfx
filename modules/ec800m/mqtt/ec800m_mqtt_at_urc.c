@@ -48,12 +48,11 @@ NRF_LOG_MODULE_REGISTER();
 #define URC_QMTSTAT_LINK_INACTIVATED 7
 #define URC_QMTSTAT_CLIENT_DISCONN   8
 
-extern EventGroupHandle_t mqtt_event;
-extern int                mqtt_task_publish(ec800m_mqtt_task_t task, uint32_t timeout);
+extern int mqtt_task_publish(ec800m_t* dev, ec800m_mqtt_task_t task, void* param);
 
 void urc_mqtt_open(struct at_client* client, const char* data, size_t size)
 {
-    taskENTER_CRITICAL();
+
     int  res = 0, flag = 0;
     char res_str[40] = {0};
     if (sscanf(data, "+QMTOPEN: %*d,%d", &res) == 1) {
@@ -87,38 +86,36 @@ void urc_mqtt_open(struct at_client* client, const char* data, size_t size)
     } else if (sscanf(data, "+QMTOPEN: %*d,%s", res_str) > 0) {
         NRF_LOG_DEBUG("mqtt has done release of [%s]", res_str);
         flag = 1;
-    } 
-    taskEXIT_CRITICAL();
+    }
+
     if (flag == 1) {
+        ec800m_t* dev        = (ec800m_t*)client->user_data;
         mqtt_status = EC800M_MQTT_OPEN;
-        mqtt_task_publish(EC800M_TASK_MQTT_CONNECT, 5000);
+        mqtt_task_publish(dev, EC800M_TASK_MQTT_CONNECT, NULL);
     }
 }
 
 void urc_mqtt_close(struct at_client* client, const char* data, size_t size)
 {
     if (mqtt_status == EC800M_MQTT_IDLE) {
-        taskENTER_CRITICAL();
+        ec800m_t* dev        = (ec800m_t*)client->user_data;
         mqtt_status = EC800M_MQTT_CLOSE;
-        taskEXIT_CRITICAL();
-        mqtt_task_publish(EC800M_TASK_MQTT_OPEN, 0);
+        mqtt_task_publish(dev, EC800M_TASK_MQTT_OPEN, NULL);
     }
 }
 
 void urc_mqtt_conn(struct at_client* client, const char* data, size_t size)
 {
-    xTimerStop(ec800m.timer, 0);
-    taskENTER_CRITICAL();
     int         res = 0, ret_code = 0, state = 0;
-    EventBits_t event = 0;
+    ec800m_t* dev        = (ec800m_t*)client->user_data;
     if (sscanf(data, "+QMTCONN: %*d,%d,%d", &res, &ret_code) == 2) {
         if (!ret_code && !res) {
             NRF_LOG_INFO("mqtt connect success.");
-            mqtt_status = EC800M_MQTT_CONN;
-            event       = EC800M_MQTT_SUCCESS;
+            dev->err    = EOK;
+            mqtt_status = EC800M_MQTT_CONN;    
         } else {
-            event = EC800M_MQTT_ERROR;
             if (ret_code != 0) {
+                dev->err = -ERROR;
                 switch (ret_code) {
                     case URC_MQTCONN_MQTVER_WRONG:
                         NRF_LOG_ERROR("mqtt version wrong.");
@@ -153,6 +150,7 @@ void urc_mqtt_conn(struct at_client* client, const char* data, size_t size)
             }
         }
     } else if (sscanf(data, "+QMTCONN: %*d,%d", &state) == 1) {
+        dev->err = -EIO;
         switch (state) {
             case URC_MQTCONN_CHECK_CONNECT_INITIAL:
                 NRF_LOG_INFO("mqtt is initializing.");
@@ -162,25 +160,24 @@ void urc_mqtt_conn(struct at_client* client, const char* data, size_t size)
                 break;
             case URC_MQTCONN_CHECK_CONNECT_SUCCESS:
                 NRF_LOG_INFO("mqtt connect success.");
-                event = EC800M_MQTT_SUCCESS;
+                mqtt_status = EC800M_MQTT_CONN;
                 break;
-            case URC_MQTCONN_CHECK_CONNECT_DISC:
+            case URC_MQTCONN_CHECK_CONNECT_DISC:                
                 NRF_LOG_INFO("mqtt is disconnecting.");
-                event = EC800M_MQTT_ERROR;
+                mqtt_status = EC800M_MQTT_DISC;
                 break;
             default:
-                event = EC800M_MQTT_ERROR;
                 break;
         }
     }
-    taskEXIT_CRITICAL();
-    xEventGroupSetBits(mqtt_event, event);
+    ec800m_post_sync(dev);
 }
 
 void urc_mqtt_stat(struct at_client* client, const char* data, size_t size)
 {
-    taskENTER_CRITICAL();
+
     int err_code = 0, task = 0;
+    ec800m_t* dev        = (ec800m_t*)client->user_data;
     sscanf(data, "+QMTSTAT: %*d,%d", &err_code);
     switch (err_code) {
         case URC_QMTSTAT_LINK_RESETED:
@@ -196,13 +193,13 @@ void urc_mqtt_stat(struct at_client* client, const char* data, size_t size)
         case URC_QMTSTAT_DISCONNECT:
             NRF_LOG_DEBUG("mqtt is disconnected.");
             vTaskDelay(500);
-            mqtt_status = EC800M_IDLE;
+            mqtt_status = EC800M_MQTT_IDLE;
             task        = EC800M_TASK_MQTT_CLOSE;
             break;
         case URC_QMTSTAT_TOO_MENY_WRONG:
             NRF_LOG_DEBUG("mqtt is disconnected.");
             vTaskDelay(500);
-            mqtt_status = EC800M_IDLE;
+            mqtt_status = EC800M_MQTT_IDLE;
             task        = EC800M_TASK_MQTT_CLOSE;
             break;
         case URC_QMTSTAT_LINK_INACTIVATED:
@@ -213,19 +210,17 @@ void urc_mqtt_stat(struct at_client* client, const char* data, size_t size)
         default:
             break;
     }
-    taskEXIT_CRITICAL();
+
     if (task) {
-        mqtt_task_publish(EC800M_TASK_MQTT_OPEN, 0);
+        mqtt_task_publish(dev, task, NULL);
     }
 }
 
 void urc_mqtt_recv(struct at_client* client, const char* data, size_t size)
 {
-    taskENTER_CRITICAL();
     static char recv_buf[EC800M_BUF_LEN];
     sscanf(data, "+QMTRECV: %*d,%*d,\"%*[^\"]\",%s", recv_buf);
     NRF_LOG_DEBUG("recv: %s", recv_buf);
-    taskEXIT_CRITICAL();
 }
 
 const struct at_urc mqtt_urc_table[] = {

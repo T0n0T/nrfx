@@ -56,8 +56,12 @@ int at_cmd_exec(at_client_t dev, at_cmd_desc_t at_cmd_id, char* keyword_line, ..
 
     memset(send_buf, 0, sizeof(send_buf));
     resp.line_counts = 0;
-    resp.line_num    = cmd->resp_linenum;
     resp.timeout     = cmd->timeout;
+    if (keyword_line) {
+        resp.line_num = cmd->resp_linenum;
+    } else {
+        resp.line_num = 0;
+    }
 
     va_start(args, at_cmd_id);
     vsprintf(send_buf, cmd->cmd_expr, args);
@@ -96,15 +100,16 @@ void ec800m_wake_up(ec800m_t* dev)
 
 void ec800m_task(void* p)
 {
-    int result = EOK;
-    for (size_t i = 0; i < sizeof(task_groups) / sizeof(ec800m_task_group_t*); i++) {
-        task_groups[i]->init();
-    }
+    int           result    = EOK;
     ec800m_t*     dev       = (ec800m_t*)p;
     TickType_t    last_time = 0, current_time = 0;
     ec800m_task_t task_cb;
 
     dev->status = EC800M_POWER_OFF;
+
+    for (size_t i = 0; i < sizeof(task_groups) / sizeof(ec800m_task_group_t*); i++) {
+        task_groups[i]->init(dev);
+    }
     while (1) {
         memset(&task_cb, 0, sizeof(ec800m_task_t));
         last_time = xTaskGetTickCount();
@@ -132,12 +137,15 @@ void ec800m_task(void* p)
                 break;
             }
         }
+        if (dev->status == EC800M_POWER_LOW) {
+            nrf_gpio_pin_write(dev->wakeup_pin, 1);
+        }
     }
 }
 
 int ec800m_wait_sync(ec800m_t* dev, uint32_t timeout)
 {
-    if(xSemaphoreTake(dev->sync, timeout) != pdTRUE) {
+    if (xSemaphoreTake(dev->sync, timeout) != pdTRUE) {
         return -ETIMEOUT;
     }
     return dev->err;
@@ -152,7 +160,7 @@ ec800m_t* ec800m_init(void)
 {
     if (at_client_init("EC800MCN", EC800M_RECV_BUFF_LEN) < 0) {
         NRF_LOG_ERROR("at client ec800m serial init failed.");
-        return;
+        return 0;
     }
 
     memset(&ec800m, 0, sizeof(ec800m));

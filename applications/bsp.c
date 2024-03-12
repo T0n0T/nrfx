@@ -21,6 +21,7 @@
 #include "FreeRTOS.h"
 #include "timers.h"
 
+ec800m_t* ec800m;
 /** gpio */
 void gpio_init(void)
 {
@@ -145,7 +146,7 @@ void bsp_init(void)
     // // xTimerStart(leds_tmr, 0);
     btn_init();
     // ec800m_power_off();
-    ec800m_init();
+    ec800m = ec800m_init();
     ccm3310_init();
     // max30102_init();
 }

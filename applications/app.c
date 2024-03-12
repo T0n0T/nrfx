@@ -14,6 +14,8 @@
 #include "ccm3310.h"
 #include "nrf_log.h"
 
+extern ec800m_t* ec800m;
+
 static TaskHandle_t m_app_task;
 static uint8_t      sm4_id = 0;
 SemaphoreHandle_t   m_app_sem;
@@ -51,7 +53,7 @@ void publish_handle(void)
         return;
     }
 #endif
-    char* publish_data = build_msg_mqtt(global_cfg.mqtt_cfg.clientid, ec800m_gnss_get(), 1, ecg_status);
+    char* publish_data = build_msg_mqtt(global_cfg.mqtt_cfg.clientid, ec800m_gnss_get(ec800m), 1, ecg_status);
     if (sm4_flag) {
         pdata      origin_mqtt = {strlen(publish_data), (uint8_t*)publish_data};
         ciphertext cipher_mqtt = ccm3310_sm4_encrypt(sm4_id, origin_mqtt);
@@ -82,50 +84,37 @@ void publish_handle(void)
     free(publish_data);
 }
 
-static int mqtt_init(void)
+static void mqtt_init(void)
 {
-    // while (ec800m.status != EC800M_IDLE) {
-    //     // NRF_LOG_DEBUG("wating for ec800m!")
-    //     LED_OFF(LED3);
-    //     vTaskDelay(pdMS_TO_TICKS(300));
-    // }
+    ec800m_power_on(ec800m);
+    ec800m_signal_check(ec800m);
+    ec800m_gnss_open(ec800m);
 #if EC800M_MQTT_SOFT
     ec800m_mqtt_conf(&global_cfg.mqtt_cfg);
     ec800m_mqtt_connect();
     while (mqtt_status != EC800M_MQTT_CONN) {
         vTaskDelay(200);
     }
-
     ec800m_mqtt_sub(global_cfg.mqtt_cfg.subtopic);
 #else
-    client = mqtt_lease();
-    if (client == NULL) {
-        NRF_LOG_ERROR("mqtt alloec fail");
-        return -1;
-    }
-    mqtt_conf(client, &global_cfg);
-
-    // int err = mqtt_connect(client);
-    // if (err != MQTT_SUCCESS_ERROR) {
-    //     NRF_LOG_ERROR("mqtt connect fail, err[%d]", err);
-    //     return -1;
-    // }
-    // extern void sub_handle(void* client, message_data_t* msg);
-    // mqtt_subscribe(client, global_cfg.mqtt_cfg.subtopic, QOS1, sub_handle);
+    mqtt_connect(client);
 #endif
-
-    return 0;
 }
 
-static int mqtt_deinit(void)
+static void mqtt_deinit(void)
 {
-    
-    return 0;
+    mqtt_disconnect(client);
+    ec800m_power_off(ec800m);
 }
 
 void app_task(void* pvParameter)
 {
-    mqtt_init();
+    client = mqtt_lease();
+    if (client == NULL) {
+        NRF_LOG_ERROR("mqtt alloec fail");
+        return;
+    }
+    mqtt_conf(client, &global_cfg);
     if (global_cfg.sm4_flag) {
         sm4_id = ccm3310_sm4_setkey((uint8_t*)global_cfg.sm4_key);
         if (!sm4_id) {
@@ -149,13 +138,11 @@ void app_task(void* pvParameter)
     LED_OFF(LED2);
     LED_OFF(LED3);
     while (1) {
-        // ec800m_power_on();
+        mqtt_init();
         LED_ON(LED3);
-        mqtt_connect(client);
         publish_handle();
         LED_OFF(LED3);
-        mqtt_disconnect(client);
-        // ec800m_power_off();
+        mqtt_deinit();
         // NRF_LOG_INFO("mqtt app task loop");
         // xSemaphoreTake(m_app_sem, pdMS_TO_TICKS(global_cfg.publish_interval));
         xSemaphoreTake(m_app_sem, pdMS_TO_TICKS(30000));

@@ -9,7 +9,6 @@
  *
  */
 
-#include "ec800m.h"
 #include "ec800m_mqtt.h"
 #include "nrfx_gpiote.h"
 
@@ -18,43 +17,22 @@
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
-EventGroupHandle_t   mqtt_event;
+static ec800m_t*     _ec800m;
 ec800m_mqtt_status_t mqtt_status;
 ec800m_mqtt_t        mqtt_config;
 
-int mqtt_task_publish(ec800m_mqtt_task_t task, uint32_t timeout)
+int mqtt_task_publish(ec800m_t* dev, ec800m_mqtt_task_t task, void* param)
 {
     ec800m_task_t task_cb = {
-        .type    = EC800_MQTT,
-        .task    = task,
-        .param   = NULL,
-        .timeout = timeout,
+        .type  = EC800_MQTT,
+        .task  = task,
+        .param = param,
     };
-    return xQueueSend(ec800m.task_queue, &task_cb, 300);
-}
-
-int mqtt_task_wait_response()
-{
-    EventBits_t rec = xEventGroupWaitBits(mqtt_event,
-                                          EC800M_MQTT_SUCCESS | EC800M_MQTT_TIMEOUT | EC800M_MQTT_ERROR,
-                                          pdTRUE,
-                                          pdFALSE,
-                                          portMAX_DELAY);
-    if (rec & EC800M_MQTT_SUCCESS) {
-        return EOK;
-    }
-    if (rec & EC800M_MQTT_ERROR) {
-        return ERROR;
-    }
-    if (rec & EC800M_MQTT_TIMEOUT) {
-        return ETIMEOUT;
-    }
-    return ERROR;
+    return xQueueSend(dev->task_queue, &task_cb, EC800M_IPC_MIN_TICK);
 }
 
 int ec800m_mqtt_conf(ec800m_mqtt_t* cfg)
 {
-    char prase_str[20] = {0};
     if (cfg->host == NULL || cfg->port == NULL || cfg->clientid == NULL) {
         NRF_LOG_INFO("host and port of mqtt should be configure.");
         return -EINVAL;
@@ -65,8 +43,8 @@ int ec800m_mqtt_conf(ec800m_mqtt_t* cfg)
 
 int ec800m_mqtt_connect(void)
 {
-    mqtt_task_publish(EC800M_TASK_MQTT_OPEN, 1000);
-    return mqtt_task_wait_response();
+    mqtt_task_publish(_ec800m, EC800M_TASK_MQTT_OPEN, NULL);
+    return ec800m_wait_sync(_ec800m, 10000);
 }
 
 int ec800m_mqtt_pub(char* topic, void* payload, uint32_t len)
@@ -87,16 +65,17 @@ int ec800m_mqtt_pub(char* topic, void* payload, uint32_t len)
     tmp_payload[len] = '\0';
 
     if (mqtt_status == EC800M_MQTT_CONN) {
-        nrf_gpio_pin_write(ec800m.wakeup_pin, 0);
-        at_set_end_sign('>');
-        at_cmd_exec(ec800m.client, AT_CMD_MQTT_PUBLISH, topic, len);
-        at_client_send(tmp_payload, len);
-        at_set_end_sign(0);
-        nrf_gpio_pin_write(ec800m.wakeup_pin, 1);
+        ec800m_mqtt_data_t _mqtt_data = {
+            .topic   = topic,
+            .payload = tmp_payload,
+            .len     = len,
+        };
+        mqtt_task_publish(_ec800m, EC800M_TASK_MQTT_PUB, &_mqtt_data);
+        result = ec800m_wait_sync(_ec800m, 5000);
     } else {
         NRF_LOG_WARNING("mqtt has not connected, try to reconnect", mqtt_status);
-        mqtt_task_publish(EC800M_TASK_MQTT_CHECK, 10000);
-        result = mqtt_task_wait_response();
+        mqtt_task_publish(_ec800m, EC800M_TASK_MQTT_CHECK, NULL);
+        result = ec800m_wait_sync(_ec800m, 10000);
     }
 __exit:
 
@@ -111,45 +90,45 @@ int ec800m_mqtt_sub(char* subtopic)
         return -EINVAL;
     }
     if (mqtt_status == EC800M_MQTT_CONN) {
-        nrf_gpio_pin_write(ec800m.wakeup_pin, 0);
-        at_cmd_exec(ec800m.client, AT_CMD_MQTT_SUBSCRIBE, subtopic);
-        nrf_gpio_pin_write(ec800m.wakeup_pin, 1);
+
+        mqtt_task_publish(_ec800m, EC800M_TASK_MQTT_SUB, subtopic);
     } else {
         NRF_LOG_WARNING("mqtt has not connected, try to reconnect", mqtt_status);
-        mqtt_task_publish(EC800M_TASK_MQTT_CHECK, 10000);
-        return mqtt_task_wait_response();
+        mqtt_task_publish(_ec800m, EC800M_TASK_MQTT_CHECK, NULL);
+        return ec800m_wait_sync(_ec800m, 10000);
     }
     return EOK;
 }
 
-static void ec800m_mqtt_init_handle(void)
+static void ec800m_mqtt_init_handle(ec800m_t* dev)
 {
-    mqtt_event  = xEventGroupCreate();
+    _ec800m     = dev;
     mqtt_status = EC800M_MQTT_IDLE;
     extern const struct at_urc mqtt_urc_table[];
-    at_obj_set_urc_table(ec800m.client, mqtt_urc_table, 5);
+    at_obj_set_urc_table(_ec800m->client, mqtt_urc_table, 5);
 }
 
-static void ec800m_mqtt_task_handle(int task, void* param)
+static void ec800m_mqtt_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
 {
-    if (task == EC800M_TASK_MQTT_CHECK) {
+    xSemaphoreTake(dev->lock, portMAX_DELAY);
+    if (task_cb->task == EC800M_TASK_MQTT_CHECK) {
         mqtt_status = EC800M_MQTT_IDLE;
-        at_cmd_exec(ec800m.client, AT_CMD_MQTT_STATUS);
+        dev->err    = at_cmd_exec(dev->client, AT_CMD_MQTT_STATUS, NULL);
     }
-    if (task == EC800M_TASK_MQTT_OPEN) {
+    if (task_cb->task == EC800M_TASK_MQTT_OPEN) {
         if (mqtt_status == EC800M_MQTT_IDLE) {
-            at_cmd_exec(ec800m.client, AT_CMD_MQTT_CLOSE);
+            dev->err = at_cmd_exec(dev->client, AT_CMD_MQTT_CLOSE, NULL);
         } else {
             if (mqtt_config.keepalive) {
-                at_cmd_exec(ec800m.client, AT_CMD_MQTT_CONF_ALIVE, mqtt_config.keepalive);
+                dev->err = at_cmd_exec(dev->client, AT_CMD_MQTT_CONF_ALIVE, NULL, mqtt_config.keepalive);
             }
-            at_cmd_exec(ec800m.client, AT_CMD_MQTT_REL, mqtt_config.host, mqtt_config.port);
+            dev->err = at_cmd_exec(dev->client, AT_CMD_MQTT_REL, NULL, mqtt_config.host, mqtt_config.port);
         }
     }
-    if (task == EC800M_TASK_MQTT_CLOSE) {
-        at_cmd_exec(ec800m.client, AT_CMD_MQTT_CLOSE);
+    if (task_cb->task == EC800M_TASK_MQTT_CLOSE) {
+        dev->err = at_cmd_exec(dev->client, AT_CMD_MQTT_CLOSE, NULL);
     }
-    if (task == EC800M_TASK_MQTT_CONNECT) {
+    if (task_cb->task == EC800M_TASK_MQTT_CONNECT) {
         if (mqtt_status == EC800M_MQTT_OPEN) {
             char cmd_para[30] = {0};
             if (mqtt_config.username && mqtt_config.password) {
@@ -157,19 +136,35 @@ static void ec800m_mqtt_task_handle(int task, void* param)
             } else {
                 sprintf(cmd_para, "%s", mqtt_config.clientid);
             }
-            at_cmd_exec(ec800m.client, AT_CMD_MQTT_CONNECT, cmd_para);
+            dev->err = at_cmd_exec(dev->client, AT_CMD_MQTT_CONNECT, NULL, cmd_para);
         }
+    }
+    if (task_cb->task == EC800M_TASK_MQTT_PUB) {
+        ec800m_mqtt_data_t* data = (ec800m_mqtt_data_t*)task_cb->param;
+        at_set_end_sign('>');
+        dev->err = at_cmd_exec(dev->client, AT_CMD_MQTT_PUBLISH, NULL, data->topic, data->len);
+        at_client_send(data->payload, data->len);
+        at_set_end_sign(0);
+        ec800m_post_sync(dev);
+    }
+    if (task_cb->task == EC800M_TASK_MQTT_SUB) {
+        char* sub = (char*)task_cb->param;
+        dev->err  = at_cmd_exec(_ec800m->client, AT_CMD_MQTT_SUBSCRIBE, sub);
     }
 }
 
-static void ec800m_mqtt_timeout_handle(int task, void* param)
+static void ec800m_mqtt_err_handle(ec800m_task_t* task_cb, ec800m_t* dev)
 {
-    xEventGroupSetBits(mqtt_event, EC800M_MQTT_TIMEOUT);
+    /**
+     * @todo err handle
+     *
+     */
+    xSemaphoreGive(dev->lock);
 }
 
 ec800m_task_group_t ec800m_mqtt_task_group = {
-    .id             = EC800_MQTT,
-    .init           = ec800m_mqtt_init_handle,
-    .task_handle    = ec800m_mqtt_task_handle,
-    // .timeout_handle = ec800m_mqtt_timeout_handle,
+    .id          = EC800_MQTT,
+    .init        = ec800m_mqtt_init_handle,
+    .task_handle = ec800m_mqtt_task_handle,
+    .err_handle  = ec800m_mqtt_err_handle,
 };

@@ -13,6 +13,7 @@
 #define EC800M_COMMON_H
 
 #include "nrfx_gpiote.h"
+#include "ec800m.h"
 
 typedef enum {
     EC800M_TASK_POWERON = 1,

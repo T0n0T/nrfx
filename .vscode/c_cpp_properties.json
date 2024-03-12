@@ -1,9 +1,0 @@
-{
-  "configurations": [
-    {
-      "name": "windows-gcc-x64",
-      "compileCommands": "build\\nrf52832_xxaa\\compile_commands.json"
-    }
-  ],
-  "version": 4
-}

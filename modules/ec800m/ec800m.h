@@ -16,9 +16,6 @@
 #include "event_groups.h"
 #include "queue.h"
 #include "semphr.h"
-#include "ec800m_common.h"
-#include "ec800m_mqtt.h"
-#include "ec800m_socket.h"
 
 #define EC800_COMM           0x00
 #define EC800_MQTT           0x01
@@ -53,7 +50,7 @@ typedef struct {
 
 typedef struct {
     uint8_t id;
-    void    (*init)(void, ec800m_t*);
+    void    (*init)(ec800m_t*);
     void    (*task_handle)(ec800m_task_t*, ec800m_t*);
     void    (*err_handle)(ec800m_task_t*, ec800m_t*);
 } ec800m_task_group_t;

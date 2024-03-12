@@ -60,7 +60,7 @@ gps_info_t ec800m_gnss_get(ec800m_t* dev)
 {
     comm_task_publish(dev, EC800M_TASK_GNSS_OPEN, NULL);
     /** take sync from task_handle */
-    if (ec800m_wait_sync(dev) != EOK) {
+    if (ec800m_wait_sync(dev, portMAX_DELAY) != EOK) {
         NRF_LOG_ERROR("gnss info expired!");
         return 0;
     }
@@ -90,7 +90,7 @@ static void ec800m_comm_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
         if(ec800m_wait_sync(dev, 10000) < 0){
             NRF_LOG_ERROR("ec800m hardfault!");
             result = -ETIMEOUT;
-            goto __power_on_exit
+            goto __power_on_exit;
         }
         /** reset ec800m */
         result = at_cmd_exec(dev->client, AT_CMD_RESET, NULL);
@@ -131,7 +131,7 @@ static void ec800m_comm_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
         // release ec800m.lock in urc
         dev->err = at_cmd_exec(dev->client, AT_CMD_POWER_DOWN, NULL);
     }
-    if (task == EC800M_TASK_POWERLOW) {
+    if (task_cb->task == EC800M_TASK_POWERLOW) {
         dev->err = at_cmd_exec(dev->client, AT_CMD_LOW_POWER, NULL);
     }
     if (task_cb->task == EC800M_TASK_SIGNAL_CHECK) {

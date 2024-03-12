@@ -12,10 +12,7 @@
 #ifndef __EC800M_MQTT_H__
 #define __EC800M_MQTT_H__
 
-#define EC800M_MQTT_SUCCESS (1 << 0)
-#define EC800M_MQTT_TIMEOUT (1 << 1)
-#define EC800M_MQTT_ERROR   (1 << 2)
-
+#include "ec800m.h"
 typedef enum {
     EC800M_MQTT_IDLE = 0,
     EC800M_MQTT_CLOSE,
@@ -23,7 +20,6 @@ typedef enum {
     EC800M_MQTT_CONN,
     EC800M_MQTT_DISC,
 } ec800m_mqtt_status_t;
-
 typedef struct {
     char     host[30];
     char     port[10];
@@ -39,8 +35,16 @@ typedef enum {
     EC800M_TASK_MQTT_CHECK = 1,
     EC800M_TASK_MQTT_OPEN,
     EC800M_TASK_MQTT_CONNECT,
+    EC800M_TASK_MQTT_PUB,
+    EC800M_TASK_MQTT_SUB,
     EC800M_TASK_MQTT_CLOSE,
 } ec800m_mqtt_task_t;
+
+typedef struct {
+    char*  topic;
+    char*  payload;
+    size_t len;
+} ec800m_mqtt_data_t;
 
 extern ec800m_mqtt_t        mqtt_config;
 extern ec800m_mqtt_status_t mqtt_status;
