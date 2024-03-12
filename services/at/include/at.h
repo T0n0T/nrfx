@@ -154,6 +154,7 @@ struct at_client {
     size_t               urc_table_size;
 
     TaskHandle_t parser;
+    void*        user_data;
 };
 typedef struct at_client* at_client_t;
 #endif /* AT_USING_CLIENT */

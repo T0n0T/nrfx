@@ -28,7 +28,7 @@ const struct at_cmd at_cmd_list[] = {
 
     /** tcp/ip using contextID=1 */
     {AT_CMD_NAME(AT_CMD_ACT_PDP), "AT+QIACT=1", NULL, 0, 15000},
-    {AT_CMD_NAME(AT_CMD_CHECK_PDP), "AT+QIACT?", NULL, 0, 15000},
+    {AT_CMD_NAME(AT_CMD_CHECK_PDP), "AT+QIACT?", "+QIACT:", 2, 15000},
     {AT_CMD_NAME(AT_CMD_DEACT_PDP), "AT+QIDEACT=1", NULL, 0, 40000},
     {AT_CMD_NAME(AT_CMD_DATAECHO_OFF), "AT+QISDE=0", NULL, 0, 300},
     {AT_CMD_NAME(AT_CMD_PING), "AT+QPING=1,%s,%d,1", "+QPING:", 6, 5000},

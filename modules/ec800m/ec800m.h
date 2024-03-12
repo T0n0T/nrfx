@@ -16,6 +16,7 @@
 #include "event_groups.h"
 #include "queue.h"
 #include "semphr.h"
+#include "ec800m_common.h"
 #include "ec800m_mqtt.h"
 #include "ec800m_socket.h"
 
@@ -26,7 +27,7 @@
 #define EC800M_BUF_LEN       256
 #define EC800M_TASK_MAX_NUM  3
 #define EC800M_RECV_BUFF_LEN 128
-
+#define EC800M_IPC_MIN_TICK  50
 typedef enum {
     EC800M_POWER_OFF = 1,
     EC800M_POWER_ON,
@@ -39,23 +40,23 @@ typedef struct {
     void*    param;
 } ec800m_task_t;
 
-typedef void* ec800m_resp_t;
-
-typedef struct {
-    uint8_t id;
-    void    (*init)(void);
-    void    (*task_handle)(int, void*, SemaphoreHandle_t);
-    void    (*resp_handle)(int, void*);
-} ec800m_task_group_t;
-
 typedef struct {
     at_client_t       client;
     uint32_t          pwr_pin;
     uint32_t          wakeup_pin;
     QueueHandle_t     task_queue;
+    SemaphoreHandle_t sync; ///< both two ways given from at_client.c, a sync for some cmd executing is necessary for user thread.
+    SemaphoreHandle_t lock; ///< in order to make 'one task only', 'before cmd' and 'after cmd' need lock and unlock.
     ec800m_status_t   status;
-    int               rssi;
+    int               err;
 } ec800m_t;
+
+typedef struct {
+    uint8_t id;
+    void    (*init)(void, ec800m_t*);
+    void    (*task_handle)(ec800m_task_t*, ec800m_t*);
+    void    (*err_handle)(ec800m_task_t*, ec800m_t*);
+} ec800m_task_group_t;
 
 #pragma pack(8)
 struct at_cmd {
@@ -129,14 +130,11 @@ typedef enum {
     AT_CMD_MAX,
 } at_cmd_desc_t;
 
-extern ec800m_t            ec800m;
 extern const struct at_cmd at_cmd_list[];
 
-void       ec800m_init(void);
-void       ec800m_wake_up(void);
-int        ec800m_power_on(void);
-void       ec800m_power_off(void);
-gps_info_t ec800m_gnss_get(void);
-int        at_cmd_exec(at_client_t dev, at_cmd_desc_t at_cmd_id, char* keyword_line, ...);
+ec800m_t* ec800m_init(void);
+int       ec800m_wait_sync(ec800m_t* dev, uint32_t timeout);
+void      ec800m_post_sync(ec800m_t* dev);
+int       at_cmd_exec(at_client_t dev, at_cmd_desc_t at_cmd_id, char* keyword_line, ...);
 
 #endif

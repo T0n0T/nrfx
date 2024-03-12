@@ -16,19 +16,26 @@
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
-extern SemaphoreHandle_t comm_sync;
-extern int               comm_task_publish(ec800m_comm_task_t task, void* param);
+extern int comm_task_publish(ec800m_comm_task_t task, void* param);
 
 void ec800m_power_on_ready(struct at_client* client, const char* data, size_t size)
 {
     NRF_LOG_INFO("ec800m power on ready");
-    comm_task_publish(EC800M_TASK_POWERON, NULL);
+    ec800m_t* dev = (ec800m_t*)client->user_data;
+    if (dev->status == EC800M_POWER_OFF) {
+        ec800m_post_sync(dev);
+    }
 }
 
-void ec800m_gnss_get_resp(struct at_client* client, const char* data, size_t size)
+void ec800m_power_off_fin(struct at_client* client, const char* data, size_t size)
 {
+    NRF_LOG_INFO("ec800m power off finish");
+    ec800m_t* dev = (ec800m_t*)client->user_data;
+    nrf_gpio_pin_write(dev->pwr_pin, 0);
+    dev->status = EC800M_POWER_OFF;
 }
 
 const struct at_urc comm_urc_table[] = {
     {"RDY", "\r\n", ec800m_power_on_ready},
+    {"POWERED DOWN", "\r\n", ec800m_power_off_fin},
 };

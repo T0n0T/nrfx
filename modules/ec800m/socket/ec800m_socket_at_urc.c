@@ -16,47 +16,32 @@
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
-extern QueueHandle_t        socket_response;
 extern ec800m_socket_data_t data_recv;
+extern uint32_t             socket_err_code;
 
-extern int  socket_task_publish(ec800m_socket_task_t task, void* param, uint32_t timeout);
-extern void response(uint32_t result);
-
-void socket_open(struct at_client* client, const char* data, size_t size)
-{
-    int      socket_num = -1;
-    uint32_t err_code   = 0;
-    sscanf(data, "+QIOPEN: %d,%d", &socket_num, &err_code);
-    if (socket_num < 0 || socket_num >= SOCKET_MAX) {
-        response(EC800M_SOCKET_ERROR);
-        return;
-    }
-    if (err_code == 0) {
-        taskENTER_CRITICAL();
-        socket[socket_num].status |= EC800M_SOCKET_WORK;
-        taskEXIT_CRITICAL();
-    }
-    response(err_code);
-}
+extern int  socket_task_publish(ec800m_socket_task_t task, void* param);
 
 void socket_send(struct at_client* client, const char* data, size_t size)
 {
+    ec800m_t* dev = (ec800m_t*)client->user_data;
     if (strstr(data, "SEND OK")) {
-        response(EC800M_SOCKET_SUCCESS);
+        ec800m_post_sync(dev);
     } else if (strstr(data, "SEND FAIL")) {
-        response(EC800M_SOCKET_ERROR);
+        dev->err = -EIO;
+        ec800m_post_sync(dev);
     }
 }
 
 void socket_recv(struct at_client* client, const char* data, size_t size)
 {
     uint32_t len = 0;
+    ec800m_t* dev = (ec800m_t*)client->user_data;
     sscanf(data, "+QIRD: %d", &len);
     if (len) {
-        at_client_recv(data_recv.buf, len, 300);
+        at_client_recv(data_recv.buf, len, EC800M_IPC_MIN_TICK);
     }
     data_recv.len = len;
-    response(EC800M_SOCKET_SUCCESS);
+    ec800m_post_sync(dev);
 }
 
 void urc_socket_recv(struct at_client* client, const char* data, size_t size)
@@ -67,32 +52,29 @@ void urc_socket_recv(struct at_client* client, const char* data, size_t size)
         NRF_LOG_ERROR("One socket has received data,but socket_num wrong");
         return;
     }
-    taskENTER_CRITICAL();
     socket[socket_num].status |= EC800M_SOCKET_RECV;
-    taskEXIT_CRITICAL();
     xSemaphoreGive(socket[socket_num].recv_sync);
 }
 
 void urc_socket_close(struct at_client* client, const char* data, size_t size)
 {
+    NRF_LOG_INFO("SOCKET CLOSE!");
     int socket_num = -1;
+    ec800m_t* dev = (ec800m_t*)client->user_data;
     sscanf(data, "+QIURC: \"closed\",%d", &socket_num);
     if (socket_num < 0 || socket_num >= SOCKET_MAX) {
         NRF_LOG_ERROR("One socket has been close but socket_num wrong");
         return;
     }
-    NRF_LOG_INFO("socket close!!!!!!!")
-    taskENTER_CRITICAL();
+    
     socket[socket_num].status = EC800M_SOCKET_IDLE;
-    taskEXIT_CRITICAL();
-    socket_task_publish(EC800M_TASK_SOCKET_CLOSE, &socket[socket_num], 0);
+    socket_task_publish(dev, EC800M_TASK_SOCKET_CLOSE, &socket[socket_num]);
 }
 
 void urc_socket_pdpdeact(struct at_client* client, const char* data, size_t size)
 {
-    taskENTER_CRITICAL();
+    NRF_LOG_INFO("PDP DEACT!");
     pdp_status = EC800M_PDP_DEACT;
-    taskEXIT_CRITICAL();
 }
 
 void urc_socket_qiurc(struct at_client* client, const char* data, size_t size)
@@ -112,23 +94,6 @@ void urc_socket_qiurc(struct at_client* client, const char* data, size_t size)
     }
 }
 
-void pdp_check_status(struct at_client* client, const char* data, size_t size)
-{
-    uint32_t pdp_num = 0;
-    sscanf(data, "+QIACT: %d", &pdp_num);
-    if (pdp_num) {
-        taskENTER_CRITICAL();
-        pdp_status = EC800M_PDP_ACT;
-        taskEXIT_CRITICAL();
-        response(EC800M_SOCKET_SUCCESS);
-    } else {
-        taskENTER_CRITICAL();
-        pdp_status = EC800M_PDP_DEACT;
-        taskEXIT_CRITICAL();
-        response(EC800M_PDP_OPEN_FAIL);
-    }
-}
-
 void socket_check_status(struct at_client* client, const char* data, size_t size)
 {
 #define SOCKET_INITIAL   0
@@ -138,52 +103,47 @@ void socket_check_status(struct at_client* client, const char* data, size_t size
 #define SOCKET_CLOSING   4
     int      socket_num = -1;
     uint32_t state_code = 0;
+    ec800m_t* dev = (ec800m_t*)client->user_data;
     sscanf(data, "+QISTATE: %d,%*[^,],%*[^,],%*[^,],%*[^,],%d", &socket_num, &state_code);
     if (socket_num < 0 || socket_num >= SOCKET_MAX) {
         response(EC800M_SOCKET_ERROR);
+        NRF_LOG_ERROR("ec800 socket[%d] err!");
+        ec800m_post_sync(dev);
         return;
     }
     if (socket[socket_num].status & EC800M_SOCKET_WORK) {
         NRF_LOG_INFO("socket[%d] status: %d", socket_num, state_code);
         if (state_code == SOCKET_CONNECTED) {
-            response(EC800M_SOCKET_SUCCESS);
+            ec800m_post_sync(dev);
         }
         if (state_code == SOCKET_CLOSING) {
-            taskENTER_CRITICAL();
             socket[socket_num].status = EC800M_SOCKET_IDLE;
-            taskEXIT_CRITICAL();
-            socket_task_publish(EC800M_TASK_SOCKET_CLOSE, &socket[socket_num], 0);
-            response(EC800M_SOCKET_IS_RELEASE);
+            socket_task_publish(EC800M_TASK_SOCKET_CLOSE, &socket[socket_num]);            
+            ec800m_post_sync(dev);
         }
         return;
     }
-    taskENTER_CRITICAL();
     socket[socket_num].status |= EC800M_SOCKET_WORK;
-    taskEXIT_CRITICAL();
-
-    response(EC800M_SOCKET_IS_USING);
+    ec800m_post_sync(dev);
 }
 
 void err_get(struct at_client* client, const char* data, size_t size)
 {
     int err_code = 0;
+    ec800m_t* dev = (ec800m_t*)client->user_data;
     sscanf(data, "+QIERROR: %d", &err_code);
     NRF_LOG_ERROR("ERR[%d] happened");
-    response(err_code);
 }
 
 void err_check(struct at_client* client, const char* data, size_t size)
 {
-    BaseType_t res = socket_task_publish(EC800M_TASK_ERR_CHECK, NULL, 0);
-    NRF_LOG_ERROR("Need to check ERR, %d", res);
+    socket_task_publish(EC800M_TASK_ERR_CHECK, NULL);    
 }
 
 const struct at_urc socket_urc_table[] = {
     {"SEND", "\r\n", socket_send},
     {"+QIRD:", "\r\n", socket_recv},
-    {"+QIOPEN:", "\r\n", socket_open},
     {"+QIURC:", "\r\n", urc_socket_qiurc},
-    {"+QIACT:", "\r\n", pdp_check_status},
     {"+QISTATE:", "\r\n", socket_check_status},
     {"+QIGETERROR:", "\r\n", err_get},
     {"ERROR", "\r\n", err_check},

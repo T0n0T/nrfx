@@ -10,118 +10,90 @@
  */
 #include "ec800m.h"
 #include "ec800m_common.h"
-#include "nrfx_gpiote.h"
 
 #define NRF_LOG_MODULE_NAME ec800comon
 #define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_INFO
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
-SemaphoreHandle_t comm_sync;
+static struct gps_info rmcinfo;
 
-int comm_task_publish(ec800m_comm_task_t task, void* param)
+static int comm_task_publish(ec800m_t* dev, ec800m_comm_task_t task, void* param)
 {
     ec800m_task_t task_cb = {
-        .type    = EC800_COMM,
-        .task    = task,
-        .param   = param,
+        .type  = EC800_COMM,
+        .task  = task,
+        .param = param,
     };
-    return xQueueSend(ec800m.task_queue, &task_cb, 0);
+    return xQueueSend(dev->task_queue, &task_cb, EC800M_IPC_MIN_TICK);
 }
 
-void ec800m_power_on(void)
+void ec800m_power_on(ec800m_t* dev)
 {
-    int result = EOK;
-    int retry  = 5;
-
-    nrf_gpio_pin_write(ec800m.pwr_pin, 1);
-    xSemaphoreTake(comm_sync, portMAX_DELAY);
-    
-}
-
-void ec800m_power_off(void)
-{
-    at_cmd_exec(ec800m.client, AT_CMD_POWER_DOWN);
-    // todo: urc
-    //  nrf_gpio_pin_write(ec800m.pwr_pin, 0);
-    //  ec800m.status = EC800M_POWER_OFF;
-}
-
-void ec800m_power_low(void)
-{
-    at_cmd_exec(ec800m.client, AT_CMD_LOW_POWER);
-}
-
-int ec800m_check_signal(void)
-{
-    /** check signal */
-    if (at_cmd_exec(ec800m.client, AT_CMD_CHECK_SIGNAL) < 0) {
-        NRF_LOG_ERROR("ec800m check signal failed.");
-    } else {
-        int rssi = 0, err_rate = 0;
-        // sscanf(parse_str, "+CSQ: %d,%d", &rssi, &err_rate);
-        if (rssi != 99 && rssi) {
-            ec800m.rssi = rssi;
-        } else {
-            NRF_LOG_WARNING("ec800m signal strength get wrong.");
-        }
+    comm_task_publish(dev, EC800M_TASK_POWERON, NULL);
+    while (dev->status == EC800M_POWER_OFF)    {
+        vTaskDelay(1000);
     }
 }
 
-int ec800m_gnss_check(void)
+void ec800m_power_off(ec800m_t* dev)
 {
-    /** configure gnss*/
-    // at_cmd_exec(ec800m.client, AT_CMD_GNSS_STATUS);
-    // if (result < 0) {
-    //     goto __exit;
-    // } else {
-    //     //todo: urc
-    //     int gnss_status = -1;
-    //     sscanf(parse_str, "+QGPS: %d", &gnss_status);
-    //     switch (gnss_status) {
-    //         case 0:
-    //             result = at_cmd_exec(ec800m.client, AT_CMD_GNSS_OPEN);
-    //             if (result < 0) {
-    //                 goto __exit;
-    //             }
-    //             break;
-    //         case 1:
-    //             NRF_LOG_INFO("gnss has already open!");
-    //             break;
-    //         default:
-    //             NRF_LOG_ERROR("Command [AT+QGPS?] fail!");
-    //             result = -ERROR;
-    //             goto __exit;
-    //     }
-    // }
+    comm_task_publish(dev, EC800M_TASK_POWEROFF, NULL);
 }
 
-int ec800m_gnss_open(void)
+void ec800m_power_low(ec800m_t* dev)
 {
-    /** only use rmc */
-    at_cmd_exec(ec800m.client, AT_CMD_GNSS_NMEA_CONF, 2);
+    comm_task_publish(dev, EC800M_TASK_POWERLOW, NULL);
 }
 
-gps_info_t ec800m_gnss_get(void)
+void ec800m_signal_check(ec800m_t* dev)
 {
-    at_cmd_exec(ec800m.client, AT_CMD_GNSS_NMEA_RMC);
-    return 0;
+    comm_task_publish(dev, EC800M_TASK_SIGNAL_CHECK, NULL);
 }
 
-void ec800m_comm_init_handle(void)
+void ec800m_gnss_open(ec800m_t* dev)
 {
-    nrf_gpio_cfg_output(ec800m.pwr_pin);
-    comm_sync = xSemaphoreCreateBinary();
+    comm_task_publish(dev, EC800M_TASK_GNSS_OPEN, NULL);
 }
 
-void ec800m_comm_task_handle(int task, void* param, )
+gps_info_t ec800m_gnss_get(ec800m_t* dev)
+{
+    comm_task_publish(dev, EC800M_TASK_GNSS_OPEN, NULL);
+    /** take sync from task_handle */
+    if (ec800m_wait_sync(dev) != EOK) {
+        NRF_LOG_ERROR("gnss info expired!");
+        return 0;
+    }
+    return &rmcinfo;
+}
+
+static void ec800m_comm_init_handle(ec800m_t* dev)
+{
+    nrf_gpio_cfg_output(dev->pwr_pin);
+    extern const struct at_urc comm_urc_table[];
+    at_obj_set_urc_table(dev->client, comm_urc_table, 2);
+}
+
+static void ec800m_comm_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
 {
     // task which need resp should wait inside this func
-    if (task == EC800M_TASK_POWERON) {
+    xSemaphoreTake(dev->lock, portMAX_DELAY);
+    if (task_cb->task == EC800M_TASK_POWERON) {
+
         int result = EOK;
         int retry  = 5;
+        ec800m_wait_sync(dev, EC800M_IPC_MIN_TICK);
+        nrf_gpio_pin_write(dev->pwr_pin, 0);
+        vTaskDelay(500);
+        nrf_gpio_pin_write(dev->pwr_pin, 1);
+        /** task sync from urc 'RDY' */
+        if(ec800m_wait_sync(dev, 10000) < 0){
+            NRF_LOG_ERROR("ec800m hardfault!");
+            result = -ETIMEOUT;
+            goto __power_on_exit
+        }
         /** reset ec800m */
-        result     = at_cmd_exec(ec800m.client, AT_CMD_RESET);
+        result = at_cmd_exec(dev->client, AT_CMD_RESET, NULL);
         if (result < 0) {
             NRF_LOG_ERROR("ec800m reset failed.");
             goto __power_on_exit;
@@ -129,52 +101,109 @@ void ec800m_comm_task_handle(int task, void* param, )
         vTaskDelay(500);
 
         /** turn off cmd echo */
-        at_cmd_exec(ec800m.client, AT_CMD_ECHO_OFF);
+        result = at_cmd_exec(dev->client, AT_CMD_ECHO_OFF, NULL);
         if (result < 0) {
             NRF_LOG_ERROR("ec800m reset failed.");
             goto __power_on_exit;
         }
 
+        char* keyword_line = NULL;
         do {
             /** check simcard with checking pin */
-            result = at_cmd_exec(ec800m.client, AT_CMD_CHECK_PIN);
+            result = at_cmd_exec(dev->client, AT_CMD_CHECK_PIN, keyword_line);
             vTaskDelay(1000);
         } while (result < 0 && retry--);
         if (result < 0) {
             NRF_LOG_ERROR("ec800m simcard detect failed.");
             goto __power_on_exit;
         }
-        ec800m.status = EC800M_POWER_ON;
+        dev->status = EC800M_POWER_ON;
         NRF_LOG_DEBUG("ec800m init OK!");
 
     __power_on_exit:
         if (result < 0) {
-            ec800m.status = EC800M_POWER_OFF;
-            NRF_LOG_ERROR("ec800m init failed!");
-        }
+            dev->status = EC800M_POWER_OFF;
+            dev->err    = result;
+            NRF_LOG_ERROR("ec800m init failed!");            
+        }        
     }
-    if (task == EC800M_TASK_POWEROFF) {
+    if (task_cb->task == EC800M_TASK_POWEROFF) {
+        // release ec800m.lock in urc
+        dev->err = at_cmd_exec(dev->client, AT_CMD_POWER_DOWN, NULL);
     }
     if (task == EC800M_TASK_POWERLOW) {
+        dev->err = at_cmd_exec(dev->client, AT_CMD_LOW_POWER, NULL);
     }
-    if (task == EC800M_TASK_SIGNAL_CHECK) {
+    if (task_cb->task == EC800M_TASK_SIGNAL_CHECK) {
+        char* keyword_line = NULL;
+        dev->err           = at_cmd_exec(dev->client, AT_CMD_CHECK_SIGNAL, keyword_line);
+        int rssi = 0, err_rate = 0;
+        sscanf(keyword_line, "+CSQ: %d,%d", &rssi, &err_rate);        
+        if (rssi != 99 && rssi) {
+            NRF_LOG_INFO("ec800m signal check rssi=%d", rssi);
+        } else {
+            NRF_LOG_WARNING("ec800m signal strength get wrong.");
+        }
     }
-    if (task == EC800M_TASK_GNSS_CHECK) {
+    if (task_cb->task == EC800M_TASK_GNSS_OPEN) {
+        int   result       = EOK;
+        char* keyword_line = NULL;
+        result             = at_cmd_exec(dev->client, AT_CMD_GNSS_STATUS, keyword_line);
+        if (result < 0) {
+            goto __gnss_check_exit;
+        } else {
+            int gnss_status = -1;
+            sscanf(keyword_line, "+QGPS: %d", &gnss_status);
+            switch (gnss_status) {
+                case 0:
+                    result = at_cmd_exec(dev->client, AT_CMD_GNSS_OPEN, NULL);
+                    break;
+                case 1:
+                    NRF_LOG_INFO("gnss has already open!");
+                    break;
+                default:
+                    NRF_LOG_ERROR("Command [AT+QGPS?] fail!");
+                    result = -ERROR;
+                    goto __gnss_check_exit;
+            }
+        }
+        /** configure gnss*/
+        result = at_cmd_exec(dev->client, AT_CMD_GNSS_NMEA_CONF, NULL, 2);
+    __gnss_check_exit:
+        if (result < 0) {
+            NRF_LOG_ERROR("ec800m gnss check failed!");
+        }
     }
-    if (task == EC800M_TASK_GNSS_OPEN) {
-    }
-    if (task == EC800M_TASK_GNSS_GET) {
-    }
+    if (task_cb->task == EC800M_TASK_GNSS_GET) {
+        char* keyword_line = NULL;
+        dev->err            = at_cmd_exec(dev->client, AT_CMD_GNSS_NMEA_RMC, keyword_line);
+        if (dev->err == EOK) {
+            char rmc[128] = {0};
+            if (sscanf(keyword_line, "+QGPSGNMEA:", "+QGPSGNMEA:%s", rmc) > 0) {
+                if (!gps_rmc_parse(&rmcinfo, rmc)) {
+                    NRF_LOG_WARNING("gnss info invalid");
+                } else {
+                    NRF_LOG_DEBUG("%d %d %d %d %d %d", rmcinfo.date.year, rmcinfo.date.month, rmcinfo.date.day,
+                                  rmcinfo.date.hour, rmcinfo.date.minute, rmcinfo.date.second);
+                }
+            }
+        }
+        ec800m_post_sync(dev);
+    }        
 }
 
-void ec800m_comm_timeout_handle(void)
+static void ec800m_comm_err_handle(ec800m_task_t* task_cb, ec800m_t* dev)
 {
-    // think about give up this func,because timer expiring event can be solve in the func above
+    /**
+     * @todo err handle
+     *
+     */
+    xSemaphoreGive(dev->lock);
 }
 
 ec800m_task_group_t ec800m_comm_task_group = {
     .id          = EC800_COMM,
     .init        = ec800m_comm_init_handle,
     .task_handle = ec800m_comm_task_handle,
-    // .timeout_handle = ec800m_comm_timeout_handle,
+    .err_handle  = ec800m_comm_err_handle,
 };
