@@ -98,13 +98,14 @@ static void mqtt_init(void)
     ec800m_mqtt_sub(global_cfg.mqtt_cfg.subtopic);
 #else
     NRF_LOG_INFO("begin connect");
-    mqtt_connect(client);
+    // ec800m_socket_open("broker.emqx.io", "1883", 1);
+    // mqtt_connect(client);
 #endif
 }
 
 static void mqtt_deinit(void)
 {
-    mqtt_disconnect(client);
+    // mqtt_disconnect(client);
     ec800m_power_off(ec800m);
 }
 

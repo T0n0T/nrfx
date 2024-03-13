@@ -16,13 +16,12 @@
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
-extern int comm_task_publish(ec800m_comm_task_t task, void* param);
-
 void ec800m_power_on_ready(struct at_client* client, const char* data, size_t size)
 {
-    NRF_LOG_DEBUG("ec800m power on ready");
+    NRF_LOG_DEBUG("ec800m power on ready");    
     ec800m_t* dev = (ec800m_t*)client->user_data;
     if (dev->status == EC800M_POWER_OFF) {
+        // ec800m_wait_sync(dev, EC800M_IPC_MIN_TICK);
         ec800m_post_sync(dev);
     }
 }

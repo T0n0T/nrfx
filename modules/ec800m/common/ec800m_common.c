@@ -79,7 +79,6 @@ static void ec800m_comm_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
     if (task_cb->task == EC800M_TASK_POWERON) {
         int result = EOK;
         int retry  = 5;
-        ec800m_wait_sync(dev, EC800M_IPC_MIN_TICK);
         nrf_gpio_pin_write(dev->pwr_pin, 0);
         vTaskDelay(500);
         nrf_gpio_pin_write(dev->pwr_pin, 1);

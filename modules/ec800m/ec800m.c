@@ -12,7 +12,7 @@
 #include "nrfx_gpiote.h"
 
 #define NRF_LOG_MODULE_NAME ec800
-#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_DEBUG
+#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_INFO
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
@@ -135,7 +135,7 @@ void ec800m_task(void* p)
 
         for (size_t i = 0; i < sizeof(task_groups) / sizeof(ec800m_task_group_t*); i++) {
             if (task_groups[i]->id == task_cb.type) {
-                dev->err = EOK;
+                // dev->err = EOK;
                 task_groups[i]->task_handle(&task_cb, dev);
                 task_groups[i]->err_handle(&task_cb, dev);
                 break;
@@ -147,15 +147,17 @@ void ec800m_task(void* p)
     }
 }
 
-int ec800m_wait_sync(ec800m_t* dev, uint32_t timeout)
+int _ec800m_wait_sync(ec800m_t* dev, uint32_t timeout)
 {
     if (xSemaphoreTake(dev->sync, timeout) != pdTRUE) {
+        NRF_LOG_DEBUG("waiting over!")
         return -ETIMEOUT;
     }
+    NRF_LOG_DEBUG("waiting success!")
     return dev->err;
 }
 
-void ec800m_post_sync(ec800m_t* dev)
+void _ec800m_post_sync(ec800m_t* dev)
 {
     xSemaphoreGive(dev->sync);
 }

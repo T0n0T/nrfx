@@ -30,12 +30,11 @@ int socket_task_publish(ec800m_t* dev, ec800m_socket_task_t task, void* param)
         .param = param,
     };
     return xQueueSend(dev->task_queue, &task_cb, EC800M_IPC_MIN_TICK);
-    // return 0;
 }
 
 int ec800m_socket_open(const char* domain, const char* port, int protocol)
 {
-    uint32_t result = EOK;
+    int result = EOK;
     if (pdp_status != EC800M_PDP_ACT) {
         socket_task_publish(_ec800m, EC800M_TASK_PDP_DEACT, NULL);
         socket_task_publish(_ec800m, EC800M_TASK_PDP_ACT, NULL);
@@ -131,7 +130,6 @@ void ec800m_socket_init_handle(ec800m_t* dev)
     for (size_t i = 0; i < SOCKET_MAX; i++) {
         socket[i].recv_sync = xSemaphoreCreateBinary();
     }
-
     NRF_LOG_INFO("ec800m socket init!")
 }
 
@@ -147,7 +145,6 @@ void ec800m_socket_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
     if (task_cb->task == EC800M_TASK_PDP_CHECK) {
         char* keyword_line = NULL;
         dev->err           = at_cmd_exec(dev->client, AT_CMD_CHECK_PDP, &keyword_line);
-        NRF_LOG_WARNING("check pdp recv [%s]", keyword_line);
         if (dev->err == EOK) {
             uint32_t pdp_num = 0;
             sscanf(keyword_line, "+QIACT: %d", &pdp_num);

@@ -724,7 +724,7 @@ int main(void)
     // conn_params_init();
     // peer_manager_init();
     // application_timers_start();
-    
+
     bsp_init();
     app_init();
 
