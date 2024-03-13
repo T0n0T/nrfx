@@ -132,6 +132,6 @@ extern const struct at_cmd at_cmd_list[];
 ec800m_t* ec800m_init(void);
 int       ec800m_wait_sync(ec800m_t* dev, uint32_t timeout);
 void      ec800m_post_sync(ec800m_t* dev);
-int       at_cmd_exec(at_client_t dev, at_cmd_desc_t at_cmd_id, char* keyword_line, ...);
+int       at_cmd_exec(at_client_t dev, at_cmd_desc_t at_cmd_id, char** keyword_line, ...);
 
 #endif

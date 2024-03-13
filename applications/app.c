@@ -97,6 +97,7 @@ static void mqtt_init(void)
     }
     ec800m_mqtt_sub(global_cfg.mqtt_cfg.subtopic);
 #else
+    NRF_LOG_INFO("begin connect");
     mqtt_connect(client);
 #endif
 }
@@ -137,15 +138,17 @@ void app_task(void* pvParameter)
     vTaskDelay(pdMS_TO_TICKS(300));
     LED_OFF(LED2);
     LED_OFF(LED3);
+    
     while (1) {
         mqtt_init();
-        LED_ON(LED3);
-        publish_handle();
-        LED_OFF(LED3);
+        // LED_ON(LED3);
+        // publish_handle();
+        // LED_OFF(LED3);
         mqtt_deinit();
         // NRF_LOG_INFO("mqtt app task loop");
         // xSemaphoreTake(m_app_sem, pdMS_TO_TICKS(global_cfg.publish_interval));
-        xSemaphoreTake(m_app_sem, pdMS_TO_TICKS(30000));
+        xSemaphoreTake(m_app_sem, pdMS_TO_TICKS(5000));
+
     }
 }
 

@@ -705,32 +705,32 @@ int main(void)
     SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
 
     // Configure and initialize the BLE stack.
-    ble_stack_init();
+    // ble_stack_init();
 
-    // Initialize modules.
-    timers_init();
-    gap_params_init();
+    // // Initialize modules.
+    // timers_init();
+    // gap_params_init();
 
     read_cfg_from_flash();
 
-    char* src = build_msg_cfg(&global_cfg);
-    NRF_LOG_RAW_INFO("%s\r\n", src);
-    free(src);
+    // char* src = build_msg_cfg(&global_cfg);
+    // NRF_LOG_RAW_INFO("%s\r\n", src);
+    // free(src);
 
-    ble_mac_set();
-    gatt_init();
-    advertising_init();
-    services_init();
-    conn_params_init();
-    peer_manager_init();
-    application_timers_start();
+    // ble_mac_set();
+    // gatt_init();
+    // advertising_init();
+    // services_init();
+    // conn_params_init();
+    // peer_manager_init();
+    // application_timers_start();
     
     bsp_init();
-    // app_init();
+    app_init();
 
     // Create a FreeRTOS task for the BLE stack.
     // The task will run advertising_start() before entering its loop.
-    nrf_sdh_freertos_init(advertising_start, &erase_bonds);
+    // nrf_sdh_freertos_init(advertising_start, &erase_bonds);
 
     NRF_LOG_INFO("FreeRTOS started.");
     // Start FreeRTOS scheduler.

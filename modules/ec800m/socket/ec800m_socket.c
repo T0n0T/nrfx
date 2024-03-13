@@ -30,6 +30,7 @@ int socket_task_publish(ec800m_t* dev, ec800m_socket_task_t task, void* param)
         .param = param,
     };
     return xQueueSend(dev->task_queue, &task_cb, EC800M_IPC_MIN_TICK);
+    // return 0;
 }
 
 int ec800m_socket_open(const char* domain, const char* port, int protocol)
@@ -145,7 +146,8 @@ void ec800m_socket_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
     }
     if (task_cb->task == EC800M_TASK_PDP_CHECK) {
         char* keyword_line = NULL;
-        dev->err           = at_cmd_exec(dev->client, AT_CMD_CHECK_PDP, keyword_line);
+        dev->err           = at_cmd_exec(dev->client, AT_CMD_CHECK_PDP, &keyword_line);
+        NRF_LOG_WARNING("check pdp recv [%s]", keyword_line);
         if (dev->err == EOK) {
             uint32_t pdp_num = 0;
             sscanf(keyword_line, "+QIACT: %d", &pdp_num);
@@ -163,7 +165,7 @@ void ec800m_socket_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
         const char*      protocol     = (s->protocol == EC800M_SOCKET_TCP_CLIENT) ? "TCP" : "UDP";
         int              socket_num   = s - socket;
         char*            keyword_line = NULL;
-        dev->err                      = at_cmd_exec(dev->client, AT_CMD_SOCKET_OPEN, keyword_line, socket_num, protocol, s->domain, s->port);
+        dev->err                      = at_cmd_exec(dev->client, AT_CMD_SOCKET_OPEN, &keyword_line, socket_num, protocol, s->domain, s->port);
         if (dev->err == EOK) {
             int      socket_num = -1;
             uint32_t err_code   = 0;

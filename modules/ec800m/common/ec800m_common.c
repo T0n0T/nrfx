@@ -31,9 +31,7 @@ static int comm_task_publish(ec800m_t* dev, ec800m_comm_task_t task, void* param
 void ec800m_power_on(ec800m_t* dev)
 {
     comm_task_publish(dev, EC800M_TASK_POWERON, NULL);
-    while (dev->status == EC800M_POWER_OFF)    {
-        vTaskDelay(1000);
-    }
+
 }
 
 void ec800m_power_off(ec800m_t* dev)
@@ -79,7 +77,6 @@ static void ec800m_comm_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
     // task which need resp should wait inside this func
     xSemaphoreTake(dev->lock, portMAX_DELAY);
     if (task_cb->task == EC800M_TASK_POWERON) {
-
         int result = EOK;
         int retry  = 5;
         ec800m_wait_sync(dev, EC800M_IPC_MIN_TICK);
@@ -87,7 +84,7 @@ static void ec800m_comm_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
         vTaskDelay(500);
         nrf_gpio_pin_write(dev->pwr_pin, 1);
         /** task sync from urc 'RDY' */
-        if(ec800m_wait_sync(dev, 10000) < 0){
+        if (ec800m_wait_sync(dev, 10000) < 0) {
             NRF_LOG_ERROR("ec800m hardfault!");
             result = -ETIMEOUT;
             goto __power_on_exit;
@@ -110,8 +107,8 @@ static void ec800m_comm_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
         char* keyword_line = NULL;
         do {
             /** check simcard with checking pin */
-            result = at_cmd_exec(dev->client, AT_CMD_CHECK_PIN, keyword_line);
             vTaskDelay(1000);
+            result = at_cmd_exec(dev->client, AT_CMD_CHECK_PIN, &keyword_line);
         } while (result < 0 && retry--);
         if (result < 0) {
             NRF_LOG_ERROR("ec800m simcard detect failed.");
@@ -124,8 +121,8 @@ static void ec800m_comm_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
         if (result < 0) {
             dev->status = EC800M_POWER_OFF;
             dev->err    = result;
-            NRF_LOG_ERROR("ec800m init failed!");            
-        }        
+            NRF_LOG_ERROR("ec800m init failed!");
+        }
     }
     if (task_cb->task == EC800M_TASK_POWEROFF) {
         // release ec800m.lock in urc
@@ -136,19 +133,19 @@ static void ec800m_comm_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
     }
     if (task_cb->task == EC800M_TASK_SIGNAL_CHECK) {
         char* keyword_line = NULL;
-        dev->err           = at_cmd_exec(dev->client, AT_CMD_CHECK_SIGNAL, keyword_line);
+        dev->err           = at_cmd_exec(dev->client, AT_CMD_CHECK_SIGNAL, &keyword_line);
         int rssi = 0, err_rate = 0;
-        sscanf(keyword_line, "+CSQ: %d,%d", &rssi, &err_rate);        
+        sscanf(keyword_line, "+CSQ: %d,%d", &rssi, &err_rate);
         if (rssi != 99 && rssi) {
             NRF_LOG_INFO("ec800m signal check rssi=%d", rssi);
         } else {
-            NRF_LOG_WARNING("ec800m signal strength get wrong.");
+            // NRF_LOG_WARNING("ec800m signal strength get wrong. %d", rssi);
         }
     }
     if (task_cb->task == EC800M_TASK_GNSS_OPEN) {
         int   result       = EOK;
         char* keyword_line = NULL;
-        result             = at_cmd_exec(dev->client, AT_CMD_GNSS_STATUS, keyword_line);
+        result             = at_cmd_exec(dev->client, AT_CMD_GNSS_STATUS, &keyword_line);
         if (result < 0) {
             goto __gnss_check_exit;
         } else {
@@ -176,7 +173,7 @@ static void ec800m_comm_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
     }
     if (task_cb->task == EC800M_TASK_GNSS_GET) {
         char* keyword_line = NULL;
-        dev->err            = at_cmd_exec(dev->client, AT_CMD_GNSS_NMEA_RMC, keyword_line);
+        dev->err           = at_cmd_exec(dev->client, AT_CMD_GNSS_NMEA_RMC, &keyword_line);
         if (dev->err == EOK) {
             char rmc[128] = {0};
             if (sscanf(keyword_line, "+QGPSGNMEA:", "+QGPSGNMEA:%s", rmc) > 0) {
@@ -189,7 +186,7 @@ static void ec800m_comm_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
             }
         }
         ec800m_post_sync(dev);
-    }        
+    }
 }
 
 static void ec800m_comm_err_handle(ec800m_task_t* task_cb, ec800m_t* dev)

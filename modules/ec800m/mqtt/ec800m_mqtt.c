@@ -149,7 +149,7 @@ static void ec800m_mqtt_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
     }
     if (task_cb->task == EC800M_TASK_MQTT_SUB) {
         char* sub = (char*)task_cb->param;
-        dev->err  = at_cmd_exec(_ec800m->client, AT_CMD_MQTT_SUBSCRIBE, sub);
+        dev->err  = at_cmd_exec(_ec800m->client, AT_CMD_MQTT_SUBSCRIBE, NULL, sub);
     }
 }
 

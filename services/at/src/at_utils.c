@@ -29,7 +29,6 @@ void at_print_raw_cmd(const char *name, const char *buf, size_t size)
 #define WIDTH_SIZE     32
 
     size_t i, j;
-
     for (i = 0; i < size; i += WIDTH_SIZE) {
         NRF_LOG_RAW_INFO("[AT] %s: %04X-%04X: ", name, i, i + WIDTH_SIZE);
         for (j = 0; j < WIDTH_SIZE; j++) {

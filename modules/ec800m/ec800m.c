@@ -34,7 +34,7 @@ static const ec800m_task_group_t* task_groups[] = {
 #if EC800M_MQTT_SOFT
     &ec800m_mqtt_task_group,
 #else
-// &ec800m_socket_task_group,
+    &ec800m_socket_task_group,
 #endif
 };
 
@@ -47,7 +47,7 @@ static const ec800m_task_group_t* task_groups[] = {
  * @param ... args used to combine with cmd
  * @return int
  */
-int at_cmd_exec(at_client_t dev, at_cmd_desc_t at_cmd_id, char* keyword_line, ...)
+int at_cmd_exec(at_client_t dev, at_cmd_desc_t at_cmd_id, char** keyword_line, ...)
 {
     va_list     args;
     int         result        = EOK;
@@ -57,13 +57,14 @@ int at_cmd_exec(at_client_t dev, at_cmd_desc_t at_cmd_id, char* keyword_line, ..
     memset(send_buf, 0, sizeof(send_buf));
     resp.line_counts = 0;
     resp.timeout     = cmd->timeout;
+
     if (keyword_line) {
         resp.line_num = cmd->resp_linenum;
     } else {
         resp.line_num = 0;
     }
 
-    va_start(args, at_cmd_id);
+    va_start(args, keyword_line);
     vsprintf(send_buf, cmd->cmd_expr, args);
     va_end(args);
 
@@ -74,15 +75,17 @@ int at_cmd_exec(at_client_t dev, at_cmd_desc_t at_cmd_id, char* keyword_line, ..
 
     if (keyword_line && cmd->resp_keyword) {
         if ((recv_line_buf = at_resp_get_line_by_kw(&resp, cmd->resp_keyword)) == NULL) {
-            NRF_LOG_ERROR("recvline err [%s]!", cmd->desc);
             result = -EINVAL;
             goto __exit;
         }
-        keyword_line = (char*)recv_line_buf;
-        // strncpy(keyword_line, recv_line_buf, strlen(recv_line_buf));
+
+        *keyword_line = (char*)recv_line_buf;
     }
 
 __exit:
+    // if (keyword_line) {
+    //     NRF_LOG_DEBUG("[%s] recvline [%s]!", cmd->desc, *keyword_line);
+    // }
 
     return result;
 }
@@ -114,13 +117,14 @@ void ec800m_task(void* p)
         memset(&task_cb, 0, sizeof(ec800m_task_t));
         last_time = xTaskGetTickCount();
         if (xSemaphoreGetMutexHolder(dev->lock) != NULL) {
-            NRF_LOG_ERROR("ec800m busy!");
+            NRF_LOG_WARNING("ec800m busy!");
             continue;
         }
 
         xQueueReceive(dev->task_queue, &task_cb, portMAX_DELAY);
-        if (dev->status == EC800M_POWER_OFF) {
-            NRF_LOG_ERROR("ec800m power has turned off!");
+        if (dev->status == EC800M_POWER_OFF && task_cb.type != EC800_COMM) {
+            NRF_LOG_DEBUG("task:%d %d", task_cb.type, task_cb.task)
+            NRF_LOG_WARNING("ec800m power has turned off!");
             continue;
         } else if (dev->status == EC800M_POWER_LOW) {
             current_time = xTaskGetTickCount();

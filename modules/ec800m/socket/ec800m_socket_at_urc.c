@@ -125,7 +125,7 @@ void socket_check_status(struct at_client* client, const char* data, size_t size
 
 void err_get(struct at_client* client, const char* data, size_t size)
 {
-    int       err_code = 0;
+    uint32_t  err_code = 0;
     ec800m_t* dev      = (ec800m_t*)client->user_data;
     sscanf(data, "+QIERROR: %d", &err_code);
     NRF_LOG_ERROR("ERR[%d] happened");

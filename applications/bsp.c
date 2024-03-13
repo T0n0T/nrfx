@@ -29,7 +29,7 @@ void gpio_init(void)
     nrf_gpio_cfg_output(LED2);
     nrf_gpio_cfg_output(LED3);
 
-    nrf_gpio_cfg_output(EC800_PIN_PWREN);
+    // nrf_gpio_cfg_output(EC800_PIN_PWREN);
 
     nrf_gpio_cfg_input(MAX_PIN_INT, NRF_GPIO_PIN_NOPULL);
 
@@ -145,7 +145,6 @@ void bsp_init(void)
     // leds_tmr = xTimerCreate("leds", pdMS_TO_TICKS(1000), pdTRUE, NULL, leds_timer_handler);
     // // xTimerStart(leds_tmr, 0);
     btn_init();
-    // ec800m_power_off();
     ec800m = ec800m_init();
     ccm3310_init();
     // max30102_init();
