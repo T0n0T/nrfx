@@ -99,13 +99,16 @@ static void mqtt_init(void)
 #else
     NRF_LOG_INFO("begin connect");
     // ec800m_socket_open("broker.emqx.io", "1883", 1);
-    // mqtt_connect(client);
+    mqtt_connect(client);
 #endif
 }
 
 static void mqtt_deinit(void)
 {
-    // mqtt_disconnect(client);
+    if (client->mqtt_client_state == CLIENT_STATE_CONNECTED) {
+        mqtt_disconnect(client);
+    }
+
     ec800m_power_off(ec800m);
 }
 
@@ -139,7 +142,7 @@ void app_task(void* pvParameter)
     vTaskDelay(pdMS_TO_TICKS(300));
     LED_OFF(LED2);
     LED_OFF(LED3);
-    
+
     while (1) {
         mqtt_init();
         // LED_ON(LED3);
@@ -149,7 +152,6 @@ void app_task(void* pvParameter)
         // NRF_LOG_INFO("mqtt app task loop");
         // xSemaphoreTake(m_app_sem, pdMS_TO_TICKS(global_cfg.publish_interval));
         xSemaphoreTake(m_app_sem, pdMS_TO_TICKS(5000));
-
     }
 }
 

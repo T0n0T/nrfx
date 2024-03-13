@@ -19,10 +19,10 @@ NRF_LOG_MODULE_REGISTER();
 void ec800m_power_on_ready(struct at_client* client, const char* data, size_t size)
 {
     NRF_LOG_DEBUG("ec800m power on ready");    
+    extern SemaphoreHandle_t      power_sync;
     ec800m_t* dev = (ec800m_t*)client->user_data;
     if (dev->status == EC800M_POWER_OFF) {
-        // ec800m_wait_sync(dev, EC800M_IPC_MIN_TICK);
-        ec800m_post_sync(dev);
+        xSemaphoreGive(power_sync);
     }
 }
 

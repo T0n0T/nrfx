@@ -175,7 +175,7 @@ ec800m_t* ec800m_init(void)
     ec800m.pwr_pin           = EC800_PIN_PWREN;
     ec800m.wakeup_pin        = EC800_PIN_DTR;
     ec800m.task_queue        = xQueueCreate(10, sizeof(ec800m_task_t));
-    ec800m.sync              = xSemaphoreCreateBinary();
+    ec800m.sync              = xSemaphoreCreateCounting(10, 0);
     ec800m.lock              = xSemaphoreCreateMutex();
 
     BaseType_t xReturned = xTaskCreate(ec800m_task,

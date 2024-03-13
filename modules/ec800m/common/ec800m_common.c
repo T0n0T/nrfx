@@ -17,6 +17,7 @@
 NRF_LOG_MODULE_REGISTER();
 
 static struct gps_info rmcinfo;
+SemaphoreHandle_t      power_sync;
 
 static int comm_task_publish(ec800m_t* dev, ec800m_comm_task_t task, void* param)
 {
@@ -31,7 +32,7 @@ static int comm_task_publish(ec800m_t* dev, ec800m_comm_task_t task, void* param
 void ec800m_power_on(ec800m_t* dev)
 {
     comm_task_publish(dev, EC800M_TASK_POWERON, NULL);
-
+    ec800m_wait_sync(dev, portMAX_DELAY);
 }
 
 void ec800m_power_off(ec800m_t* dev)
@@ -68,6 +69,7 @@ gps_info_t ec800m_gnss_get(ec800m_t* dev)
 static void ec800m_comm_init_handle(ec800m_t* dev)
 {
     nrf_gpio_cfg_output(dev->pwr_pin);
+    power_sync = xSemaphoreCreateBinary();
     extern const struct at_urc comm_urc_table[];
     at_obj_set_urc_table(dev->client, comm_urc_table, 2);
 }
@@ -83,7 +85,7 @@ static void ec800m_comm_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
         vTaskDelay(500);
         nrf_gpio_pin_write(dev->pwr_pin, 1);
         /** task sync from urc 'RDY' */
-        if (ec800m_wait_sync(dev, 10000) < 0) {
+        if (xSemaphoreTake(power_sync, 10000) < 0) {
             NRF_LOG_ERROR("ec800m hardfault!");
             result = -ETIMEOUT;
             goto __power_on_exit;
@@ -122,6 +124,7 @@ static void ec800m_comm_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
             dev->err    = result;
             NRF_LOG_ERROR("ec800m init failed!");
         }
+        ec800m_post_sync(dev);
     }
     if (task_cb->task == EC800M_TASK_POWEROFF) {
         // release ec800m.lock in urc
