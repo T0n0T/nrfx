@@ -1,0 +1,27 @@
+{
+    "version": 4,
+    "beforeBuildTasks": [],
+    "afterBuildTasks": [],
+    "global": {
+        "use-microLIB": true,
+        "output-debug-info": "enable"
+    },
+    "c/cpp-compiler": {
+        "optimization": "level-3",
+        "one-elf-section-per-function": true,
+        "c99-mode": true,
+        "C_FLAGS": "--reduce_paths",
+        "CXX_FLAGS": "--reduce_paths",
+        "warnings": "unspecified"
+    },
+    "asm-compiler": {
+        "misc-controls": "--cpreproc_opts=-DBLE_STACK_SUPPORT_REQD,-DBOARD_PCA10056,-DCONFIG_GPIO_AS_PINRESET,-DDEBUG_NRF,-DFLOAT_ABI_HARD,-DNRF52840_XXAA,-DNRF_DFU_DEBUG_VERSION,-DNRF_DFU_SETTINGS_VERSION=2,-DNRF_DFU_SVCI_ENABLED,-DNRF_SD_BLE_API_VERSION=7,-DS140,-DSOFTDEVICE_PRESENT,-DSVC_INTERFACE_CALL_AS_NORMAL_FUNCTION,-D__HEAP_SIZE=0"
+    },
+    "linker": {
+        "output-format": "elf",
+        "xo-base": "",
+        "ro-base": "0x00000000",
+        "rw-base": "0x20000000",
+        "misc-controls": "--diag_suppress 6330"
+    }
+}

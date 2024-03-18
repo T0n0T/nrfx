@@ -1,0 +1,76 @@
+---
+BasedOnStyle: LLVM
+Language: Cpp
+
+###################################
+#          indent conf
+###################################
+
+UseTab: Never
+IndentWidth: 4
+TabWidth: 4
+ColumnLimit: 0
+AccessModifierOffset: -4
+NamespaceIndentation: All
+FixNamespaceComments: false
+BreakBeforeBraces: Linux
+
+###################################
+#          other styles
+###################################
+
+#
+# for more conf, you can ref: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+#
+
+AllowShortIfStatementsOnASingleLine: false
+
+AllowShortLoopsOnASingleLine: true
+
+AllowShortBlocksOnASingleLine: false
+
+IndentCaseLabels: true
+
+SortIncludes: false
+
+AlignConsecutiveAssignments: Consecutive
+
+PointerAlignment: Left
+
+# 连续的空行保留几行
+MaxEmptyLinesToKeep: 1
+
+#注释对齐
+AlignTrailingComments: true
+# 中括号两边空格 []
+SpacesInSquareBrackets: false
+# 小括号两边添加空格
+SpacesInParentheses: false
+#多行声明语句按照=对齐
+AlignConsecutiveDeclarations: true
+
+AlignConsecutiveMacros: AcrossEmptyLines
+
+BraceWrapping:
+    # class定义后面
+    AfterClass: true
+    # 控制语句后面
+    AfterControlStatement: false
+    # enum定义后面
+    AfterEnum: true
+    # 函数定义后面
+    AfterFunction: true
+    # 命名空间定义后面
+    AfterNamespace: true
+    # ObjC定义后面
+    AfterObjCDeclaration: true
+    # struct定义后面
+    AfterStruct: true
+    # union定义后面
+    AfterUnion: true
+    # catch之前
+    BeforeCatch: true
+    # else之前
+    BeforeElse: true
+    # 缩进大括号
+    IndentBraces: false

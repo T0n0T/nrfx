@@ -1,0 +1,1243 @@
+{
+  "name": "bootloader_s132_pca10040",
+  "type": "ARM",
+  "dependenceList": [],
+  "srcDirs": [
+    ".eide/deps"
+  ],
+  "virtualFolder": {
+    "name": "<virtual_root>",
+    "files": [],
+    "folders": [
+      {
+        "name": "Application",
+        "files": [
+          {
+            "path": "nrf_sdk/examples/dfu/dfu_public_key.c"
+          },
+          {
+            "path": "nrf_sdk/examples/dfu/secure_bootloader/main.c"
+          },
+          {
+            "path": "nrf_sdk/examples/dfu/secure_bootloader/pca10040_s132_ble_debug/config/sdk_config.h"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "Board Definition",
+        "files": [
+          {
+            "path": "nrf_sdk/components/boards/boards.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/mdk/arm_startup_nrf52.s"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/mdk/system_nrf52.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "nano-pb",
+        "files": [
+          {
+            "path": "nrf_sdk/external/nano-pb/pb_common.c"
+          },
+          {
+            "path": "nrf_sdk/external/nano-pb/pb_decode.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "nRF_BLE",
+        "files": [
+          {
+            "path": "nrf_sdk/components/ble/common/ble_srv_common.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "nRF_Bootloader",
+        "files": [
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/nrf_bootloader_app_start_final.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/nrf_bootloader_app_start.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/nrf_bootloader_dfu_timers.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/nrf_bootloader_fw_activation.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/nrf_bootloader_info.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/nrf_bootloader_wdt.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/nrf_bootloader.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "nRF_Crypto",
+        "files": [
+          {
+            "path": "nrf_sdk/components/libraries/crypto/nrf_crypto_ecc.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/crypto/nrf_crypto_ecdsa.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/crypto/nrf_crypto_hash.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/crypto/nrf_crypto_init.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/crypto/nrf_crypto_shared.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "nRF_Crypto backend nRF sw",
+        "files": [
+          {
+            "path": "nrf_sdk/components/libraries/crypto/backend/nrf_sw/nrf_sw_backend_hash.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "nRF_Crypto backend Oberon",
+        "files": [
+          {
+            "path": "nrf_sdk/components/libraries/crypto/backend/oberon/oberon_backend_chacha_poly_aead.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/crypto/backend/oberon/oberon_backend_ecc.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/crypto/backend/oberon/oberon_backend_ecdh.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/crypto/backend/oberon/oberon_backend_ecdsa.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/crypto/backend/oberon/oberon_backend_eddsa.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/crypto/backend/oberon/oberon_backend_hash.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/crypto/backend/oberon/oberon_backend_hmac.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "nRF_Crypto backend uECC",
+        "files": [
+          {
+            "path": "nrf_sdk/components/libraries/crypto/backend/micro_ecc/micro_ecc_backend_ecc.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/crypto/backend/micro_ecc/micro_ecc_backend_ecdh.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/crypto/backend/micro_ecc/micro_ecc_backend_ecdsa.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "nRF_DFU",
+        "files": [
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/ble_dfu/nrf_dfu_ble.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/dfu/dfu-cc.pb.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/dfu/nrf_dfu_flash.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/dfu/nrf_dfu_handling_error.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/dfu/nrf_dfu_mbr.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/dfu/nrf_dfu_req_handler.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/dfu/nrf_dfu_settings_svci.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/dfu/nrf_dfu_settings.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/dfu/nrf_dfu_transport.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/dfu/nrf_dfu_utils.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/dfu/nrf_dfu_validation.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/dfu/nrf_dfu_ver_validation.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/dfu/nrf_dfu.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "nRF_Drivers",
+        "files": [
+          {
+            "path": "nrf_sdk/modules/nrfx/hal/nrf_nvmc.c"
+          },
+          {
+            "path": "nrf_sdk/modules/nrfx/soc/nrfx_atomic.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "nRF_Libraries",
+        "files": [
+          {
+            "path": "nrf_sdk/components/libraries/atomic_fifo/nrf_atfifo.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/atomic/nrf_atomic.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/balloc/nrf_balloc.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/crc32/crc32.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/experimental_section_vars/nrf_section_iter.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/fstorage/nrf_fstorage_nvmc.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/fstorage/nrf_fstorage_sd.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/fstorage/nrf_fstorage.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/mem_manager/mem_manager.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/memobj/nrf_memobj.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/queue/nrf_queue.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/ringbuf/nrf_ringbuf.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/scheduler/app_scheduler.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/sha256/sha256.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/strerror/nrf_strerror.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/util/app_error_weak.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/util/app_util_platform.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/util/nrf_assert.c"
+          },
+          {
+            "path": "nrf_sdk/external/fprintf/nrf_fprintf_format.c"
+          },
+          {
+            "path": "nrf_sdk/external/fprintf/nrf_fprintf.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "nRF_Log",
+        "files": [
+          {
+            "path": "nrf_sdk/components/libraries/log/src/nrf_log_backend_rtt.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/log/src/nrf_log_backend_serial.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/log/src/nrf_log_default_backends.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/log/src/nrf_log_frontend.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/log/src/nrf_log_str_formatter.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "nRF_micro-ecc",
+        "files": [
+          {
+            "path": "nrf_sdk/external/micro-ecc/nrf52hf_keil/armgcc/micro_ecc_lib_nrf52.lib"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "nRF_Oberon_Crypto",
+        "files": [
+          {
+            "path": "nrf_sdk/external/nrf_oberon/lib/cortex-m4/hard-float/short-wchar/oberon_3.0.8.lib"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "nRF_Segger_RTT",
+        "files": [
+          {
+            "path": "nrf_sdk/external/segger_rtt/SEGGER_RTT_printf.c"
+          },
+          {
+            "path": "nrf_sdk/external/segger_rtt/SEGGER_RTT_Syscalls_KEIL.c"
+          },
+          {
+            "path": "nrf_sdk/external/segger_rtt/SEGGER_RTT.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "nRF_SoftDevice",
+        "files": [
+          {
+            "path": "nrf_sdk/components/softdevice/common/nrf_sdh_ble.c"
+          },
+          {
+            "path": "nrf_sdk/components/softdevice/common/nrf_sdh_soc.c"
+          },
+          {
+            "path": "nrf_sdk/components/softdevice/common/nrf_sdh.c"
+          }
+        ],
+        "folders": []
+      },
+      {
+        "name": "nRF_SVC",
+        "files": [
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/dfu/nrf_dfu_svci_handler.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/bootloader/dfu/nrf_dfu_svci.c"
+          },
+          {
+            "path": "nrf_sdk/components/libraries/svc/nrf_svc_handler.c"
+          }
+        ],
+        "folders": []
+      }
+    ]
+  },
+  "outDir": "build",
+  "deviceName": null,
+  "packDir": null,
+  "miscInfo": {
+    "uid": "81c1cdfac42a323abb5a9baff0d9003b"
+  },
+  "targets": {
+    "nrf52840_xxaa_s140": {
+      "excludeList": [],
+      "toolchain": "AC5",
+      "compileConfig": {
+        "cpuType": "Cortex-M4",
+        "floatingPointHardware": "single",
+        "scatterFilePath": "",
+        "useCustomScatterFile": false,
+        "storageLayout": {
+          "RAM": [
+            {
+              "tag": "RAM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            },
+            {
+              "tag": "RAM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            },
+            {
+              "tag": "RAM",
+              "id": 3,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            },
+            {
+              "tag": "IRAM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x20005978",
+                "size": "0x3a688"
+              },
+              "isChecked": true,
+              "noInit": false
+            },
+            {
+              "tag": "IRAM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            }
+          ],
+          "ROM": [
+            {
+              "tag": "ROM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            },
+            {
+              "tag": "ROM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            },
+            {
+              "tag": "ROM",
+              "id": 3,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            },
+            {
+              "tag": "IROM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0xf1000",
+                "size": "0xd000"
+              },
+              "isChecked": true,
+              "isStartup": true
+            },
+            {
+              "tag": "IROM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            }
+          ]
+        },
+        "options": "null"
+      },
+      "uploader": "JLink",
+      "uploadConfig": {
+        "bin": "",
+        "baseAddr": "",
+        "cpuInfo": {
+          "vendor": "Nordic Semi",
+          "cpuName": "nRF52840_xxAA"
+        },
+        "proType": 1,
+        "speed": 8000,
+        "otherCmds": ""
+      },
+      "uploadConfigMap": {},
+      "custom_dep": {
+        "name": "default",
+        "incList": [
+          "nrf_sdk/examples/dfu/secure_bootloader/config",
+          "nrf_sdk/components/ble/common",
+          "nrf_sdk/components/boards",
+          "nrf_sdk/components/libraries/atomic",
+          "nrf_sdk/components/libraries/atomic_fifo",
+          "nrf_sdk/components/libraries/balloc",
+          "nrf_sdk/components/libraries/bootloader",
+          "nrf_sdk/components/libraries/bootloader/ble_dfu",
+          "nrf_sdk/components/libraries/bootloader/dfu",
+          "nrf_sdk/components/libraries/crc32",
+          "nrf_sdk/components/libraries/crypto",
+          "nrf_sdk/components/libraries/crypto/backend/cc310",
+          "nrf_sdk/components/libraries/crypto/backend/cc310_bl",
+          "nrf_sdk/components/libraries/crypto/backend/cifra",
+          "nrf_sdk/components/libraries/crypto/backend/mbedtls",
+          "nrf_sdk/components/libraries/crypto/backend/micro_ecc",
+          "nrf_sdk/components/libraries/crypto/backend/nrf_hw",
+          "nrf_sdk/components/libraries/crypto/backend/nrf_sw",
+          "nrf_sdk/components/libraries/crypto/backend/oberon",
+          "nrf_sdk/components/libraries/crypto/backend/optiga",
+          "nrf_sdk/components/libraries/delay",
+          "nrf_sdk/components/libraries/experimental_section_vars",
+          "nrf_sdk/components/libraries/fstorage",
+          "nrf_sdk/components/libraries/log",
+          "nrf_sdk/components/libraries/log/src",
+          "nrf_sdk/components/libraries/mem_manager",
+          "nrf_sdk/components/libraries/memobj",
+          "nrf_sdk/components/libraries/mutex",
+          "nrf_sdk/components/libraries/queue",
+          "nrf_sdk/components/libraries/ringbuf",
+          "nrf_sdk/components/libraries/scheduler",
+          "nrf_sdk/components/libraries/stack_info",
+          "nrf_sdk/components/libraries/strerror",
+          "nrf_sdk/components/libraries/svc",
+          "nrf_sdk/components/libraries/util",
+          "nrf_sdk/components/softdevice/common",
+          "nrf_sdk/components/softdevice/s140/headers",
+          "nrf_sdk/components/softdevice/s140/headers/nrf52",
+          "nrf_sdk/examples/dfu/secure_bootloader",
+          "nrf_sdk/external/fprintf",
+          "nrf_sdk/external/nano-pb",
+          "nrf_sdk/external/nrf_cc310/include",
+          "nrf_sdk/external/nrf_cc310_bl/include",
+          "nrf_sdk/external/nrf_oberon",
+          "nrf_sdk/external/nrf_oberon/include",
+          "nrf_sdk/external/segger_rtt",
+          "nrf_sdk/integration/nrfx",
+          "nrf_sdk/modules/nrfx",
+          "nrf_sdk/modules/nrfx/hal",
+          "nrf_sdk/examples/dfu/secure_bootloader/pca10056_s140_ble_debug/config",
+          ".cmsis/include",
+          "nrf_sdk/examples/dfu/secure_bootloader/pca10056_s140_ble_debug/arm5_no_packs/RTE/_nrf52840_xxaa_s140",
+          ".eide/deps"
+        ],
+        "libList": [],
+        "sourceDirList": [],
+        "defineList": [
+          "BLE_STACK_SUPPORT_REQD",
+          "BOARD_PCA10056",
+          "CONFIG_GPIO_AS_PINRESET",
+          "DEBUG_NRF",
+          "FLOAT_ABI_HARD",
+          "NRF52840_XXAA",
+          "NRF_DFU_DEBUG_VERSION",
+          "NRF_DFU_SETTINGS_VERSION=2",
+          "NRF_DFU_SVCI_ENABLED",
+          "NRF_SD_BLE_API_VERSION=7",
+          "S140",
+          "SOFTDEVICE_PRESENT",
+          "SVC_INTERFACE_CALL_AS_NORMAL_FUNCTION",
+          "__HEAP_SIZE=0"
+        ]
+      }
+    },
+    "flash_s140_nrf52_7.2.0_softdevice": {
+      "compileConfig": {
+        "cpuType": "",
+        "floatingPointHardware": "single",
+        "scatterFilePath": "",
+        "useCustomScatterFile": false,
+        "storageLayout": {
+          "RAM": [
+            {
+              "tag": "RAM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            },
+            {
+              "tag": "RAM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            },
+            {
+              "tag": "RAM",
+              "id": 3,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            },
+            {
+              "tag": "IRAM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x20005978",
+                "size": "0x3a688"
+              },
+              "isChecked": true,
+              "noInit": false
+            },
+            {
+              "tag": "IRAM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            }
+          ],
+          "ROM": [
+            {
+              "tag": "ROM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            },
+            {
+              "tag": "ROM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            },
+            {
+              "tag": "ROM",
+              "id": 3,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            },
+            {
+              "tag": "IROM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0xf1000",
+                "size": "0xd000"
+              },
+              "isChecked": true,
+              "isStartup": true
+            },
+            {
+              "tag": "IROM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            }
+          ]
+        },
+        "options": "null"
+      },
+      "uploader": "JLink",
+      "uploadConfig": {
+        "bin": "",
+        "baseAddr": "",
+        "cpuInfo": {
+          "vendor": "null",
+          "cpuName": "null"
+        },
+        "proType": 1,
+        "speed": 8000,
+        "otherCmds": ""
+      },
+      "uploadConfigMap": {},
+      "toolchain": "AC5",
+      "custom_dep": {
+        "name": "default",
+        "sourceDirList": [],
+        "libList": [],
+        "incList": [
+          "nrf_sdk/examples/dfu/secure_bootloader/config",
+          "nrf_sdk/examples/dfu/secure_bootloader/pca10056_s140_ble_debug/config",
+          ".cmsis/include",
+          "nrf_sdk/examples/dfu/secure_bootloader/pca10056_s140_ble_debug/arm5_no_packs/RTE/_flash_s140_nrf52_7.2.0_softdevice"
+        ],
+        "defineList": [
+          "__HEAP_SIZE=0"
+        ]
+      },
+      "excludeList": [
+        "<virtual_root>/Board Definition/boards.c",
+        "<virtual_root>/nRF_BLE/ble_srv_common.c",
+        "<virtual_root>/nRF_Bootloader/nrf_bootloader.c",
+        "<virtual_root>/nRF_Bootloader/nrf_bootloader_app_start.c",
+        "<virtual_root>/nRF_Bootloader/nrf_bootloader_app_start_final.c",
+        "<virtual_root>/nRF_Bootloader/nrf_bootloader_dfu_timers.c",
+        "<virtual_root>/nRF_Bootloader/nrf_bootloader_fw_activation.c",
+        "<virtual_root>/nRF_Bootloader/nrf_bootloader_info.c",
+        "<virtual_root>/nRF_Bootloader/nrf_bootloader_wdt.c",
+        "<virtual_root>/nRF_Crypto/nrf_crypto_ecc.c",
+        "<virtual_root>/nRF_Crypto/nrf_crypto_ecdsa.c",
+        "<virtual_root>/nRF_Crypto/nrf_crypto_hash.c",
+        "<virtual_root>/nRF_Crypto/nrf_crypto_init.c",
+        "<virtual_root>/nRF_Crypto/nrf_crypto_shared.c",
+        "<virtual_root>/nRF_Crypto backend CC310_BL/cc310_bl_backend_ecc.c",
+        "<virtual_root>/nRF_Crypto backend CC310_BL/cc310_bl_backend_ecdsa.c",
+        "<virtual_root>/nRF_Crypto backend CC310_BL/cc310_bl_backend_hash.c",
+        "<virtual_root>/nRF_Crypto backend CC310_BL/cc310_bl_backend_init.c",
+        "<virtual_root>/nRF_Crypto backend CC310_BL/cc310_bl_backend_shared.c",
+        "<virtual_root>/nRF_Crypto backend Oberon/oberon_backend_chacha_poly_aead.c",
+        "<virtual_root>/nRF_Crypto backend Oberon/oberon_backend_ecc.c",
+        "<virtual_root>/nRF_Crypto backend Oberon/oberon_backend_ecdh.c",
+        "<virtual_root>/nRF_Crypto backend Oberon/oberon_backend_ecdsa.c",
+        "<virtual_root>/nRF_Crypto backend Oberon/oberon_backend_eddsa.c",
+        "<virtual_root>/nRF_Crypto backend Oberon/oberon_backend_hash.c",
+        "<virtual_root>/nRF_Crypto backend Oberon/oberon_backend_hmac.c",
+        "<virtual_root>/nRF_DFU/dfu-cc.pb.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_ble.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_flash.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_handling_error.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_mbr.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_req_handler.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_settings.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_settings_svci.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_transport.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_utils.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_validation.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_ver_validation.c",
+        "<virtual_root>/nRF_Drivers/nrf_nvmc.c",
+        "<virtual_root>/nRF_Drivers/nrfx_atomic.c",
+        "<virtual_root>/nRF_Libraries/app_error_weak.c",
+        "<virtual_root>/nRF_Libraries/app_scheduler.c",
+        "<virtual_root>/nRF_Libraries/app_util_platform.c",
+        "<virtual_root>/nRF_Libraries/crc32.c",
+        "<virtual_root>/nRF_Libraries/mem_manager.c",
+        "<virtual_root>/nRF_Libraries/nrf_assert.c",
+        "<virtual_root>/nRF_Libraries/nrf_atfifo.c",
+        "<virtual_root>/nRF_Libraries/nrf_atomic.c",
+        "<virtual_root>/nRF_Libraries/nrf_balloc.c",
+        "<virtual_root>/nRF_Libraries/nrf_fprintf.c",
+        "<virtual_root>/nRF_Libraries/nrf_fprintf_format.c",
+        "<virtual_root>/nRF_Libraries/nrf_fstorage.c",
+        "<virtual_root>/nRF_Libraries/nrf_fstorage_nvmc.c",
+        "<virtual_root>/nRF_Libraries/nrf_fstorage_sd.c",
+        "<virtual_root>/nRF_Libraries/nrf_memobj.c",
+        "<virtual_root>/nRF_Libraries/nrf_queue.c",
+        "<virtual_root>/nRF_Libraries/nrf_ringbuf.c",
+        "<virtual_root>/nRF_Libraries/nrf_section_iter.c",
+        "<virtual_root>/nRF_Libraries/nrf_strerror.c",
+        "<virtual_root>/nRF_Log/nrf_log_backend_rtt.c",
+        "<virtual_root>/nRF_Log/nrf_log_backend_serial.c",
+        "<virtual_root>/nRF_Log/nrf_log_default_backends.c",
+        "<virtual_root>/nRF_Log/nrf_log_frontend.c",
+        "<virtual_root>/nRF_Log/nrf_log_str_formatter.c",
+        "<virtual_root>/nRF_Oberon_Crypto/oberon_3.0.8.lib",
+        "<virtual_root>/nRF_SVC/nrf_dfu_svci.c",
+        "<virtual_root>/nRF_SVC/nrf_dfu_svci_handler.c",
+        "<virtual_root>/nRF_SVC/nrf_svc_handler.c",
+        "<virtual_root>/nRF_Segger_RTT/SEGGER_RTT.c",
+        "<virtual_root>/nRF_Segger_RTT/SEGGER_RTT_Syscalls_KEIL.c",
+        "<virtual_root>/nRF_Segger_RTT/SEGGER_RTT_printf.c",
+        "<virtual_root>/nRF_SoftDevice/nrf_sdh.c",
+        "<virtual_root>/nRF_SoftDevice/nrf_sdh_ble.c",
+        "<virtual_root>/nRF_SoftDevice/nrf_sdh_soc.c",
+        "<virtual_root>/nano-pb/pb_common.c",
+        "<virtual_root>/nano-pb/pb_decode.c",
+        "<virtual_root>/nrf_cc310_bl/nrf_cc310_bl_0.9.13.lib"
+      ]
+    },
+    "nrf52832_xxaa_s132": {
+      "excludeList": [],
+      "toolchain": "AC5",
+      "compileConfig": {
+        "cpuType": "Cortex-M4",
+        "floatingPointHardware": "single",
+        "scatterFilePath": "",
+        "useCustomScatterFile": false,
+        "storageLayout": {
+          "RAM": [
+            {
+              "tag": "RAM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            },
+            {
+              "tag": "RAM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            },
+            {
+              "tag": "RAM",
+              "id": 3,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            },
+            {
+              "tag": "IRAM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x20005968",
+                "size": "0x0000A698"
+              },
+              "isChecked": true,
+              "noInit": false
+            },
+            {
+              "tag": "IRAM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            }
+          ],
+          "ROM": [
+            {
+              "tag": "ROM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            },
+            {
+              "tag": "ROM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            },
+            {
+              "tag": "ROM",
+              "id": 3,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            },
+            {
+              "tag": "IROM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x71000",
+                "size": "0xd000"
+              },
+              "isChecked": true,
+              "isStartup": true
+            },
+            {
+              "tag": "IROM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            }
+          ]
+        },
+        "options": "null"
+      },
+      "uploader": "JLink",
+      "uploadConfig": {
+        "bin": "",
+        "baseAddr": "",
+        "cpuInfo": {
+          "vendor": "Nordic Semi",
+          "cpuName": "nRF52840_xxAA"
+        },
+        "proType": 1,
+        "speed": 8000,
+        "otherCmds": ""
+      },
+      "uploadConfigMap": {},
+      "custom_dep": {
+        "name": "default",
+        "incList": [
+          "nrf_sdk/examples/dfu/secure_bootloader/config",
+          "nrf_sdk/components/ble/common",
+          "nrf_sdk/components/boards",
+          "nrf_sdk/components/libraries/atomic",
+          "nrf_sdk/components/libraries/atomic_fifo",
+          "nrf_sdk/components/libraries/balloc",
+          "nrf_sdk/components/libraries/bootloader",
+          "nrf_sdk/components/libraries/bootloader/ble_dfu",
+          "nrf_sdk/components/libraries/bootloader/dfu",
+          "nrf_sdk/components/libraries/crc32",
+          "nrf_sdk/components/libraries/crypto",
+          "nrf_sdk/components/libraries/crypto/backend/cc310",
+          "nrf_sdk/components/libraries/crypto/backend/cc310_bl",
+          "nrf_sdk/components/libraries/crypto/backend/cifra",
+          "nrf_sdk/components/libraries/crypto/backend/mbedtls",
+          "nrf_sdk/components/libraries/crypto/backend/micro_ecc",
+          "nrf_sdk/components/libraries/crypto/backend/nrf_hw",
+          "nrf_sdk/components/libraries/crypto/backend/nrf_sw",
+          "nrf_sdk/components/libraries/crypto/backend/oberon",
+          "nrf_sdk/components/libraries/crypto/backend/optiga",
+          "nrf_sdk/components/libraries/delay",
+          "nrf_sdk/components/libraries/experimental_section_vars",
+          "nrf_sdk/components/libraries/fstorage",
+          "nrf_sdk/components/libraries/log",
+          "nrf_sdk/components/libraries/log/src",
+          "nrf_sdk/components/libraries/mem_manager",
+          "nrf_sdk/components/libraries/memobj",
+          "nrf_sdk/components/libraries/queue",
+          "nrf_sdk/components/libraries/ringbuf",
+          "nrf_sdk/components/libraries/scheduler",
+          "nrf_sdk/components/libraries/sha256",
+          "nrf_sdk/components/libraries/stack_info",
+          "nrf_sdk/components/libraries/strerror",
+          "nrf_sdk/components/libraries/svc",
+          "nrf_sdk/components/libraries/util",
+          "nrf_sdk/components/softdevice/common",
+          "nrf_sdk/components/softdevice/s132/headers",
+          "nrf_sdk/components/softdevice/s132/headers/nrf52",
+          "nrf_sdk/examples/dfu/secure_bootloader",
+          "nrf_sdk/external/fprintf",
+          "nrf_sdk/external/micro-ecc/micro-ecc",
+          "nrf_sdk/external/nano-pb",
+          "nrf_sdk/external/nrf_oberon",
+          "nrf_sdk/external/nrf_oberon/include",
+          "nrf_sdk/external/segger_rtt",
+          "nrf_sdk/integration/nrfx",
+          "nrf_sdk/modules/nrfx",
+          "nrf_sdk/modules/nrfx/hal",
+          "nrf_sdk/modules/nrfx/mdk",
+          "nrf_sdk/examples/dfu/secure_bootloader/pca10040_s132_ble_debug/config",
+          "nrf_sdk/examples/dfu/secure_bootloader/pca10040_s132_ble_debug/arm5_no_packs/RTE/_nrf52832_xxaa_s132",
+          "nrf_sdk/components/toolchain/cmsis/include"
+        ],
+        "libList": [],
+        "sourceDirList": [],
+        "defineList": [
+          "BLE_STACK_SUPPORT_REQD",
+          "BOARD_PCA10040",
+          "CONFIG_GPIO_AS_PINRESET",
+          "DEBUG_NRF",
+          "FLOAT_ABI_HARD",
+          "NRF52",
+          "NRF52832_XXAA",
+          "NRF52_PAN_74",
+          "NRF_DFU_DEBUG_VERSION",
+          "NRF_DFU_SETTINGS_VERSION=2",
+          "NRF_DFU_SVCI_ENABLED",
+          "NRF_SD_BLE_API_VERSION=7",
+          "S132",
+          "SOFTDEVICE_PRESENT",
+          "SVC_INTERFACE_CALL_AS_NORMAL_FUNCTION",
+          "__HEAP_SIZE=0",
+          "uECC_ENABLE_VLI_API=0",
+          "uECC_OPTIMIZATION_LEVEL=3",
+          "uECC_SQUARE_FUNC=0",
+          "uECC_SUPPORT_COMPRESSED_POINT=0",
+          "uECC_VLI_NATIVE_LITTLE_ENDIAN=1"
+        ]
+      }
+    },
+    "flash_s132_nrf52_7.2.0_softdevice": {
+      "compileConfig": {
+        "cpuType": "",
+        "floatingPointHardware": "single",
+        "scatterFilePath": "",
+        "useCustomScatterFile": false,
+        "storageLayout": {
+          "RAM": [
+            {
+              "tag": "RAM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            },
+            {
+              "tag": "RAM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            },
+            {
+              "tag": "RAM",
+              "id": 3,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            },
+            {
+              "tag": "IRAM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x20005968",
+                "size": "0xa698"
+              },
+              "isChecked": true,
+              "noInit": false
+            },
+            {
+              "tag": "IRAM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "noInit": false
+            }
+          ],
+          "ROM": [
+            {
+              "tag": "ROM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            },
+            {
+              "tag": "ROM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            },
+            {
+              "tag": "ROM",
+              "id": 3,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            },
+            {
+              "tag": "IROM",
+              "id": 1,
+              "mem": {
+                "startAddr": "0x71000",
+                "size": "0xd000"
+              },
+              "isChecked": true,
+              "isStartup": true
+            },
+            {
+              "tag": "IROM",
+              "id": 2,
+              "mem": {
+                "startAddr": "0x0",
+                "size": "0x0"
+              },
+              "isChecked": false,
+              "isStartup": false
+            }
+          ]
+        },
+        "options": "null"
+      },
+      "uploader": "JLink",
+      "uploadConfig": {
+        "bin": "",
+        "baseAddr": "",
+        "cpuInfo": {
+          "vendor": "Nordic Semi",
+          "cpuName": "nRF52840_xxAA"
+        },
+        "proType": 1,
+        "speed": 8000,
+        "otherCmds": ""
+      },
+      "uploadConfigMap": {},
+      "toolchain": "AC5",
+      "custom_dep": {
+        "name": "default",
+        "sourceDirList": [],
+        "libList": [],
+        "incList": [
+          "nrf_sdk/examples/dfu/secure_bootloader/config",
+          "nrf_sdk/examples/dfu/secure_bootloader/pca10040_s132_ble_debug/config",
+          "nrf_sdk/examples/dfu/secure_bootloader/pca10040_s132_ble_debug/arm5_no_packs/RTE/_flash_s132_nrf52_7.2.0_softdevice"
+        ],
+        "defineList": [
+          "__HEAP_SIZE=0"
+        ]
+      },
+      "excludeList": [
+        "<virtual_root>/Board Definition/boards.c",
+        "<virtual_root>/nRF_BLE/ble_srv_common.c",
+        "<virtual_root>/nRF_Bootloader/nrf_bootloader.c",
+        "<virtual_root>/nRF_Bootloader/nrf_bootloader_app_start.c",
+        "<virtual_root>/nRF_Bootloader/nrf_bootloader_app_start_final.c",
+        "<virtual_root>/nRF_Bootloader/nrf_bootloader_dfu_timers.c",
+        "<virtual_root>/nRF_Bootloader/nrf_bootloader_fw_activation.c",
+        "<virtual_root>/nRF_Bootloader/nrf_bootloader_info.c",
+        "<virtual_root>/nRF_Bootloader/nrf_bootloader_wdt.c",
+        "<virtual_root>/nRF_Crypto/nrf_crypto_ecc.c",
+        "<virtual_root>/nRF_Crypto/nrf_crypto_ecdsa.c",
+        "<virtual_root>/nRF_Crypto/nrf_crypto_hash.c",
+        "<virtual_root>/nRF_Crypto/nrf_crypto_init.c",
+        "<virtual_root>/nRF_Crypto/nrf_crypto_shared.c",
+        "<virtual_root>/nRF_Crypto backend Oberon/oberon_backend_chacha_poly_aead.c",
+        "<virtual_root>/nRF_Crypto backend Oberon/oberon_backend_ecc.c",
+        "<virtual_root>/nRF_Crypto backend Oberon/oberon_backend_ecdh.c",
+        "<virtual_root>/nRF_Crypto backend Oberon/oberon_backend_ecdsa.c",
+        "<virtual_root>/nRF_Crypto backend Oberon/oberon_backend_eddsa.c",
+        "<virtual_root>/nRF_Crypto backend Oberon/oberon_backend_hash.c",
+        "<virtual_root>/nRF_Crypto backend Oberon/oberon_backend_hmac.c",
+        "<virtual_root>/nRF_Crypto backend nRF sw/nrf_sw_backend_hash.c",
+        "<virtual_root>/nRF_Crypto backend uECC/micro_ecc_backend_ecc.c",
+        "<virtual_root>/nRF_Crypto backend uECC/micro_ecc_backend_ecdh.c",
+        "<virtual_root>/nRF_Crypto backend uECC/micro_ecc_backend_ecdsa.c",
+        "<virtual_root>/nRF_DFU/dfu-cc.pb.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_ble.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_flash.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_handling_error.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_mbr.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_req_handler.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_settings.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_settings_svci.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_transport.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_utils.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_validation.c",
+        "<virtual_root>/nRF_DFU/nrf_dfu_ver_validation.c",
+        "<virtual_root>/nRF_Drivers/nrf_nvmc.c",
+        "<virtual_root>/nRF_Drivers/nrfx_atomic.c",
+        "<virtual_root>/nRF_Libraries/app_error_weak.c",
+        "<virtual_root>/nRF_Libraries/app_scheduler.c",
+        "<virtual_root>/nRF_Libraries/app_util_platform.c",
+        "<virtual_root>/nRF_Libraries/crc32.c",
+        "<virtual_root>/nRF_Libraries/mem_manager.c",
+        "<virtual_root>/nRF_Libraries/nrf_assert.c",
+        "<virtual_root>/nRF_Libraries/nrf_atfifo.c",
+        "<virtual_root>/nRF_Libraries/nrf_atomic.c",
+        "<virtual_root>/nRF_Libraries/nrf_balloc.c",
+        "<virtual_root>/nRF_Libraries/nrf_fprintf.c",
+        "<virtual_root>/nRF_Libraries/nrf_fprintf_format.c",
+        "<virtual_root>/nRF_Libraries/nrf_fstorage.c",
+        "<virtual_root>/nRF_Libraries/nrf_fstorage_nvmc.c",
+        "<virtual_root>/nRF_Libraries/nrf_fstorage_sd.c",
+        "<virtual_root>/nRF_Libraries/nrf_memobj.c",
+        "<virtual_root>/nRF_Libraries/nrf_queue.c",
+        "<virtual_root>/nRF_Libraries/nrf_ringbuf.c",
+        "<virtual_root>/nRF_Libraries/nrf_section_iter.c",
+        "<virtual_root>/nRF_Libraries/nrf_strerror.c",
+        "<virtual_root>/nRF_Libraries/sha256.c",
+        "<virtual_root>/nRF_Log/nrf_log_backend_rtt.c",
+        "<virtual_root>/nRF_Log/nrf_log_backend_serial.c",
+        "<virtual_root>/nRF_Log/nrf_log_default_backends.c",
+        "<virtual_root>/nRF_Log/nrf_log_frontend.c",
+        "<virtual_root>/nRF_Log/nrf_log_str_formatter.c",
+        "<virtual_root>/nRF_Oberon_Crypto/oberon_3.0.8.lib",
+        "<virtual_root>/nRF_SVC/nrf_dfu_svci.c",
+        "<virtual_root>/nRF_SVC/nrf_dfu_svci_handler.c",
+        "<virtual_root>/nRF_SVC/nrf_svc_handler.c",
+        "<virtual_root>/nRF_Segger_RTT/SEGGER_RTT.c",
+        "<virtual_root>/nRF_Segger_RTT/SEGGER_RTT_Syscalls_KEIL.c",
+        "<virtual_root>/nRF_Segger_RTT/SEGGER_RTT_printf.c",
+        "<virtual_root>/nRF_SoftDevice/nrf_sdh.c",
+        "<virtual_root>/nRF_SoftDevice/nrf_sdh_ble.c",
+        "<virtual_root>/nRF_SoftDevice/nrf_sdh_soc.c",
+        "<virtual_root>/nRF_micro-ecc/micro_ecc_lib_nrf52.lib",
+        "<virtual_root>/nano-pb/pb_common.c",
+        "<virtual_root>/nano-pb/pb_decode.c"
+      ]
+    }
+  },
+  "version": "3.3"
+}
