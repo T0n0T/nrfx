@@ -13,13 +13,13 @@
         "name": "Application",
         "files": [
           {
-            "path": "nrf_sdk/examples/dfu/dfu_public_key.c"
+            "path": "app/dfu_public_key.c"
           },
           {
-            "path": "nrf_sdk/examples/dfu/secure_bootloader/main.c"
+            "path": "app/main.c"
           },
           {
-            "path": "nrf_sdk/examples/dfu/secure_bootloader/pca10040_s132_ble_debug/config/sdk_config.h"
+            "path": "config/sdk_config.h"
           }
         ],
         "folders": []
@@ -507,7 +507,6 @@
       "custom_dep": {
         "name": "default",
         "incList": [
-          "nrf_sdk/examples/dfu/secure_bootloader/config",
           "nrf_sdk/components/ble/common",
           "nrf_sdk/components/boards",
           "nrf_sdk/components/libraries/atomic",
@@ -545,7 +544,6 @@
           "nrf_sdk/components/softdevice/common",
           "nrf_sdk/components/softdevice/s140/headers",
           "nrf_sdk/components/softdevice/s140/headers/nrf52",
-          "nrf_sdk/examples/dfu/secure_bootloader",
           "nrf_sdk/external/fprintf",
           "nrf_sdk/external/nano-pb",
           "nrf_sdk/external/nrf_cc310/include",
@@ -556,10 +554,12 @@
           "nrf_sdk/integration/nrfx",
           "nrf_sdk/modules/nrfx",
           "nrf_sdk/modules/nrfx/hal",
-          "nrf_sdk/examples/dfu/secure_bootloader/pca10056_s140_ble_debug/config",
-          ".cmsis/include",
-          "nrf_sdk/examples/dfu/secure_bootloader/pca10056_s140_ble_debug/arm5_no_packs/RTE/_nrf52840_xxaa_s140",
-          ".eide/deps"
+          "nrf_sdk/modules/nrfx/mdk",
+          "nrf_sdk/components/toolchain/cmsis/include",
+          "config",
+          "app",
+          "nrf_sdk/external/micro-ecc/micro-ecc",
+          "nrf_sdk/components/libraries/sha256"
         ],
         "libList": [],
         "sourceDirList": [],
