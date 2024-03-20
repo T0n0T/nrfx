@@ -252,9 +252,15 @@ void ble_mac_set(void)
 {
     ble_gap_addr_t bleAddr = {0};
     bleAddr.addr_id_peer   = BLE_GAP_ADDR_TYPE_PUBLIC;
+
     memcpy(&bleAddr.addr, global_cfg.ble_mac, BLE_GAP_ADDR_LEN);
-    uint32_t err_code = sd_ble_gap_addr_set(&bleAddr);
-    APP_ERROR_CHECK(err_code);
+    sprintf(global_cfg.mqtt_cfg.clientid,
+            "CYG_%02X%02X%02X%02X%02X%02X",
+            global_cfg.ble_mac[5], global_cfg.ble_mac[4], global_cfg.ble_mac[3], global_cfg.ble_mac[2], global_cfg.ble_mac[1], global_cfg.ble_mac[0]);
+    sprintf(global_cfg.mqtt_cfg.pubtopic, "/iot/%s/BR/device/data", global_cfg.mqtt_cfg.clientid);
+    sprintf(global_cfg.mqtt_cfg.subtopic, "/iot/%s/BR/device/reply", global_cfg.mqtt_cfg.clientid);
+    // uint32_t err_code = sd_ble_gap_addr_set(&bleAddr);
+    // APP_ERROR_CHECK(err_code);
 }
 
 /**@brief Function for initializing the GATT module. */
@@ -596,8 +602,8 @@ static void advertising_init(void)
     init.advdata.uuids_complete.p_uuids  = m_adv_uuids;
 
     init.config.ble_adv_fast_enabled  = true;
-    init.config.ble_adv_fast_interval = APP_ADV_INTERVAL;
-    init.config.ble_adv_fast_timeout  = APP_ADV_DURATION;
+    init.config.ble_adv_fast_interval = BLE_GAP_ADV_INTERVAL_MAX;
+    init.config.ble_adv_fast_timeout  = 0;
 
     init.evt_handler = on_adv_evt;
 
@@ -705,32 +711,31 @@ int main(void)
     SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
 
     // Configure and initialize the BLE stack.
-    // ble_stack_init();
+    ble_stack_init();
 
-    // // Initialize modules.
-    // timers_init();
-    // gap_params_init();
+    // Initialize modules.
+    timers_init();
+    gap_params_init();
 
     read_cfg_from_flash();
-
+    ble_mac_set();
     // char* src = build_msg_cfg(&global_cfg);
     // NRF_LOG_RAW_INFO("%s\r\n", src);
     // free(src);
 
-    // ble_mac_set();
-    // gatt_init();
-    // advertising_init();
-    // services_init();
-    // conn_params_init();
-    // peer_manager_init();
-    // application_timers_start();
+    gatt_init();
+    advertising_init();
+    services_init();
+    conn_params_init();
+    peer_manager_init();
+    application_timers_start();
 
     bsp_init();
-    app_init();
+    // app_init();
 
     // Create a FreeRTOS task for the BLE stack.
     // The task will run advertising_start() before entering its loop.
-    // nrf_sdh_freertos_init(advertising_start, &erase_bonds);
+    nrf_sdh_freertos_init(advertising_start, &erase_bonds);
 
     NRF_LOG_INFO("FreeRTOS started.");
     // Start FreeRTOS scheduler.

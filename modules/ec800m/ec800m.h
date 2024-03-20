@@ -55,6 +55,8 @@ typedef struct {
     void (*err_handle)(ec800m_task_t*, ec800m_t*);
 } ec800m_task_group_t;
 
+typedef void ec800m_timer_out_cb_t(ec800m_t*);
+
 #pragma pack(8)
 struct at_cmd {
     char*    desc;

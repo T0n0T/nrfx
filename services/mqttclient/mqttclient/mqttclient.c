@@ -1034,18 +1034,18 @@ exit:
         if(NULL == c->mqtt_thread) {
 
             /* connect success, and need init mqtt thread */
-            c->mqtt_thread= platform_thread_init("mqtt_yield_thread", mqtt_yield_thread, c, MQTT_THREAD_STACK_SIZE, MQTT_THREAD_PRIO, MQTT_THREAD_TICK);
+            // c->mqtt_thread= platform_thread_init("mqtt_yield_thread", mqtt_yield_thread, c, MQTT_THREAD_STACK_SIZE, MQTT_THREAD_PRIO, MQTT_THREAD_TICK);
 
-            if (NULL != c->mqtt_thread) {
+            // if (NULL != c->mqtt_thread) {
                 mqtt_set_client_state(c, CLIENT_STATE_CONNECTED);
-                platform_thread_startup(c->mqtt_thread);
-                platform_thread_start(c->mqtt_thread);       /* start run mqtt thread */
-            } else {
-                /*creat the thread fail and disconnect the mqtt socket connect*/
-                network_release(c->mqtt_network);
-                rc = MQTT_CONNECT_FAILED_ERROR;
-                MQTT_LOG_W("%s:%d %s()... mqtt yield thread creat failed...", __FILE__, __LINE__, __FUNCTION__);    
-            }
+                // platform_thread_startup(c->mqtt_thread);
+                // platform_thread_start(c->mqtt_thread);       /* start run mqtt thread */
+            // } else {
+            //     /*creat the thread fail and disconnect the mqtt socket connect*/
+            //     network_release(c->mqtt_network);
+            //     rc = MQTT_CONNECT_FAILED_ERROR;
+            //     MQTT_LOG_W("%s:%d %s()... mqtt yield thread creat failed...", __FILE__, __LINE__, __FUNCTION__);    
+            // }
         } else {
             mqtt_set_client_state(c, CLIENT_STATE_CONNECTED);   /* reconnect, mqtt thread is already exists */
         }

@@ -29,9 +29,8 @@ void gpio_init(void)
     nrf_gpio_cfg_output(LED2);
     nrf_gpio_cfg_output(LED3);
 
-    // nrf_gpio_cfg_output(EC800_PIN_PWREN);
-
-    nrf_gpio_cfg_input(MAX_PIN_INT, NRF_GPIO_PIN_NOPULL);
+    nrf_gpio_cfg_output(EC800_PIN_PWREN);
+    nrf_gpio_pin_clear(EC800_PIN_PWREN);
 
     nrf_gpio_pin_write(LED1, 1);
     nrf_gpio_pin_write(LED2, 1);
@@ -41,6 +40,8 @@ void gpio_init(void)
     nrf_gpio_cfg_output(GINT0);
     nrf_gpio_pin_write(GINT0, 1);
     nrf_gpio_cfg_input(GINT1, NRF_GPIO_PIN_NOPULL);
+
+    nrfx_gpiote_init();
 }
 
 void set_sleep_exit_pin(void)
@@ -117,8 +118,13 @@ void beep_off(void)
 
 void bsp_uninit(void)
 {
+    nrf_gpio_pin_clear(EC800_PIN_PWREN); 
     gpio_uninit();
     beep_uninit();
+    twim_uninit();
+    spim_uninit();
+    extern nrfx_uart_t p_instance;
+    nrfx_uart_uninit(&p_instance);
 }
 
 TimerHandle_t leds_tmr;
@@ -142,24 +148,22 @@ void bsp_init(void)
     gpio_init();
 
     beep_init();
-    // leds_tmr = xTimerCreate("leds", pdMS_TO_TICKS(1000), pdTRUE, NULL, leds_timer_handler);
-    // // xTimerStart(leds_tmr, 0);
+    // // leds_tmr = xTimerCreate("leds", pdMS_TO_TICKS(1000), pdTRUE, NULL, leds_timer_handler);
+    // // // xTimerStart(leds_tmr, 0);
     btn_init();
-    ec800m = ec800m_init();
-    ccm3310_init();
-    // max30102_init();
+    ec800m = ec800m_init(); //440 uA
+    ccm3310_init();         //260 ua, 4 pins low
+
+    max30102_init();
+    nrf_uart_disable(NRF_UART0);
 }
 
 void PRE_SLEEP(void)
 {
     // nrf_uart_disable(NRF_UART0);
-    spim_uninit();
-    // twim_uninit();
 }
 
 void POST_SLEEP(void)
 {
     // nrf_uart_enable(NRF_UART0);
-    spim_init();
-    // twim_init();
 }

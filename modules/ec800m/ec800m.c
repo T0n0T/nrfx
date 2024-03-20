@@ -12,7 +12,7 @@
 #include "nrfx_gpiote.h"
 
 #define NRF_LOG_MODULE_NAME ec800
-#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_INFO
+#define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_DEBUG
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
@@ -24,10 +24,10 @@ static struct at_response resp = {
     .buf_size = EC800M_RECV_BUFF_LEN,
 };
 
-extern ec800m_task_group_t ec800m_comm_task_group;
-extern ec800m_task_group_t ec800m_mqtt_task_group;
-extern ec800m_task_group_t ec800m_socket_task_group;
-static ec800m_t            ec800m;
+extern ec800m_task_group_t   ec800m_comm_task_group;
+extern ec800m_task_group_t   ec800m_mqtt_task_group;
+extern ec800m_task_group_t   ec800m_socket_task_group;
+static ec800m_t              _ec800m;
 
 static const ec800m_task_group_t* task_groups[] = {
     &ec800m_comm_task_group,
@@ -95,7 +95,6 @@ void ec800m_wake_up(ec800m_t* dev)
     int result = EOK;
     do {
         nrf_gpio_pin_write(dev->wakeup_pin, 0);
-        NRF_LOG_DEBUG("wake up module!!");
         result = at_client_obj_wait_connect(dev->client, 10000);
         vTaskDelay(pdMS_TO_TICKS(500));
     } while (result < 0);
@@ -122,14 +121,12 @@ void ec800m_task(void* p)
         }
 
         xQueueReceive(dev->task_queue, &task_cb, portMAX_DELAY);
-        if (dev->status == EC800M_POWER_OFF && task_cb.type != EC800_COMM) {
-            NRF_LOG_DEBUG("task:%d %d", task_cb.type, task_cb.task)
-            NRF_LOG_WARNING("ec800m power has turned off!");
-            continue;
-        } else if (dev->status == EC800M_POWER_LOW) {
+        if (dev->status == EC800M_POWER_LOW) {
             current_time = xTaskGetTickCount();
-            if (current_time - last_time > pdMS_TO_TICKS(10000)) {
+            if (current_time - last_time > pdMS_TO_TICKS(5000)) {
+                NRF_LOG_DEBUG("waking up!");
                 ec800m_wake_up(dev);
+                vTaskDelay(5000);
             }
         }
 
@@ -141,9 +138,10 @@ void ec800m_task(void* p)
                 break;
             }
         }
-        if (dev->status == EC800M_POWER_LOW) {
-            nrf_gpio_pin_write(dev->wakeup_pin, 1);
-        }
+        // NRF_LOG_INFO("wakeup pin:%d", nrf_gpio_pin_read(dev->wakeup_pin));
+        // if (dev->status == EC800M_POWER_LOW) {
+        //     nrf_gpio_pin_write(dev->wakeup_pin, 1);
+        // }
     }
 }
 
@@ -169,19 +167,19 @@ ec800m_t* ec800m_init(void)
         return 0;
     }
 
-    memset(&ec800m, 0, sizeof(ec800m));
-    ec800m.client            = at_client_get(NULL);
-    ec800m.client->user_data = &ec800m;
-    ec800m.pwr_pin           = EC800_PIN_PWREN;
-    ec800m.wakeup_pin        = EC800_PIN_DTR;
-    ec800m.task_queue        = xQueueCreate(10, sizeof(ec800m_task_t));
-    ec800m.sync              = xSemaphoreCreateCounting(10, 0);
-    ec800m.lock              = xSemaphoreCreateMutex();
+    memset(&_ec800m, 0, sizeof(_ec800m));
+    _ec800m.client            = at_client_get(NULL);
+    _ec800m.client->user_data = &_ec800m;
+    _ec800m.pwr_pin           = EC800_PIN_PWREN;
+    _ec800m.wakeup_pin        = EC800_PIN_DTR;
+    _ec800m.task_queue        = xQueueCreate(10, sizeof(ec800m_task_t));
+    _ec800m.sync              = xSemaphoreCreateBinary();
+    _ec800m.lock              = xSemaphoreCreateMutex();
 
     BaseType_t xReturned = xTaskCreate(ec800m_task,
                                        "EC800M",
                                        512,
-                                       &ec800m,
+                                       &_ec800m,
                                        configMAX_PRIORITIES - 2,
                                        &ec800m_task_handle);
     if (xReturned != pdPASS) {
@@ -189,5 +187,5 @@ ec800m_t* ec800m_init(void)
         APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
         return 0;
     }
-    return &ec800m;
+    return &_ec800m;
 }

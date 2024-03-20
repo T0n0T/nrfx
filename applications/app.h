@@ -41,5 +41,6 @@ int   parse_cfg(char* json, config_t* config);
 void  read_cfg_from_flash(void);
 void  write_cfg(config_t* cfg);
 int   read_cfg(config_t* cfg);
+void  mqtt_conf(mqtt_client_t* client, config_t* cfg);
 
 #endif

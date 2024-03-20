@@ -24,24 +24,25 @@ extern int socket_task_publish(ec800m_t* dev, ec800m_socket_task_t task, void* p
 void socket_send(struct at_client* client, const char* data, size_t size)
 {
     ec800m_t* dev = (ec800m_t*)client->user_data;
-    if (strstr(data, "SEND OK")) {
-        ec800m_post_sync(dev);
+    extern SemaphoreHandle_t tx_sync;
+    if (strstr(data, "SEND OK")) {     
     } else if (strstr(data, "SEND FAIL")) {
-        dev->err = -EIO;
-        ec800m_post_sync(dev);
+        dev->err = -EIO;        
     }
+    xSemaphoreGive(tx_sync);    
 }
 
 void socket_recv(struct at_client* client, const char* data, size_t size)
 {
     uint32_t  len = 0;
     ec800m_t* dev = (ec800m_t*)client->user_data;
+    extern SemaphoreHandle_t rx_sync;
     sscanf(data, "+QIRD: %d", &len);
     if (len) {
         at_client_recv(data_recv.buf, len, EC800M_IPC_MIN_TICK);
     }
     data_recv.len = len;
-    ec800m_post_sync(dev);
+    xSemaphoreGive(rx_sync);
 }
 
 void urc_socket_recv(struct at_client* client, const char* data, size_t size)
@@ -133,8 +134,9 @@ void err_get(struct at_client* client, const char* data, size_t size)
 
 void err_check(struct at_client* client, const char* data, size_t size)
 {
-    ec800m_t* dev      = (ec800m_t*)client->user_data;
-    socket_task_publish(dev, EC800M_TASK_ERR_CHECK, NULL);
+    // ec800m_t* dev      = (ec800m_t*)client->user_data;
+    // socket_task_publish(dev, EC800M_TASK_ERR_CHECK, NULL);
+    NVIC_SystemReset();
 }
 
 const struct at_urc socket_urc_table[] = {
@@ -142,6 +144,6 @@ const struct at_urc socket_urc_table[] = {
     {"+QIRD:", "\r\n", socket_recv},
     {"+QIURC:", "\r\n", urc_socket_qiurc},
     {"+QISTATE:", "\r\n", socket_check_status},
-    {"+QIGETERROR:", "\r\n", err_get},
+    // {"+QIGETERROR:", "\r\n", err_get},
     {"ERROR", "\r\n", err_check},
 };

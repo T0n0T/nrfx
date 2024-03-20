@@ -385,7 +385,7 @@ int at_client_obj_wait_connect(at_client_t client, uint32_t timeout)
         resp->buf_len     = 0;
         resp->line_counts = 0;
         at_utils_send(client->device, 0, "AT\r\n", 4);
-
+    NRF_LOG_INFO("AT calling!!!")
         if (xSemaphoreTake(client->resp_notice, pdMS_TO_TICKS(resp->timeout)) != pdTRUE)
             continue;
         else

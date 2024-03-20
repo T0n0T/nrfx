@@ -11,7 +11,7 @@
 #include "ec800m.h"
 #include "ec800m_common.h"
 
-#define NRF_LOG_MODULE_NAME ec800comon
+#define NRF_LOG_MODULE_NAME ec800comm
 #define NRF_LOG_LEVEL       NRF_LOG_SEVERITY_INFO
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
@@ -53,14 +53,15 @@ void ec800m_signal_check(ec800m_t* dev)
 void ec800m_gnss_open(ec800m_t* dev)
 {
     comm_task_publish(dev, EC800M_TASK_GNSS_OPEN, NULL);
+    ec800m_wait_sync(dev, portMAX_DELAY);
 }
 
 gps_info_t ec800m_gnss_get(ec800m_t* dev)
 {
-    comm_task_publish(dev, EC800M_TASK_GNSS_OPEN, NULL);
+    comm_task_publish(dev, EC800M_TASK_GNSS_GET, NULL);
     /** take sync from task_handle */
-    if (ec800m_wait_sync(dev, portMAX_DELAY) != EOK) {
-        NRF_LOG_ERROR("gnss info expired!");
+    if (ec800m_wait_sync(dev, portMAX_DELAY) < 0) {
+        NRF_LOG_WARNING("gnss info invalid! err[%d]", dev->err);
         return 0;
     }
     return &rmcinfo;
@@ -69,6 +70,7 @@ gps_info_t ec800m_gnss_get(ec800m_t* dev)
 static void ec800m_comm_init_handle(ec800m_t* dev)
 {
     nrf_gpio_cfg_output(dev->pwr_pin);
+    nrf_gpio_cfg_output(dev->wakeup_pin);
     power_sync = xSemaphoreCreateBinary();
     extern const struct at_urc comm_urc_table[];
     at_obj_set_urc_table(dev->client, comm_urc_table, 2);
@@ -81,11 +83,12 @@ static void ec800m_comm_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
     if (task_cb->task == EC800M_TASK_POWERON) {
         int result = EOK;
         int retry  = 5;
+        nrf_uart_enable(dev->client->device->p_reg);
         nrf_gpio_pin_write(dev->pwr_pin, 0);
         vTaskDelay(500);
         nrf_gpio_pin_write(dev->pwr_pin, 1);
         /** task sync from urc 'RDY' */
-        if (xSemaphoreTake(power_sync, 10000) < 0) {
+        if (xSemaphoreTake(power_sync, 10000) != pdTRUE) {
             NRF_LOG_ERROR("ec800m hardfault!");
             result = -ETIMEOUT;
             goto __power_on_exit;
@@ -132,6 +135,9 @@ static void ec800m_comm_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
     }
     if (task_cb->task == EC800M_TASK_POWERLOW) {
         dev->err = at_cmd_exec(dev->client, AT_CMD_LOW_POWER, NULL);
+        if (dev->err == EOK) {
+            dev->status = EC800M_POWER_LOW;
+        }
     }
     if (task_cb->task == EC800M_TASK_SIGNAL_CHECK) {
         char* keyword_line = NULL;
@@ -172,18 +178,24 @@ static void ec800m_comm_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
         if (result < 0) {
             NRF_LOG_ERROR("ec800m gnss check failed!");
         }
+        ec800m_post_sync(dev);
+    }
+    if (task_cb->task == EC800M_TASK_GNSS_CHECK) {
+        char* keyword_line = NULL;
+        dev->err           = at_cmd_exec(dev->client, AT_CMD_GNSS_LOC, &keyword_line);
     }
     if (task_cb->task == EC800M_TASK_GNSS_GET) {
-        char* keyword_line = NULL;
-        dev->err           = at_cmd_exec(dev->client, AT_CMD_GNSS_NMEA_RMC, &keyword_line);
+        uint8_t retry        = 10;
+        char*   keyword_line = NULL;
+        dev->err             = at_cmd_exec(dev->client, AT_CMD_GNSS_NMEA_RMC, &keyword_line);
         if (dev->err == EOK) {
             char rmc[128] = {0};
-            if (sscanf(keyword_line, "+QGPSGNMEA:", "+QGPSGNMEA:%s", rmc) > 0) {
+            if (sscanf(keyword_line, "+QGPSGNMEA:%s", rmc) > 0) {
                 if (!gps_rmc_parse(&rmcinfo, rmc)) {
-                    NRF_LOG_WARNING("gnss info invalid");
+                    dev->err = -EINVAL;
                 } else {
-                    NRF_LOG_DEBUG("%d %d %d %d %d %d", rmcinfo.date.year, rmcinfo.date.month, rmcinfo.date.day,
-                                  rmcinfo.date.hour, rmcinfo.date.minute, rmcinfo.date.second);
+                    NRF_LOG_INFO("gnss: %d %d %d %d %d %d", rmcinfo.date.year, rmcinfo.date.month, rmcinfo.date.day,
+                                 rmcinfo.date.hour, rmcinfo.date.minute, rmcinfo.date.second);
                 }
             }
         }

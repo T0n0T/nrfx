@@ -11,7 +11,13 @@
 #include "app.h"
 #include "cJSON.h"
 #include "time.h"
+#include "FreeRTOS.h"
+#include "task.h"
 #include "nrf_log.h"
+
+static time_t old_ticks;
+static time_t new_stamps;
+static time_t _new_stamps;
 
 char* build_msg_mqtt(char* device_id, gps_info_t info, int energyStatus, int correctlyWear)
 {
@@ -26,9 +32,14 @@ char* build_msg_mqtt(char* device_id, gps_info_t info, int energyStatus, int cor
     tm_now.tm_hour   = info->date.hour;
     tm_now.tm_min    = info->date.minute;
     tm_now.tm_sec    = info->date.second;
-    time_t now       = mktime(&tm_now);
 
-    cJSON_AddNumberToObject(root, "timestamp", now);
+    _new_stamps = mktime(&tm_now);
+
+    new_stamps += ((time_t)xTaskGetTickCount() - old_ticks) * 1000 / configTICK_RATE_HZ;
+    new_stamps = new_stamps > _new_stamps ? new_stamps : _new_stamps;
+    old_ticks = (time_t)xTaskGetTickCount();
+
+    cJSON_AddNumberToObject(root, "timestamp", new_stamps);
     cJSON_AddStringToObject(root, "type", "SmartBraceletServiceUp");
     cJSON_AddItemToObject(root, "body", body = cJSON_CreateObject());
     cJSON_AddStringToObject(body, "deviceId", device_id);

@@ -19,7 +19,8 @@ NRF_LOG_MODULE_REGISTER();
 ec800m_pdp_status_t  pdp_status;
 ec800m_socket_t      socket[SOCKET_MAX];
 ec800m_socket_data_t data_recv;
-uint32_t             socket_err_code;
+SemaphoreHandle_t    rx_sync;
+SemaphoreHandle_t    tx_sync;
 static ec800m_t*     _ec800m;
 
 int socket_task_publish(ec800m_t* dev, ec800m_socket_task_t task, void* param)
@@ -62,7 +63,7 @@ int ec800m_socket_open(const char* domain, const char* port, int protocol)
     s->port     = (char*)port;
     s->protocol = protocol;
     socket_task_publish(_ec800m, EC800M_TASK_SOCKET_OPEN, s);
-    result = ec800m_wait_sync(_ec800m, portMAX_DELAY);
+    result = ec800m_wait_sync(_ec800m, 15000);
     if (result < 0) {
         NRF_LOG_ERROR("socket open fail, err[%d]", result);
         return -ERROR;
@@ -73,7 +74,7 @@ int ec800m_socket_open(const char* domain, const char* port, int protocol)
 int ec800m_socket_close(int socket_num)
 {
     socket_task_publish(_ec800m, EC800M_TASK_SOCKET_CLOSE, &socket[socket_num]);
-    return EOK;
+    return ec800m_wait_sync(_ec800m, portMAX_DELAY);;
 }
 
 int ec800m_socket_read_with_timeout(int socket_num, void* buf, size_t len, int timeout)
@@ -92,10 +93,13 @@ int ec800m_socket_read_with_timeout(int socket_num, void* buf, size_t len, int t
         NRF_LOG_WARNING("ec800m expect value from socket[%d],but no value!", socket_num);
         return 0;
     }
+    xSemaphoreTake(rx_sync, 0);
     socket_task_publish(_ec800m, EC800M_TASK_SOCKET_RECV, data);
-    int result = ec800m_wait_sync(_ec800m, EC800M_IPC_MIN_TICK);
-    if (result < 0) {
-        NRF_LOG_ERROR("socket recv fail, err[%d]", result);
+    if (xSemaphoreTake(rx_sync, timeout) != pdTRUE) {
+        NRF_LOG_WARNING("socket recv timeout");
+        return -ETIMEOUT;
+    } else if (_ec800m->err < 0) {
+        NRF_LOG_ERROR("socket recv fail, err[%d]", _ec800m->err);
         return -ERROR;
     }
 
@@ -113,12 +117,16 @@ int ec800m_socket_write_with_timeout(int socket_num, const void* buf, size_t len
          .buf        = (char*)buf,
          .len        = len_s,
     };
+    xSemaphoreTake(tx_sync, 0);
     socket_task_publish(_ec800m, EC800M_TASK_SOCKET_SEND, &data);
-    int result = ec800m_wait_sync(_ec800m, timeout);
-    if (result < 0) {
-        NRF_LOG_ERROR("socket send fail, err[%d]", result);
+    if (xSemaphoreTake(tx_sync, timeout) != pdTRUE) {
+        NRF_LOG_WARNING("socket send timeout");
+        return -ETIMEOUT;
+    } else if (_ec800m->err < 0) {
+        NRF_LOG_ERROR("socket send fail, err[%d]", _ec800m->err);
         return -ERROR;
     }
+
     return len_s;
 }
 
@@ -126,10 +134,12 @@ void ec800m_socket_init_handle(ec800m_t* dev)
 {
     extern const struct at_urc socket_urc_table[];
     _ec800m = dev;
-    at_obj_set_urc_table(dev->client, socket_urc_table, 6);
+    at_obj_set_urc_table(dev->client, socket_urc_table, 5);
     for (size_t i = 0; i < SOCKET_MAX; i++) {
         socket[i].recv_sync = xSemaphoreCreateBinary();
     }
+    tx_sync = xSemaphoreCreateBinary();
+    rx_sync = xSemaphoreCreateBinary();
     NRF_LOG_INFO("ec800m socket init!")
 }
 
@@ -163,6 +173,7 @@ void ec800m_socket_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
         int              socket_num   = s - socket;
         char*            keyword_line = NULL;
         dev->err                      = at_cmd_exec(dev->client, AT_CMD_SOCKET_OPEN, &keyword_line, socket_num, protocol, s->domain, s->port);
+
         if (dev->err == EOK) {
             int      socket_num = -1;
             uint32_t err_code   = 0;
@@ -180,6 +191,7 @@ void ec800m_socket_task_handle(ec800m_task_t* task_cb, ec800m_t* dev)
         int              socket_num = s - socket;
         socket[socket_num].status   = EC800M_SOCKET_IDLE;
         dev->err                    = at_cmd_exec(dev->client, AT_CMD_SOCKET_CLOSE, NULL, socket_num);
+        ec800m_post_sync(dev);
     }
     if (task_cb->task == EC800M_TASK_SOCKET_CHECK) {
         ec800m_socket_t* s          = (ec800m_socket_t*)task_cb->param;
@@ -210,11 +222,11 @@ static void ec800m_socket_err_handle(ec800m_task_t* task_cb, ec800m_t* dev)
      *
      */
     xSemaphoreGive(dev->lock);
-    if ((task_cb->task == EC800M_TASK_SOCKET_SEND || task_cb->task == EC800M_TASK_SOCKET_RECV) && dev->err < 0) {
-        ec800m_socket_data_t* data = (ec800m_socket_data_t*)task_cb->param;
-        socket_task_publish(_ec800m, EC800M_TASK_SOCKET_CHECK, &socket[data->socket_num]);
-        socket_task_publish(_ec800m, EC800M_TASK_SOCKET_CHECK, &socket[data->socket_num]);
-    }
+    // if ((task_cb->task == EC800M_TASK_SOCKET_SEND || task_cb->task == EC800M_TASK_SOCKET_RECV) && dev->err < 0) {
+    //     ec800m_socket_data_t* data = (ec800m_socket_data_t*)task_cb->param;
+    //     socket_task_publish(_ec800m, EC800M_TASK_SOCKET_CHECK, &socket[data->socket_num]);
+    //     socket_task_publish(_ec800m, EC800M_TASK_SOCKET_CHECK, &socket[data->socket_num]);
+    // }
 }
 
 ec800m_task_group_t ec800m_socket_task_group = {

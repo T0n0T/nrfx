@@ -27,7 +27,7 @@ const struct at_cmd at_cmd_list[] = {
     {AT_CMD_NAME(AT_CMD_CHECK_PIN), "AT+CPIN?", "READY", 0, 5000},
 
     /** tcp/ip using contextID=1 */
-    {AT_CMD_NAME(AT_CMD_ACT_PDP), "AT+QIACT=1", NULL, 0, 5000},
+    {AT_CMD_NAME(AT_CMD_ACT_PDP), "AT+QIACT=1", NULL, 0, 15000},
     {AT_CMD_NAME(AT_CMD_CHECK_PDP), "AT+QIACT?", "+QIACT:", 0, 5000},
     {AT_CMD_NAME(AT_CMD_DEACT_PDP), "AT+QIDEACT=1", NULL, 0, 40000},
     {AT_CMD_NAME(AT_CMD_DATAECHO_OFF), "AT+QISDE=0", NULL, 0, 300},
@@ -38,7 +38,7 @@ const struct at_cmd at_cmd_list[] = {
     {AT_CMD_NAME(AT_CMD_QUERY_DNS), "AT+QIDNSCFG=1", "+QIDNSCFG:", 2, 300},
 
     /** socket,buffer mode */
-    {AT_CMD_NAME(AT_CMD_SOCKET_OPEN), "AT+QIOPEN=1,%d,\"%s\",\"%s\",%s", "+QIOPEN:", 4, 5000},
+    {AT_CMD_NAME(AT_CMD_SOCKET_OPEN), "AT+QIOPEN=1,%d,\"%s\",\"%s\",%s", "+QIOPEN:", 4, 15000},
     {AT_CMD_NAME(AT_CMD_SOCKET_CLOSE), "AT+QICLOSE=%d", NULL, 0, 10000},
     {AT_CMD_NAME(AT_CMD_SOCKET_SEND), "AT+QISEND=%d,%d", NULL, 0, 300},
     {AT_CMD_NAME(AT_CMD_SOCKET_RECV), "AT+QIRD=%d,%d", NULL, 0, 300},
@@ -48,9 +48,9 @@ const struct at_cmd at_cmd_list[] = {
     {AT_CMD_NAME(AT_CMD_GNSS_OPEN), "AT+QGPS=1", NULL, 0, 300},
     {AT_CMD_NAME(AT_CMD_GNSS_CLOSE), "AT+QGPS=0", NULL, 0, 300},
     {AT_CMD_NAME(AT_CMD_GNSS_STATUS), "AT+QGPS?", "+QGPS:", 0, 300},
-    {AT_CMD_NAME(AT_CMD_GNSS_LOC), "AT+QGPSLOC=2", NULL, 0, 300},
+    {AT_CMD_NAME(AT_CMD_GNSS_LOC), "AT+QGPSLOC=2", NULL, 2, 300},
     {AT_CMD_NAME(AT_CMD_GNSS_NMEA_CONF), "AT+QGPSCFG=\"gpsnmeatype\",%d", NULL, 0, 300},
-    {AT_CMD_NAME(AT_CMD_GNSS_NMEA_RMC), "AT+QGPSGNMEA=\"RMC\"", "+QGPSGNMEA:", 2, 300},
+    {AT_CMD_NAME(AT_CMD_GNSS_NMEA_RMC), "AT+QGPSGNMEA=\"RMC\"", "+QGPSGNMEA:", 0, 300},
 
     /** mqtt using client_idx=0 */
     {AT_CMD_NAME(AT_CMD_MQTT_REL), "AT+QMTOPEN=0,\"%s\",%s", NULL, 0, 3000},
@@ -59,7 +59,7 @@ const struct at_cmd at_cmd_list[] = {
     {AT_CMD_NAME(AT_CMD_MQTT_STATUS), "AT+QMTCONN?", NULL, 0, 5000},
     {AT_CMD_NAME(AT_CMD_MQTT_CONNECT), "AT+QMTCONN=0,\"%s\"", NULL, 0, 5000},
     {AT_CMD_NAME(AT_CMD_MQTT_DISCONNECT), "AT+QMTDISC=0", NULL, 0, 30000},
-    {AT_CMD_NAME(AT_CMD_MQTT_PUBLISH), "AT+QMTPUBEX=0,0,0,0,\"%s\",%d", "", 3000},
+    {AT_CMD_NAME(AT_CMD_MQTT_PUBLISH), "AT+QMTPUBEX=0,0,0,0,\"%s\",%d", NULL, 0, 3000},
     {AT_CMD_NAME(AT_CMD_MQTT_SUBSCRIBE), "AT+QMTSUB=0,1,\"%s\",2", NULL, 0, 3000},
     {AT_CMD_NAME(AT_CMD_MQTT_READBUF), "AT+QMTRECV=0", NULL, 0, 5000},
     {AT_CMD_NAME(AT_CMD_MQTT_CONF_ALIVE), "AT+QMTCFG=\"keepalive\",0,%d", NULL, 0, 300},

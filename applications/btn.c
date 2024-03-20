@@ -46,8 +46,8 @@ void btn_release(void)
 void btn_click(void)
 {
     NRF_LOG_DEBUG("single click!");
-    // extern SemaphoreHandle_t m_app_sem;
-    // xSemaphoreGive(m_app_sem);
+    extern SemaphoreHandle_t m_app_sem;
+    xSemaphoreGive(m_app_sem);
 }
 
 void btn_double(void)
@@ -113,12 +113,10 @@ static void btn_task(void* pvParameter)
 
 void btn_init(void)
 {
-    nrfx_err_t err = nrfx_gpiote_init();
-    APP_ERROR_CHECK(err);
     nrfx_gpiote_in_config_t cfg = NRFX_GPIOTE_CONFIG_IN_SENSE_HITOLO(0);
     cfg.pull                    = NRF_GPIO_PIN_PULLUP;
-    err                         = nrfx_gpiote_in_init(SW, &cfg, btn_work_on);
-    APP_ERROR_CHECK(err);
+    nrfx_gpiote_in_init(SW, &cfg, btn_work_on);
+
     nrfx_gpiote_in_event_enable(SW, true);
     // nrf_gpio_cfg_input(SW, NRF_GPIO_PIN_PULLUP);
     btn_create(&SW_BUTTON);

@@ -17,18 +17,18 @@
 #define NRF_LOG_INFO_COLOR            3
 
 #define EC800M_MQTT_SOFT              0
-#define MQTT_PUBLISH_DEFAULT_INTERVAL 5000
+#define MQTT_PUBLISH_DEFAULT_INTERVAL 60000
 
-#define EC800M_MQTT_DEFAULT_CFG                             \
-    {                                                       \
-        .host      = "broker.emqx.io",                      \
-        .port      = "1883",                                \
-        .keepalive = 300,                                   \
-        .clientid  = "CYG_5E89460B99",                      \
-        .username  = NULL,                                  \
-        .password  = NULL,                                  \
-        .subtopic  = "/iot/CYG_5E89460B99/BR/device/reply", \
-        .pubtopic  = "/iot/CYG_5E89460B99/BR/device/data",  \
+#define EC800M_MQTT_DEFAULT_CFG                          \
+    {                                                    \
+        .host      = "broker.emqx.io",                   \
+        .port      = "1883",                             \
+        .keepalive = 300,                                \
+        .clientid  = "CYG_DEFAULT",                      \
+        .username  = NULL,                               \
+        .password  = NULL,                               \
+        .subtopic  = "/iot/CYG_DEFAULT/BR/device/reply", \
+        .pubtopic  = "/iot/CYG_DEFAULT/BR/device/data",  \
     }
 
 // #define EC800M_MQTT_DEFAULT_CFG                        \
