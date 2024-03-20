@@ -153,14 +153,14 @@ void app_task(void* pvParameter)
         retry      = 10;
         m_gps_data = NULL;
         if (client->mqtt_client_state == CLIENT_STATE_CONNECTED) {
-            // while (retry--) {
-            //     m_gps_data = ec800m_gnss_get(ec800m);
-            //     if (m_gps_data == NULL || m_gps_data->AV == 'V') {
-            //         vTaskDelay(pdMS_TO_TICKS(5000));
-            //     } else {
-            //         break;
-            //     }
-            // }
+            while (retry--) {
+                m_gps_data = ec800m_gnss_get(ec800m);
+                if (m_gps_data == NULL || m_gps_data->AV == 'V') {
+                    vTaskDelay(pdMS_TO_TICKS(5000));
+                } else {
+                    break;
+                }
+            }
             publish_handle();
         }
         LED_OFF(LED3);

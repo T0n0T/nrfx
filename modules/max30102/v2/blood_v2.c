@@ -64,8 +64,11 @@ void max30102_ecg_init(void)
     n_ir_buffer_length = 500; // buffer length of 100 stores 5 seconds of samples running at 100sps
 
     for (i = 0; i < n_ir_buffer_length; i++) {
-        while (nrf_gpio_pin_read(MAX_PIN_INT) == 1)
-            ; // wait until the interrupt pin asserts
+        while (nrf_gpio_pin_read(MAX_PIN_INT) == 1) {
+            // wait until the interrupt pin asserts
+            vTaskDelay(3);
+        }
+
         max30102_read_fifo(&aun_red_buffer[i], &aun_ir_buffer[i]);
 
         if (un_min > aun_red_buffer[i])
@@ -139,7 +142,8 @@ int max30102_data_handle(int32_t* heart_rate, int32_t* sp02)
         // take 100 sets of samples before calculating the heart rate.
         for (i = 400; i < 500; i++) {
             un_prev_data = aun_red_buffer[i - 1];
-            while (nrf_gpio_pin_read(MAX_PIN_INT)) {
+            while (nrf_gpio_pin_read(MAX_PIN_INT) == 1) {
+                vTaskDelay(3);
             }
 
             max30102_read_fifo(&aun_red_buffer[i], &aun_ir_buffer[i]);

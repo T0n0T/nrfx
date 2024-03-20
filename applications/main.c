@@ -731,7 +731,7 @@ int main(void)
     application_timers_start();
 
     bsp_init();
-    // app_init();
+    app_init();
 
     // Create a FreeRTOS task for the BLE stack.
     // The task will run advertising_start() before entering its loop.
