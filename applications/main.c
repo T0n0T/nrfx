@@ -259,8 +259,8 @@ void ble_mac_set(void)
             global_cfg.ble_mac[5], global_cfg.ble_mac[4], global_cfg.ble_mac[3], global_cfg.ble_mac[2], global_cfg.ble_mac[1], global_cfg.ble_mac[0]);
     sprintf(global_cfg.mqtt_cfg.pubtopic, "/iot/%s/BR/device/data", global_cfg.mqtt_cfg.clientid);
     sprintf(global_cfg.mqtt_cfg.subtopic, "/iot/%s/BR/device/reply", global_cfg.mqtt_cfg.clientid);
-    // uint32_t err_code = sd_ble_gap_addr_set(&bleAddr);
-    // APP_ERROR_CHECK(err_code);
+    uint32_t err_code = sd_ble_gap_addr_set(&bleAddr);
+    APP_ERROR_CHECK(err_code);
 }
 
 /**@brief Function for initializing the GATT module. */

@@ -25,9 +25,9 @@ NRF_LOG_MODULE_REGISTER();
 
 #define MAX_BRIGHTNESS 255
 #define SAMPLE_NUM     5
-uint32_t aun_ir_buffer[500];  // IR LED sensor data
+__ALIGN(4) uint32_t aun_ir_buffer[500];  // IR LED sensor data
 int32_t  n_ir_buffer_length;  // data length
-uint32_t aun_red_buffer[500]; // Red LED sensor data
+__ALIGN(4) uint32_t aun_red_buffer[500]; // Red LED sensor data
 
 uint8_t uch_dummy;
 uint8_t change_flag;
@@ -40,7 +40,6 @@ static void max30102_read_fifo(uint32_t* pun_red_led, uint32_t* pun_ir_led);
 void max30102_ecg_init(void)
 {
     uint32_t un_min, un_max;
-    uint32_t un_prev_data;
     int32_t  n_sp02;        // SPO2 value
     int8_t   ch_spo2_valid; // indicator to show if the SP02 calculation is valid
     int32_t  n_heart_rate;  // heart rate value
@@ -76,8 +75,6 @@ void max30102_ecg_init(void)
         if (un_max < aun_red_buffer[i])
             un_max = aun_red_buffer[i]; // update signal max
     }
-    un_prev_data = aun_red_buffer[i];
-    un_prev_data = un_prev_data;
     maxim_heart_rate_and_oxygen_saturation(aun_ir_buffer, n_ir_buffer_length, aun_red_buffer, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid);
 }
 
@@ -113,11 +110,9 @@ static void max30102_read_fifo(uint32_t* pun_red_led, uint32_t* pun_ir_led)
 int max30102_data_handle(int32_t* heart_rate, int32_t* sp02)
 {
     // variables to calculate the on-board LED brightness that reflects the heartbeats
-    uint32_t un_min, un_max, un_prev_data;
+    uint32_t un_min, un_max;
     int      i;
     int      retry = 10;
-    float    f_temp;
-    int32_t  n_brightness;
 
     int     s_ecg_status;
     int32_t n_sp02;        // SPO2 value
@@ -141,28 +136,11 @@ int max30102_data_handle(int32_t* heart_rate, int32_t* sp02)
         }
         // take 100 sets of samples before calculating the heart rate.
         for (i = 400; i < 500; i++) {
-            un_prev_data = aun_red_buffer[i - 1];
             while (nrf_gpio_pin_read(MAX_PIN_INT) == 1) {
                 vTaskDelay(3);
             }
-
             max30102_read_fifo(&aun_red_buffer[i], &aun_ir_buffer[i]);
-            // NRF_LOG_DEBUG("[%d]: aun_red_buffer = %d, aun_ir_buffer = %d", i, aun_red_buffer[i], aun_ir_buffer[i]);
-            if (aun_red_buffer[i] > un_prev_data) {
-                f_temp = aun_red_buffer[i] - un_prev_data;
-                f_temp /= (un_max - un_min);
-                f_temp *= MAX_BRIGHTNESS;
-                n_brightness -= (int)f_temp;
-                if (n_brightness < 0)
-                    n_brightness = 0;
-            } else {
-                f_temp = un_prev_data - aun_red_buffer[i];
-                f_temp /= (un_max - un_min);
-                f_temp *= MAX_BRIGHTNESS;
-                n_brightness += (int)f_temp;
-                if (n_brightness > MAX_BRIGHTNESS)
-                    n_brightness = MAX_BRIGHTNESS;
-            }
+            NRF_LOG_DEBUG("[%d]: aun_red_buffer = %d, aun_ir_buffer = %d", i, aun_red_buffer[i], aun_ir_buffer[i]);
         }
 
         ch_hr_valid   = 0;
