@@ -171,14 +171,14 @@ void max30102_init(void)
         return;
     } // Reads/clears the interrupt status register
 
-    BaseType_t xReturned = xTaskCreate(max30102_thread_entry,
-                                       "MAX30102",
-                                       512,
-                                       0,
-                                       configMAX_PRIORITIES - 3,
-                                       &max30102_handle);
-    if (xReturned != pdPASS) {
-        NRF_LOG_ERROR("MAX30102 task not created.");
-        APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
-    }
+    // BaseType_t xReturned = xTaskCreate(max30102_thread_entry,
+    //                                    "MAX30102",
+    //                                    512,
+    //                                    0,
+    //                                    configMAX_PRIORITIES - 3,
+    //                                    &max30102_handle);
+    // if (xReturned != pdPASS) {
+    //     NRF_LOG_ERROR("MAX30102 task not created.");
+    //     APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
+    // }
 }

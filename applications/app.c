@@ -12,6 +12,7 @@
 #include "bsp.h"
 #include "ec800m.h"
 #include "ccm3310.h"
+#include "blood.h"
 #include "nrf_log.h"
 
 extern ec800m_t* ec800m;
@@ -89,6 +90,16 @@ static void mqtt_init(void)
 {
     ec800m_power_on(ec800m);
     ec800m_gnss_open(ec800m);
+    uint8_t retry = 12;
+    m_gps_data    = NULL;
+    while (retry--) {
+        m_gps_data = ec800m_gnss_get(ec800m);
+        if (m_gps_data == NULL || m_gps_data->AV == 'V') {
+            vTaskDelay(pdMS_TO_TICKS(5000));
+        } else {
+            break;
+        }
+    }
 #if EC800M_MQTT_SOFT
     ec800m_mqtt_conf(&global_cfg.mqtt_cfg);
     ec800m_mqtt_connect();
@@ -116,7 +127,6 @@ static void mqtt_deinit(void)
 
 void app_task(void* pvParameter)
 {
-    uint8_t retry = 10;
     client        = mqtt_lease();
     if (client == NULL) {
         NRF_LOG_ERROR("mqtt alloc fail");
@@ -150,17 +160,8 @@ void app_task(void* pvParameter)
     while (1) {
         mqtt_init();
         LED_ON(LED3);
-        retry      = 10;
-        m_gps_data = NULL;
         if (client->mqtt_client_state == CLIENT_STATE_CONNECTED) {
-            while (retry--) {
-                m_gps_data = ec800m_gnss_get(ec800m);
-                if (m_gps_data == NULL || m_gps_data->AV == 'V') {
-                    vTaskDelay(pdMS_TO_TICKS(5000));
-                } else {
-                    break;
-                }
-            }
+            blood_Loop();
             publish_handle();
         }
         LED_OFF(LED3);
