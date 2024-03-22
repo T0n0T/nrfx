@@ -71,7 +71,7 @@ extern int __bss_end__;
 #define configUSE_TICKLESS_IDLE                 1
 #define configUSE_TICKLESS_IDLE_SIMPLE_DEBUG    1 /* See into vPortSuppressTicksAndSleep source code for explanation */
 #define configCPU_CLOCK_HZ                      (SystemCoreClock)
-#define configTICK_RATE_HZ                      1024
+#define configTICK_RATE_HZ                      1000 
 #define configMAX_PRIORITIES                    (10)
 #define configMINIMAL_STACK_SIZE                (60)
 #define configTOTAL_HEAP_SIZE                   (28000)
@@ -107,7 +107,7 @@ extern int __bss_end__;
 #define configUSE_TIMERS             1
 #define configTIMER_TASK_PRIORITY    (configMAX_PRIORITIES - 1)
 #define configTIMER_QUEUE_LENGTH     32
-#define configTIMER_TASK_STACK_DEPTH (80)
+#define configTIMER_TASK_STACK_DEPTH (512)
 
 /* Tickless Idle configuration. */
 #define configEXPECTED_IDLE_TIME_BEFORE_SLEEP 2

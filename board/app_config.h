@@ -17,7 +17,7 @@
 #define NRF_LOG_INFO_COLOR            3
 
 #define EC800M_MQTT_SOFT              0
-#define MQTT_PUBLISH_DEFAULT_INTERVAL 60000
+#define MQTT_PUBLISH_DEFAULT_INTERVAL 600000
 
 #define EC800M_MQTT_DEFAULT_CFG                          \
     {                                                    \

@@ -138,9 +138,14 @@ int       at_cmd_exec(at_client_t dev, at_cmd_desc_t at_cmd_id, char** keyword_l
 
 #include "SEGGER_RTT.h"
 
+// #define ec800m_wait_sync(dev, timeout) \
+//     (SEGGER_RTT_printf(0, "%s:%d %s()...waiting\r\n", __FILE__, __LINE__, __FUNCTION__), _ec800m_wait_sync((ec800m_t*)dev, (uint32_t)timeout))
+// #define ec800m_post_sync(dev) \
+//     (SEGGER_RTT_printf(0, "%s:%d %s()...posting\r\n", __FILE__, __LINE__, __FUNCTION__), _ec800m_post_sync((ec800m_t*)dev))
+
 #define ec800m_wait_sync(dev, timeout) \
-    (SEGGER_RTT_printf(0, "%s:%d %s()...waiting\r\n", __FILE__, __LINE__, __FUNCTION__), _ec800m_wait_sync((ec800m_t*)dev, (uint32_t)timeout))
+    (_ec800m_wait_sync((ec800m_t*)dev, (uint32_t)timeout))
 #define ec800m_post_sync(dev) \
-    (SEGGER_RTT_printf(0, "%s:%d %s()...posting\r\n", __FILE__, __LINE__, __FUNCTION__), _ec800m_post_sync((ec800m_t*)dev))
+    (_ec800m_post_sync((ec800m_t*)dev))
 
 #endif

@@ -18,21 +18,27 @@ NRF_LOG_MODULE_REGISTER();
 
 void ec800m_power_on_ready(struct at_client* client, const char* data, size_t size)
 {
-    NRF_LOG_DEBUG("ec800m power on ready");    
-    extern SemaphoreHandle_t      power_sync;
-    ec800m_t* dev = (ec800m_t*)client->user_data;
-    if (dev->status == EC800M_POWER_OFF) {
-        xSemaphoreGive(power_sync);
+    NRF_LOG_INFO("ec800m power on ready");
+    extern SemaphoreHandle_t power_on_sync;
+    ec800m_t*                dev = (ec800m_t*)client->user_data;
+    if (dev->status == EC800M_POWER_OFF && power_on_sync) {
+        xSemaphoreGive(power_on_sync);
     }
 }
 
 void ec800m_power_off_fin(struct at_client* client, const char* data, size_t size)
 {
-    NRF_LOG_DEBUG("ec800m power off finish");
+    NRF_LOG_INFO("ec800m power off finish");
     ec800m_t* dev = (ec800m_t*)client->user_data;
     nrf_gpio_pin_write(dev->pwr_pin, 0);
     nrf_uart_disable(client->device->p_reg);
-    dev->status = EC800M_POWER_OFF;
+    extern SemaphoreHandle_t power_off_sync;
+    if (dev->status != EC800M_POWER_OFF) {
+        dev->status = EC800M_POWER_OFF;
+        if (power_off_sync) {
+            xSemaphoreGive(power_off_sync);
+        }
+    }
 }
 
 const struct at_urc comm_urc_table[] = {

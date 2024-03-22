@@ -88,50 +88,59 @@ void publish_handle(void)
 
 static void mqtt_init(void)
 {
-    ec800m_power_on(ec800m);
-    ec800m_gnss_open(ec800m);
-    uint8_t retry = 12;
-    m_gps_data    = NULL;
-    while (retry--) {
-        m_gps_data = ec800m_gnss_get(ec800m);
-        if (m_gps_data == NULL || m_gps_data->AV == 'V') {
-            vTaskDelay(pdMS_TO_TICKS(5000));
-        } else {
-            break;
+    if (ec800m->status == EC800M_POWER_OFF) {
+        NRF_LOG_DEBUG("power on");
+        ec800m_power_on(ec800m);
+        ec800m_gnss_open(ec800m);
+    }
+    if (ec800m->status != EC800M_POWER_OFF) {
+        uint8_t retry = 3;
+        m_gps_data    = NULL;
+        while (retry--) {
+            m_gps_data = ec800m_gnss_get(ec800m);
+            if (m_gps_data == NULL || m_gps_data->AV == 'V') {
+                vTaskDelay(pdMS_TO_TICKS(5000));
+            } else {
+                break;
+            }
         }
-    }
 #if EC800M_MQTT_SOFT
-    ec800m_mqtt_conf(&global_cfg.mqtt_cfg);
-    ec800m_mqtt_connect();
-    while (mqtt_status != EC800M_MQTT_CONN) {
-        vTaskDelay(200);
-    }
-    ec800m_mqtt_sub(global_cfg.mqtt_cfg.subtopic);
+        ec800m_mqtt_conf(&global_cfg.mqtt_cfg);
+        ec800m_mqtt_connect();
+        while (mqtt_status != EC800M_MQTT_CONN) {
+            vTaskDelay(200);
+        }
+        ec800m_mqtt_sub(global_cfg.mqtt_cfg.subtopic);
 #else
-    NRF_LOG_INFO("begin connect");
-    mqtt_connect(client);
+        if (client->mqtt_client_state != CLIENT_STATE_CONNECTED) {
+            NRF_LOG_DEBUG("begin connect");
+            mqtt_connect(client);
+        }
 #endif
+    }
 }
 
 static void mqtt_deinit(void)
 {
-    if (client->mqtt_client_state == CLIENT_STATE_CONNECTED) {
-        mqtt_disconnect(client);
-    }
-
-    ec800m_power_off(ec800m);
-    if (sm4_flag) {
-        nrf_gpio_pin_write(GINT0, 1);
+    if (ec800m->status != EC800M_POWER_OFF) {
+        if (client->mqtt_client_state == CLIENT_STATE_CONNECTED) {
+            mqtt_disconnect(client);
+            NRF_LOG_DEBUG("begin disconnect %d", xTaskGetTickCount());
+        }
+        ec800m_power_off(ec800m);
+        NRF_LOG_DEBUG("power off");
     }
 }
 
 void app_task(void* pvParameter)
 {
-    client        = mqtt_lease();
+    client = mqtt_lease();
     if (client == NULL) {
         NRF_LOG_ERROR("mqtt alloc fail");
         return;
     }
+    //expired timer for shutdown ec800m is set to 10s,publish interval should be largger than it.
+    global_cfg.publish_interval = global_cfg.publish_interval > 20000 ?  global_cfg.publish_interval : 20000;
     mqtt_conf(client, &global_cfg);
     if (global_cfg.sm4_flag) {
         sm4_id = ccm3310_sm4_setkey((uint8_t*)global_cfg.sm4_key);
@@ -158,14 +167,22 @@ void app_task(void* pvParameter)
     LED_OFF(LED3);
 
     while (1) {
-        mqtt_init();
         LED_ON(LED3);
+        NRF_LOG_DEBUG("looper begin %d", xTaskGetTickCount());
+        xTimerStop(m_app_timer, 0);
+        mqtt_init();
         if (client->mqtt_client_state == CLIENT_STATE_CONNECTED) {
+            NRF_LOG_DEBUG("mqtt publish begin");
             blood_Loop();
             publish_handle();
+            if (sm4_flag) {
+                nrf_gpio_pin_write(GINT0, 1);
+            }
+            NRF_LOG_DEBUG("mqtt publish end");
         }
-        LED_OFF(LED3);
+
         xTimerStart(m_app_timer, 0);
+        LED_OFF(LED3);
         xSemaphoreTake(m_app_sem, pdMS_TO_TICKS(global_cfg.publish_interval));
     }
 }
@@ -179,7 +196,7 @@ void app_init(void)
 {
     m_app_sem = xSemaphoreCreateBinary();
 
-    m_app_timer          = xTimerCreate("app_tr", pdMS_TO_TICKS(5000), pdFALSE, (void*)0, (TimerCallbackFunction_t)app_timer_handler);
+    m_app_timer          = xTimerCreate("app_tr", pdMS_TO_TICKS(10000), pdFALSE, (void*)0, (TimerCallbackFunction_t)app_timer_handler);
     BaseType_t xReturned = xTaskCreate(app_task,
                                        "APP",
                                        512,

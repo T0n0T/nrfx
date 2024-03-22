@@ -23,7 +23,7 @@
 
 typedef struct {
     ec800m_mqtt_t mqtt_cfg;
-    uint16_t      publish_interval;
+    uint32_t      publish_interval;
     uint8_t       sm4_flag;
     uint8_t       sm4_key[16];
     uint8_t       ble_mac[6];
