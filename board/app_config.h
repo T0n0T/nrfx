@@ -75,12 +75,17 @@
 #define MAX_PIN_SDA 31
 
 // hal
-#define BEEP       2
-#define SW         19
-#define LED1       25
-#define LED2       26
-#define LED3       27
-#define POWER_KEEP 28
+#define BEEP            2
+#define SW              19
+#define LED1            25
+#define LED2            26
+#define LED3            27
+#define LED_RUN         -1
+#define LED_BATTERY_LOW -1
+#define LED_DATA        -1
+#define ADC_BATTERY     -1
+
+#define POWER_KEEP      28
 
 // ec800m
 #define UART_PIN_RX      4

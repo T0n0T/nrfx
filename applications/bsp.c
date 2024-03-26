@@ -17,11 +17,16 @@
 #include "button.h"
 #include <nrfx_power.h>
 #include <nrfx_systick.h>
+#include "nrf_drv_saadc.h"
 
 #include "FreeRTOS.h"
 #include "timers.h"
 
-ec800m_t* ec800m;
+ec800m_t*            ec800m;
+static TimerHandle_t leds_tmr;
+extern uint8_t       working_flag;
+extern uint8_t       battery_flag;
+
 /** gpio */
 void gpio_init(void)
 {
@@ -116,9 +121,31 @@ void beep_off(void)
     nrfx_pwm_stop(&m_pwm0, 1);
 }
 
+/** adc */
+void saadc_callback(nrf_drv_saadc_evt_t const * p_event)
+{
+   
+}
+
+void adc_init(void)
+{
+    ret_code_t                 err_code;
+    nrf_saadc_channel_config_t channel_config = NRFX_SAADC_DEFAULT_CHANNEL_CONFIG_SE(ADC_BATTERY);
+    err_code                                  = nrf_drv_saadc_init(NULL, saadc_callback);
+    APP_ERROR_CHECK(err_code);
+    err_code = nrfx_saadc_channel_init(0, &channel_config);
+    APP_ERROR_CHECK(err_code);
+}
+
+void adc_read(void)
+{
+    int16_t saadc_val;
+    nrfx_saadc_sample_convert(0, &saadc_val);
+}
+
 void bsp_uninit(void)
 {
-    nrf_gpio_pin_clear(EC800_PIN_PWREN); 
+    nrf_gpio_pin_clear(EC800_PIN_PWREN);
     gpio_uninit();
     beep_uninit();
     twim_uninit();
@@ -126,8 +153,6 @@ void bsp_uninit(void)
     extern nrfx_uart_t p_instance;
     nrfx_uart_uninit(&p_instance);
 }
-
-TimerHandle_t leds_tmr;
 
 /**
  * @brief Handle events from leds timer.
@@ -139,7 +164,20 @@ TimerHandle_t leds_tmr;
  */
 static void leds_timer_handler(TimerHandle_t xTimer)
 {
-    nrf_gpio_pin_toggle(LED1);
+    static flag = 0;
+    if (!flag) {
+        nrf_gpio_pin_toggle(LED_RUN);
+        if (battery_flag) {
+            nrf_gpio_pin_toggle(LED_BATTERY_LOW);
+        }
+        flag = 1;
+    } else {
+        flag = 0;
+    }
+
+    if (working_flag) {
+        nrf_gpio_pin_toggle(LED_DATA);
+    }
 }
 
 void bsp_init(void)
@@ -151,8 +189,8 @@ void bsp_init(void)
     // // leds_tmr = xTimerCreate("leds", pdMS_TO_TICKS(1000), pdTRUE, NULL, leds_timer_handler);
     // // // xTimerStart(leds_tmr, 0);
     btn_init();
-    ec800m = ec800m_init(); //440 uA
-    ccm3310_init();         //260 ua, 4 pins low
+    ec800m = ec800m_init(); // 440 uA
+    ccm3310_init();         // 260 ua, 4 pins low
 
     max30102_init();
     nrf_uart_disable(NRF_UART0);

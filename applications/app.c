@@ -23,6 +23,8 @@ static gps_info_t    m_gps_data;
 static uint8_t       sm4_id;
 SemaphoreHandle_t    m_app_sem;
 uint8_t              sm4_flag;
+uint8_t              working_flag;
+uint8_t              battery_flag;
 
 #if !EC800M_MQTT_SOFT
 mqtt_client_t* client      = NULL;
@@ -160,14 +162,9 @@ void app_task(void* pvParameter)
         }
         nrf_gpio_pin_write(GINT0, 1);
     }
-    LED_ON(LED2);
-    LED_ON(LED3);
-    vTaskDelay(pdMS_TO_TICKS(300));
-    LED_OFF(LED2);
-    LED_OFF(LED3);
 
     while (1) {
-        LED_ON(LED3);
+        working_flag = 1;
         NRF_LOG_DEBUG("looper begin %d", xTaskGetTickCount());
         xTimerStop(m_app_timer, 0);
         mqtt_init();
@@ -182,7 +179,7 @@ void app_task(void* pvParameter)
         }
 
         xTimerStart(m_app_timer, 0);
-        LED_OFF(LED3);
+        working_flag = 0;
         xSemaphoreTake(m_app_sem, pdMS_TO_TICKS(global_cfg.publish_interval));
     }
 }

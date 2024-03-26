@@ -8,23 +8,25 @@
  * @copyright Copyright (c) 2023
  *
  */
-#include "app.h"
+#include "app.h"           
 #include "cJSON.h"
 #include "time.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "nrf_rtc.h"
 #include "nrf_log.h"
 
-static time_t old_ticks;
+static uint32_t new_ticks;
+static uint32_t old_ticks;
 static time_t new_stamps;
-static time_t _new_stamps;
+static time_t _stamps;
 
 char* build_msg_mqtt(char* device_id, gps_info_t info, int energyStatus, int correctlyWear)
 {
     cJSON *root, *body;
     char*  out;
     root = cJSON_CreateObject();
-
+    
     struct tm tm_now = {0};
     tm_now.tm_year   = info->date.year - 1900;
     tm_now.tm_mon    = info->date.month - 1; /* .tm_min's range is [0-11] */
@@ -33,13 +35,17 @@ char* build_msg_mqtt(char* device_id, gps_info_t info, int energyStatus, int cor
     tm_now.tm_min    = info->date.minute;
     tm_now.tm_sec    = info->date.second;
 
-    _new_stamps = mktime(&tm_now);
+    new_stamps = mktime(&tm_now);
+    if(new_stamps < 0){
+        new_ticks  = nrf_rtc_counter_get(portNRF_RTC_REG);
+        _stamps += new_ticks - old_ticks;
+        old_ticks = new_ticks;
+        
+    }else{
+        _stamps = new_stamps;
+    }
 
-    new_stamps += ((time_t)xTaskGetTickCount() - old_ticks) * 1000 / configTICK_RATE_HZ;
-    new_stamps = new_stamps > _new_stamps ? new_stamps : _new_stamps;
-    old_ticks = (time_t)xTaskGetTickCount();
-
-    cJSON_AddNumberToObject(root, "timestamp", new_stamps);
+    cJSON_AddNumberToObject(root, "timestamp", _stamps);
     cJSON_AddStringToObject(root, "type", "SmartBraceletServiceUp");
     cJSON_AddItemToObject(root, "body", body = cJSON_CreateObject());
     cJSON_AddStringToObject(body, "deviceId", device_id);
